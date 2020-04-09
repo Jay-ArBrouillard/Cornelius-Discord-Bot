@@ -21,8 +21,6 @@ public class MemeBot2 extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-
-
         // use Unirest to poll an API
         Unirest.get("https://meme-api.herokuapp.com/gimme").asJsonAsync(new Callback<JsonNode>() {
 
