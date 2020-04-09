@@ -1,12 +1,6 @@
 package Wumpus;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Game {
     public Board board;
@@ -41,18 +35,12 @@ public class Game {
             return gameOverString;
         }
 
-        ArrayList<Cell> cells = WumpusUtils.getAdjacentCells(human.getLocation());
-        String tunnels = "";
-        for (Cell cell : cells) {
-            tunnels += cell.getRoomNumber() + " ";
-        }
         status.append("Arrows: ");
         for (int i = 0; i < this.human.getArrows(); i++) {
             status.append("+--> ");
         }
         status.append("\n");
         status.append(WumpusUtils.getNearbyHazards(human.getLocation()));
-        status.append("Tunnels lead to ").append(tunnels);
         status.append("\n");
         status.append("Where would you like to move or shoot or q to quit? (m/s/q)\n");
         map.update(human);
@@ -65,6 +53,8 @@ public class Game {
         int y = this.human.getLocation()[1];
 
         if (this.board.getGameBoard()[x][y].hasBats()) {
+            //Remove the 'x' from the current spot since they are being moved from that spot
+            this.map.updateCurrent(this.human);
             int newRoom = this.human.getCurrentRoom();
             while (newRoom == this.human.getCurrentRoom()) {
                 newRoom = WumpusUtils.getRandomNumber(0, this.board.getLength() * this.board.getWidth() - 1);

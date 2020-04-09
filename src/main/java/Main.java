@@ -21,7 +21,6 @@ public class Main {
 
     public static void main(String[] args) throws LoginException, IOException {
         // config.txt contains two lines
-        //Dotenv dotenv = Dotenv.load();
         // the first is the bot token
         String token = System.getenv("TOKEN");
         // the second is the bot's owner's id

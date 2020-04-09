@@ -183,7 +183,7 @@ public class WumpusBot extends ListenerAdapter {
         );
 
         new WumpusUtils(game); //Make sure to set the utils
-        game.setMap(new Map(game.board.getGameBoard()));    //Make sure to add map to game
+        game.setMap(new Map(game.board.getGameBoard(), Integer.toString(game.board.getGameBoard()[length-1][width-1].getRoomNumber()).length()));    //Make sure to add map to game
         return "success";
     }
 }

@@ -11,9 +11,11 @@ import static Wumpus.WumpusUtils.getAdjacentCells;
 
 public class Human extends Character {
     private int arrows = 5;
+    private int[] previousLoc; //Needed for map
 
     public Human(int[] location, int currentRoom) {
         super(location, currentRoom);
+        this.previousLoc = location;
     }
 
     /**
@@ -41,6 +43,7 @@ public class Human extends Character {
     }
 
     private void move(Cell to, Cell[][] gameBoard) {
+        previousLoc = this.getLocation(); //set previous location
         gameBoard[to.getLocation()[0]][to.getLocation()[1]].setHuman(this); //move human to new room
         gameBoard[this.getLocation()[0]][this.getLocation()[1]].setHuman(null); //remove human from old room
         this.setCurrentRoom(to.getRoomNumber());    //Set new room number
@@ -131,5 +134,13 @@ public class Human extends Character {
 
     public void setArrows(int arrows) {
         this.arrows = arrows;
+    }
+
+    public int[] getPreviousLoc() {
+        return previousLoc;
+    }
+
+    public void setPreviousLoc(int[] previousLoc) {
+        this.previousLoc = previousLoc;
     }
 }
