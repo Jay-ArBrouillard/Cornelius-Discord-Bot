@@ -1,0 +1,5 @@
+package Wumpus;
+
+public enum State {
+    SETUP, NOT_STARTED, CHOOSE_ACTION, WAITING_MOVE, WAITING_SHOOT, RESOLVE_ACTION
+}
