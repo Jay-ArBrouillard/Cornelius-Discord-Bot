@@ -1,6 +1,7 @@
 package Wumpus;
 
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,13 +25,26 @@ public class Human extends Character {
      * @return
      */
     public String moveOrShoot(String input) {
-        if (input.equalsIgnoreCase("m")) {
-            return "Where to?";
-        } else if (input.equalsIgnoreCase("s")) {
-            return "Which room to shoot towards?";
-        } else {
-            return "Invalid move or shoot command (m/s): `" + input + "`";
+        String [] split = input.split(" ");
+        if (input == null || input.length() == 0) {
+            return "Invalid move or shoot command (ex: `m 5`/`s 5`/`q`): `" + input + "`";
         }
+        if (split.length != 2) {
+            return "Invalid move or shoot command (ex: `m 5`/`s 5`/`q`): `" + input + "`";
+        }
+        String roomNumber = split[1];
+        if (split[0].equalsIgnoreCase("m")) {
+            if (!StringUtils.isNumeric(roomNumber)) {
+                return "Invalid room number (ex: `m 5`/`s 5`/`q`): `" + split[0] + "`";
+            }
+        } else if (split[0].equalsIgnoreCase("s")) {
+            if (!StringUtils.isNumeric(roomNumber)) {
+                return "Invalid room number (ex: `m 5`/`s 5`/`q`): `" + split[0] + "`";
+            }
+        } else {
+            return "Invalid move or shoot command (ex: `m 5`/`s 5`/`q`): `" + input + "`";
+        }
+        return "success";
     }
 
     /**

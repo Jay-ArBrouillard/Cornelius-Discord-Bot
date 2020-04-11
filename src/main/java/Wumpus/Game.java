@@ -42,7 +42,7 @@ public class Game {
         status.append("\n");
         status.append(WumpusUtils.getNearbyHazards(human.getLocation()));
         status.append("\n");
-        status.append("Where would you like to move or shoot or q to quit? (m/s/q)\n");
+        status.append("Where would you like to move or shoot or quit? (ex: `m 5`/`s 5`/`q`)\n");
         map.update(human);
         status.append(map.getMapString());
         return status.toString();

@@ -56,59 +56,48 @@ public class WumpusBot extends ListenerAdapter {
             case SETUP:
                 reply = initialize(message);
                 if (reply.equals("success")) {
-                    gameState = State.NOT_STARTED;
+                    gameState = State.START_UP;
                 }
-            case NOT_STARTED:
+            case START_UP:
                 if (game == null) return;
                 reply = game.getStatus();
                 gameState = State.CHOOSE_ACTION;
                 break;
             case CHOOSE_ACTION:
                 if (game == null) return;
+                //Check for move or shoot inputs
                 reply = game.human.moveOrShoot(message);
-                if (reply.equals("Where to?")) {
-                    gameState = State.WAITING_MOVE;
-                }
-                else if (reply.equals("Which room to shoot towards?")) {
-                    gameState = State.WAITING_SHOOT;
-                }
-                break;
-            case WAITING_MOVE:
-                if (game == null) return;
-                String validateMoveMsg = game.human.validate(message);
-                if (validateMoveMsg.equals("success")) {
-                    game.human.move(message, game.board);
-                    reply = game.getStatus();
-                    if (reply.contains("Game Over")) {
-                        game = null;
-                        gameState = State.NOT_STARTED;
+                if (reply.equals("success")) {
+                    String [] inputs = message.split(" ");
+                    String validateMsg = game.human.validate(inputs[1]);
+                    //Handle move command
+                    if (inputs[0].equalsIgnoreCase("m")) {
+                        if (validateMsg.equals("success")) {
+                            game.human.move(inputs[1], game.board);
+                            reply = game.getStatus();
+                            if (reply.contains("Game Over")) {
+                                game = null;
+                                gameState = State.SETUP;
+                            }
+                        }
+                        else {
+                            reply = validateMsg;
+                        }
                     }
-                    else {
-                        gameState = State.CHOOSE_ACTION;
-                    }
-                }
-                else {
-                    reply = validateMoveMsg;
-                }
-                break;
-            case WAITING_SHOOT:
-                if (game == null) return;
-                String validateShootMsg = game.human.validate(message);
-                if (validateShootMsg.equals("success")) {
-                    game.human.shoot(message, game.board, event);
-                    reply = game.getStatus();
-                    if (reply.contains("Game Over")) {
-                        game = null;
-                        gameState = State.NOT_STARTED;
-                    }
-                    else {
-                        gameState = State.CHOOSE_ACTION;
+                    else { //Handle shoot command
+                        if (validateMsg.equals("success")) {
+                            game.human.shoot(inputs[1], game.board, event);
+                            reply = game.getStatus();
+                            if (reply.contains("Game Over")) {
+                                game = null;
+                                gameState = State.SETUP;
+                            }
+                        }
+                        else {
+                            reply = validateMsg;
+                        }
                     }
                 }
-                else {
-                    reply = validateShootMsg;
-                }
-                gameState = State.CHOOSE_ACTION;
                 break;
         }
 

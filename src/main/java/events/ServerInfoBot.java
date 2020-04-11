@@ -3,8 +3,10 @@ package events;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.Guild;
 
 import java.awt.*;
 import java.time.format.DateTimeFormatter;
@@ -28,20 +30,32 @@ public class ServerInfoBot extends Command {
             event.getChannel().sendMessage("`"+event.getMessage().getContentRaw()+"`" + " won't work in a direct messsage").queue();
             return;
         }
-        String[] members = new String[event.getGuild().getMembers().size()];
-        for (int i = 0; i < event.getGuild().getMembers().size(); i++) {
-            members[i] = event.getGuild().getMembers().get(i).getEffectiveName() + "- joined: " +
-                         event.getGuild().getMembers().get(i).getTimeJoined().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT));
-        }
+        Guild guild = event.getGuild();
 
-        EmbedBuilder eb = new EmbedBuilder();
-        eb.setColor(Color.RED);
-        eb.setAuthor(event.getGuild().getName());
-        eb.setThumbnail("https://static.thenounproject.com/png/9347475-200.png");
-        eb.addField("Server Owner: ", event.getGuild().getName(), true);
-        eb.addField("Member Count:", Integer.toString(members.length), true);
-        eb.setDescription("**Members:** \n" + Arrays.toString(members) + "\n **Invite Link** \n" + "https://discord.gg/ZwVbJA");
+        String generalInfo = String.format(
+                "**Owner**: <@%s>\n**Region**: %s\n**Creation Date**: %s\n**Verification Level**: %s",
+                guild.getOwnerId(),
+                guild.getRegion().getName(),
+                guild.getTimeCreated().format(DateTimeFormatter.RFC_1123_DATE_TIME),
+                guild.getVerificationLevel()
+        );
 
-        event.getChannel().sendMessage(eb.build()).queue();
+        String memberInfo = String.format(
+                "**Total Roles**: %s\n**Total Members**: %s\n**Online Members**: %s\n**Offline Members**: %s\n**Bot Count**: %s",
+                guild.getRoleCache().size(),
+                guild.getMemberCache().size(),
+                guild.getMemberCache().stream().filter((m) -> m.getOnlineStatus() == OnlineStatus.ONLINE).count(),
+                guild.getMemberCache().stream().filter((m) -> m.getOnlineStatus() == OnlineStatus.OFFLINE).count(),
+                guild.getMemberCache().stream().filter((m) -> m.getUser().isBot()).count()
+        );
+
+        EmbedBuilder embed = new EmbedBuilder()
+                .setTitle("Server info for " + guild.getName())
+                .setThumbnail(guild.getIconUrl())
+                .addField("General Info", generalInfo, false)
+                .addField("Role And Member Counts", memberInfo, false)
+                ;
+
+        event.getChannel().sendMessage(embed.build()).queue();
     }
 }
