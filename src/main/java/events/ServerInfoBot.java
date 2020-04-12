@@ -25,11 +25,12 @@ public class ServerInfoBot extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        if (!event.getChannelType().isGuild()) {
-            event.reactError();
-            event.getChannel().sendMessage("`"+event.getMessage().getContentRaw()+"`" + " won't work in a direct messsage").queue();
-            return;
-        }
+        if (event.getAuthor().isBot()) return;
+//        if (!event.getChannelType().isGuild()) {
+//            event.reactError();
+//            event.getChannel().sendMessage("`"+event.getMessage().getContentRaw()+"`" + " won't work in a direct messsage").queue();
+//            return;
+//        }
         Guild guild = event.getGuild();
 
         String generalInfo = String.format(

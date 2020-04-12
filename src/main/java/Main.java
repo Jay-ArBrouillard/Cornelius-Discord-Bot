@@ -20,6 +20,7 @@ import net.dv8tion.jda.api.entities.TextChannel;
 
 public class Main {
 
+    public static int[] delay = {0}; //ms
     public static int[] timeLeft = {0}; //ms
     public static boolean watchingMovie = false;
     public static String[] activities = new String[] {
@@ -50,7 +51,7 @@ public class Main {
         // define a command client
         CommandClientBuilder client = new CommandClientBuilder();
 
-        // The default is "Type !!help" (or whatver prefix you set)
+        // The default is "Type !!help" (or whatever prefix you set)
         client.useDefaultGame();
 
         // sets the owner of the bot
@@ -63,14 +64,14 @@ public class Main {
         client.setPrefix("!");
 
         // adds commands
-        client.addCommands(new ChooseBot(), new HelloBot(waiter), new MemeBot(), new ServerInfoBot(), new UserInfoBot());
+        client.addCommands(new ChooseBot(), new HelloBot(waiter), new MemeBot(), new UserInfoBot());
 
 
         int rand = getRandomNumber(0, activities.length-1);
         movieTitle[0] = activities[rand];
         // start getting a bot account set up
         JDA jda = JDABuilder.createDefault(token)
-                  .addEventListeners(new NumberGeneratorBot(), new WumpusBot(), new CopyPastaBot(), waiter, client.build())
+                  .addEventListeners(new PollBot(), new WitBot(), new NumberGeneratorBot(), new WumpusBot(), new CopyPastaBot(), waiter, client.build())
                   .setStatus(OnlineStatus.ONLINE)
                   .setActivity(Activity.watching(movieTitle[0]))
                   .setAutoReconnect(true)
@@ -119,7 +120,7 @@ public class Main {
                     }
                 });
             }
-        }, 0, 1000*60);
+        }, delay[0], 1000*60);
     }
 
     public static void getMovieData(JDA jda, TextChannel ch, JSONObject discoverApi) {

@@ -21,6 +21,7 @@ public class HelloBot extends Command {
     @Override
     protected void execute(CommandEvent event)
     {
+        if (event.getAuthor().isBot()) return;
         // ask what the user's name is
         event.reply("Hello. What is your name?");
 
