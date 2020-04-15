@@ -1,5 +1,5 @@
 package Wumpus;
 
 public enum State {
-    SETUP, START_UP, CHOOSE_ACTION
+    SETUP, RULES_INIT, START_UP, CHOOSE_ACTION
 }
