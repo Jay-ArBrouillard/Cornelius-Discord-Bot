@@ -3,6 +3,7 @@ package Utils;
 import commands.*;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.exceptions.RateLimitedException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import javax.annotation.Nonnull;
@@ -46,6 +47,12 @@ public class CommandHelper extends ListenerAdapter {
             help.append("`").append(WumpusCommand.Help.getName()).append(" ")
                             .append(WumpusCommand.Help.getArguments()).append("`")
                             .append(" - ").append(WumpusCommand.Help.getDescription()).append("\n");
+            help.append("`").append(Covid19Command.Help.getName()).append(" ")
+                            .append(Covid19Command.Help.getArguments()).append("`")
+                            .append(" - ").append(Covid19Command.Help.getDescription()).append("\n");
+            help.append("`").append(Holiday.Help.getName()).append(" ")
+                            .append(Holiday.Help.getArguments()).append("`")
+                            .append(" - ").append(Holiday.Help.getDescription()).append("\n");
 
             mc.sendTyping().queue();
             mc.sendMessage(help.toString()).queue();
@@ -74,6 +81,11 @@ public class CommandHelper extends ListenerAdapter {
         else if (WumpusCommand.isRunning() || message.contains("!wumpus")) {
             WumpusCommand.execute(event, message);
         }
-
+        else if (message.contains("!purge")) {
+            PurgeCommand.execute(event);
+        }
+        else if (message.contains("!covid")) {
+            Covid19Command.execute(event, message);
+        }
     }
 }

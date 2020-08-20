@@ -121,6 +121,9 @@ public class WumpusCommand {
             if (length <= 1 || width <= 1) {
                 return "`" + inputs + "` length and width must be greater than 1 ex: `5 5`";
             }
+            if (length > 100 || width > 100) {
+                return "`" + inputs + "` length and width must be less than ex: `5 5`";
+            }
         } catch (Exception e) {
             return "`" + inputs + "` is invalid please supply a length and width ex: `5 5`";
         }

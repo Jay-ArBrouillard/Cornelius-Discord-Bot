@@ -30,14 +30,21 @@ public class MovieWatcher extends ListenerAdapter {
     public MovieWatcher(String moviesApiKey, JDA jda) {
         this.moviesApiKey = moviesApiKey;
         this.jda = jda;
-        startTimer(jda);
     }
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
         if (event.getMessage().getAuthor().isBot()) return;
         String message = event.getMessage().getContentRaw();
-        if (message.contains("!break")) {
+        if (message.contains("!stop")) {
+            timeLeft = 0;
+            event.getChannel().sendTyping().queue();
+            timer.cancel();
+            event.getChannel().sendMessage("Sounds good my dude.").queue();
+            isBreak = false;
+            jda.getPresence().setPresence(Activity.playing("!help or @Cornelius !help"), true);
+        }
+        else if(message.contains("!break")) {
             String [] args = message.split(" ");
             int i = 0;
             try {
@@ -60,6 +67,10 @@ public class MovieWatcher extends ListenerAdapter {
             event.getChannel().sendTyping().queue();
             event.getChannel().sendMessage("Ok! I'll find something else to watch, gimme a minute...").queue();
             isBreak = false;
+            movieTitle = null;
+            timer.cancel();
+            timer = new Timer();
+            startTimer(jda);
         }
     }
 
@@ -75,6 +86,9 @@ public class MovieWatcher extends ListenerAdapter {
                         jda.getPresence().setPresence(Activity.watching(" (" + timeLeft + "m) " + movieTitle), true);
                     }
                     return;
+                }
+                else {
+                    isBreak = false;
                 }
                 Unirest.get("https://api.themoviedb.org/3/discover/movie?api_key="+moviesApiKey+ "&language=en-US&include_adult=true&include_video=false&page="+getRandomNumber(1,500)).asJsonAsync(new Callback<JsonNode>() {
                     // The API call was successful
@@ -97,14 +111,14 @@ public class MovieWatcher extends ListenerAdapter {
                     @Override
                     public void failed(UnirestException ue) {
                         delay = getRandomNumber(getRandomNumber(0,10),getRandomNumber(10,60));
-                        jda.getPresence().setPresence(Activity.playing("!help or @Cornelius"), true);
+                        jda.getPresence().setPresence(Activity.playing("!help or @Cornelius !help"), true);
                     }
 
                     // The API call was cancelled (this should never happen)
                     @Override
                     public void cancelled() {
                         delay = getRandomNumber(getRandomNumber(0,10),getRandomNumber(10,60));
-                        jda.getPresence().setPresence(Activity.playing("!help or @Cornelius"), true);
+                        jda.getPresence().setPresence(Activity.playing("!help or @Cornelius !help"), true);
                     }
                 });
             }
@@ -156,7 +170,13 @@ public class MovieWatcher extends ListenerAdapter {
                 }
 
                 EmbedBuilder eb = new EmbedBuilder();
-                eb.setTitle("Cornelius finished watching `" + movieTitle + "`");
+                if (movieTitle == null)  {
+                    movieTitle = movieApi.getString("original_title");
+                    eb.setTitle("Cornelius is watching `" + movieTitle + "`");
+                }
+                else {
+                    eb.setTitle("Cornelius finished watching `" + movieTitle + "`");
+                }
                 eb.setColor(Color.getHSBColor(getRandomNumber(0, 360), getRandomNumber(0,100), getRandomNumber(0, 100)));
                 eb.addField("He is now watching", discoverApi.getString("title"), false);
                 eb.addField("Genre(s): ", genreString, true);
@@ -179,27 +199,19 @@ public class MovieWatcher extends ListenerAdapter {
             @Override
             public void failed(UnirestException ue) {
                 delay = getRandomNumber(getRandomNumber(0,10),getRandomNumber(10,60));
-                jda.getPresence().setPresence(Activity.playing("!help or @Cornelius"), true);
+                jda.getPresence().setPresence(Activity.playing("!help or @Cornelius !help"), true);
             }
 
             // The API call was cancelled (this should never happen)
             @Override
             public void cancelled() {
                 delay = getRandomNumber(getRandomNumber(0,10),getRandomNumber(10,60));
-                jda.getPresence().setPresence(Activity.playing("!help or @Cornelius"), true);
+                jda.getPresence().setPresence(Activity.playing("!help or @Cornelius !help"), true);
             }
         });
     }
 
-    public int getRandomNumber() {
-        return getRandomNumber(Integer.MIN_VALUE, Integer.MAX_VALUE);
-    }
-
     public int getRandomNumber(long min, long max) {
         return (int) (min + Math.random() * (max - min + 1));
-    }
-
-    public void setDelay(int delay) {
-        this.delay = delay;
     }
 }
