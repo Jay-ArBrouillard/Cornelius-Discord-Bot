@@ -87,5 +87,8 @@ public class CommandHelper extends ListenerAdapter {
         else if (message.contains("!covid")) {
             Covid19Command.execute(event, message);
         }
+        else if (ChessCommand.isRunning() || message.contains("!chess")) {
+            ChessCommand.execute(event, message);
+        }
     }
 }
