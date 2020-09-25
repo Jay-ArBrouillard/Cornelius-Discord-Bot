@@ -3,7 +3,6 @@ package Utils;
 import commands.*;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.exceptions.RateLimitedException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import javax.annotation.Nonnull;
@@ -87,7 +86,7 @@ public class CommandHelper extends ListenerAdapter {
         else if (message.contains("!covid")) {
             Covid19Command.execute(event, message);
         }
-        else if (ChessCommand.isRunning() || message.contains("!chess")) {
+        else if (ChessCommand.isRunning() || message.contains("!chess") && mc.getName().equals("chess")) {
             ChessCommand.execute(event, message);
         }
     }

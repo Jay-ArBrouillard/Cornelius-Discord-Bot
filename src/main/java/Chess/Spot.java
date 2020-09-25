@@ -1,4 +1,6 @@
-package Chess;
+package chess;
+
+import chess.pieces.Piece;
 
 public class Spot {
     private Piece piece;
@@ -59,6 +61,14 @@ public class Spot {
 
     public void setyPos(String yPos) {
         this.yPos = yPos;
+    }
+
+    public boolean isOccupied() {
+        return this.piece != null;
+    }
+
+    public String toString() {
+        return xPos + yPos;
     }
 }
 
