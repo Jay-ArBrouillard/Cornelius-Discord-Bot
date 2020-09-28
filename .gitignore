@@ -1,0 +1,10 @@
+*.log
+*.log*
+*.env
+*.json
+/build/*
+/out/*
+/gradle/*
+/.gradle/*
+/tokens/*
+
