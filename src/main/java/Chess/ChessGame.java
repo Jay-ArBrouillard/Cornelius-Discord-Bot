@@ -1,11 +1,13 @@
 package chess;
 
+import Utils.GoogleSheets;
 import chess.board.Board;
-import chess.board.BoardUtils;
 import chess.board.Move;
-import chess.board.Move.*;
 import chess.board.Tile;
 import chess.player.MoveTransition;
+import chess.player.ai.AlphaBetaWithMoveOrdering;
+import chess.player.ai.IterativeDeepening;
+import net.dv8tion.jda.api.entities.MessageChannel;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,10 +15,39 @@ import java.util.Collection;
 public class ChessGame {
     public Board board;
     private ChessMessageHandler messageHandler;
+    private AlphaBetaWithMoveOrdering minimaxDepth6;
+    private IterativeDeepening iterativeDeepening;
 
-    public ChessGame() {
+    public ChessGame(MessageChannel messageChannel) {
         board = Board.createStandardBoard();
         messageHandler = new ChessMessageHandler();
+//        minimaxDepth6 = new AlphaBetaWithMoveOrdering(6, 0, messageChannel);
+        iterativeDeepening = new IterativeDeepening(9, messageChannel);
+    }
+
+    public boolean isWhitePlayerTurn() {
+        return board.getCurrentPlayer().getAlliance().isWhite();
+    }
+
+    public String setupPlayers(String input) {
+        if (input.equals("1")) {
+            board.getWhitePlayer().setIsRobot(false);
+            board.getBlackPlayer().setIsRobot(false);
+            return GameMode.PVP.toString();
+        }
+        else if (input.equals("2")) {
+            board.getWhitePlayer().setIsRobot(false);
+            board.getBlackPlayer().setIsRobot(true);
+            return GameMode.PVC.toString();
+        }
+        else if (input.equals("3")) {
+            board.getWhitePlayer().setIsRobot(true);
+            board.getBlackPlayer().setIsRobot(false);
+            return GameMode.CVP.toString();
+        }
+        else {
+            return new StringBuilder("`").append(input).append("` is not a valid option. Please choose an option (1-3)").toString();
+        }
     }
 
     public String processMove(String input)
@@ -43,25 +74,25 @@ public class ChessGame {
                 }
             }
 
-            return "`Legal Moves for "  + filteredInput + "` on " + this.board.getCurrentPlayer().getAlliance() + " side`: " + legalMovesForTile.toString();
+            return "`Legal Moves for "  + filteredInput + " on " + this.board.getCurrentPlayer().getAlliance() + " side`: " + legalMovesForTile.toString();
         }
         if (messageHandler.handleErrorMessage().equals(messageHandler.ERROR)) {
             return messageHandler.getLastErrorMessage();
         }
         //////////////////////// Special Case for castling //////////////////////////
-        String filtered = input.replaceAll("\\s+", "");
+        String inputNoSpaces = input.replaceAll("\\s+", "");
         if (input.equals("o-o")) { //King side castle
             if (this.board.getCurrentPlayer().getAlliance().isBlack()) {
-                return handleMove(3, 1, filtered);
+                return handleMove(3, 1, inputNoSpaces);
             } else {
-                return handleMove(59, 57, filtered);
+                return handleMove(59, 57, inputNoSpaces);
             }
         }
         else if (input.equals("o-o-o")) { //Queen side castle
             if (this.board.getCurrentPlayer().getAlliance().isBlack()) {
-                return handleMove(3, 5, filtered);
+                return handleMove(3, 5, inputNoSpaces);
             } else {
-                return handleMove(59, 61, filtered);
+                return handleMove(59, 61, inputNoSpaces);
             }
         }
 
@@ -71,10 +102,10 @@ public class ChessGame {
             return messageHandler.getLastErrorMessage();
         }
 
-        String x1Str = Character.toString(filtered.charAt(0)).toLowerCase();
-        String y1Str = Character.toString(filtered.charAt(1)).toLowerCase();
-        String x2Str = Character.toString(filtered.charAt(2)).toLowerCase();
-        String y2Str = Character.toString(filtered.charAt(3)).toLowerCase();
+        String x1Str = Character.toString(inputNoSpaces.charAt(0)).toLowerCase();
+        String y1Str = Character.toString(inputNoSpaces.charAt(1)).toLowerCase();
+        String x2Str = Character.toString(inputNoSpaces.charAt(2)).toLowerCase();
+        String y2Str = Character.toString(inputNoSpaces.charAt(3)).toLowerCase();
 
         messageHandler.validateRowAndColumn(x1Str+y1Str, x2Str+y2Str);
         if (messageHandler.handleErrorMessage().equals(messageHandler.ERROR)) {
@@ -92,7 +123,7 @@ public class ChessGame {
             return messageHandler.getLastErrorMessage();
         }
 
-        return handleMove(startCoordinate, destinationCoordinate, filtered);
+        return handleMove(startCoordinate, destinationCoordinate, inputNoSpaces);
     }
 
     private String handleMove(int startCoordinate, int destinationCoordinate, String filtered) {
@@ -107,9 +138,19 @@ public class ChessGame {
                 return this.board.getCurrentPlayer().getOpponent().getAlliance() + " has checkmated " + this.board.getCurrentPlayer().getAlliance() + "! Game Over!";
             }
 
+            // Is game in a draw?
+            if (this.board.isDraw50MoveRule()) {
+                return "DRAW (50 move rule)! The previous 50 moves resulted in no captures or pawn movements.";
+            }
+
+            if (this.board.isDrawImpossibleToCheckMate()) {
+                return "DRAW! Neither player can reach checkmate in the current game state... " +
+                        "This occurred from one of the following combinations:\n1.King versus King\n2.King and Bishop versus king\n3.King and Knight versus King\n4.King and Bishop versus King and Bishop with the bishops on the same color.";
+            }
+
             // Is game in stalement?
             if (this.board.getCurrentPlayer().isInStaleMate()) {
-                return "DRAW! Game Over!";
+                return "DRAW (Stalement)! " + this.board.getCurrentPlayer().getAlliance() + " is not in check and has no legal moves they can make. Game Over!";
             }
 
             // Is someone in check?
@@ -117,32 +158,7 @@ public class ChessGame {
                 return this.board.getCurrentPlayer().getAlliance() + " is in check!";
             }
 
-            String alliance = this.board.getCurrentPlayer().getOpponent().getAlliance().toString();
-            if (move instanceof PawnEnPassantAttackMove) {
-                return "Success!" + alliance + " " + move.getMovedPiece().getPieceType() + " en passant " + BoardUtils.getPositionAtCoordinate(move.getMovedPiece().getPiecePosition());
-            }
-            else if (move instanceof PawnPromotion) {
-                return "Success!Pawn at " + BoardUtils.getPositionAtCoordinate(move.getCurrentCoordinate()) + " promoted to " + move.getMovedPiece().getPieceType();
-            }
-            else if (move instanceof KingSideCastleMove) {
-                return "Success!" + alliance + " " + move.toString() + " (KingSideCastleMove)";
-            }
-            else if (move instanceof QueenSideCastleMove) {
-                return "Success!" + alliance + " " + move.toString() + " (QueenSideCastleMove)";
-            }
-            else if (move instanceof AttackMove || move instanceof MajorAttackMove) {
-                return "Success!" + alliance + " " + move.getMovedPiece().getPieceType() + " captured " + BoardUtils.getPositionAtCoordinate(move.getMovedPiece().getPiecePosition());
-            }
-            else if (move instanceof PawnMove || move instanceof MajorMove) {
-                return "Success!" + alliance + " " + move.getMovedPiece().getPieceType() + " moved to " + BoardUtils.getPositionAtCoordinate(move.getMovedPiece().getPiecePosition());
-            }
-            else if (move instanceof PawnJump) {
-                return "Success!" + alliance + " " + move.getMovedPiece().getPieceType() + " jumped to " + BoardUtils.getPositionAtCoordinate(move.getMovedPiece().getPiecePosition());
-            }
-            else {
-                return "Fail: " + move;
-            }
-
+            return "Success!" + move.toString();
         }
         else {
             if (transition.getMoveStatus().leavesPlayerInCheck()) {
@@ -228,4 +244,16 @@ public class ChessGame {
         return intValue;
     }
 
+    /*
+     * Amount of time AI has to choose a move
+     */
+    public int aiTimeLimit() {
+        return iterativeDeepening.MAXIMUM_TIME / 1000;
+    }
+
+    public String ai() {
+//        final Move bestMove = minimaxDepth6.execute(this.board);
+        final Move bestMove = iterativeDeepening.execute(this.board);
+        return handleMove(bestMove.getCurrentCoordinate(), bestMove.getDestinationCoordinate(), null);
+    }
 }

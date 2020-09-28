@@ -1,6 +1,7 @@
 package chess.board;
 
 import chess.*;
+import chess.board.Move.*;
 import chess.pieces.*;
 import chess.player.BlackPlayer;
 import chess.player.Player;
@@ -16,32 +17,35 @@ import java.util.List;
 
 public class Board {
     private final List<Tile> gameBoard;
-    private final Collection<Piece> whitePieces; //Active (non-captured) white pieces
-    private final Collection<Piece> blackPieces; //Active (non-captured) black pieces
+    private final List<Piece> whitePieces; //Active (non-captured) white pieces
+    private final List<Piece> blackPieces; //Active (non-captured) black pieces
 
     private final WhitePlayer whitePlayer;
     private final BlackPlayer blackPlayer;
     private final Player currentPlayer;
 
     private final Pawn enPassantPawn;
+    private final List<Move> movesPlayed;
 
     private static final int START_X_COORDINATE = 70;//1204;
     private static final int START_Y_COORDINATE = 43;
     private static final int X_OFFSET = 162;
     private static final int Y_OFFSET = 162;
 
-    public Board(Builder builder) {
+    public Board(Builder builder, List<Move> movesPlayed) {
         this.gameBoard = createGameBoard(builder);
         this.whitePieces = calculateActivePieces(this.gameBoard, Alliance.WHITE);
         this.blackPieces = calculateActivePieces(this.gameBoard, Alliance.BLACK);
         this.enPassantPawn = builder.enPassantPawn;
 
-        final Collection<Move> whiteStandardLegalMoves = calculateLegalMoves(this.whitePieces);
-        final Collection<Move> blackStandardLegalMoves = calculateLegalMoves(this.blackPieces);
+        final List<Move> whiteStandardLegalMoves = calculateLegalMoves(this.whitePieces);
+        final List<Move> blackStandardLegalMoves = calculateLegalMoves(this.blackPieces);
 
         this.whitePlayer = new WhitePlayer(this, whiteStandardLegalMoves, blackStandardLegalMoves);
         this.blackPlayer = new BlackPlayer(this, whiteStandardLegalMoves, blackStandardLegalMoves);
         this.currentPlayer = builder.nextMoveMaker.choosePlayer(this.whitePlayer, this.blackPlayer);
+
+        this.movesPlayed = movesPlayed;
     }
 
     public Collection<Piece> getWhitePieces() {
@@ -68,7 +72,113 @@ public class Board {
         return this.enPassantPawn;
     }
 
-    private Collection<Move> calculateLegalMoves(Collection<Piece> pieces) {
+    public List<Move> getMovesPlayed() {
+        return movesPlayed;
+    }
+
+    public boolean isDraw50MoveRule() {
+        if (movesPlayed.size() < 50) {
+            return false;
+        }
+        int iterations = 0;
+        for (int i = movesPlayed.size() - 1; i >= 0 || iterations < 50; i--) {
+            final Move move = movesPlayed.get(i);
+            if (move instanceof PawnMove ||
+                    move instanceof PawnAttackMove ||
+                    move instanceof PawnEnPassantAttackMove ||
+                    move instanceof MajorAttackMove) {
+                return false;
+            }
+            iterations++;
+        }
+        return true;
+    }
+
+    public boolean isDrawImpossibleToCheckMate() {
+        //king versus king
+        if (this.blackPieces.size() == 1 && this.whitePieces.size() == 1) {
+            if (this.blackPieces.get(0) instanceof King && this.whitePieces.get(0) instanceof King) {
+                return true;
+            }
+        }
+        //king and bishop versus king
+        if (this.blackPieces.size() == 2 && this.whitePieces.size() == 1) {
+            boolean hasBlackKing = false;
+            boolean hasBlackBishop = false;
+            for (final Piece piece : this.blackPieces) {
+                if (piece instanceof King) hasBlackKing = true;
+                if (piece instanceof Bishop) hasBlackBishop = true;
+            }
+            if (hasBlackKing && hasBlackBishop && this.whitePieces.get(0) instanceof King) {
+                return true;
+            }
+        }
+        if (this.blackPieces.size() == 1 && this.whitePieces.size() == 2) {
+            boolean hasWhiteKing = false;
+            boolean hasWhiteBishop = false;
+            for (final Piece piece : this.whitePieces) {
+                if (piece instanceof King) hasWhiteKing = true;
+                if (piece instanceof Bishop) hasWhiteBishop = true;
+            }
+            if (hasWhiteKing && hasWhiteBishop && this.blackPieces.get(0) instanceof King) {
+                return true;
+            }
+        }
+        //king and knight versus king
+        if (this.blackPieces.size() == 2 && this.whitePieces.size() == 1) {
+            boolean hasBlackKing = false;
+            boolean hasBlackKnight = false;
+            for (final Piece piece : this.blackPieces) {
+                if (piece instanceof King) hasBlackKing = true;
+                if (piece instanceof Knight) hasBlackKnight = true;
+            }
+            if (hasBlackKing && hasBlackKnight && this.whitePieces.get(0) instanceof King) {
+                return true;
+            }
+        }
+        if (this.blackPieces.size() == 1 && this.whitePieces.size() == 2) {
+            boolean hasWhiteKing = false;
+            boolean hasWhiteKnight = false;
+            for (final Piece piece : this.whitePieces) {
+                if (piece instanceof King) hasWhiteKing = true;
+                if (piece instanceof Knight) hasWhiteKnight = true;
+            }
+            if (hasWhiteKing && hasWhiteKnight && this.blackPieces.get(0) instanceof King) {
+                return true;
+            }
+        }
+        //king and bishop versus king and bishop with the bishops on the same color.
+        if (this.blackPieces.size() == 2 && this.whitePieces.size() == 2) {
+            boolean hasBlackKing = false;
+            boolean hasBlackBishop = false;
+            Boolean blackBishopTileColor = null;//false is dark, true is light
+            for (final Piece piece : this.blackPieces) {
+                if (piece instanceof King) hasBlackKing = true;
+                if (piece instanceof Bishop) {
+                    hasBlackBishop = true;
+                    blackBishopTileColor = BoardUtils.getColorAtCoordinate(piece.getPiecePosition()) == 1 ? true : false;
+                }
+            }
+            boolean hasWhiteKing = false;
+            boolean hasWhiteBishop = false;
+            Boolean whiteBishopTileColor = null; //false is dark, true is light
+            for (final Piece piece : this.whitePieces) {
+                if (piece instanceof King) hasWhiteKing = true;
+                if (piece instanceof Bishop) {
+                    hasWhiteBishop = true;
+                    whiteBishopTileColor = BoardUtils.getColorAtCoordinate(piece.getPiecePosition()) == 1 ? true : false;
+                }
+            }
+
+            if (hasBlackKing && hasBlackBishop && hasWhiteKing && hasWhiteBishop && blackBishopTileColor == whiteBishopTileColor) {
+                System.out.println("Draw: " + blackBishopTileColor + ", " + whiteBishopTileColor);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private List<Move> calculateLegalMoves(Collection<Piece> pieces) {
         final List<Move> legalMovesForAlliance = new ArrayList<>();
         for (final Piece piece : pieces) {
             legalMovesForAlliance.addAll(piece.getLegalMoves(this));
@@ -76,14 +186,7 @@ public class Board {
         return Collections.unmodifiableList(legalMovesForAlliance);
     }
 
-    public Collection<Move> getAllLegalMoves() {
-        final Collection<Move> allLegalMoves = new ArrayList<>();
-        allLegalMoves.addAll(this.whitePlayer.getLegalMoves());
-        allLegalMoves.addAll(this.blackPlayer.getLegalMoves());
-        return Collections.unmodifiableCollection(allLegalMoves);
-    }
-
-    private static Collection<Piece> calculateActivePieces(List<Tile> gameBoard, Alliance alliance) {
+    private static List<Piece> calculateActivePieces(List<Tile> gameBoard, Alliance alliance) {
         final List<Piece> activePieces = new ArrayList<>();
         for (final Tile tile : gameBoard) {
             if (tile.isTileOccupied()) {
@@ -126,7 +229,7 @@ public class Board {
                     BufferedImage piece = ImageIO.read(new File(curr.getPiece().getFilePath()));
                     g.drawImage(piece, x, y, 120, 120, null);
                 }
-                if ((i+1) % BoardUtils.NUM_TILES_PER_ROW == 0 && i != 0) {
+                if ((i+1) % BoardUtils.NUM_TILES_PER_ROW == 0) {
                     x = START_X_COORDINATE;
                     y += Y_OFFSET;
                 }
@@ -136,7 +239,6 @@ public class Board {
             }
 
             ImageIO.write(result, "png", new File("src/main/java/chess/gameState.png"));
-            System.out.println("Successfully reset board image");
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -149,7 +251,7 @@ public class Board {
         builder.setPiece(new Rook(0, Alliance.BLACK));
         builder.setPiece(new Knight(1, Alliance.BLACK));
         builder.setPiece(new Bishop(2, Alliance.BLACK));
-        builder.setPiece(new King(3, Alliance.BLACK));
+        builder.setPiece(new King(3, Alliance.BLACK, true, true));
         builder.setPiece(new Queen(4, Alliance.BLACK));
         builder.setPiece(new Bishop(5, Alliance.BLACK));
         builder.setPiece(new Knight(6, Alliance.BLACK));
@@ -174,7 +276,7 @@ public class Board {
         builder.setPiece(new Rook(56, Alliance.WHITE));
         builder.setPiece(new Knight(57, Alliance.WHITE));
         builder.setPiece(new Bishop(58, Alliance.WHITE));
-        builder.setPiece(new King(59, Alliance.WHITE));
+        builder.setPiece(new King(59, Alliance.WHITE, true, true));
         builder.setPiece(new Queen(60, Alliance.WHITE));
         builder.setPiece(new Bishop(61, Alliance.WHITE));
         builder.setPiece(new Knight(62, Alliance.WHITE));
@@ -182,7 +284,7 @@ public class Board {
         //white to move
         builder.setMoveMaker(Alliance.WHITE);
         //build the board
-        return builder.build();
+        return builder.build(new LinkedList<>());
     }
 
     public static class Builder {
@@ -205,8 +307,8 @@ public class Board {
             return this;
         }
 
-        public Board build() {
-            return new Board(this);
+        public Board build(List<Move> movesPlayed) {
+            return new Board(this, movesPlayed);
         }
 
         public void setEnPassantPawn(Pawn movedPawn) {

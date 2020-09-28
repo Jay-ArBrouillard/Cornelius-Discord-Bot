@@ -133,6 +133,11 @@ public class Pawn extends Piece {
         return new Pawn(move.getDestinationCoordinate(), move.getMovedPiece().getPieceAlliance());
     }
 
+    @Override
+    public int locationBonus() {
+        return this.pieceAlliance.pawnBonus(this.piecePosition);
+    }
+
     public Piece getPromotionPiece() {
         return new Queen(this.piecePosition, this.pieceAlliance, false); //TODO currently always promotes to Queen no choice
     }

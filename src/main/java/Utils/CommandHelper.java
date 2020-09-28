@@ -17,9 +17,9 @@ public class CommandHelper extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
-        if (event.getMessage().getAuthor().isBot()) return;
         String message = event.getMessage().getContentRaw();
         MessageChannel mc = event.getChannel();
+        if (event.getMessage().getAuthor().isBot()) return;
         if (message.contains("!help")) {
             StringBuilder help = new StringBuilder("**Cornelius** commands:\n");
             help.append("`").append(ChooseCommand.Help.getName()).append(" ")
@@ -86,7 +86,7 @@ public class CommandHelper extends ListenerAdapter {
         else if (message.contains("!covid")) {
             Covid19Command.execute(event, message);
         }
-        else if (ChessCommand.isRunning() || message.contains("!chess") && mc.getName().equals("chess")) {
+        else if ((ChessCommand.isRunning() || message.contains("!chess")) && mc.getName().equals("chess")) {
             ChessCommand.execute(event, message);
         }
     }

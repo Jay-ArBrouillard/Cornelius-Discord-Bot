@@ -7,8 +7,10 @@ import chess.player.Player;
 public class ChessMessageHandler {
 
     public StringBuilder lastErrorMessage;
-    public String NO_ERROR = "NO_ERROR";
-    public String ERROR = "ERROR";
+    public final String NO_ERROR = "NO_ERROR";
+    public final String ERROR = "ERROR";
+    public final String PVP = "PVP";
+
 
     public ChessMessageHandler() {
         lastErrorMessage = new StringBuilder();

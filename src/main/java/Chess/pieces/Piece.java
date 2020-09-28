@@ -76,8 +76,8 @@ public abstract class Piece {
     }
 
     public abstract Collection<Move> getLegalMoves (final Board board);
-
     public abstract Piece movePiece(Move move);
+    public abstract int locationBonus();
 
     public enum PieceType {
 
@@ -167,7 +167,6 @@ public abstract class Piece {
         }
 
         public abstract boolean isKing();
-
         public abstract boolean isRook();
     }
 }

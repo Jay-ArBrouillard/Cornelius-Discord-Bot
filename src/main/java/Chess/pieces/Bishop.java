@@ -61,6 +61,11 @@ public class Bishop extends Piece {
         return new Bishop(move.getDestinationCoordinate(), move.getMovedPiece().getPieceAlliance());
     }
 
+    @Override
+    public int locationBonus() {
+        return this.pieceAlliance.bishopBonus(this.piecePosition);
+    }
+
     private static boolean isFirstColumnExclusion(final int currentCandidate,
                                                   final int candidateDestinationCoordinate) {
         return (BoardUtils.FIRST_COLUMN.get(candidateDestinationCoordinate) &&

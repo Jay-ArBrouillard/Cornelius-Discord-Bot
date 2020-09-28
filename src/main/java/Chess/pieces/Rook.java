@@ -59,6 +59,10 @@ public class Rook extends Piece {
         return new Rook(move.getDestinationCoordinate(), move.getMovedPiece().getPieceAlliance());
     }
 
+    @Override
+    public int locationBonus() {
+        return this.pieceAlliance.rookBonus(this.piecePosition);
+    }
 
     private static boolean isColumnExclusion(final int currentCandidate,
                                              final int candidateDestinationCoordinate) {

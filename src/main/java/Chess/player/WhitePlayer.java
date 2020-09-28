@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class WhitePlayer extends Player {
-    public WhitePlayer(final Board board, final Collection<Move> whiteStandardLegalMoves, final Collection<Move> blackStandardLegalMoves) {
+    public WhitePlayer(final Board board, final List<Move> whiteStandardLegalMoves, final List<Move> blackStandardLegalMoves) {
         super(board, whiteStandardLegalMoves, blackStandardLegalMoves);
     }
 
@@ -36,6 +36,10 @@ public class WhitePlayer extends Player {
 
     @Override
     protected Collection<Move> calculateKingCastles(final Collection<Move> playerLegalMoves, final Collection<Move> opponentLegalMoves) {
+        if (!hasCastleOpportunities()) {
+            return Collections.emptyList();
+        }
+
         final List<Move> kingCastles = new ArrayList<>();
 
         if (this.playerKing.isFirstMove() && !this.isInCheck()) {

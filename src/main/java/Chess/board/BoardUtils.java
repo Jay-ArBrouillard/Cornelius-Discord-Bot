@@ -1,6 +1,12 @@
 package chess.board;
 
+import chess.pieces.King;
+import chess.pieces.Piece;
+import chess.player.MoveTransition;
+
 import java.util.*;
+
+import static chess.board.Move.NULL_MOVE;
 
 public class BoardUtils {
 
@@ -75,6 +81,53 @@ public class BoardUtils {
                 "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1"));
     }
 
+    //0 for DARK and 1 for LIGHT
+    private final static int[] TILE_COLORS = {
+            1,  0,  1,  0,  1,  0,  1,  0,
+            0,  1,  0,  1,  0,  1,  0,  1,
+            1,  0,  1,  0,  1,  0,  1,  0,
+            0,  1,  0,  1,  0,  1,  0,  1,
+            1,  0,  1,  0,  1,  0,  1,  0,
+            0,  1,  0,  1,  0,  1,  0,  0,
+            1,  0,  1,  0,  1,  0,  1,  0,
+            0,  1,  0,  1,  0,  1,  0,  1,
+    };
+
+    private final static int[] WHITE_FORWARD_MOVE = {
+            -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
+            7,  7,  7,  7,  7,  7,  7,  7,
+            15,  15,  15,  15,  15,  15,  15,  15,
+            23,  23,  23,  23,  23,  23,  23,  23,
+            31,  31,  31,  31,  31,  31,  31,  31,
+            39,  39,  39,  39,  39,  39,  39,  39,
+            47,  47,  47,  47,  47,  47,  47,  47,
+            55,  55,  55,  55,  55,  55,  55,  55,
+    };
+
+    private final static int[] BLACK_FORWARD_MOVE = {
+            8,  8,  8,  8,  8,  8,  8,  8,
+            16,  16,  16,  16,  16,  16,  16,  16,
+            24,  24,  24,  24,  24,  24,  24,  24,
+            32,  32,  32,  32,  32,  32,  32,  32,
+            40,  40,  40,  40,  40,  40,  40,  40,
+            48,  48,  48,  48,  48,  48,  48,  48,
+            56,  56,  56,  56,  56,  56,  56,  56,
+            -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
+    };
+
+
+    public static int getWhiteForwardMoveCoordinate(final int coordinate) {
+        return WHITE_FORWARD_MOVE[coordinate];
+    }
+
+    public static int getBlackForwardMoveCoordinate(final int coordinate) {
+        return BLACK_FORWARD_MOVE[coordinate];
+    }
+
+    public static int getColorAtCoordinate(final int coordinate) {
+        return TILE_COLORS[coordinate];
+    }
+
     public static int getCoordinateAtPosition(final String position) {
         return POSITION_TO_COORDINATE.get(position);
     }
@@ -85,5 +138,48 @@ public class BoardUtils {
 
     public static boolean isValidTileCoordinate(int coordinate) {
         return coordinate >=0 && coordinate < 64;
+    }
+
+    public static boolean isThreatenedBoardImmediate(final Board board) {
+        return board.getWhitePlayer().isInCheck() || board.getBlackPlayer().isInCheck();
+    }
+
+    public static boolean kingThreat(final Move move) {
+        final Board board = move.getBoard();
+        final MoveTransition transition = board.getCurrentPlayer().makeMove(move);
+        return transition.getTransitionBoard().getCurrentPlayer().isInCheck();
+    }
+
+    public static boolean isKingPawnTrap(final Board board,
+                                         final King king,
+                                         final int frontTile) {
+        final Piece piece = board.getTile(frontTile).getPiece();
+        return piece != null &&
+                piece.getPieceType() == Piece.PieceType.PAWN &&
+                piece.getPieceAlliance() != king.getPieceAlliance();
+    }
+
+    public static int mvvlva(final Move move) {
+        final Piece movingPiece = move.getMovedPiece();
+        if(move.isAttack()) {
+            final Piece attackedPiece = move.getAttackedPiece();
+            return (attackedPiece.getPieceType().getPieceValue() - movingPiece.getPieceType().getPieceValue() +  Piece.PieceType.KING.getPieceValue()) * 100;
+        }
+        return Piece.PieceType.KING.getPieceValue() - movingPiece.getPieceType().getPieceValue();
+    }
+
+    public static List<Move> lastNMoves(final Board board, int N) {
+        final List<Move> moveHistory = board.getMovesPlayed();
+        final List<Move> lastNMoves = new ArrayList<>();
+        for (int i = moveHistory.size()-1; i >= N; i--) {
+            Move move = moveHistory.get(i);
+            lastNMoves.add(move);
+        }
+        return Collections.unmodifiableList(lastNMoves);
+    }
+
+    public static boolean isEndGame(final Board board) {
+        return board.getCurrentPlayer().isInCheckMate() ||
+                board.getCurrentPlayer().isInStaleMate();
     }
 }

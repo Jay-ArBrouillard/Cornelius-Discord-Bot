@@ -64,6 +64,11 @@ public class Queen extends Piece {
         return new Queen(move.getDestinationCoordinate(), move.getMovedPiece().getPieceAlliance());
     }
 
+    @Override
+    public int locationBonus() {
+        return this.pieceAlliance.queenBonus(this.piecePosition);
+    }
+
     private static boolean isFirstColumnExclusion(final int currentPosition,
                                                   final int candidatePosition) {
         return BoardUtils.FIRST_COLUMN.get(candidatePosition) && ((currentPosition == -9)

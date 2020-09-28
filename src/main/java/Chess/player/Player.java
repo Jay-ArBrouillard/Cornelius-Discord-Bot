@@ -16,13 +16,14 @@ import java.util.stream.Stream;
 public abstract class Player {
     protected final Board board;
     protected final King playerKing;
-    protected final Collection<Move> legalMoves;
+    protected final List<Move> legalMoves;
     private final boolean isInCheck;
+    protected boolean isRobot;
 
-    protected Player(final Board board, final Collection<Move> legalMoves, final Collection<Move> opponentMoves) {
+    protected Player(final Board board, final List<Move> legalMoves, final List<Move> opponentMoves) {
         this.board = board;
         this.playerKing = establishKing();
-        this.legalMoves = Collections.unmodifiableCollection(Stream.concat(legalMoves.stream(),
+        this.legalMoves = Collections.unmodifiableList(Stream.concat(legalMoves.stream(),
                             calculateKingCastles(legalMoves, opponentMoves).stream()).collect(Collectors.toList()));
         this.isInCheck = !Player.calculateAttacksOnTile(this.playerKing.getPiecePosition(), opponentMoves).isEmpty();
     }
@@ -52,7 +53,19 @@ public abstract class Player {
         return this.playerKing;
     }
 
-    public Collection<Move> getLegalMoves() {
+    public boolean isCastled() {
+        return this.playerKing.isCastled();
+    }
+
+    public boolean isKingSideCastleCapable() {
+        return this.playerKing.isKingSideCastleCapable();
+    }
+
+    public boolean isQueenSideCastleCapable() {
+        return this.playerKing.isQueenSideCastleCapable();
+    }
+
+    public List<Move> getLegalMoves() {
         return this.legalMoves;
     }
 
@@ -62,6 +75,14 @@ public abstract class Player {
 
     public boolean isInCheck() {
         return this.isInCheck;
+    }
+
+    public boolean isRobot() {
+        return isRobot;
+    }
+
+    public void setIsRobot(boolean isRobot) {
+        this.isRobot = isRobot;
     }
 
     public boolean isInCheckMate() {
@@ -83,10 +104,6 @@ public abstract class Player {
         return false;
     }
 
-    public boolean isCastled() {
-        return false;
-    }
-
     public MoveTransition makeMove(final Move move) {
         if (!isMoveLegal(move)) {
             return new MoveTransition(this.board, move, MoveStatus.ILLEGAL_MOVE);
@@ -100,6 +117,11 @@ public abstract class Player {
             return new MoveTransition(this.board, move, MoveStatus.LEAVES_PLAYER_CHECK);
         }
         return new MoveTransition(transitionBoard, move, MoveStatus.DONE);
+    }
+
+    protected boolean hasCastleOpportunities() {
+        return !this.isInCheck && !this.playerKing.isCastled() &&
+                (this.playerKing.isKingSideCastleCapable() || this.playerKing.isQueenSideCastleCapable());
     }
 
     public abstract Alliance getAlliance();

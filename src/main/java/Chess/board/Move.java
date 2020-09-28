@@ -72,6 +72,22 @@ public abstract class Move {
         return null;
     }
 
+    public boolean isForwardMove() {
+        if (this.board.getCurrentPlayer().getAlliance().isWhite()) {
+            int value = BoardUtils.getWhiteForwardMoveCoordinate(getCurrentCoordinate());
+            if (value != -1 && value <= getDestinationCoordinate()) {
+                return true;
+            }
+        }
+        else {
+            int value = BoardUtils.getBlackForwardMoveCoordinate(getCurrentCoordinate());
+            if (value != -1 && value >= getDestinationCoordinate()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /*
      * Execute method for Normal Move
      */
@@ -88,8 +104,8 @@ public abstract class Move {
         }
         builder.setPiece(this.movedPiece.movePiece(this));
         builder.setMoveMaker(this.board.getCurrentPlayer().getOpponent().getAlliance());
-
-        return builder.build(); //Return a new board
+        this.board.getMovesPlayed().add(this);
+        return builder.build(this.board.getMovesPlayed()); //Return a new board
     }
 
     /*
@@ -223,8 +239,8 @@ public abstract class Move {
             builder.setPiece(movedPawn);
             builder.setEnPassantPawn(movedPawn);
             builder.setMoveMaker(this.board.getCurrentPlayer().getOpponent().getAlliance());
-
-            return builder.build(); //Return a new board
+            this.board.getMovesPlayed().add(this);
+            return builder.build(this.board.getMovesPlayed()); //Return a new board
         }
 
         @Override
@@ -283,7 +299,8 @@ public abstract class Move {
             }
             builder.setPiece(this.movedPiece.movePiece(this));
             builder.setMoveMaker(this.board.getCurrentPlayer().getOpponent().getAlliance());
-            return builder.build();
+            this.board.getMovesPlayed().add(this);
+            return builder.build(this.board.getMovesPlayed()); //Return a new board
         }
 
         @Override
@@ -331,7 +348,8 @@ public abstract class Move {
             }
             builder.setPiece(this.promotedPawn.getPromotionPiece().movePiece(this));
             builder.setMoveMaker(this.board.getCurrentPlayer().getOpponent().getAlliance());
-            return builder.build();
+            this.board.getMovesPlayed().add(this);
+            return builder.build(this.board.getMovesPlayed()); //Return a new board
         }
 
         @Override
@@ -409,7 +427,8 @@ public abstract class Move {
             builder.setPiece(this.movedPiece.movePiece(this));
             builder.setPiece(new Rook(this.castleRookDestination, this.castleRook.getPieceAlliance()));
             builder.setMoveMaker(this.board.getCurrentPlayer().getOpponent().getAlliance());
-            return builder.build();
+            this.board.getMovesPlayed().add(this);
+            return builder.build(this.board.getMovesPlayed()); //Return a new board
         }
 
         @Override
@@ -491,10 +510,7 @@ public abstract class Move {
         }
 
         public static Move createMove(final Board board, final int currentCoordinate, final int destinationCoordinate) {
-            for (final Move move : board.getAllLegalMoves()) {
-                if (move instanceof KingSideCastleMove || move instanceof  QueenSideCastleMove) {
-                    String s = "stop";
-                }
+            for (final Move move : board.getCurrentPlayer().getLegalMoves()) {
                 if(move.getCurrentCoordinate() == currentCoordinate && move.getDestinationCoordinate() == destinationCoordinate) {
                     return move;
                 }
