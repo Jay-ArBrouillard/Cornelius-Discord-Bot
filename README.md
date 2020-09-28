@@ -1,2 +1,9 @@
 # Cornelius-Discord-Bot
-Can play "Hunt the wumpus" and give you random numbers. Continuing to add functionality.
+Commands not limited to:
+- Chess
+- Choose
+- Holidays
+- Meme
+- Hunt the wumpus
+- Number Generator
+- Poll
