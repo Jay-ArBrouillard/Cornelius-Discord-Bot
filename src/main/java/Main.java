@@ -10,14 +10,14 @@ import javax.security.auth.login.LoginException;
 public class Main {
 
     public static void main(String[] args) throws LoginException, InterruptedException {
-        System.out.println("MAKE SURE TO CHANGE TOKEN AND OWNER ID BEFORE PUSHING TO HEROKU OR GITHUB");
+        //System.out.println("MAKE SURE TO CHANGE TOKEN AND OWNER ID BEFORE PUSHING TO HEROKU OR GITHUB");
 
-        String token = "NjkzMjgyMDk5MTY3NDk0MjI1.Xn6zRQ.VR_oQqO5IUToXtDYB-jx0QZ48hU";//System.getenv("TOKEN");
+        String token = System.getenv("TOKEN");
         // the second is the bot's owner's id
-        String ownerId = "693282099167494225";//System.getenv("OWNER_ID");
-        String moviesApiKey = "x";//System.getenv("MOVIES_API_KEY");
-        String calendarApiKey = "X";//System.getenv("HOLIDAY_API_KEY");
-        String unsplashAccessKey = "X";//System.getenv("UNSPLASH_ACCESS_KEY");
+        String ownerId = System.getenv("OWNER_ID");
+        String moviesApiKey = System.getenv("MOVIES_API_KEY");
+        String calendarApiKey = System.getenv("HOLIDAY_API_KEY");
+        String unsplashAccessKey = System.getenv("UNSPLASH_ACCESS_KEY");
 
         // start getting a bot account set up
         JDA jda = JDABuilder.createDefault(token)
