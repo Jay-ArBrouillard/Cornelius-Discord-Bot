@@ -67,7 +67,12 @@ public class GoogleSheets {
         // Load client secrets.
         InputStream in = GoogleSheets.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
         if (in == null) {
-            throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
+            System.out.println("Didn't find inputstream1");
+            in = GoogleSheets.class.getResourceAsStream("src/main/java/resources/credentials.json");
+            if (in == null) {
+                System.out.println("Didn't find inputstream2");
+                throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
+            }
         }
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 
