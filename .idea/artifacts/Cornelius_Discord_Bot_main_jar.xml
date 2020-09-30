@@ -2,9 +2,6 @@
   <artifact type="jar" name="Cornelius-Discord-Bot.main:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/Cornelius_Discord_Bot_main_jar</output-path>
     <root id="archive" name="Cornelius-Discord-Bot.main.jar">
-      <element id="directory" name="META-INF">
-        <element id="file-copy" path="$PROJECT_DIR$/src/main/resources/META-INF/MANIFEST.MF" />
-      </element>
       <element id="module-output" name="Cornelius-Discord-Bot.main" />
       <element id="extracted-dir" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/commons-logging/commons-logging/1.2/4bfc12adfe4842bf07b657f0369c4cb522955686/commons-logging-1.2.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.squareup.okio/okio/1.17.2/78c7820b205002da4d2d137f6f312bd64b3d6049/okio-1.17.2.jar" path-in-jar="/" />
