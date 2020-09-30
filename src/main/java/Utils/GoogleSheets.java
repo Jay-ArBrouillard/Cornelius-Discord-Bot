@@ -7,23 +7,16 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.Json;
 import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.JsonObjectParser;
-import com.google.api.client.json.JsonParser;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.ValueRange;
-import kong.unirest.json.JSONObject;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class GoogleSheets {
@@ -49,8 +42,7 @@ public class GoogleSheets {
                     .get(SPREAD_SHEET_ID, range)
                     .execute();
         } catch (Exception e) {
-            System.out.println(e);
-            //Do nothing
+            e.printStackTrace();
         }
 
     }
@@ -75,6 +67,7 @@ public class GoogleSheets {
 
         try {
             f2 = new FileWriter(file,false);
+            System.out.println(System.getenv("GOOGLE_CREDENTIALS"));
             f2.write(System.getenv("GOOGLE_CREDENTIALS"));
         } catch (IOException e) {
             e.printStackTrace();
@@ -83,6 +76,12 @@ public class GoogleSheets {
         }
 
         InputStream in = new FileInputStream(file);
+        Scanner s = new Scanner(in);
+        String result = "";
+        while (s.hasNext()) {
+            result += s.next();
+        }
+        System.out.println("result: " +result);
 
         if (in == null) {
             throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
@@ -129,7 +128,7 @@ public class GoogleSheets {
 
             return true;
         } catch (Exception e) {
-            //Do nothing
+            e.printStackTrace();
             return false;
         }
     }
@@ -204,7 +203,7 @@ public class GoogleSheets {
             }
             return false;
         } catch (Exception e) {
-            //Do nothing
+            e.printStackTrace();
             return false;
         }
     }
@@ -233,7 +232,7 @@ public class GoogleSheets {
 
             return true;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
             return false;
         }
     }
