@@ -1,6 +1,7 @@
 package Utils;
 
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
@@ -13,8 +14,6 @@ import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-
-import static com.google.api.client.googleapis.auth.oauth2.GoogleCredential.fromStream;
 
 public class GoogleSheets {
     private static String APPLICATION_NAME = "players";
@@ -52,7 +51,7 @@ public class GoogleSheets {
     public static Credential authorize() throws IOException {
         // Load client secrets.
         InputStream in = GoogleSheets.class.getResourceAsStream("/google-credentials.json");
-        Credential credential = fromStream(in).createScoped(SCOPES);
+        Credential credential = GoogleCredential.fromStream(in, HTTP_TRANSPORT, JSON_FACTORY);
         return credential;
     }
 
