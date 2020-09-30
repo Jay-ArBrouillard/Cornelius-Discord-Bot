@@ -76,6 +76,10 @@ public class GoogleSheets {
 
         InputStream targetStream = new ByteArrayInputStream(System.getenv("GOOGLE_CREDENTIALS").getBytes());
 
+        if (targetStream == null) {
+            System.out.println("targetStream is null");
+        }
+
 //        InputStream stream = GoogleSheets.class.getResourceAsStream("/google-credentials.json");
 //        if (in == null) {
 //            throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
