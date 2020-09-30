@@ -40,14 +40,10 @@ public class ChessCommand {
             if (isMessageFromPlayer(event.getAuthor().getId())) {
                 if (gameMode != null && gameMode.isPlayerVsComputer()) { //Player vs Computer game
                     if (chessGame.isWhitePlayerTurn()) { // Black quit
-                        System.out.println("black quit updating users in google sheets");
-
                         db.updateUser(blackPlayerId, false, false);
                         db.updateUser(whitePlayerId, true, false);
                     }
                     else { // White quit
-                        System.out.println("white quit updating users in google sheets");
-
                         db.updateUser(blackPlayerId, true, false);
                         db.updateUser(whitePlayerId, false, false);
                     }
@@ -156,9 +152,6 @@ public class ChessCommand {
                     blackPlayerName = "Cornelius";
                     whitePlayerId = event.getAuthor().getId();
                     blackPlayerId = System.getenv("OWNER_ID"); //Cornelius Discord Id
-
-                    System.out.println("blackPlayerId: " + blackPlayerId);
-
                     gameState = GameStatus.PLAYER_MOVE;
                     gameMode = GameMode.PVC;
                 }
