@@ -1,17 +1,10 @@
 package Utils;
 
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
-import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
-import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
-import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.ValueRange;
@@ -21,6 +14,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import static com.google.api.client.googleapis.auth.oauth2.GoogleCredential.fromStream;
+
 public class GoogleSheets {
     private static String APPLICATION_NAME = "players";
     private static String SPREAD_SHEET_ID = System.getenv("SPREAD_SHEET_ID");
@@ -28,7 +23,7 @@ public class GoogleSheets {
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private static Sheets service;
 
-    public GoogleSheets() throws Exception {
+    public GoogleSheets() {
         getSheetsService();
     }
 
@@ -57,9 +52,7 @@ public class GoogleSheets {
     public static Credential authorize() throws IOException {
         // Load client secrets.
         InputStream in = GoogleSheets.class.getResourceAsStream("/google-credentials.json");
-        GoogleCredential credential = GoogleCredential
-                .fromStream(in)
-                .createScoped(SCOPES);
+        Credential credential = fromStream(in).createScoped(SCOPES);
         return credential;
     }
 
@@ -69,11 +62,16 @@ public class GoogleSheets {
      * @return an authorized Sheets API client service
      * @throws IOException
      */
-    public static void getSheetsService() throws Exception {
-        Credential credential = authorize();
-        service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
-                .setApplicationName(APPLICATION_NAME)
-                .build();
+    public static void getSheetsService() {
+        try {
+            Credential credential = authorize();
+            service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
+                    .setApplicationName(APPLICATION_NAME)
+                    .build();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     public static boolean addUser(String id, String name) {
