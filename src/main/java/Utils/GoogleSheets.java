@@ -7,12 +7,16 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.Json;
 import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.JsonObjectParser;
+import com.google.api.client.json.JsonParser;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.ValueRange;
+import kong.unirest.json.JSONObject;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -65,12 +69,23 @@ public class GoogleSheets {
      */
     private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
         // Load client secrets.
-        InputStream in = new FileInputStream(new File(CREDENTIALS_FILE_PATH));
+        File file = new File("credentials.json");
+        FileWriter f2 = null;
+
+        try {
+            f2 = new FileWriter(file,false);
+            System.out.println("writing: " + System.getenv("google-credentials.json"));
+            f2.write(System.getenv("google-credentials.json"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            f2.close();
+        }
+
+        InputStream in = new FileInputStream(file);
+
         if (in == null) {
-            in = new FileInputStream(new File("google-credentials.json"));
-            if (in == null) {
-                throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
-            }
+            throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
         }
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 
