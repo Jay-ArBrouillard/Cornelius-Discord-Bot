@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class GoogleSheets {
     private static String APPLICATION_NAME = "players";
@@ -59,7 +60,7 @@ public class GoogleSheets {
      * If modifying these scopes, delete your previously saved tokens/ folder.
      */
     private static final List<String> SCOPES = Collections.singletonList(SheetsScopes.SPREADSHEETS);
-    private static final String CREDENTIALS_FILE_PATH = "//google-credentials.json";
+    private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
 
     /**
      * Creates an authorized Credential object.
@@ -74,28 +75,7 @@ public class GoogleSheets {
 
         try {
             f2 = new FileWriter(file,false);
-
-            if (System.getenv("google-credentials.json") != null) {
-                System.out.println("writing: " + System.getenv("google-credentials.json"));
-                f2.write(System.getenv("google-credentials.json"));
-            }
-            else if (System.getenv("/google-credentials.json") != null) {
-                System.out.println("writing: " + System.getenv("/google-credentials.json"));
-                f2.write(System.getenv("/google-credentials.json"));
-            }
-            else if (System.getenv("//google-credentials.json") != null) {
-                System.out.println("writing: " + System.getenv("//google-credentials.json"));
-                f2.write(System.getenv("google-credentials.json"));
-            } else if (System.getenv("GOOGLE_CREDENTIALS") != null) {
-                System.out.println("writing: " + System.getenv("GOOGLE_CREDENTIALS"));
-                f2.write(System.getenv("GOOGLE_CREDENTIALS"));
-            }
-            else if (System.getenv("GOOGLE_APPLICATION_CREDENTIALS") != null) {
-                System.out.println("writing: " + System.getenv("GOOGLE_APPLICATION_CREDENTIALS"));
-                f2.write(System.getenv("GOOGLE_APPLICATION_CREDENTIALS"));
-            } else {
-                System.out.println("nothing worked");
-            }
+            f2.write(System.getenv("GOOGLE_CREDENTIALS"));
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -115,7 +95,8 @@ public class GoogleSheets {
                 .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
                 .setAccessType("offline")
                 .build();
-        return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
+        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
+        return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
     }
 
     public static boolean addUser(String id, String name) {
@@ -224,6 +205,35 @@ public class GoogleSheets {
             return false;
         } catch (Exception e) {
             //Do nothing
+            return false;
+        }
+    }
+
+    public static boolean addCompletedMatch(String player1, String player2, String id1, String id2, String winnerName, String loserName, boolean isDraw, Long startTime) {
+        try {
+            if (service == null) connect();
+
+            Long seconds = (System.currentTimeMillis() - startTime) / 1000;
+            int day = (int) TimeUnit.SECONDS.toDays(seconds);
+            long hours = TimeUnit.SECONDS.toHours(seconds) - (day *24);
+            long minute = TimeUnit.SECONDS.toMinutes(seconds) - (TimeUnit.SECONDS.toHours(seconds)* 60);
+            long second = TimeUnit.SECONDS.toSeconds(seconds) - (TimeUnit.SECONDS.toMinutes(seconds) *60);
+
+            String matchLength = "" + day + " days " + hours + " hours " + minute + " minutes " + second + " seconds";
+            String date = getCurrentDateTime();
+
+            ValueRange appendBody = new ValueRange().setValues(Arrays.asList(Arrays.asList(player1, player2, id1, id2, winnerName, loserName, isDraw, matchLength, date)));
+
+            service.spreadsheets().values()
+                    .append(SPREAD_SHEET_ID, "matches", appendBody)
+                    .setValueInputOption("USER_ENTERED")
+                    .setInsertDataOption("INSERT_ROWS")
+                    .setIncludeValuesInResponse(true)
+                    .execute();
+
+            return true;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
             return false;
         }
     }
