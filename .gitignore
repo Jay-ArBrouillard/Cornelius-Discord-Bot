@@ -4,5 +4,5 @@
 *.json
 /gradle/*
 /.gradle/*
-/tokens/*
+/tokens/StoredCredential
 
