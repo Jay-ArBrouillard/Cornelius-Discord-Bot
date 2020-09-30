@@ -50,8 +50,8 @@ public class GoogleSheets {
      */
     public static Credential authorize() throws IOException {
         // Load client secrets.
-        FileInputStream in = new FileInputStream(System.getenv("GOOGLE_CREDENTIALS"));
-        Credential credential = GoogleCredential.fromStream(in, HTTP_TRANSPORT, JSON_FACTORY).createScoped(SCOPES);
+        InputStream targetStream = new ByteArrayInputStream(System.getenv("GOOGLE_CREDENTIALS").getBytes());
+        Credential credential = GoogleCredential.fromStream(targetStream, HTTP_TRANSPORT, JSON_FACTORY).createScoped(SCOPES);
         return credential;
     }
 
