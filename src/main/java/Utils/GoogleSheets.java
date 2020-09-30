@@ -67,8 +67,8 @@ public class GoogleSheets {
 
         try {
             f2 = new FileWriter(file,false);
-            System.out.println(System.getenv("GOOGLE_CREDENTIALS"));
-            f2.write(System.getenv("GOOGLE_CREDENTIALS"));
+
+            f2.write(System.getenv("GOOGLE_CREDENTIALS").toString());
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -81,12 +81,13 @@ public class GoogleSheets {
         while (s.hasNext()) {
             result += s.next();
         }
-        System.out.println("result: " +result);
+        System.out.println("result:" +result);
+        System.out.println("fileExists:"+file.exists());
 
-        if (in == null) {
-            throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
-        }
-        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
+//        if (in == null) {
+//            throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
+//        }
+        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new FileReader(file));
 
         // Build flow and trigger user authorization request.
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
