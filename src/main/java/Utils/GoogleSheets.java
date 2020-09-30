@@ -75,19 +75,19 @@ public class GoogleSheets {
 //            f2.close();
 //        }
 
-//        InputStream targetStream = new ByteArrayInputStream(System.getenv("GOOGLE_CREDENTIALS").getBytes());
-//
-//        if (targetStream == null) {
-//            System.out.println("targetStream is null");
-//        }
+        InputStream targetStream = new ByteArrayInputStream(System.getenv("GOOGLE_CREDENTIALS").getBytes());
 
-        InputStream in = GoogleSheets.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
-        if (in == null) {
-            throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
+        if (targetStream == null) {
+            System.out.println("targetStream is null");
         }
 
+//        InputStream in = GoogleSheets.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
+//        if (in == null) {
+//            throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
+//        }
 
-        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
+
+        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(targetStream));
         File tokens = new File(TOKENS_DIRECTORY_PATH);
         System.out.println("tokens:" + tokens.exists());
         // Build flow and trigger user authorization request.
