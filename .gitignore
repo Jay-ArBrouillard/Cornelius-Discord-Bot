@@ -2,7 +2,4 @@
 *.log*
 *.env
 *.json
-/gradle/*
-/.gradle/*
-/tokens/StoredCredential
 
