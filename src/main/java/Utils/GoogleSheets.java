@@ -67,7 +67,6 @@ public class GoogleSheets {
 
         try {
             f2 = new FileWriter(file,false);
-
             f2.write(System.getenv("GOOGLE_CREDENTIALS").toString());
         } catch (IOException e) {
             e.printStackTrace();
@@ -75,19 +74,13 @@ public class GoogleSheets {
             f2.close();
         }
 
-        InputStream in = new FileInputStream(file);
-        Scanner s = new Scanner(in);
-        String result = "";
-        while (s.hasNext()) {
-            result += s.next();
-        }
-        System.out.println("result:" +result);
         System.out.println("fileExists:"+file.exists());
-
+        InputStream in = GoogleSheets.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
 //        if (in == null) {
 //            throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
 //        }
-        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new FileReader(file));
+
+        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 
         // Build flow and trigger user authorization request.
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
