@@ -2,6 +2,7 @@ package Utils;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
+import com.google.api.client.extensions.java6.auth.oauth2.VerificationCodeReceiver;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
@@ -74,19 +75,19 @@ public class GoogleSheets {
 //            f2.close();
 //        }
 
-        InputStream targetStream = new ByteArrayInputStream(System.getenv("GOOGLE_CREDENTIALS").getBytes());
-
-        if (targetStream == null) {
-            System.out.println("targetStream is null");
-        }
-
-//        InputStream in = GoogleSheets.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
-//        if (in == null) {
-//            throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
+//        InputStream targetStream = new ByteArrayInputStream(System.getenv("GOOGLE_CREDENTIALS").getBytes());
+//
+//        if (targetStream == null) {
+//            System.out.println("targetStream is null");
 //        }
 
+        InputStream in = GoogleSheets.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
+        if (in == null) {
+            throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
+        }
 
-        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(targetStream));
+
+        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
         File tokens = new File(TOKENS_DIRECTORY_PATH);
         System.out.println("tokens:" + tokens.exists());
         // Build flow and trigger user authorization request.
@@ -95,7 +96,23 @@ public class GoogleSheets {
                 .setDataStoreFactory(new FileDataStoreFactory(new File(TOKENS_DIRECTORY_PATH)))
                 .setAccessType("offline")
                 .build();
-        return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
+
+        return new AuthorizationCodeInstalledApp(flow, new VerificationCodeReceiver() {
+            @Override
+            public String getRedirectUri() throws IOException {
+                return "http://dashboard.heroku.com/apps/cornelius-discord-bot";
+            }
+
+            @Override
+            public String waitForCode() throws IOException {
+                return null;
+            }
+
+            @Override
+            public void stop() throws IOException {
+
+            }
+        }).authorize("user");
     }
 
     public static boolean addUser(String id, String name) {
