@@ -74,8 +74,28 @@ public class GoogleSheets {
 
         try {
             f2 = new FileWriter(file,false);
-            System.out.println("writing: " + System.getenv("google-credentials.json"));
-            f2.write(System.getenv("google-credentials.json"));
+
+            if (System.getenv("google-credentials.json") != null) {
+                System.out.println("writing: " + System.getenv("google-credentials.json"));
+                f2.write(System.getenv("google-credentials.json"));
+            }
+            else if (System.getenv("/google-credentials.json") != null) {
+                System.out.println("writing: " + System.getenv("/google-credentials.json"));
+                f2.write(System.getenv("/google-credentials.json"));
+            }
+            else if (System.getenv("//google-credentials.json") != null) {
+                System.out.println("writing: " + System.getenv("//google-credentials.json"));
+                f2.write(System.getenv("google-credentials.json"));
+            } else if (System.getenv("GOOGLE_CREDENTIALS") != null) {
+                System.out.println("writing: " + System.getenv("GOOGLE_CREDENTIALS"));
+                f2.write(System.getenv("GOOGLE_CREDENTIALS"));
+            }
+            else if (System.getenv("GOOGLE_APPLICATION_CREDENTIALS") != null) {
+                System.out.println("writing: " + System.getenv("GOOGLE_APPLICATION_CREDENTIALS"));
+                f2.write(System.getenv("GOOGLE_APPLICATION_CREDENTIALS"));
+            } else {
+                System.out.println("nothing worked");
+            }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
