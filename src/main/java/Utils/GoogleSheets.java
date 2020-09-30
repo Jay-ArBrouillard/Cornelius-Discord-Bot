@@ -2,11 +2,12 @@ package Utils;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
-import com.google.api.client.extensions.java6.auth.oauth2.VerificationCodeReceiver;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -23,101 +24,61 @@ import java.util.concurrent.TimeUnit;
 public class GoogleSheets {
     private static String APPLICATION_NAME = "players";
     private static String SPREAD_SHEET_ID = System.getenv("SPREAD_SHEET_ID");
+    private static HttpTransport HTTP_TRANSPORT;
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-    private static final String TOKENS_DIRECTORY_PATH = "tokens";
     private static Sheets service;
 
-    public GoogleSheets() {
-        connect();
-    }
-
-    public static void connect() {
-        try {
-            // Build a new authorized API client service.
-            final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-            final String range = "players!A1:F2";
-            service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
-                    .setApplicationName(APPLICATION_NAME)
-                    .build();
-            service.spreadsheets().values()
-                    .get(SPREAD_SHEET_ID, range)
-                    .execute();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+    public GoogleSheets() throws Exception {
+        getSheetsService();
     }
 
     /**
      * Global instance of the scopes required by this quickstart.
-     * If modifying these scopes, delete your previously saved tokens/ folder.
+     * <p>
+     * If modifying these scopes, delete your previously saved credentials
+     * at ~/.credentials/sheets.googleapis.com-java-quickstart
      */
-    private static final List<String> SCOPES = Collections.singletonList(SheetsScopes.SPREADSHEETS);
-    private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
+    private static final List<String> SCOPES = Arrays.asList(SheetsScopes.SPREADSHEETS);
+
+    static {
+        try {
+            HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+    }
 
     /**
      * Creates an authorized Credential object.
-     * @param HTTP_TRANSPORT The network HTTP Transport.
-     * @return An authorized Credential object.
-     * @throws IOException If the credentials.json file cannot be found.
+     *
+     * @return an authorized Credential object.
+     * @throws IOException
      */
-    private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
+    public static Credential authorize() throws IOException {
         // Load client secrets.
-//        File file = new File("credentials.json");
-//        FileWriter f2 = null;
-//
-//        try {
-//            f2 = new FileWriter(file,false);
-//            f2.write(System.getenv("GOOGLE_CREDENTIALS").toString());
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } finally {
-//            f2.close();
-//        }
+        InputStream in = GoogleSheets.class.getResourceAsStream("/google-credentials.json");
+        GoogleCredential credential = GoogleCredential
+                .fromStream(in)
+                .createScoped(SCOPES);
+        return credential;
+    }
 
-        InputStream targetStream = new ByteArrayInputStream(System.getenv("GOOGLE_CREDENTIALS").getBytes());
-
-        if (targetStream == null) {
-            System.out.println("targetStream is null");
-        }
-
-//        InputStream in = GoogleSheets.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
-//        if (in == null) {
-//            throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
-//        }
-
-
-        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(targetStream));
-        File tokens = new File(TOKENS_DIRECTORY_PATH);
-        System.out.println("tokens:" + tokens.exists());
-        // Build flow and trigger user authorization request.
-        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-                HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
-                .setDataStoreFactory(new FileDataStoreFactory(new File(TOKENS_DIRECTORY_PATH)))
-                .setAccessType("offline")
+    /**
+     * Build and set an authorized Sheets API client service.
+     *
+     * @return an authorized Sheets API client service
+     * @throws IOException
+     */
+    public static void getSheetsService() throws Exception {
+        Credential credential = authorize();
+        service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
+                .setApplicationName(APPLICATION_NAME)
                 .build();
-
-        return new AuthorizationCodeInstalledApp(flow, new VerificationCodeReceiver() {
-            @Override
-            public String getRedirectUri() throws IOException {
-                return "http://dashboard.heroku.com/apps/cornelius-discord-bot";
-            }
-
-            @Override
-            public String waitForCode() throws IOException {
-                return null;
-            }
-
-            @Override
-            public void stop() throws IOException {
-
-            }
-        }).authorize("user");
     }
 
     public static boolean addUser(String id, String name) {
         try {
-            if (service == null) connect();
+            if (service == null) getSheetsService();
 
             //If user does not exist add them
             ValueRange response = service.spreadsheets().values()
@@ -152,7 +113,7 @@ public class GoogleSheets {
 
     public static boolean updateUser(String id, boolean isWin, boolean isDraw) {
         try {
-            if (service == null) connect();
+            if (service == null) getSheetsService();
             ValueRange response = service.spreadsheets().values()
                     .get(SPREAD_SHEET_ID, "players")
                     .execute();
@@ -227,7 +188,7 @@ public class GoogleSheets {
 
     public static boolean addCompletedMatch(String player1, String player2, String id1, String id2, String winnerName, String loserName, boolean isDraw, Long startTime) {
         try {
-            if (service == null) connect();
+            if (service == null) getSheetsService();
 
             Long seconds = (System.currentTimeMillis() - startTime) / 1000;
             int day = (int) TimeUnit.SECONDS.toDays(seconds);
