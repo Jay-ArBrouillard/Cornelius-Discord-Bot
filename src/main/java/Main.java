@@ -13,7 +13,7 @@ import javax.security.auth.login.LoginException;
 
 public class Main {
 
-    public static void main(String[] args) throws LoginException, InterruptedException {
+    public static void main(String[] args) throws LoginException, InterruptedException {//
         String token = System.getenv("TOKEN");
         // the second is the bot's owner's id
         String ownerId = System.getenv("OWNER_ID");
