@@ -52,7 +52,7 @@ public class GoogleSheets {
      * If modifying these scopes, delete your previously saved tokens/ folder.
      */
     private static final List<String> SCOPES = Collections.singletonList(SheetsScopes.SPREADSHEETS);
-    private static final String CREDENTIALS_FILE_PATH = "google-credentials.json";
+    private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
 
     /**
      * Creates an authorized Credential object.
@@ -80,7 +80,7 @@ public class GoogleSheets {
             System.out.println("targetStream is null");
         }
 
-//        InputStream stream = GoogleSheets.class.getResourceAsStream("/google-credentials.json");
+//        InputStream in = GoogleSheets.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
 //        if (in == null) {
 //            throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
 //        }
