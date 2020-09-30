@@ -24,11 +24,10 @@ import java.util.List;
 
 public class GoogleSheets {
     private static String APPLICATION_NAME = "players";
-    private static String SPREAD_SHEET_ID = "1lSYTcv2Bucg5OBrGjLvPoi5kWoHos9GqORW9wATqzr4"; //TODO REMOVE THIS
+    private static String SPREAD_SHEET_ID = System.getenv("SPREAD_SHEET_ID");
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
     private static Sheets service;
-    private static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss");
 
     public GoogleSheets() {
         connect();
