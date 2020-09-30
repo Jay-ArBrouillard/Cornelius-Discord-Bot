@@ -52,7 +52,7 @@ public class GoogleSheets {
      * If modifying these scopes, delete your previously saved tokens/ folder.
      */
     private static final List<String> SCOPES = Collections.singletonList(SheetsScopes.SPREADSHEETS);
-    private static final String CREDENTIALS_FILE_PATH = "credentials.json";
+    private static final String CREDENTIALS_FILE_PATH = "google-credentials.json";
 
     /**
      * Creates an authorized Credential object.
@@ -62,19 +62,19 @@ public class GoogleSheets {
      */
     private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
         // Load client secrets.
-        File file = new File("credentials.json");
-        FileWriter f2 = null;
+//        File file = new File("credentials.json");
+//        FileWriter f2 = null;
+//
+//        try {
+//            f2 = new FileWriter(file,false);
+//            f2.write(System.getenv("GOOGLE_CREDENTIALS").toString());
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } finally {
+//            f2.close();
+//        }
 
-        try {
-            f2 = new FileWriter(file,false);
-            f2.write(System.getenv("GOOGLE_CREDENTIALS").toString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            f2.close();
-        }
-
-        System.out.println("fileExists:"+file.exists());
+        System.out.println("fileExists:"+new File("google-credentials.json").exists());
         InputStream in = GoogleSheets.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
 //        if (in == null) {
 //            throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
