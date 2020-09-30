@@ -74,13 +74,15 @@ public class GoogleSheets {
 //            f2.close();
 //        }
 
-        System.out.println("fileExists:"+new File("google-credentials.json").exists());
-        InputStream stream = GoogleSheets.class.getResourceAsStream("/google-credentials.json");
+        InputStream targetStream = new ByteArrayInputStream(System.getenv("GOOGLE_CREDENTIALS").getBytes());
+
+//        InputStream stream = GoogleSheets.class.getResourceAsStream("/google-credentials.json");
 //        if (in == null) {
 //            throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
 //        }
 
-        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(stream));
+
+        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(targetStream));
 
         // Build flow and trigger user authorization request.
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
