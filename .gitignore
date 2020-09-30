@@ -2,7 +2,6 @@
 *.log*
 *.env
 *.json
-/build/*
 /gradle/*
 /.gradle/*
 /tokens/*
