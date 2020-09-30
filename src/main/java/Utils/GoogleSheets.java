@@ -75,8 +75,7 @@ public class GoogleSheets {
 //        }
 
         System.out.println("fileExists:"+new File("google-credentials.json").exists());
-        FileInputStream stream = new FileInputStream(ClassLoader.getSystemResource("google-credentials.json").getPath());
-        InputStream in = GoogleSheets.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
+        InputStream stream = GoogleSheets.class.getResourceAsStream("/google-credentials.json");
 //        if (in == null) {
 //            throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
 //        }
