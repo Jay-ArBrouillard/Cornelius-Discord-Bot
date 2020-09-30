@@ -3,7 +3,6 @@
 *.env
 *.json
 /build/*
-/out/*
 /gradle/*
 /.gradle/*
 /tokens/*
