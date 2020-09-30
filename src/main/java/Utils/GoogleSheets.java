@@ -35,6 +35,9 @@ public class GoogleSheets {
     public static void connect() {
         try {
             // Build a new authorized API client service.
+
+            System.out.println("trying to connect");
+
             final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
             final String range = "players!A1:F2";
             service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
@@ -43,7 +46,10 @@ public class GoogleSheets {
             service.spreadsheets().values()
                     .get(SPREAD_SHEET_ID, range)
                     .execute();
+
+            System.out.println("Successfully connected");
         } catch (Exception e) {
+            System.out.println("Failed to connect");
             //Do nothing
         }
 
@@ -117,6 +123,7 @@ public class GoogleSheets {
 
     public static boolean updateUser(String id, boolean isWin, boolean isDraw) {
         try {
+            System.out.println("instead updateUser");
             if (service == null) connect();
             ValueRange response = service.spreadsheets().values()
                     .get(SPREAD_SHEET_ID, "players")
