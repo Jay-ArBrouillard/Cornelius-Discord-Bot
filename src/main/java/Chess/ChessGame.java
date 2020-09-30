@@ -135,7 +135,7 @@ public class ChessGame {
 
             // Is someone in check mate?
             if (this.board.getCurrentPlayer().isInCheckMate()) {
-                return this.board.getCurrentPlayer().getOpponent().getAlliance() + " has checkmated " + this.board.getCurrentPlayer().getAlliance() + "! Game Over!";
+                return "CHECKMATE";
             }
 
             // Is game in a draw?
@@ -155,7 +155,7 @@ public class ChessGame {
 
             // Is someone in check?
             if (this.board.getCurrentPlayer().isInCheck()) {
-                return this.board.getCurrentPlayer().getAlliance() + " is in check!";
+                return "CHECK" + move.toString();
             }
 
             return "Success!" + move.toString();
@@ -252,7 +252,6 @@ public class ChessGame {
     }
 
     public String ai() {
-//        final Move bestMove = minimaxDepth6.execute(this.board);
         final Move bestMove = iterativeDeepening.execute(this.board);
         return handleMove(bestMove.getCurrentCoordinate(), bestMove.getDestinationCoordinate(), null);
     }

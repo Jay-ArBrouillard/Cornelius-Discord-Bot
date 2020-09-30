@@ -97,7 +97,6 @@ public class IterativeDeepening implements MoveStrategy {
 
         while (currentDepth <= this.searchDepth) {
             if (System.currentTimeMillis() - startTime > MAXIMUM_TIME && bestMove != NULL_MOVE) {
-                messageChannel.sendTyping().queue();
                 break;
             }
 //            final long subTimeStart = System.currentTimeMillis();
@@ -136,8 +135,8 @@ public class IterativeDeepening implements MoveStrategy {
             currentDepth++;
         }
         this.executionTime = System.currentTimeMillis() - startTime;
-        System.out.printf("%s SELECTS %s [#boards evaluated = %d, time taken = %d ms, eval rate = %.1f cutoffCount = %d prune percent = %.2f\n", board.getCurrentPlayer(),
-                bestMove, this.boardsEvaluated, this.executionTime, (1000 * ((double)this.boardsEvaluated/this.executionTime)), this.cutOffsProduced, 100 * ((double)this.cutOffsProduced/this.boardsEvaluated));
+//        System.out.printf("%s SELECTS %s [#boards evaluated = %d, time taken = %d ms, eval rate = %.1f cutoffCount = %d prune percent = %.2f\n", board.getCurrentPlayer(),
+//                bestMove, this.boardsEvaluated, this.executionTime, (1000 * ((double)this.boardsEvaluated/this.executionTime)), this.cutOffsProduced, 100 * ((double)this.cutOffsProduced/this.boardsEvaluated));
         return bestMove;
     }
 

@@ -131,7 +131,7 @@ public class GoogleSheets {
                 for (List row : allUsers) {
                     if (row.get(0).equals(id)) {
                         int wins = Integer.parseInt((String) row.get(2));
-                        int losses = Integer.parseInt((String) row.get(3));
+                        double losses = Double.parseDouble((String) row.get(3));
                         int draws = Integer.parseInt((String) row.get(4));
 
                         if (isWin) {

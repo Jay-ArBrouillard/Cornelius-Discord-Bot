@@ -23,22 +23,45 @@ public class ChessCommand {
     private static String blackPlayerName;
     private static String whitePlayerId;
     private static String blackPlayerId;
-
+    private static String reply;
+    private static String belowMessage;
+    private static File boardImageFile;
 
     public static boolean isRunning() {
         return chessGame != null && gameState != GameStatus.INACTIVE;
     }
 
+    public static boolean isMessageFromPlayer(String id) {
+        return whitePlayerId != null && blackPlayerId != null && (whitePlayerId.equals(id) || blackPlayerId.equals(id));
+    }
+
     public static void execute(MessageReceivedEvent event, String message) {
         if (message.equalsIgnoreCase("q") || message.equalsIgnoreCase("quit")) {
-            if (gameMode.isPlayerVsComputer()) {
-                db.updateUser(event.getAuthor().getId(), false, false);
-            }
-            else {
-                if (whitePlayerId != null && blackPlayerId != null && gameState != GameStatus.CHALLENGE_OPPONENT) {
-                    db.updateUser(event.getAuthor().getId(), false, false);
+            if (isMessageFromPlayer(event.getAuthor().getId())) {
+                if (gameMode != null && gameMode.isPlayerVsComputer()) { //Player vs Computer game
+                    if (chessGame.isWhitePlayerTurn()) { // Black quit
+                        db.updateUser(blackPlayerId, false, false);
+                        db.updateUser(whitePlayerId, true, false);
+                    }
+                    else { // White quit
+                        db.updateUser(blackPlayerId, true, false);
+                        db.updateUser(whitePlayerId, false, false);
+                    }
+                }
+                else { //Player vs Player Game
+                    if (whitePlayerId != null && blackPlayerId != null && gameState != GameStatus.CHALLENGE_OPPONENT) {
+                        if (event.getAuthor().getId().equals(blackPlayerId)) { // Black quit
+                            db.updateUser(blackPlayerId, false, false);
+                            db.updateUser(whitePlayerId, true, false);
+                        }
+                        else { // White quit
+                            db.updateUser(blackPlayerId, true, false);
+                            db.updateUser(whitePlayerId, false, false);
+                        }
+                    }
                 }
             }
+
             endGame(event.getChannel());
             return;
         }
@@ -57,69 +80,57 @@ public class ChessCommand {
         }
 
         //State machine game mechanics
-        String reply = "";
-        String belowMessage = null;
-        File boardImageFile = null;
         switch (gameState) {
             case PLAYER_MOVE:
                 reply = chessGame.processMove(message);
-                if (reply.contains("Game Over") || reply.contains("DRAW")) {
+                if (reply.contains("CHECKMATE") || reply.contains("DRAW")) {
                     boardImageFile = new File(gameBoardImageLoc);
                     belowMessage = "GG";
                     if (reply.contains("DRAW")) {
                         db.updateUser(blackPlayerId, false, true);
                         db.updateUser(whitePlayerId, false, true);
                     }
-                    if (chessGame.isWhitePlayerTurn()) {  //That means Black checkmated White
-                        db.updateUser(blackPlayerId, true, false);
-                        db.updateUser(whitePlayerId, false, false);
-                    } else { // White checkmated Black
-                        db.updateUser(blackPlayerId, false, false);
-                        db.updateUser(whitePlayerId, true, false);
+                    else { //CHECKMATE
+                        if (chessGame.isWhitePlayerTurn()) { // Black checkmated White
+                            reply = "`" + blackPlayerName + "` has CHECKMATED `" + whitePlayerName + "`";
+                            db.updateUser(blackPlayerId, true, false);
+                            db.updateUser(whitePlayerId, false, false);
+                        }
+                        else { // White checkmated Black
+                            reply = "`" + whitePlayerName + "` has CHECKMATED `" + blackPlayerName + "`";
+                            db.updateUser(blackPlayerId, false, false);
+                            db.updateUser(whitePlayerId, true, false);
+                        }
                     }
-                    endGame(event.getChannel());
-                } else if (reply.contains("is in check!") || reply.contains("Success!")) {
+                } else if (reply.contains("CHECK") || reply.contains("Success!")) {
                     boardImageFile = new File(gameBoardImageLoc);
-                    reply = reply.replace("Success!", ""); //Remove success from the reply message
-                    if (chessGame.isWhitePlayerTurn()) {
-                        belowMessage = "`" + whitePlayerName + "` turn. Make a move (ex: `c2c4` or `help` or `helpb2` to see possible moves or `q` to forfeit the game)";
+                    if (reply.contains("Success!")) {
+                        reply = reply.replace("Success!", ""); //Remove success from the reply message
+                        if (chessGame.isWhitePlayerTurn()) {
+                            reply = "`" + blackPlayerName + "` SELECTS " + reply;
+                            belowMessage = "`" + whitePlayerName + "'s` turn. ";
+                        }
+                        else {
+                            reply = "`" + whitePlayerName + "` SELECTS " + reply;
+                            belowMessage = "`" + blackPlayerName + "'s` turn. ";
+                        }
                     }
-                    else {
-                        belowMessage = "`" + blackPlayerName + "` turn. Make a move (ex: `c2c4` or `help` or `helpb2` to see possible moves or `q` to forfeit the game)";
+                    else { //CHECK
+                        reply = reply.replace("CHECK", ""); //Remove CHECK from the reply message
+                        if (chessGame.isWhitePlayerTurn()) {
+                            reply = "`" + blackPlayerName + "` SELECTS " + reply + " `" + whitePlayerName + "` is in check!";
+                            belowMessage = "`" + whitePlayerName + "'s` turn. ";
+                        }
+                        else {
+                            reply = "`" + whitePlayerName + "` SELECTS " + reply + " `" + blackPlayerName + "` is in check!";
+                            belowMessage = "`" + blackPlayerName + "'s` turn. ";
+                        }
                     }
-                    if (gameMode.isPlayerVsComputer()) { //Only change turn if move went through
+                    if (gameMode.isPlayerVsPlayer()) {
+                        belowMessage += "Make a move (ex: `c2c4` or `help` or `helpb2` to see possible moves or `q` to forfeit the game)";
+                    }
+                    else { //Only change turn if move went through
                         gameState = GameStatus.COMPUTER_MOVE;
-                    }
-                }
-                break;
-            case COMPUTER_MOVE:
-                reply = chessGame.ai();
-                if (reply.contains("Game Over") || reply.contains("DRAW")) {
-                    boardImageFile = new File(gameBoardImageLoc);
-                    belowMessage = "GG";
-                    if (reply.contains("DRAW")) {
-                        db.updateUser(blackPlayerId, false, true);
-                        db.updateUser(whitePlayerId, false, true);
-                    }
-                    if (chessGame.isWhitePlayerTurn()) {  //That means Black checkmated White
-                        db.updateUser(blackPlayerId, true, false);
-                        db.updateUser(whitePlayerId, false, false);
-                    } else { // White checkmated Black
-                        db.updateUser(blackPlayerId, false, false);
-                        db.updateUser(whitePlayerId, true, false);
-                    }
-                    endGame(event.getChannel());
-                } else if (reply.contains("is in check!") || reply.contains("Success!")) {
-                    boardImageFile = new File(gameBoardImageLoc);
-                    reply = reply.replace("Success!", ""); //Remove success from the reply message
-                    if (chessGame.isWhitePlayerTurn()) {
-                        belowMessage = "`" + whitePlayerName + "` turn. Make a move (ex: `c2c4` or `help` or `helpb2` to see possible moves or `q` to forfeit the game)";
-                    }
-                    else {
-                        belowMessage = "`" + blackPlayerName + "` turn. Make a move (ex: `c2c4` or `help` or `helpb2` to see possible moves or `q` to forfeit the game)";
-                    }
-                    if (gameMode.isPlayerVsComputer()) { //Only change turn if move went through
-                        gameState = GameStatus.PLAYER_MOVE;
                     }
                 }
                 break;
@@ -139,6 +150,8 @@ public class ChessCommand {
                     boardImageFile = new File(gameBoardImageLoc);
                     whitePlayerName = event.getAuthor().getName();
                     blackPlayerName = "Cornelius";
+                    whitePlayerId = event.getAuthor().getId();
+                    blackPlayerId = System.getenv("OWNER_ID"); //Cornelius Discord Id
                     gameState = GameStatus.PLAYER_MOVE;
                     gameMode = GameMode.PVC;
                 }
@@ -147,6 +160,8 @@ public class ChessCommand {
                     boardImageFile = new File(gameBoardImageLoc);
                     whitePlayerName = "Cornelius";
                     blackPlayerName = event.getAuthor().getName();
+                    whitePlayerId = System.getenv("OWNER_ID"); //Cornelius Discord Id
+                    blackPlayerId = event.getAuthor().getId();
                     gameState = GameStatus.COMPUTER_MOVE;
                     gameMode = GameMode.CVP;
                 }
@@ -167,22 +182,31 @@ public class ChessCommand {
                     blackPlayerName = member.getEffectiveName();
                     whitePlayerId = event.getAuthor().getId();
                     blackPlayerId = member.getId();
-                    reply = "`" + event.getAuthor().getName() + "` challenges `" + member.getEffectiveName() + "` to a chess game. Challengee must reply 'y' to this text chat to accept!";
+                    reply = "`" + event.getAuthor().getName() + "` challenges <@" + blackPlayerId + "> to a chess game. Challengee must reply `y` to this text chat to accept!";
                     gameState = GameStatus.OPPONENT_ACCEPT_DECLINE;
                 }
                 break;
             case OPPONENT_ACCEPT_DECLINE:
-                if (message.equalsIgnoreCase("y")) {
-                    reply = "`" + whitePlayerName + "` vs `" + blackPlayerName + "`";
-                    boardImageFile = new File(gameBoardImageLoc);
-                    belowMessage = "`"+ event.getAuthor().getName() + "` goes first. Make a move (ex: `c2 c4`)";
-                    gameState = GameStatus.PLAYER_MOVE;
+                if (event.getAuthor().getId().equals(blackPlayerId)) {
+                    if (message.equalsIgnoreCase("y")) {
+                        reply = "<@" + whitePlayerId + "> vs <@" + blackPlayerId + ">";
+                        boardImageFile = new File(gameBoardImageLoc);
+                        belowMessage = "`"+ whitePlayerName + "` goes first. Make a move (ex: `c2 c4`)";
+                        gameState = GameStatus.PLAYER_MOVE;
+                    }
+                    else {
+                        reply = "`" + blackPlayerName + "` has declined the chess match";
+                    }
                 }
-                else {
-                    reply = blackPlayerName + " has declined the chess match";
-                    endGame(event.getChannel());
+                else if (event.getAuthor().getId().equals(whitePlayerId)) {
+                    if (message.equalsIgnoreCase("q")) {
+                        reply = "`" + whitePlayerName + "` has declined the challenge";
+                    }
+                    else {
+                        reply = "Waiting for <@"+blackPlayerId+"> to accept `y` or decline the challenge. Or type `q` to quit."; //No reply
+                    }
+                    //Do nothing waiting
                 }
-
 
                 break;
             default:
@@ -206,6 +230,7 @@ public class ChessCommand {
             event.getChannel().purgeMessagesById(oldMessageIds);
             oldMessageIds.clear();
         }
+
         event.getChannel().sendMessage(reply).queue((msg) -> currentMessageIds.add(msg.getId()));
         if (file != null) {
             event.getChannel().sendFile(file).queue((msg) -> currentMessageIds.add(msg.getId()));
@@ -216,36 +241,63 @@ public class ChessCommand {
 
         oldMessageIds.addAll(currentMessageIds);
         currentMessageIds.clear();
+
+        if (reply.contains("CHECK") || reply.contains("DRAW") || reply.contains("declined")) {
+            endGame(event.getChannel());
+        }
     }
 
     public static void computerAction(MessageReceivedEvent event) {
-        String reply = "";
-        String belowMessage = null;
-        File file = null;
-
-        if (gameMode.isPlayerVsComputer()) {
-            event.getChannel().sendMessage("`Cornelius` is THINKING...").queue();
-        }
         reply = chessGame.ai();
-        if (reply.contains("Game Over!") || reply.contains("DRAW")) {
-            file = new File(gameBoardImageLoc);
+        if (reply.contains("CHECKMATE") || reply.contains("DRAW")) {
+            boardImageFile = new File(gameBoardImageLoc);
             belowMessage = "GG";
-            endGame(event.getChannel());
-        } else if (reply.contains("is in check!") || reply.contains("Success!")) {
-            file = new File(gameBoardImageLoc);
-            reply = reply.replace("Success!", ""); //Remove success from the reply message
-            reply = "`Cornelius` SELECTS " + reply;
-            belowMessage = "Make a move (ex: `c2c4` or `help` or `helpb2` to see possible moves or `q` to forfeit the game)";
-            if (gameMode != null && gameMode.isPlayerVsComputer()) {
-                gameState = GameStatus.PLAYER_MOVE;
+            if (reply.contains("DRAW")) {
+                db.updateUser(blackPlayerId, false, true);
+                db.updateUser(whitePlayerId, false, true);
             }
+            else { //CHECKMATE
+                if (chessGame.isWhitePlayerTurn()) { // Black checkmated White
+                    reply = "`" + blackPlayerName + "` has CHECKMATED `" + whitePlayerName + "`";
+                    db.updateUser(blackPlayerId, true, false);
+                    db.updateUser(whitePlayerId, false, false);
+                }
+                else { // White checkmated Black
+                    reply = "`" + whitePlayerName + "` has CHECKMATED `" + blackPlayerName + "`";
+                    db.updateUser(blackPlayerId, false, false);
+                    db.updateUser(whitePlayerId, true, false);
+                }
+            }
+        } else if (reply.contains("CHECK") || reply.contains("Success!")) {
+            boardImageFile = new File(gameBoardImageLoc);
+            reply = reply.replace("Success!", ""); //Remove success from the reply message
+            if (chessGame.isWhitePlayerTurn()) {
+                if (reply.contains("CHECK")) {
+                    reply = reply.replace("CHECK", ""); //Remove CHECK from the reply message
+                    reply = "`" + blackPlayerName + "` SELECTS " + reply + " `" + whitePlayerName + "` is in check!";
+                }
+                else {
+                    reply = "`" + blackPlayerName + "` SELECTS " + reply;
+                }
+                belowMessage = "`" + whitePlayerName + "'s` turn. Make a move (ex: `c2c4` or `help` or `helpb2` to see possible moves or `q` to forfeit the game)";
+            }
+            else {
+                if (reply.contains("CHECK")) {
+                    reply = reply.replace("CHECK", ""); //Remove CHECK from the reply message
+                    reply = "`" + whitePlayerName + "` SELECTS " + reply + " `" + blackPlayerName + "` is in check!";
+                }
+                else {
+                    reply = "`" + whitePlayerName + "` SELECTS " + reply;
+                }
+                belowMessage = "`" + blackPlayerName + "'s` turn. Make a move (ex: `c2c4` or `help` or `helpb2` to see possible moves or `q` to forfeit the game)";
+            }
+            gameState = GameStatus.PLAYER_MOVE;
         }
 
-        sendMessages(event, reply, file, belowMessage);
+        sendMessages(event, reply, boardImageFile, belowMessage);
     }
 
     public static void endGame(MessageChannel messageChannel) {
-        messageChannel.sendMessage("Quitting `Chess`...\n\n").queue();
         chessGame = null;
         gameState = GameStatus.INACTIVE;
         gameMode = null;
@@ -253,6 +305,12 @@ public class ChessCommand {
         oldMessageIds.clear();
         whitePlayerName = null;
         blackPlayerName = null;
+        whitePlayerId = null;
+        blackPlayerId = null;
+        reply = null;
+        belowMessage = null;
+        boardImageFile = null;
+        messageChannel.sendMessage("Quitting `Chess`\nCheck out the spreadsheet for game stats:\nhttps://docs.google.com/spreadsheets/d/1lSYTcv2Bucg5OBrGjLvPoi5kWoHos9GqORW9wATqzr4/edit?usp=sharing").queue();
     }
 
     public static class Help {

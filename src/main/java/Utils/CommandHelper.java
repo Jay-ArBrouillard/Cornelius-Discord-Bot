@@ -16,7 +16,7 @@ public class CommandHelper extends ListenerAdapter {
     }
 
     @Override
-    public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
+    public void onMessageReceived (@Nonnull MessageReceivedEvent event) {
         String message = event.getMessage().getContentRaw();
         MessageChannel mc = event.getChannel();
         if (event.getMessage().getAuthor().isBot()) return;
