@@ -49,7 +49,7 @@ public class GoogleSheets {
                     .get(SPREAD_SHEET_ID, range)
                     .execute();
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println(e);
             //Do nothing
         }
 
@@ -60,7 +60,7 @@ public class GoogleSheets {
      * If modifying these scopes, delete your previously saved tokens/ folder.
      */
     private static final List<String> SCOPES = Collections.singletonList(SheetsScopes.SPREADSHEETS);
-    private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
+    private static final String CREDENTIALS_FILE_PATH = "credentials.json";
 
     /**
      * Creates an authorized Credential object.
