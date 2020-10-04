@@ -214,8 +214,9 @@ public class Board {
 
     public void buildImage() {
         //Begin with board image as background
+        BufferedImage result = null;
         try {
-            BufferedImage result = ImageIO.read(new File("src/main/java/chess/assets/board.png"));
+            result = ImageIO.read(new File("src/main/java/chess/assets/board.png"));
             Graphics g = result.getGraphics();
 
             //Overlay all the pieces onto the board based on matrix top bottom, left to right
@@ -238,9 +239,12 @@ public class Board {
             }
             ImageIO.write(result, "png", new File("src/main/java/chess/gameState.png"));
             result.flush();
-            result = null; //Keep
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            if (result != null) {
+                result.flush();
+            }
         }
     }
 
