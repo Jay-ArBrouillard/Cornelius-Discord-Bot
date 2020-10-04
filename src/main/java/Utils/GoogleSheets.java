@@ -11,7 +11,9 @@ import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.ValueRange;
 
 import java.io.*;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -21,6 +23,7 @@ public class GoogleSheets {
     private static HttpTransport HTTP_TRANSPORT;
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private static Sheets service;
+    private static DecimalFormat df = new DecimalFormat("##.00");
 
     public GoogleSheets() {
         getSheetsService();
@@ -51,6 +54,7 @@ public class GoogleSheets {
     public static Credential authorize() throws IOException {
         // Load client secrets.
         InputStream targetStream = new ByteArrayInputStream(System.getenv("GOOGLE_CREDENTIALS").getBytes());
+//        InputStream targetStream = GoogleSheets.class.getResourceAsStream("/credentials.json"); //For local testing
         Credential credential = GoogleCredential.fromStream(targetStream, HTTP_TRANSPORT, JSON_FACTORY).createScoped(SCOPES);
         return credential;
     }
@@ -73,7 +77,13 @@ public class GoogleSheets {
 
     }
 
-    public static boolean addUser(String id, String name) {
+    /**
+     * Add new user if they don't exist and returns their elo value
+     * @param id
+     * @param name
+     * @return
+     */
+    public static int addUser(String id, String name) {
         try {
             if (service == null) getSheetsService();
 
@@ -84,31 +94,30 @@ public class GoogleSheets {
             List<List<Object>> allUsers = response.getValues();
             for (List row : allUsers) {
                 if (row.get(0).equals(id)) {
-                    return false; //User exists already
+                    return Integer.parseInt((String)row.get(2)); //User exists already
                 }
             }
 
             String now = getCurrentDateTime();
-
+            //New users get default elo of 1000
             ValueRange appendBody = new ValueRange()
                 .setValues(Arrays.asList(
-                        Arrays.asList(id, name, "0", "0", "0", "0", now, now)
+                        Arrays.asList(id, name, 1000, "0", "0", "0", "0", now, now)
                 ));
             service.spreadsheets().values()
                 .append(SPREAD_SHEET_ID, "players", appendBody)
-                .setValueInputOption("USER_ENTERED")
+                .setValueInputOption("RAW")
                 .setInsertDataOption("INSERT_ROWS")
-                .setIncludeValuesInResponse(true)
                 .execute();
 
-            return true;
+            return 1000;
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return -1;
         }
     }
 
-    public static boolean updateUser(String id, boolean isWin, boolean isDraw) {
+    public static boolean updateUser(String id, boolean isWin, boolean isDraw, int thisElo, int otherElo) {
         try {
             if (service == null) getSheetsService();
             ValueRange response = service.spreadsheets().values()
@@ -121,57 +130,71 @@ public class GoogleSheets {
                 int rowNumber = 1;
                 for (List row : allUsers) {
                     if (row.get(0).equals(id)) {
-                        int wins = Integer.parseInt((String) row.get(2));
-                        double losses = Double.parseDouble((String) row.get(3));
-                        int draws = Integer.parseInt((String) row.get(4));
+                        int wins = Integer.parseInt((String) row.get(3));
+                        double losses = Double.parseDouble((String) row.get(4));
+                        int draws = Integer.parseInt((String) row.get(5));
+
+                        //Calculate new elo
+                        double probabilityWin = (1.0 / (1.0 + Math.pow(10, ((thisElo-otherElo) / 400)))); // Probability winning
+                        double newEloRating = thisElo;
 
                         if (isWin) {
+                            //Update wins
                             wins++;
                             ValueRange body = new ValueRange().setValues(Arrays.asList(Arrays.asList(wins)));
                             service.spreadsheets().values()
-                                    .update(SPREAD_SHEET_ID, "C"+rowNumber, body)
-                                    .setValueInputOption("RAW")
+                                    .update(SPREAD_SHEET_ID, "D"+rowNumber, body)
+                                    .setValueInputOption("USER_ENTERED")
                                     .execute();
-                            if (losses == 0) losses = 1;
-                            body = new ValueRange().setValues(Arrays.asList(Arrays.asList((wins+draws)/losses)));
-                            service.spreadsheets().values()
-                                    .update(SPREAD_SHEET_ID, "F"+rowNumber, body)
-                                    .setValueInputOption("RAW")
-                                    .execute();
+                            //Update Elo
+                            if (newEloRating != -1) {
+                                newEloRating = newEloRating + determineK(thisElo) * (1 - probabilityWin);
+                                updateElo(rowNumber, newEloRating);
+                            }
+                            //Update "Updated On" Column
                             changeUpdatedOnColumn(rowNumber);
-                            return true;
                         }
                         else if (!isWin && !isDraw) {
+                            //Update losses
                             losses++;
                             ValueRange body = new ValueRange().setValues(Arrays.asList(Arrays.asList(losses)));
                             service.spreadsheets().values()
-                                    .update(SPREAD_SHEET_ID, "D"+rowNumber, body)
-                                    .setValueInputOption("RAW")
+                                    .update(SPREAD_SHEET_ID, "E"+rowNumber, body)
+                                    .setValueInputOption("USER_ENTERED")
                                     .execute();
-                            body = new ValueRange().setValues(Arrays.asList(Arrays.asList((wins+draws)/losses)));
-                            service.spreadsheets().values()
-                                    .update(SPREAD_SHEET_ID, "F"+rowNumber, body)
-                                    .setValueInputOption("RAW")
-                                    .execute();
+                            //Update Elo
+                            if (newEloRating != -1) {
+                                newEloRating = thisElo + determineK(thisElo) * (0 - probabilityWin);
+                                updateElo(rowNumber, newEloRating);
+                            }
+                            //Update "Updated On" Column
                             changeUpdatedOnColumn(rowNumber);
-                            return true;
                         }
                         else if (isDraw) {
+                            //Update draws
                             draws++;
                             ValueRange body = new ValueRange().setValues(Arrays.asList(Arrays.asList(draws)));
                             service.spreadsheets().values()
-                                    .update(SPREAD_SHEET_ID, "E"+rowNumber, body)
-                                    .setValueInputOption("RAW")
-                                    .execute();
-                            if (losses == 0) losses = 1;
-                            body = new ValueRange().setValues(Arrays.asList(Arrays.asList((wins+draws)/losses)));
-                            service.spreadsheets().values()
                                     .update(SPREAD_SHEET_ID, "F"+rowNumber, body)
-                                    .setValueInputOption("RAW")
+                                    .setValueInputOption("USER_ENTERED")
                                     .execute();
+                            //Update Elo
+                            if (newEloRating != -1) {
+                                newEloRating = thisElo + determineK(thisElo) * (0.5 - probabilityWin);
+                                updateElo(rowNumber, newEloRating);
+                            }
+                            //Update "Updated On" Column
                             changeUpdatedOnColumn(rowNumber);
-                            return true;
                         }
+
+                        //Update Win Loss Ratio
+                        if (losses == 0) losses = 1;
+                        ValueRange body = new ValueRange().setValues(Arrays.asList(Arrays.asList(df.format((wins+draws)/losses))));
+                        service.spreadsheets().values()
+                                .update(SPREAD_SHEET_ID, "G"+rowNumber, body)
+                                .setValueInputOption("USER_ENTERED")
+                                .execute();
+                        return true;
                     }
                     rowNumber++;
                 }
@@ -194,15 +217,12 @@ public class GoogleSheets {
             long second = TimeUnit.SECONDS.toSeconds(seconds) - (TimeUnit.SECONDS.toMinutes(seconds) *60);
 
             String matchLength = "" + day + " days " + hours + " hours " + minute + " minutes " + second + " seconds";
-            String date = getCurrentDateTime();
-
-            ValueRange appendBody = new ValueRange().setValues(Arrays.asList(Arrays.asList(player1, player2, id1, id2, winnerName, loserName, isDraw, matchLength, date)));
+            ValueRange appendBody = new ValueRange().setValues(Arrays.asList(Arrays.asList(player1, player2, id1, id2, winnerName, loserName, isDraw, matchLength, getCurrentDateTime())));
 
             service.spreadsheets().values()
                     .append(SPREAD_SHEET_ID, "matches", appendBody)
-                    .setValueInputOption("USER_ENTERED")
+                    .setValueInputOption("RAW")
                     .setInsertDataOption("INSERT_ROWS")
-                    .setIncludeValuesInResponse(true)
                     .execute();
 
             return true;
@@ -212,18 +232,44 @@ public class GoogleSheets {
         }
     }
 
+    private static void updateElo(int rowNumber, double newElo) throws IOException {
+        ValueRange body = new ValueRange().setValues(Arrays.asList(Arrays.asList((int)newElo)));
+        service.spreadsheets().values()
+                .update(SPREAD_SHEET_ID, "C"+rowNumber, body)
+                .setValueInputOption("RAW")
+                .execute();
+    }
+
     private static void changeUpdatedOnColumn(int rowNumber) throws IOException {
         ValueRange body = new ValueRange().setValues(Arrays.asList(Arrays.asList(getCurrentDateTime())));
         service.spreadsheets().values()
-                .update(SPREAD_SHEET_ID, "H"+rowNumber, body)
+                .update(SPREAD_SHEET_ID, "I"+rowNumber, body)
                 .setValueInputOption("RAW")
                 .execute();
     }
 
     public static String getCurrentDateTime() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date d = new Date();
-        String datetime = sdf.format(d);
-        return datetime;
+        Date myDate = Date.from(Instant.now());
+        SimpleDateFormat formatter = new SimpleDateFormat("MM-dd-yyyy hh:mm aa", Locale.ENGLISH);
+        return formatter.format(myDate);
+    }
+
+    /**
+     * Determine the rating constant K-factor based on current rating
+     *
+     * @param rating
+     *            Player rating
+     * @return K-factor
+     */
+    public static int determineK(int rating) {
+        int K;
+        if (rating < 2000) {
+            K = 32;
+        } else if (rating >= 2000 && rating < 2400) {
+            K = 24;
+        } else {
+            K = 16;
+        }
+        return K;
     }
 }

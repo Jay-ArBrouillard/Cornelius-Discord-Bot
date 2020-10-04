@@ -23,6 +23,8 @@ public class ChessCommand {
     private static String blackPlayerName;
     private static String whitePlayerId;
     private static String blackPlayerId;
+    private static int whitePlayerElo;
+    private static int blackPlayerElo;
     private static String reply;
     private static String belowMessage;
     private static File boardImageFile;
@@ -39,28 +41,28 @@ public class ChessCommand {
     public static void execute(MessageReceivedEvent event, String message) {
         if (message.equalsIgnoreCase("q") || message.equalsIgnoreCase("quit")) {
             if (isMessageFromPlayer(event.getAuthor().getId())) {
-                if (gameMode != null && gameMode.isPlayerVsComputer()) { //Player vs Computer game
+                if (gameMode != null && gameMode.isPlayerVsComputer() && (gameState == GameStatus.PLAYER_MOVE || gameState == GameStatus.COMPUTER_MOVE)) { //Player vs Computer game
                     if (event.getAuthor().getId().equals(blackPlayerId)) { // Black quit
-                        db.updateUser(blackPlayerId, false, false);
-                        db.updateUser(whitePlayerId, true, false);
+                        db.updateUser(blackPlayerId, false, false, blackPlayerElo, whitePlayerElo);
+                        db.updateUser(whitePlayerId, true, false, whitePlayerElo, blackPlayerElo);
                         db.addCompletedMatch(whitePlayerName, blackPlayerName, whitePlayerId, blackPlayerId, whitePlayerName, blackPlayerName, false, matchStartTime);
                     }
                     else if (event.getAuthor().getId().equals(whitePlayerId)) { // White quit
-                        db.updateUser(blackPlayerId, true, false);
-                        db.updateUser(whitePlayerId, false, false);
+                        db.updateUser(blackPlayerId, true, false, blackPlayerElo, whitePlayerElo);
+                        db.updateUser(whitePlayerId, false, false, whitePlayerElo, blackPlayerElo);
                         db.addCompletedMatch(whitePlayerName, blackPlayerName, whitePlayerId, blackPlayerId, blackPlayerName, whitePlayerName, false, matchStartTime);
                     }
                 }
                 else { //Player vs Player Game
-                    if (whitePlayerId != null && blackPlayerId != null && gameState != GameStatus.CHALLENGE_OPPONENT) {
+                    if (whitePlayerId != null && blackPlayerId != null && gameState == GameStatus.PLAYER_MOVE) {
                         if (event.getAuthor().getId().equals(blackPlayerId)) { // Black quit
-                            db.updateUser(blackPlayerId, false, false);
-                            db.updateUser(whitePlayerId, true, false);
+                            db.updateUser(blackPlayerId, false, false, blackPlayerElo, whitePlayerElo);
+                            db.updateUser(whitePlayerId, true, false, whitePlayerElo, blackPlayerElo);
                             db.addCompletedMatch(whitePlayerName, blackPlayerName, whitePlayerId, blackPlayerId, whitePlayerName, blackPlayerName, false, matchStartTime);
                         }
                         else if (event.getAuthor().getId().equals(whitePlayerId)) { // White quit
-                            db.updateUser(blackPlayerId, true, false);
-                            db.updateUser(whitePlayerId, false, false);
+                            db.updateUser(blackPlayerId, true, false, blackPlayerElo, whitePlayerElo);
+                            db.updateUser(whitePlayerId, false, false, whitePlayerElo, blackPlayerElo);
                             db.addCompletedMatch(whitePlayerName, blackPlayerName, whitePlayerId, blackPlayerId, blackPlayerName, whitePlayerName, false, matchStartTime);
                         }
                     }
@@ -88,6 +90,7 @@ public class ChessCommand {
         switch (gameState) {
             case PLAYER_MOVE:
                 //Check if it is their turn
+                oldMessageIds.add(event.getMessageId());
                 if (chessGame.isWhitePlayerTurn() && !event.getAuthor().getId().equals(whitePlayerId)) {
                     reply = "It's `" + whitePlayerName + "'s` turn";
                     belowMessage = null;
@@ -106,21 +109,21 @@ public class ChessCommand {
                     boardImageFile = new File(gameBoardImageLoc);
                     belowMessage = "GG";
                     if (reply.contains("DRAW")) {
-                        db.updateUser(blackPlayerId, false, true);
-                        db.updateUser(whitePlayerId, false, true);
+                        db.updateUser(blackPlayerId, false, true, blackPlayerElo, whitePlayerElo);
+                        db.updateUser(whitePlayerId, false, true, whitePlayerElo, blackPlayerElo);
                         db.addCompletedMatch(whitePlayerName, blackPlayerName, whitePlayerId, blackPlayerId, "", "", true, matchStartTime);
                     }
                     else { //CHECKMATE
                         if (chessGame.isWhitePlayerTurn()) { // Black checkmated White
                             reply = "`" + blackPlayerName + "` has CHECKMATED `" + whitePlayerName + "`";
-                            db.updateUser(blackPlayerId, true, false);
-                            db.updateUser(whitePlayerId, false, false);
+                            db.updateUser(blackPlayerId, true, false, blackPlayerElo, whitePlayerElo);
+                            db.updateUser(whitePlayerId, false, false, whitePlayerElo, blackPlayerElo);
                             db.addCompletedMatch(whitePlayerName, blackPlayerName, whitePlayerId, blackPlayerId, blackPlayerName, whitePlayerName, false, matchStartTime);
                         }
                         else { // White checkmated Black
                             reply = "`" + whitePlayerName + "` has CHECKMATED `" + blackPlayerName + "`";
-                            db.updateUser(blackPlayerId, false, false);
-                            db.updateUser(whitePlayerId, true, false);
+                            db.updateUser(blackPlayerId, false, false, blackPlayerElo, whitePlayerElo);
+                            db.updateUser(whitePlayerId, true, false, whitePlayerElo, blackPlayerElo);
                             db.addCompletedMatch(whitePlayerName, blackPlayerName, whitePlayerId, blackPlayerId, whitePlayerName, blackPlayerName, false, matchStartTime);
                         }
                     }
@@ -164,47 +167,65 @@ public class ChessCommand {
                 reply = chessGame.setupPlayers(message);
                 if (reply.equals(GameMode.PVP.toString())) {
                     reply = "`Player vs Player Chess Game`\nPlease challenge another player by entering their `userId` (Click on user and Copy ID)";
+                    whitePlayerElo = db.addUser(event.getAuthor().getId(), event.getAuthor().getName());
+                    whitePlayerName = event.getAuthor().getName();
+                    whitePlayerId = event.getAuthor().getId();
                     gameState = GameStatus.CHALLENGE_OPPONENT;
                     gameMode = GameMode.PVP;
                 }
                 else if (reply.equals(GameMode.PVC.toString())) {
-                    reply = "`Starting Player vs. Computer Game`\nMake a move (ex: `c2 c4`)";
                     boardImageFile = new File(gameBoardImageLoc);
                     whitePlayerName = event.getAuthor().getName();
                     blackPlayerName = "Cornelius";
+                    whitePlayerElo = db.addUser(event.getAuthor().getId(), event.getAuthor().getName());
+                    blackPlayerElo = db.addUser("693282099167494225", "Cornelius");
                     whitePlayerId = event.getAuthor().getId();
-                    blackPlayerId = System.getenv("OWNER_ID"); //Cornelius Discord Id
+                    blackPlayerId = "693282099167494225";//System.getenv("OWNER_ID"); //Cornelius Discord Id
                     gameState = GameStatus.PLAYER_MOVE;
                     gameMode = GameMode.PVC;
                     matchStartTime = System.currentTimeMillis();
+                    reply = "`Starting " + whitePlayerName + " (" + whitePlayerElo + ")" + " vs. Cornelius (" + blackPlayerElo + ") Chess Game`\nMake a move (ex: `c2 c4`)";
                 }
                 else if (reply.equals(GameMode.CVP.toString())) {
-                    reply = "`Starting Computer vs. Player Game`\nCornelius will go first...";
+
                     boardImageFile = new File(gameBoardImageLoc);
                     whitePlayerName = "Cornelius";
                     blackPlayerName = event.getAuthor().getName();
-                    whitePlayerId = System.getenv("OWNER_ID"); //Cornelius Discord Id
+                    whitePlayerElo = db.addUser("693282099167494225", "Cornelius");
+                    blackPlayerElo = db.addUser(event.getAuthor().getId(), event.getAuthor().getName());
+                    whitePlayerId = "693282099167494225";//System.getenv("OWNER_ID"); //Cornelius Discord Id
                     blackPlayerId = event.getAuthor().getId();
                     gameState = GameStatus.COMPUTER_MOVE;
                     gameMode = GameMode.CVP;
                     matchStartTime = System.currentTimeMillis();
+                    reply = "`Starting Cornelius (" + whitePlayerElo + ")" + " vs. " + blackPlayerName + " (" + blackPlayerElo + ") Chess Game`\nCornelius will go first...";
                 }
                 else {
                     reply = "Please choose from player options `(1-4)`:";
                 }
                 break;
             case CHALLENGE_OPPONENT:
+                //The player who sent the challenge must enter the challengee's  user id
+                if (!event.getAuthor().getId().equals(whitePlayerId)) {
+                    reply = "`" + whitePlayerName + "` must enter the Challengee user id";
+                    belowMessage = null;
+                    boardImageFile = null;
+                    break;
+                }
                 Guild guild = event.getGuild();
-                Member member = guild.getMemberById(message.trim());
+                Member member = null;
+                try {
+                   member = guild.getMemberById(message.trim());
+                }
+                catch (Exception e) {
+                    //Do nothing
+                }
                 if (member == null || !guild.getMembers().contains(member)) {
                     reply = "Opponent does not exist or is not in your discord server. Please reenter userId.";
                 }
                 else { //Valid opponent found
-                    db.addUser(event.getAuthor().getId(), event.getAuthor().getName());
-                    db.addUser(message.trim(), member.getEffectiveName());
-                    whitePlayerName = event.getAuthor().getName();
+                    blackPlayerElo = db.addUser(message.trim(), member.getEffectiveName());
                     blackPlayerName = member.getEffectiveName();
-                    whitePlayerId = event.getAuthor().getId();
                     blackPlayerId = member.getId();
                     reply = "`" + event.getAuthor().getName() + "` challenges <@" + blackPlayerId + "> to a chess game. Challengee must reply `y` to this text chat to accept!";
                     gameState = GameStatus.OPPONENT_ACCEPT_DECLINE;
@@ -213,7 +234,7 @@ public class ChessCommand {
             case OPPONENT_ACCEPT_DECLINE:
                 if (event.getAuthor().getId().equals(blackPlayerId)) {
                     if (message.equalsIgnoreCase("y")) {
-                        reply = "<@" + whitePlayerId + "> vs <@" + blackPlayerId + ">";
+                        reply = "<@" + whitePlayerId + "> ("+whitePlayerElo+") vs <@" + blackPlayerId + "> ("+blackPlayerElo+") Chess Game";
                         boardImageFile = new File(gameBoardImageLoc);
                         belowMessage = "`"+ whitePlayerName + "` goes first. Make a move (ex: `c2 c4`)";
                         gameState = GameStatus.PLAYER_MOVE;
@@ -278,21 +299,21 @@ public class ChessCommand {
             boardImageFile = new File(gameBoardImageLoc);
             belowMessage = "GG";
             if (reply.contains("DRAW")) {
-                db.updateUser(blackPlayerId, false, true);
-                db.updateUser(whitePlayerId, false, true);
+                db.updateUser(blackPlayerId, false, true, blackPlayerElo, whitePlayerElo);
+                db.updateUser(whitePlayerId, false, true, whitePlayerElo, blackPlayerElo);
                 db.addCompletedMatch(whitePlayerName, blackPlayerName, whitePlayerId, blackPlayerId, "", "", true, matchStartTime);
             }
             else { //CHECKMATE
                 if (chessGame.isWhitePlayerTurn()) { // Black checkmated White
                     reply = "`" + blackPlayerName + "` has CHECKMATED `" + whitePlayerName + "`";
-                    db.updateUser(blackPlayerId, true, false);
-                    db.updateUser(whitePlayerId, false, false);
+                    db.updateUser(blackPlayerId, true, false, blackPlayerElo, whitePlayerElo);
+                    db.updateUser(whitePlayerId, false, false, whitePlayerElo, blackPlayerElo);
                     db.addCompletedMatch(whitePlayerName, blackPlayerName, whitePlayerId, blackPlayerId, blackPlayerName, whitePlayerName, false, matchStartTime);
                 }
                 else { // White checkmated Black
                     reply = "`" + whitePlayerName + "` has CHECKMATED `" + blackPlayerName + "`";
-                    db.updateUser(blackPlayerId, false, false);
-                    db.updateUser(whitePlayerId, true, false);
+                    db.updateUser(blackPlayerId, false, false, blackPlayerElo, whitePlayerElo);
+                    db.updateUser(whitePlayerId, true, false, whitePlayerElo, blackPlayerElo);
                     db.addCompletedMatch(whitePlayerName, blackPlayerName, whitePlayerId, blackPlayerId, whitePlayerName, blackPlayerName, false, matchStartTime);
                 }
             }
