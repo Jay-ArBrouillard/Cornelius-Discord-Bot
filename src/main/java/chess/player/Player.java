@@ -17,7 +17,7 @@ public abstract class Player {
     protected final Board board;
     protected final King playerKing;
     protected final List<Move> legalMoves;
-    private final boolean isInCheck;
+    protected final boolean isInCheck;
     protected boolean isRobot;
 
     protected Player(final Board board, final List<Move> legalMoves, final List<Move> opponentMoves) {
