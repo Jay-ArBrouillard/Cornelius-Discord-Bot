@@ -25,7 +25,7 @@ public class Board {
     private final Player currentPlayer;
 
     private final Pawn enPassantPawn;
-    private final List<Move> movesPlayed;
+    private final List<Move> movesPlayed; //Will contain no more than the last 50 moves
 
     private static final int START_X_COORDINATE = 70;
     private static final int START_Y_COORDINATE = 43;
@@ -80,8 +80,7 @@ public class Board {
         if (movesPlayed.size() < 50) {
             return false;
         }
-        int iterations = 0;
-        for (int i = movesPlayed.size() - 1; i >= 0 || iterations < 50; i--) {
+        for (int i = 0; i < movesPlayed.size(); i++) {
             final Move move = movesPlayed.get(i);
             if (move instanceof PawnMove ||
                     move instanceof PawnAttackMove ||
@@ -89,7 +88,6 @@ public class Board {
                     move instanceof MajorAttackMove) {
                 return false;
             }
-            iterations++;
         }
         return true;
     }
@@ -318,6 +316,9 @@ public class Board {
         }
 
         public Board build(List<Move> movesPlayed) {
+            if (movesPlayed.size() >= 51) {
+                movesPlayed.remove(0); //IMPORTANT: never let the size exceed 50 moves. Remove the first move in the list
+            }
             return new Board(this, movesPlayed);
         }
 
