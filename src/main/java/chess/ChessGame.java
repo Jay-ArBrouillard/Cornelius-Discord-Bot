@@ -128,8 +128,9 @@ public class ChessGame {
 
     private String handleMove(int startCoordinate, int destinationCoordinate, String filtered) {
         final Move move = Move.MoveFactory.createMove(this.board, startCoordinate, destinationCoordinate);
-        final MoveTransition transition = this.board.getCurrentPlayer().makeMove(move);
+        MoveTransition transition = this.board.getCurrentPlayer().makeMove(move);
         if (transition.getMoveStatus().isDone()) {
+            this.board = null;
             this.board = transition.getTransitionBoard();
             this.board.buildImage();
 
@@ -162,9 +163,11 @@ public class ChessGame {
         }
         else {
             if (transition.getMoveStatus().leavesPlayerInCheck()) {
+                transition = null;
                 return "`"+filtered + "` leaves " + this.board.getCurrentPlayer().getAlliance() + " player in check";
             }
             else {
+                transition = null;
                 return "`"+filtered + "` is not a legal move for " + this.board.getCurrentPlayer().getAlliance();
             }
         }
