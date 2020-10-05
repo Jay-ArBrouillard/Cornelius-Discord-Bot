@@ -158,7 +158,7 @@ public class ChessGame {
             if (this.board.getCurrentPlayer().isInCheck()) {
                 return "CHECK" + move.toString();
             }
-
+            transition = null;
             return "Success!" + move.toString();
         }
         else {
