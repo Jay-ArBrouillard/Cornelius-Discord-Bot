@@ -227,7 +227,9 @@ public class Board {
                 Tile curr = this.gameBoard.get(i);
                 if (curr.isTileOccupied()) {
                     //Overlay that piece
-                    g.drawImage(ImageIO.read(new File(curr.getPiece().getFilePath())), x, y, 120, 120, null);
+                    BufferedImage piece = ImageIO.read(new File(curr.getPiece().getFilePath()));
+                    g.drawImage(piece, x, y, 120, 120, null);
+                    piece.flush();
                 }
                 if ((i+1) % BoardUtils.NUM_TILES_PER_ROW == 0) {
                     x = START_X_COORDINATE;
