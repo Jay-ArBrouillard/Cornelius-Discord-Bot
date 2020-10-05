@@ -241,16 +241,16 @@ public class Board {
                 }
             }
             ImageIO.write(result, "png", new File("src/main/java/chess/gameState.png"));
-            result.flush();
-            g.dispose();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             if (result != null) {
                 result.flush();
+                result = null;
             }
             if (g != null) {
                 g.dispose();
+                g = null;
             }
         }
     }
