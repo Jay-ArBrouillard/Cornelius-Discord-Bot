@@ -99,7 +99,7 @@ abstract class UCIEngine {
                 case DEFAULT:
                     break;
                 case BMI2:
-                    path.append("_bmi2");
+                    path.append("_bmi2.exe"); //Quick patch fix
                     break;
                 case MODERN:
                     path.append("_modern");
