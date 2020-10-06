@@ -70,7 +70,7 @@ public abstract class Piece {
         else {
             pathbuilder.append("White_");
         }
-        pathbuilder.append(this.pieceType.pieceName);
+        pathbuilder.append(this.pieceType.fullPieceName);
         pathbuilder.append(".png");
         return pathbuilder.toString();
     }
@@ -81,7 +81,7 @@ public abstract class Piece {
 
     public enum PieceType {
 
-        PAWN(100, "Pawn") {
+        PAWN(100, "P", "Pawn") {
             @Override
             public boolean isKing() {
                 return false;
@@ -92,7 +92,7 @@ public abstract class Piece {
                 return false;
             }
         },
-        KNIGHT(300, "Knight") {
+        KNIGHT(300, "N", "Knight") {
             @Override
             public boolean isKing() {
                 return false;
@@ -103,7 +103,7 @@ public abstract class Piece {
                 return false;
             }
         },
-        BISHOP(330, "Bishop") {
+        BISHOP(330, "B", "Bishop") {
             @Override
             public boolean isKing() {
                 return false;
@@ -114,7 +114,7 @@ public abstract class Piece {
                 return false;
             }
         },
-        ROOK(500, "Rook") {
+        ROOK(500, "R", "Rook") {
             @Override
             public boolean isKing() {
                 return false;
@@ -125,7 +125,7 @@ public abstract class Piece {
                 return true;
             }
         },
-        QUEEN(900, "Queen") {
+        QUEEN(900, "Q", "Queen") {
             @Override
             public boolean isKing() {
                 return false;
@@ -136,7 +136,7 @@ public abstract class Piece {
                 return false;
             }
         },
-        KING(10000, "King") {
+        KING(10000, "K", "King") {
             @Override
             public boolean isKing() {
                 return true;
@@ -150,9 +150,15 @@ public abstract class Piece {
 
         private final int value;
         private final String pieceName;
+        private final String fullPieceName;
+
 
         public int getPieceValue() {
             return this.value;
+        }
+
+        public String getFullPieceName() {
+            return this.fullPieceName;
         }
 
         @Override
@@ -161,9 +167,11 @@ public abstract class Piece {
         }
 
         PieceType(final int val,
-                  final String pieceName) {
+                  final String pieceName,
+                  final String fullPieceName) {
             this.value = val;
             this.pieceName = pieceName;
+            this.fullPieceName = fullPieceName;
         }
 
         public abstract boolean isKing();

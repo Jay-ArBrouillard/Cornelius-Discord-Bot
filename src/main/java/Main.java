@@ -16,7 +16,7 @@ public class Main {
     public static void main(String[] args) throws LoginException, InterruptedException {//
         String token = System.getenv("TOKEN");
         // the second is the bot's owner's id
-        String ownerId = System.getenv("OWNER_ID");
+        String ownerId =System.getenv("OWNER_ID");
         String moviesApiKey = System.getenv("MOVIES_API_KEY");
         String calendarApiKey = System.getenv("HOLIDAY_API_KEY");
         String unsplashAccessKey = System.getenv("UNSPLASH_ACCESS_KEY");

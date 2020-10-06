@@ -13,6 +13,9 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import java.util.Collection;
 import java.util.Comparator;
 
+/**
+ * Minimax Algorithm with Alpha-Beta Pruning and Move Ordering
+ */
 public class AlphaBetaWithMoveOrdering implements MoveStrategy {
 
     private final BoardEvaluator evaluator;

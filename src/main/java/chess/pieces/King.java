@@ -83,6 +83,11 @@ public class King extends Piece {
     }
 
     @Override
+    public String toString() {
+        return this.pieceType.toString();
+    }
+
+    @Override
     public boolean equals(final Object other) {
         if (this == other) {
             return true;

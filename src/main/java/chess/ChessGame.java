@@ -1,28 +1,41 @@
 package chess;
 
-import Utils.GoogleSheets;
 import chess.board.Board;
 import chess.board.Move;
 import chess.board.Tile;
+import chess.pgn.FenUtils;
 import chess.player.MoveTransition;
-import chess.player.ai.AlphaBetaWithMoveOrdering;
-import chess.player.ai.IterativeDeepening;
+import chess.player.ai.stockfish.StockFishClient;
+import chess.player.ai.stockfish.engine.enums.Option;
+import chess.player.ai.stockfish.engine.enums.Query;
+import chess.player.ai.stockfish.engine.enums.QueryType;
+import chess.player.ai.stockfish.engine.enums.Variant;
 import net.dv8tion.jda.api.entities.MessageChannel;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class ChessGame {
     public Board board;
     private ChessMessageHandler messageHandler;
-    private AlphaBetaWithMoveOrdering minimaxDepth6;
-    private IterativeDeepening iterativeDeepening;
+    private StockFishClient stockFishClient;
+    public String evalScore;
 
     public ChessGame(MessageChannel messageChannel) {
         board = Board.createStandardBoard();
         messageHandler = new ChessMessageHandler();
-//        minimaxDepth6 = new AlphaBetaWithMoveOrdering(6, 0, messageChannel);
-        iterativeDeepening = new IterativeDeepening(9, messageChannel);
+        try {
+            stockFishClient = new StockFishClient.Builder()
+//                    .setInstances(4)
+//                    .setOption(Option.Threads, 4) // Number of threads that Stockfish will use
+                    .setOption(Option.Minimum_Thinking_Time, 1000) // Minimum thinking time Stockfish will take
+                    .setOption(Option.Skill_Level, 20) // Stockfish skill level 0-20
+                    .setVariant(Variant.BMI2) // Stockfish Variant
+                    .build();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean isWhitePlayerTurn() {
@@ -158,6 +171,13 @@ public class ChessGame {
             if (this.board.getCurrentPlayer().isInCheck()) {
                 return "CHECK" + move.toString();
             }
+
+            //Update eval score
+            //+position eval is good for white, -negative eval is good for black
+            evalScore = stockFishClient.submit(new Query.Builder(QueryType.EVAL)
+                    .setFen(FenUtils.parseFEN(this.board))
+                    .build()).substring(22);
+
             transition = null;
             return "Success!" + move.toString();
         }
@@ -247,15 +267,24 @@ public class ChessGame {
         return intValue;
     }
 
-    /*
-     * Amount of time AI has to choose a move
-     */
-    public int aiTimeLimit() {
-        return iterativeDeepening.MAXIMUM_TIME / 1000;
-    }
+    public String ai(MessageChannel mc) {
+        int randomThinkTime = ThreadLocalRandom.current().nextInt(5000, 10000 + 1); //Between 5-10 seconds
+        mc.sendTyping().queue();
+        String bestMoveString = stockFishClient.submit(new Query.Builder(QueryType.Best_Move)
+                                        .setMovetime(randomThinkTime)
+                                        .setFen(FenUtils.parseFEN(this.board))
+                                        .build());
+        mc.sendTyping().queue();
 
-    public String ai() {
-        final Move bestMove = iterativeDeepening.execute(this.board);
-        return handleMove(bestMove.getCurrentCoordinate(), bestMove.getDestinationCoordinate(), null);
+        String x1Str = Character.toString(bestMoveString.charAt(0));
+        String y1Str = Character.toString(bestMoveString.charAt(1));
+        String x2Str = Character.toString(bestMoveString.charAt(2));
+        String y2Str = Character.toString(bestMoveString.charAt(3));
+
+        ///////////////////////// Get board coordinates from input ////////////////////////////////
+        int startCoordinate = convertInputToInteger(x1Str, y1Str);
+        int destinationCoordinate = convertInputToInteger(x2Str, y2Str);
+
+        return handleMove(startCoordinate, destinationCoordinate, null);
     }
 }

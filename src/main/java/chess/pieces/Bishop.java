@@ -62,6 +62,11 @@ public class Bishop extends Piece {
     }
 
     @Override
+    public String toString() {
+        return this.pieceType.toString();
+    }
+
+    @Override
     public int locationBonus() {
         return this.pieceAlliance.bishopBonus(this.piecePosition);
     }

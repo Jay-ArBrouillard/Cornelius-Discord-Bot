@@ -5,7 +5,6 @@ import chess.board.BoardUtils;
 import chess.board.Move;
 import chess.player.MoveTransition;
 import com.google.common.collect.ComparisonChain;
-import com.google.common.collect.Ordering;
 import com.google.common.primitives.Ints;
 import net.dv8tion.jda.api.entities.MessageChannel;
 
@@ -13,6 +12,9 @@ import java.util.*;
 
 import static chess.board.Move.NULL_MOVE;
 
+/**
+ * Minimax Algorithm with Iterative Deepening
+ */
 public class IterativeDeepening implements MoveStrategy {
 
     private final BoardEvaluator evaluator;

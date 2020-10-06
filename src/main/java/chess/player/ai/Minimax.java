@@ -4,6 +4,9 @@ import chess.board.Board;
 import chess.board.Move;
 import chess.player.MoveTransition;
 
+/**
+ * Simple Minimax algorithm
+ */
 public class Minimax implements MoveStrategy {
 
     private final BoardEvaluator boardEvaluator;

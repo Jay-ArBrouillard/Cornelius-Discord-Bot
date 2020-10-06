@@ -2,6 +2,7 @@ package commands;
 
 import Utils.GoogleSheets;
 import chess.*;
+import chess.pgn.FenUtils;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -151,16 +152,17 @@ public class ChessCommand {
                             belowMessage = "`" + blackPlayerName + "'s` turn. ";
                         }
                     }
+                    reply += " : " + chessGame.evalScore;
                     if (gameMode.isPlayerVsPlayer()) {
                         belowMessage += "Make a move (ex: `c2c4` or `help` or `helpb2` to see possible moves or `q` to forfeit the game)";
                     }
-                    else { //Only change turn if move went through
+                    else { //Only change game status here if its computer game
                         gameState = GameStatus.COMPUTER_MOVE;
                     }
                 }
                 break;
             case SETUP:
-                reply = "New `Chess` game started. Please choose from player options `(1-4)`:\n1. Player (WHITE) vs. Player (BLACK)\n2. Player vs. Computer\n3. Computer vs. Player";
+                reply = "New `Chess` game started. Please choose from player options `(1-3)`:\n1. Player (WHITE) vs. Player (BLACK)\n2. Player vs. Computer\n3. Computer vs. Player";
                 gameState = GameStatus.SETUP_RESPONSE;
                 break;
             case SETUP_RESPONSE:
@@ -294,7 +296,7 @@ public class ChessCommand {
     }
 
     public static void computerAction(MessageReceivedEvent event) {
-        reply = chessGame.ai();
+        reply = chessGame.ai(event.getChannel());
         if (reply.contains("CHECKMATE") || reply.contains("DRAW")) {
             boardImageFile = new File(gameBoardImageLoc);
             belowMessage = "GG";
@@ -342,7 +344,7 @@ public class ChessCommand {
             }
             gameState = GameStatus.PLAYER_MOVE;
         }
-
+        reply += " : " + chessGame.evalScore;
         sendMessages(event, reply, boardImageFile, belowMessage);
     }
 

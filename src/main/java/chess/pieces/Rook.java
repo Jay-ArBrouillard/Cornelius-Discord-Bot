@@ -60,6 +60,11 @@ public class Rook extends Piece {
     }
 
     @Override
+    public String toString() {
+        return this.pieceType.toString();
+    }
+
+    @Override
     public int locationBonus() {
         return this.pieceAlliance.rookBonus(this.piecePosition);
     }

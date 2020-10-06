@@ -124,7 +124,7 @@ public abstract class Move {
 
         @Override
         public String toString() {
-            return this.movedPiece.getPieceType().toString() + " Major Attack `" + BoardUtils.getPositionAtCoordinate(this.getCurrentCoordinate()) + BoardUtils.getPositionAtCoordinate(this.destinationCoordinate) + "`";
+            return this.movedPiece.getPieceType().getFullPieceName() + " Major Attack `" + BoardUtils.getPositionAtCoordinate(this.getCurrentCoordinate()) + BoardUtils.getPositionAtCoordinate(this.destinationCoordinate) + "`";
         }
     }
 
@@ -145,7 +145,7 @@ public abstract class Move {
 
         @Override
         public String toString() {
-            return this.movedPiece.getPieceType().toString() + " Major Move `" + BoardUtils.getPositionAtCoordinate(this.getCurrentCoordinate()) + BoardUtils.getPositionAtCoordinate(this.destinationCoordinate) + "`";
+            return this.movedPiece.getPieceType().getFullPieceName() + " Major Move `" + BoardUtils.getPositionAtCoordinate(this.getCurrentCoordinate()) + BoardUtils.getPositionAtCoordinate(this.destinationCoordinate) + "`";
         }
     }
 

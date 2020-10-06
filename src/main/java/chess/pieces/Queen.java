@@ -65,6 +65,11 @@ public class Queen extends Piece {
     }
 
     @Override
+    public String toString() {
+        return this.pieceType.toString();
+    }
+
+    @Override
     public int locationBonus() {
         return this.pieceAlliance.queenBonus(this.piecePosition);
     }
