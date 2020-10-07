@@ -33,7 +33,7 @@ abstract class UCIEngine {
 
     void sendCommand(String command) {
         try {
-            output.write(command + "\n");
+            output.write(command.getBytes() + "\n");
             output.flush();
         } catch (IOException e) {
             throw new StockfishEngineException(e);
