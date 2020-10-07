@@ -26,11 +26,6 @@ abstract class UCIEngine {
                 System.out.println("process is not alive");
             }
 
-            System.out.println(process.getErrorStream().toString());
-            System.out.println(process.getInputStream().toString());
-            System.out.println(process.getOutputStream().toString());
-            System.out.println(process.exitValue());
-
             for (Option option : options)
                 passOption(option);
         } catch (IOException e) {
@@ -45,9 +40,19 @@ abstract class UCIEngine {
 
     void sendCommand(String command) {
         try {
-            System.out.println(process.exitValue());
+            if (process.isAlive()) {
+                System.out.println("process is working");
+            }
+            else {
+                System.out.println("process is not alive");
+            }
             output.write(command + "\n");
-            System.out.println(process.exitValue());
+            if (process.isAlive()) {
+                System.out.println("process is working");
+            }
+            else {
+                System.out.println("process is not alive");
+            }
             output.flush();
         } catch (IOException e) {
             throw new StockfishEngineException(e);
