@@ -15,7 +15,7 @@ abstract class UCIEngine {
 
     UCIEngine(String path, Variant variant, Option... options) throws StockfishInitException {
         try {
-            process = new ProcessBuilder("stockfish_20090216_x64_bmi2.exe").start();
+            process = new ProcessBuilder("bin/stockfish_20090216_x64_bmi2.exe").start();
             input = new BufferedReader(new InputStreamReader(process.getInputStream()));
             output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
