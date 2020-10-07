@@ -80,7 +80,7 @@ abstract class UCIEngine {
     }
 
     private String getPath(Variant variant, String override) {
-        StringBuilder path = new StringBuilder(override == null ? "bin/stockfish_20090216_x64_avx2.exe" : override + "stockfish_20090216_x64");
+        StringBuilder path = new StringBuilder(override == null ? "bin/stockfish_20090216_x64.exe" : override + "stockfish_20090216_x64");
 /*
         if (System.getProperty("os.name").toLowerCase().contains("win"))
             switch (variant) {
