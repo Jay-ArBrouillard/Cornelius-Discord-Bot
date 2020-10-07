@@ -15,7 +15,7 @@ public enum Option {
     Nodestime("nodestime");
 
     private String optionString;
-    private long value;
+    private Long value;
 
     Option(String option) {
         optionString = option;
@@ -24,6 +24,14 @@ public enum Option {
     public Option setValue(long value) {
         this.value = value;
         return this;
+    }
+
+    public Long getValue() {
+        return value;
+    }
+
+    public void setValue(Long value) {
+        this.value = value;
     }
 
     @Override

@@ -19,13 +19,6 @@ abstract class UCIEngine {
             input = new BufferedReader(new InputStreamReader(process.getInputStream()));
             output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
-            if (process.isAlive()) {
-                System.out.println("process is working");
-            }
-            else {
-                System.out.println("process is not alive");
-            }
-
             for (Option option : options)
                 passOption(option);
         } catch (IOException e) {
@@ -40,19 +33,7 @@ abstract class UCIEngine {
 
     void sendCommand(String command) {
         try {
-            if (process.isAlive()) {
-                System.out.println("process is working");
-            }
-            else {
-                System.out.println("process is not alive");
-            }
             output.write(command + "\n");
-            if (process.isAlive()) {
-                System.out.println("process is working");
-            }
-            else {
-                System.out.println("process is not alive");
-            }
             output.flush();
         } catch (IOException e) {
             throw new StockfishEngineException(e);
@@ -93,7 +74,9 @@ abstract class UCIEngine {
     }
 
     private void passOption(Option option) {
-        sendCommand(option.toString());
+        if (option.getValue() != null) {
+            sendCommand(option.toString());
+        }
     }
 
     private String getPath(Variant variant, String override) {
