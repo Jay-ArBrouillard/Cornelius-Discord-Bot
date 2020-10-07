@@ -15,7 +15,7 @@ abstract class UCIEngine {
 
     UCIEngine(String path, Variant variant, Option... options) throws StockfishInitException {
         try {
-            process = Runtime.getRuntime().exec(getPath(variant, path));
+            process = Runtime.getRuntime().exec("chmod +x " + getPath(variant, path));
             input = new BufferedReader(new InputStreamReader(process.getInputStream()));
             output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
@@ -34,9 +34,7 @@ abstract class UCIEngine {
     void sendCommand(String command) {
         try {
             output.write(command + "\n");
-            if (output != null) {
-                output.flush();
-            }
+            output.flush();
         } catch (IOException e) {
             throw new StockfishEngineException(e);
         }
