@@ -27,7 +27,7 @@ public class ChessGame {
         messageHandler = new ChessMessageHandler();
         try {
             stockFishClient = new StockFishClient.Builder()
-//                    .setInstances(4)
+//                    .setInstances(1)
 //                    .setOption(Option.Threads, 4) // Number of threads that Stockfish will use
                     .setOption(Option.Minimum_Thinking_Time, 1000) // Minimum thinking time Stockfish will take
                     .setOption(Option.Skill_Level, 20) // Stockfish skill level 0-20
