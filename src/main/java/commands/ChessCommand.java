@@ -152,7 +152,7 @@ public class ChessCommand {
                             belowMessage = "`" + blackPlayerName + "'s` turn. ";
                         }
                     }
-                    reply += " : " + chessGame.evalScore;
+                    if (chessGame.evalScore != null) reply += " : " + chessGame.evalScore;
                     if (gameMode.isPlayerVsPlayer()) {
                         belowMessage += "Make a move (ex: `c2c4` or `help` or `helpb2` to see possible moves or `q` to forfeit the game)";
                     }
@@ -344,7 +344,7 @@ public class ChessCommand {
             }
             gameState = GameStatus.PLAYER_MOVE;
         }
-        reply += " : " + chessGame.evalScore;
+        if (chessGame.evalScore != null) reply += " : " + chessGame.evalScore;
         sendMessages(event, reply, boardImageFile, belowMessage);
     }
 

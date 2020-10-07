@@ -176,7 +176,10 @@ public class ChessGame {
             //+position eval is good for white, -negative eval is good for black
             evalScore = stockFishClient.submit(new Query.Builder(QueryType.EVAL)
                     .setFen(FenUtils.parseFEN(this.board))
-                    .build()).substring(22);
+                    .build());
+            if (evalScore != null) {
+                evalScore = evalScore.substring(22);
+            }
 
             transition = null;
             return "Success!" + move.toString();
