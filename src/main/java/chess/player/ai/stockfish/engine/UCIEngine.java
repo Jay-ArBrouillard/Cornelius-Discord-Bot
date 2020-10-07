@@ -37,8 +37,9 @@ abstract class UCIEngine {
 
     void sendCommand(String command) {
         try {
-            output.write(command + "\n");
-//            output.flush();
+            output.write(command);
+            output.newLine();
+            output.close();
         } catch (IOException e) {
             throw new StockfishEngineException(e);
         }
@@ -78,8 +79,6 @@ abstract class UCIEngine {
     }
 
     private void passOption(Option option) {
-        if (option.getValue() != null) {
-            sendCommand(option.toString());
-        }
+        sendCommand(option.toString());
     }
 }
