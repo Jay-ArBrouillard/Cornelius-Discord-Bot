@@ -15,7 +15,8 @@ abstract class UCIEngine {
 
     UCIEngine(String path, Variant variant, Option... options) throws StockfishInitException {
         try {
-            process = Runtime.getRuntime().exec(getPath(variant, path));
+            String[] cmd = { "chmod", "744", getPath(variant, path) };
+            process = Runtime.getRuntime().exec(cmd);
             input = new BufferedReader(new InputStreamReader(process.getInputStream()));
             output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
