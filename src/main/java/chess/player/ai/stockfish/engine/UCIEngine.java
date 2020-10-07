@@ -29,6 +29,7 @@ abstract class UCIEngine {
             System.out.println(process.getErrorStream().toString());
             System.out.println(process.getInputStream().toString());
             System.out.println(process.getOutputStream().toString());
+            System.out.println(process.exitValue());
 
             for (Option option : options)
                 passOption(option);
@@ -44,7 +45,9 @@ abstract class UCIEngine {
 
     void sendCommand(String command) {
         try {
+            System.out.println(process.exitValue());
             output.write(command + "\n");
+            System.out.println(process.exitValue());
             output.flush();
         } catch (IOException e) {
             throw new StockfishEngineException(e);
