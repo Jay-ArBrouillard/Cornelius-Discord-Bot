@@ -19,13 +19,6 @@ abstract class UCIEngine {
             input = new BufferedReader(new InputStreamReader(process.getInputStream()));
             output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
-            if (input == null) {
-                System.out.println("initializing input is null");
-            }
-            if (output == null) {
-                System.out.println("initializing output is null");
-            }
-
             for (Option option : options)
                 passOption(option);
         } catch (IOException e) {
@@ -90,7 +83,7 @@ abstract class UCIEngine {
     }
 
     private String getPath(Variant variant, String override) {
-        StringBuilder path = new StringBuilder(override == null ? "bin/stockfish_20090216_x64" : override + "stockfish_20090216_x64");
+        StringBuilder path = new StringBuilder(override == null ? "chmod +x ./bin/stockfish_20090216_x64" : override + "stockfish_20090216_x64");
 
         if (System.getProperty("os.name").toLowerCase().contains("win"))
             switch (variant) {
