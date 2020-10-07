@@ -19,6 +19,17 @@ abstract class UCIEngine {
             input = new BufferedReader(new InputStreamReader(process.getInputStream()));
             output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
+            if (process.isAlive()) {
+                System.out.println("process is working");
+            }
+            else {
+                System.out.println("process is not alive");
+            }
+
+            System.out.println(process.getErrorStream().toString());
+            System.out.println(process.getInputStream().toString());
+            System.out.println(process.getOutputStream().toString());
+
             for (Option option : options)
                 passOption(option);
         } catch (IOException e) {
@@ -33,13 +44,8 @@ abstract class UCIEngine {
 
     void sendCommand(String command) {
         try {
-            if (output != null) {
-                output.write(command + "\n");
-                output.flush();
-            }
-            else {
-                System.out.println("output is null");
-            }
+            output.write(command + "\n");
+            output.flush();
         } catch (IOException e) {
             throw new StockfishEngineException(e);
         }
