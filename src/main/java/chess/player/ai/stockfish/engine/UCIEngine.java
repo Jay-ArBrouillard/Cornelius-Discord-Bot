@@ -15,8 +15,7 @@ abstract class UCIEngine {
 
     UCIEngine(String path, Variant variant, Option... options) throws StockfishInitException {
         try {
-            String[] cmd = { "chmod", "744", getPath(variant, path) };
-            process = Runtime.getRuntime().exec(cmd);
+            process = Runtime.getRuntime().exec(getPath(variant, path));
             input = new BufferedReader(new InputStreamReader(process.getInputStream()));
             output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
@@ -81,8 +80,8 @@ abstract class UCIEngine {
     }
 
     private String getPath(Variant variant, String override) {
-        StringBuilder path = new StringBuilder(override == null ? "bin/stockfish_20090216_x64" : override + "stockfish_20090216_x64");
-
+        StringBuilder path = new StringBuilder(override == null ? "bin/stockfish_20090216_x64_avx2.exe" : override + "stockfish_20090216_x64");
+/*
         if (System.getProperty("os.name").toLowerCase().contains("win"))
             switch (variant) {
                 case DEFAULT:
@@ -109,7 +108,7 @@ abstract class UCIEngine {
                     break;
                 default:
                     throw new StockfishEngineException("Illegal variant provided.");
-            }
+    }*/
 
         return path.toString();
     }
