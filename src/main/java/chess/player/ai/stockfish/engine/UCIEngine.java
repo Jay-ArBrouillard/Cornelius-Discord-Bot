@@ -19,6 +19,13 @@ abstract class UCIEngine {
             input = new BufferedReader(new InputStreamReader(process.getInputStream()));
             output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
+            if (input == null) {
+                System.out.println("initializing input is null");
+            }
+            if (output == null) {
+                System.out.println("initializing output is null");
+            }
+
             for (Option option : options)
                 passOption(option);
         } catch (IOException e) {
@@ -33,7 +40,13 @@ abstract class UCIEngine {
 
     void sendCommand(String command) {
         try {
-            output.write(command + "\n");
+            if (output != null) {
+                output.write(command + "\n");
+                output.flush();
+            }
+            else {
+                System.out.println("output is null");
+            }
         } catch (IOException e) {
             throw new StockfishEngineException(e);
         }
