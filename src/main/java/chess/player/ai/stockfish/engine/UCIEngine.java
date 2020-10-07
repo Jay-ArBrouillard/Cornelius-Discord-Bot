@@ -15,7 +15,7 @@ abstract class UCIEngine {
 
     UCIEngine(String path, Variant variant, Option... options) throws StockfishInitException {
         try {
-            process = Runtime.getRuntime().exec(getPath(variant, path));
+            process = Runtime.getRuntime().exec(getPath(variant, path), null, new File("bin"));
             input = new BufferedReader(new InputStreamReader(process.getInputStream()));
             output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
@@ -80,7 +80,7 @@ abstract class UCIEngine {
     }
 
     private String getPath(Variant variant, String override) {
-        StringBuilder path = new StringBuilder(override == null ? "bin/stockfish_20090216_x64.exe" : override + "stockfish_20090216_x64");
+        StringBuilder path = new StringBuilder(override == null ? "bin/stockfish_20090216_x64_bmi2.exe" : override + "stockfish_20090216_x64");
 /*
         if (System.getProperty("os.name").toLowerCase().contains("win"))
             switch (variant) {
