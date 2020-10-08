@@ -1,5 +1,11 @@
 import Utils.CommandHelper;
 import Utils.MovieWatcher;
+import chess.pgn.FenUtils;
+import chess.player.ai.stockfish.StockFishClient;
+import chess.player.ai.stockfish.engine.enums.Option;
+import chess.player.ai.stockfish.engine.enums.Query;
+import chess.player.ai.stockfish.engine.enums.QueryType;
+import chess.player.ai.stockfish.engine.enums.Variant;
 import commands.Holiday;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -20,6 +26,24 @@ public class Main {
         String moviesApiKey = System.getenv("MOVIES_API_KEY");
         String calendarApiKey = System.getenv("HOLIDAY_API_KEY");
         String unsplashAccessKey = System.getenv("UNSPLASH_ACCESS_KEY");
+
+        StockFishClient stockFishClient = null;
+        try {
+             stockFishClient = new StockFishClient.Builder()
+                    .setOption(Option.Minimum_Thinking_Time, 1000) // Minimum thinking time Stockfish will take
+                    .setOption(Option.Skill_Level, 20) // Stockfish skill level 0-20
+                    .setVariant(Variant.BMI2) // Stockfish Variant
+                    .build();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        String bestMoveString = stockFishClient.submit(new Query.Builder(QueryType.Best_Move)
+                .setMovetime(1000)
+                .setFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+                .build());
+
+        System.out.println(bestMoveString);
 
         // start getting a bot account set up
         JDA jda = JDABuilder.createDefault(token)

@@ -90,15 +90,6 @@ public class ChessCommand {
             chessGame.board.buildImage();
             gameState = GameStatus.SETUP;
             db = new GoogleSheets();
-            try {
-                stockFishClient = new StockFishClient.Builder()
-                        .setOption(Option.Minimum_Thinking_Time, 1000) // Minimum thinking time Stockfish will take
-                        .setOption(Option.Skill_Level, 20) // Stockfish skill level 0-20
-                        .setVariant(Variant.BMI2) // Stockfish Variant
-                        .build();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
 
         //State machine game mechanics
