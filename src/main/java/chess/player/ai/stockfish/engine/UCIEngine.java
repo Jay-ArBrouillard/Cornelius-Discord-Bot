@@ -15,12 +15,13 @@ abstract class UCIEngine {
 
     UCIEngine(String path, Variant variant, Option... options) throws StockfishInitException {
         try {
-                Process process = new ProcessBuilder().command("bin/stockfish_20090216_x64_bmi2").start();
+                Process process = new ProcessBuilder().command("bin/stockfish_20090216_x64").start();
 
                 StringBuilder output = new StringBuilder();
                 BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
-                writer.write("position fen rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" + "\n");
+                writer.write("position fen rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+                writer.newLine();
                 writer.write("go movetime 1000");
                 writer.flush();
 
