@@ -15,8 +15,7 @@ abstract class UCIEngine {
 
     UCIEngine(Variant variant, Option... options) throws StockfishInitException {
         try {
-            process = new ProcessBuilder().command(getPath(variant)).start();
-
+            process = Runtime.getRuntime().exec(getPath(variant));
             input = new BufferedReader(new InputStreamReader(process.getInputStream()));
             output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 

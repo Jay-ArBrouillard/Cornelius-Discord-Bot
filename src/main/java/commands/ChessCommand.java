@@ -301,7 +301,7 @@ public class ChessCommand {
 
     public static void computerAction(MessageReceivedEvent event) {
         reply = chessGame.ai(event.getChannel());
-        if (reply.contains("CHECKMATE") || reply.contains("DRAW")) {
+        if (reply.contains("CHECKMATE") || reply.contains("DRAW") || reply.contains("RESIGNED")) {
             boardImageFile = new File(gameBoardImageLoc);
             belowMessage = "GG";
             if (reply.contains("DRAW")) {
@@ -309,15 +309,16 @@ public class ChessCommand {
                 db.updateUser(whitePlayerId, false, true, whitePlayerElo, blackPlayerElo);
                 db.addCompletedMatch(whitePlayerName, blackPlayerName, whitePlayerId, blackPlayerId, "", "", true, matchStartTime);
             }
-            else { //CHECKMATE
+            else { //CHECKMATE or RESIGNED
+                String result = reply.contains("CHECKMATE") ? "CHECKMATED" : "RESIGNED";
                 if (chessGame.isWhitePlayerTurn()) { // Black checkmated White
-                    reply = "`" + blackPlayerName + "` has CHECKMATED `" + whitePlayerName + "`";
+                    reply = "`" + blackPlayerName + "` has "+result+" `" + whitePlayerName + "`";
                     db.updateUser(blackPlayerId, true, false, blackPlayerElo, whitePlayerElo);
                     db.updateUser(whitePlayerId, false, false, whitePlayerElo, blackPlayerElo);
                     db.addCompletedMatch(whitePlayerName, blackPlayerName, whitePlayerId, blackPlayerId, blackPlayerName, whitePlayerName, false, matchStartTime);
                 }
                 else { // White checkmated Black
-                    reply = "`" + whitePlayerName + "` has CHECKMATED `" + blackPlayerName + "`";
+                    reply = "`" + whitePlayerName + "` has "+result+" `" + blackPlayerName + "`";
                     db.updateUser(blackPlayerId, false, false, blackPlayerElo, whitePlayerElo);
                     db.updateUser(whitePlayerId, true, false, whitePlayerElo, blackPlayerElo);
                     db.addCompletedMatch(whitePlayerName, blackPlayerName, whitePlayerId, blackPlayerId, whitePlayerName, blackPlayerName, false, matchStartTime);

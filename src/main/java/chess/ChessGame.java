@@ -25,8 +25,9 @@ public class ChessGame {
     public ChessGame() {
         try {
             client = new StockFishClient.Builder()
+//                    .setInstances(4) //Only 1 chess game can be played at any time so I don't think increase instances will make any difference
                     .setOption(Option.Minimum_Thinking_Time, 1000) // Minimum thinking time Stockfish will take
-                    .setOption(Option.Skill_Level, 20) // Stockfish skill level 0-20
+                    .setOption(Option.Skill_Level, 0) // Stockfish skill level 0-20
                     .setVariant(Variant.MODERN) // As of 10/8/2020 Modern is the fastest variant that works on Heroku
                     .build();                   // on Local Windows BMI2 is the festest
         } catch (Exception e) {
@@ -95,16 +96,16 @@ public class ChessGame {
         String inputNoSpaces = input.replaceAll("\\s+", "");
         if (input.equals("o-o")) { //King side castle
             if (this.board.getCurrentPlayer().getAlliance().isBlack()) {
-                return handleMove(3, 1, inputNoSpaces);
+                return handleMove(3, 1, inputNoSpaces, false);
             } else {
-                return handleMove(59, 57, inputNoSpaces);
+                return handleMove(59, 57, inputNoSpaces, false);
             }
         }
         else if (input.equals("o-o-o")) { //Queen side castle
             if (this.board.getCurrentPlayer().getAlliance().isBlack()) {
-                return handleMove(3, 5, inputNoSpaces);
+                return handleMove(3, 5, inputNoSpaces, false);
             } else {
-                return handleMove(59, 61, inputNoSpaces);
+                return handleMove(59, 61, inputNoSpaces, false);
             }
         }
 
@@ -135,10 +136,10 @@ public class ChessGame {
             return messageHandler.getLastErrorMessage();
         }
 
-        return handleMove(startCoordinate, destinationCoordinate, inputNoSpaces);
+        return handleMove(startCoordinate, destinationCoordinate, inputNoSpaces, false);
     }
 
-    private String handleMove(int startCoordinate, int destinationCoordinate, String filtered) {
+    private String handleMove(int startCoordinate, int destinationCoordinate, String filtered, boolean isComputer) {
         final Move move = Move.MoveFactory.createMove(this.board, startCoordinate, destinationCoordinate);
         MoveTransition transition = this.board.getCurrentPlayer().makeMove(move);
         if (transition.getMoveStatus().isDone()) {
@@ -173,20 +174,28 @@ public class ChessGame {
 
             //Update eval score
             //+position eval is good for white, -negative eval is good for black
-            evalScore = client.submit(new Query.Builder(QueryType.EVAL)
-                    .setFen(FenUtils.parseFEN(this.board))
-                    .build()).substring(22);
+            Query query = new Query.Builder(QueryType.EVAL).setFen(FenUtils.parseFEN(this.board)).build();
+            final String[] temp = new String[1];
+            synchronized(this){
+                client.submit(query, result -> temp[0] = result);
+            }
+            evalScore = temp[0];
+            //Should computer resign?
+            if (isComputer) {
+                double evaluationScore = Double.parseDouble(evalScore.replaceAll("(white side)", "").trim());
+                if ((this.board.getCurrentPlayer().getAlliance().isWhite() && evaluationScore <= -10.0) ||
+                        (this.board.getCurrentPlayer().getAlliance().isBlack() && evaluationScore >= 10.0)) {
+                    return "Cornelius has RESIGNED!";
+                }
+            }
 
-            transition = null;
             return "Success!" + move.toString();
         }
         else {
             if (transition.getMoveStatus().leavesPlayerInCheck()) {
-                transition = null;
                 return "`"+filtered + "` leaves " + this.board.getCurrentPlayer().getAlliance() + " player in check";
             }
             else {
-                transition = null;
                 return "`"+filtered + "` is not a legal move for " + this.board.getCurrentPlayer().getAlliance();
             }
         }
@@ -270,22 +279,26 @@ public class ChessGame {
         int randomThinkTime = ThreadLocalRandom.current().nextInt(5000, 10000 + 1); //Between 5-10 seconds
         mc.sendTyping().queue();
 
-        String bestMoveString = client.submit(new Query.Builder(QueryType.Best_Move)
-                    .setMovetime(randomThinkTime)
-                    .setFen(FenUtils.parseFEN(this.board))
-                    .build());
+        Query query = new Query.Builder(QueryType.Best_Move).setMovetime(randomThinkTime).setFen(FenUtils.parseFEN(this.board)).build();
+        String bestMoveString = null;
+        final String[] reply = new String[1];
+        synchronized(this){
+            client.submit(query, result -> {
+                mc.sendTyping().queue();
 
-        mc.sendTyping().queue();
+                String x1Str = Character.toString(bestMoveString.charAt(0));
+                String y1Str = Character.toString(bestMoveString.charAt(1));
+                String x2Str = Character.toString(bestMoveString.charAt(2));
+                String y2Str = Character.toString(bestMoveString.charAt(3));
 
-        String x1Str = Character.toString(bestMoveString.charAt(0));
-        String y1Str = Character.toString(bestMoveString.charAt(1));
-        String x2Str = Character.toString(bestMoveString.charAt(2));
-        String y2Str = Character.toString(bestMoveString.charAt(3));
+                ///////////////////////// Get board coordinates from input ////////////////////////////////
+                int startCoordinate = convertInputToInteger(x1Str, y1Str);
+                int destinationCoordinate = convertInputToInteger(x2Str, y2Str);
 
-        ///////////////////////// Get board coordinates from input ////////////////////////////////
-        int startCoordinate = convertInputToInteger(x1Str, y1Str);
-        int destinationCoordinate = convertInputToInteger(x2Str, y2Str);
+                reply[0] = handleMove(startCoordinate, destinationCoordinate, null, true);
+            });
+        }
 
-        return handleMove(startCoordinate, destinationCoordinate, null);
+        return reply[0];
     }
 }
