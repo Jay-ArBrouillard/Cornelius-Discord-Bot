@@ -27,7 +27,7 @@ abstract class UCIEngine {
                 PrintWriter writer = new PrintWriter(process.getOutputStream());
                 writer.println("position fen rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
                 writer.println("go movetime 1000");
-                writer.close();
+                writer.flush();
 
                 String line;
                 while ((line = input.readLine()) != null) {
