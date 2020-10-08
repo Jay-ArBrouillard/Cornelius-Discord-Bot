@@ -15,17 +15,13 @@ abstract class UCIEngine {
 
     UCIEngine(String path, Variant variant, Option... options) throws StockfishInitException {
         try {
-            process = new ProcessBuilder("bin/stockfish_20090216_x64_bmi2.exe").start();
-            while (!process.isAlive()) {
-                Thread.sleep(1000);
-            }
-
+            process = Runtime.getRuntime().exec("bin/stockfish_20090216_x64_bmi2.exe");
             input = new BufferedReader(new InputStreamReader(process.getInputStream()));
             output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
             for (Option option : options)
                 passOption(option);
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             throw new StockfishInitException("Unable to start and bind Stockfish process: ", e);
         }
     }
@@ -37,9 +33,8 @@ abstract class UCIEngine {
 
     void sendCommand(String command) {
         try {
-            output.write(command);
-            output.newLine();
-            output.close();
+            output.write(command + "\n");
+            output.flush();
         } catch (IOException e) {
             throw new StockfishEngineException(e);
         }
