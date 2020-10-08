@@ -16,26 +16,19 @@ abstract class UCIEngine {
     UCIEngine(String path, Variant variant, Option... options) throws StockfishInitException {
         try {
                 Process process = new ProcessBuilder().command("bin/stockfish_20090216_x64_bmi2.exe").start();
-                int exitVal = process.waitFor();
-                if (exitVal == 0) {
-                    System.out.println("success");
-                }
-                else {
-                    System.out.println("error");
-                }
                 StringBuilder output = new StringBuilder();
                 BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
-                writer.write("position fen rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" + "\n");
-                writer.write("go movetime 1000");
-                writer.flush();
+                PrintWriter writer = new PrintWriter(process.getOutputStream());
+                writer.println("position fen rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+                writer.println("go movetime 1000");
+                writer.close();
 
                 String line;
                 while ((line = input.readLine()) != null) {
                     output.append(line + "\n");
                 }
 
-                exitVal = process.waitFor();
+                int exitVal = process.waitFor();
                 if (exitVal == 0) {
                     System.out.println("success");
                     System.out.println(output.toString());
