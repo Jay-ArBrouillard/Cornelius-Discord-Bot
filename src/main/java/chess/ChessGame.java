@@ -178,8 +178,9 @@ public class ChessGame {
             //Should computer resign?
             if (isComputer) {
                 double evaluationScore = Double.parseDouble(evalScore.replaceAll("(white side)", "").trim());
-                if ((this.board.getCurrentPlayer().getAlliance().isWhite() && evaluationScore <= -10.0) ||
-                        (this.board.getCurrentPlayer().getAlliance().isBlack() && evaluationScore >= 10.0)) {
+                if ((this.board.getCurrentPlayer().getOpponent().getAlliance().isWhite() && evaluationScore >= 10.0) ||
+                        (this.board.getCurrentPlayer().getOpponent().getAlliance().isBlack() && evaluationScore >= -10.0)) {
+                    System.out.println("Cornelius has resigned");
                     return "Cornelius has RESIGNED!";
                 }
             }

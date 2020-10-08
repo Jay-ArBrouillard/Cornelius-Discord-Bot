@@ -294,7 +294,7 @@ public class ChessCommand {
         oldMessageIds.addAll(currentMessageIds);
         currentMessageIds.clear();
 
-        if (reply.contains("CHECK") || reply.contains("DRAW") || reply.contains("RESIGNED") || reply.contains("declined")) {
+        if (reply.contains("checkmate") || reply.contains("DRAW") || reply.contains("resign") || reply.contains("decline")) {
             endGame(event.getChannel());
         }
     }
