@@ -271,10 +271,24 @@ public class ChessGame {
     public String ai(MessageChannel mc, StockFishClient stockFishClient) {
         int randomThinkTime = ThreadLocalRandom.current().nextInt(5000, 10000 + 1); //Between 5-10 seconds
         mc.sendTyping().queue();
-        String bestMoveString = stockFishClient.submit(new Query.Builder(QueryType.Best_Move)
-                                        .setMovetime(randomThinkTime)
-                                        .setFen(FenUtils.parseFEN(this.board))
-                                        .build());
+
+        String bestMoveString = null;
+        try {
+            StockFishClient client = new StockFishClient.Builder()
+                    .setInstances(1)
+                    .setOption(Option.Minimum_Thinking_Time, 1000) // Minimum thinking time Stockfish will take
+                    .setOption(Option.Skill_Level, 20) // Stockfish skill level 0-20
+                    .setVariant(Variant.BMI2) // Stockfish Variant
+                    .build();
+            bestMoveString = client.submit(new Query.Builder(QueryType.Best_Move)
+                    .setMovetime(randomThinkTime)
+                    .setFen(FenUtils.parseFEN(this.board))
+                    .build());
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
         mc.sendTyping().queue();
 
         String x1Str = Character.toString(bestMoveString.charAt(0));
