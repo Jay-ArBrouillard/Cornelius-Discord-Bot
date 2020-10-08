@@ -15,34 +15,44 @@ abstract class UCIEngine {
 
     UCIEngine(String path, Variant variant, Option... options) throws StockfishInitException {
         try {
-                Process process = Runtime.getRuntime().exec(new String[]{"cmd", "-c", "bin/stockfish_20090216_x64_bmi2.exe"}); //new ProcessBuilder().command("bin/stockfish_20090216_x64_bmi2.exe").start();
-//                while (!process.isAlive()) {
-//                    Thread.sleep(1000);
-//                }
+                //Build command
+                List<String> commands = new ArrayList<>();
+                commands.add("/bin/stockfish_20090216_x64_bmi2.exe");
+                //Add arguments
+//                commands.add("/home/narek/pk.txt");
+                System.out.println(commands);
 
-                System.out.println("Process is : " + process.isAlive());
+                //Run macro on target
+                ProcessBuilder pb = new ProcessBuilder(commands);
+                pb.directory(new File("/bin"));
+                pb.redirectErrorStream(true);
+                Process process = pb.start();
 
-                StringBuilder output = new StringBuilder();
-                InputStream stdout = process.getInputStream();
-                InputStreamReader isr = new InputStreamReader(stdout);
-                OutputStream stdin = process.getOutputStream();
-                OutputStreamWriter osr = new OutputStreamWriter(stdin);
-                BufferedWriter writer = new BufferedWriter(osr);
-                BufferedReader reader = new BufferedReader(isr);
+                //Read output
+                StringBuilder out = new StringBuilder();
+                BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                String line = null, previous = null;
+                while ((line = br.readLine()) != null)
+                    if (!line.equals(previous)) {
+                        previous = line;
+                        out.append(line).append('\n');
+                        System.out.println(line);
+                    }
 
-                writer.write("position fen rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-                writer.newLine();
-                writer.write("go movetime 1000");
-                writer.close();
-
-                String ch = reader.readLine();
-                while (ch != null) {
-                    output.append(ch);
-                    ch = reader.readLine();
+                //Check result
+                if (process.waitFor() == 0) {
+                    System.out.println("Success!");
+                    System.exit(0);
                 }
-                System.out.println(output);
 
-                reader.close();
+                //Abnormal termination: Log command parameters and output and throw ExecutionException
+                System.err.println(commands);
+                System.err.println(out.toString());
+                System.exit(1);
+
+
+//                writer.write("position fen rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+
 
 
 //            input = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -50,7 +60,7 @@ abstract class UCIEngine {
 
 //            for (Option option : options)
 //                passOption(option);
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             throw new StockfishInitException("Unable to start and bind Stockfish process: ", e);
         }
     }
