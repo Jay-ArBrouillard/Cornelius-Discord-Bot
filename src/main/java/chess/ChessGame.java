@@ -174,7 +174,7 @@ public class ChessGame {
 
             //Update eval score
             //+position eval is good for white, -negative eval is good for black
-            evalScore = client.submit(new Query.Builder(QueryType.EVAL).setFen(FenUtils.parseFEN(this.board)).build());
+            evalScore = client.submit(new Query.Builder(QueryType.EVAL).setFen(FenUtils.parseFEN(this.board)).build()).substring(22);
             //Should computer resign?
             if (isComputer) {
                 double evaluationScore = Double.parseDouble(evalScore.replaceAll("(white side)", "").trim());
