@@ -71,16 +71,6 @@ public class Stockfish extends UCIEngine {
         return legal.toString();
     }
 
-    public void close() throws IOException {
-        try {
-            sendCommand("quit");
-        } finally {
-            process.destroy();
-            input.close();
-            output.close();
-        }
-    }
-
     private String getFen() {
         waitForReady();
         sendCommand("d");

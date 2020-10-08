@@ -174,12 +174,7 @@ public class ChessGame {
 
             //Update eval score
             //+position eval is good for white, -negative eval is good for black
-            Query query = new Query.Builder(QueryType.EVAL).setFen(FenUtils.parseFEN(this.board)).build();
-            final String[] temp = new String[1];
-            synchronized(this){
-                client.submit(query, result -> temp[0] = result);
-            }
-            evalScore = temp[0];
+            evalScore = client.submit(new Query.Builder(QueryType.EVAL).setFen(FenUtils.parseFEN(this.board)).build());
             //Should computer resign?
             if (isComputer) {
                 double evaluationScore = Double.parseDouble(evalScore.replaceAll("(white side)", "").trim());
@@ -279,26 +274,18 @@ public class ChessGame {
         int randomThinkTime = ThreadLocalRandom.current().nextInt(5000, 10000 + 1); //Between 5-10 seconds
         mc.sendTyping().queue();
 
-        Query query = new Query.Builder(QueryType.Best_Move).setMovetime(randomThinkTime).setFen(FenUtils.parseFEN(this.board)).build();
-        String bestMoveString = null;
-        final String[] reply = new String[1];
-        synchronized(this){
-            client.submit(query, result -> {
-                mc.sendTyping().queue();
+        String bestMoveString = client.submit(new Query.Builder(QueryType.Best_Move).setMovetime(randomThinkTime).setFen(FenUtils.parseFEN(this.board)).build());
+        mc.sendTyping().queue();
 
-                String x1Str = Character.toString(bestMoveString.charAt(0));
-                String y1Str = Character.toString(bestMoveString.charAt(1));
-                String x2Str = Character.toString(bestMoveString.charAt(2));
-                String y2Str = Character.toString(bestMoveString.charAt(3));
+        String x1Str = Character.toString(bestMoveString.charAt(0));
+        String y1Str = Character.toString(bestMoveString.charAt(1));
+        String x2Str = Character.toString(bestMoveString.charAt(2));
+        String y2Str = Character.toString(bestMoveString.charAt(3));
 
-                ///////////////////////// Get board coordinates from input ////////////////////////////////
-                int startCoordinate = convertInputToInteger(x1Str, y1Str);
-                int destinationCoordinate = convertInputToInteger(x2Str, y2Str);
+        ///////////////////////// Get board coordinates from input ////////////////////////////////
+        int startCoordinate = convertInputToInteger(x1Str, y1Str);
+        int destinationCoordinate = convertInputToInteger(x2Str, y2Str);
 
-                reply[0] = handleMove(startCoordinate, destinationCoordinate, null, true);
-            });
-        }
-
-        return reply[0];
+        return handleMove(startCoordinate, destinationCoordinate, null, true);
     }
 }
