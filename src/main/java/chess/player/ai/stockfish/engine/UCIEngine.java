@@ -16,10 +16,10 @@ abstract class UCIEngine {
     UCIEngine(String path, Variant variant, Option... options) throws StockfishInitException {
         try {
             process = new ProcessBuilder().command("bin/stockfish_20090216_x64_bmi2.exe")
-                    .directory(new File(path))
-                    .redirectInput(new File("bin", "input.txt"))
-                    .redirectOutput(new File("bin", "output.txt"))
-                    .redirectError(new File("bin", "runtime_error.txt"))
+//                    .directory(new File(path))
+//                    .redirectInput(new File("bin", "input.txt"))
+//                    .redirectOutput(new File("bin", "output.txt"))
+//                    .redirectError(new File("bin", "runtime_error.txt"))
                     .start();
             process.waitFor();
 
