@@ -1,5 +1,6 @@
 package chess.player.ai.stockfish.engine;
 
+import chess.pieces.Pawn;
 import chess.player.ai.stockfish.engine.enums.Option;
 import chess.player.ai.stockfish.engine.enums.Variant;
 import chess.player.ai.stockfish.exception.StockfishEngineException;
@@ -9,13 +10,19 @@ import java.io.*;
 import java.util.*;
 
 abstract class UCIEngine {
-    final BufferedReader input;
-    final BufferedWriter output;
-    final Process process;
+    BufferedReader input;
+    BufferedWriter output;
+    Process process;
+    List<Option> options;
 
     UCIEngine(String path, Variant variant, Option... options) throws StockfishInitException {
+        options = Option.values();
+        createProcess();
+    }
+
+    void createProcess() throws StockfishInitException {
         try {
-            process = Runtime.getRuntime().exec("chmod +x bin/stockfish_20090216_x64_bmi2.exe");
+            process = Runtime.getRuntime().exec("bin/stockfish_20090216_x64_bmi2.exe");
             input = new BufferedReader(new InputStreamReader(process.getInputStream()));
             output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
@@ -24,6 +31,10 @@ abstract class UCIEngine {
         } catch (IOException e) {
             throw new StockfishInitException("Unable to start and bind Stockfish process: ", e);
         }
+    }
+
+    void passOption(Option option) {
+        sendCommand(option.toString());
     }
 
     void waitForReady() {
@@ -35,7 +46,8 @@ abstract class UCIEngine {
         try {
             output.write(command + "\n");
             output.flush();
-        } catch (IOException e) {
+            createProcess();
+        } catch (IOException | StockfishInitException e) {
             throw new StockfishEngineException(e);
         }
     }
@@ -71,9 +83,5 @@ abstract class UCIEngine {
         } catch (IOException e) {
             throw new StockfishEngineException(e);
         }
-    }
-
-    private void passOption(Option option) {
-        sendCommand(option.toString());
     }
 }
