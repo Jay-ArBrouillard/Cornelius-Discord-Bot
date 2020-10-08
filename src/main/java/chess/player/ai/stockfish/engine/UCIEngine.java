@@ -18,15 +18,22 @@ abstract class UCIEngine {
 
     UCIEngine(String path, Variant variant, Option... options) throws StockfishInitException {
         try {
-            String[] command = {"bin/stockfish_20090216_x64_bmi2.exe"};
+            String[] cmd = {"bin/stockfish_20090216_x64_bmi2.exe"};
 
-            process = new ProcessBuilder().command(command).start();
+            process = new ProcessBuilder().command(cmd).start();
             process.waitFor();
             os = process.getOutputStream();
             ps = new PrintStream(os);
             for (Option option : options)
                 passOption(option);
 
+            waitForReady();
+            sendCommand("position fen rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+
+            StringBuilder command = new StringBuilder("go movetime 1000");
+
+            waitForReady();
+            sendCommand(command.toString());
 
             input = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String cOutput;

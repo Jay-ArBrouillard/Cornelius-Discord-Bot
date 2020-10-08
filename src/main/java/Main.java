@@ -40,13 +40,13 @@ public class Main {
             e.printStackTrace();
         }
 
-        String bestMoveString = stockFishClient.submit(new Query.Builder(QueryType.Best_Move)
-                .setMovetime(1000)
-                .setFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
-                .build());
+//        String bestMoveString = stockFishClient.submit(new Query.Builder(QueryType.Best_Move)
+//                .setMovetime(1000)
+//                .setFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+//                .build());
 
         System.out.println("SUCCESS!");
-        System.out.println(bestMoveString);
+//        System.out.println(bestMoveString);
 
 
         // start getting a bot account set up
