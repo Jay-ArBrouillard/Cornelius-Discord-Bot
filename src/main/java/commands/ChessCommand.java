@@ -263,13 +263,14 @@ public class ChessCommand {
 
         sendMessages(event, reply, boardImageFile, belowMessage);
         if (gameState.equals(GameStatus.COMPUTER_MOVE)) {
-            new Thread(() -> {
-                try {
-                    computerAction(event);
-                } catch (Exception e) {
-                    //Do nothing
-                }
-            }).start();
+            computerAction(event);
+//            new Thread(() -> {
+//                try {
+//                    computerAction(event);
+//                } catch (Exception e) {
+//                    //Do nothing
+//                }
+//            }).start();
         }
     }
 
