@@ -15,7 +15,7 @@ abstract class UCIEngine {
 
     UCIEngine(String path, Variant variant, Option... options) throws StockfishInitException {
         try {
-            String[] command = {"chmod +x", "bin/stockfish_20090216_x64_bmi2.exe"};
+            String[] command = {"bin/stockfish_20090216_x64_bmi2.exe"};
 
             process = new ProcessBuilder().command(command).start();
 
@@ -23,6 +23,11 @@ abstract class UCIEngine {
             PrintStream ps = new PrintStream(os);
             ps.println(os);
             ps.flush();
+            BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String cOutput;
+            while ((cOutput = br.readLine()) != null) {
+                System.out.println(cOutput);
+            }
 
 //            input = new BufferedReader(new InputStreamReader(process.getInputStream()));
 //            output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
