@@ -28,6 +28,7 @@ public class ChessGame {
         board = Board.createStandardBoard();
         messageHandler = new ChessMessageHandler();
         try {
+            client = new Stockfish();
             // initialize and connect to engine
             if (client.startEngine()) {
                 System.out.println("Engine has started..");
