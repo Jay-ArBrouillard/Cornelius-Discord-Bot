@@ -33,7 +33,7 @@ abstract class UCIEngine {
                 writer.write("position fen rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
                 writer.write("\n");
                 writer.write("go movetime 1000");
-                writer.flush();
+//                writer.flush();
 
                 String ch = reader.readLine();
                 while (ch != null) {
