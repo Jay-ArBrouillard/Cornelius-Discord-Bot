@@ -16,7 +16,7 @@ abstract class UCIEngine {
     List<Option> options;
 
     UCIEngine(String path, Variant variant, Option... options) throws StockfishInitException {
-        options = Option.values();
+        this.options = Arrays.asList(Option.values());
         createProcess();
     }
 
