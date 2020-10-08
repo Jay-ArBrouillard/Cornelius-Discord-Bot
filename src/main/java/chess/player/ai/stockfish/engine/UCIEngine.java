@@ -40,6 +40,7 @@ abstract class UCIEngine {
                     output.append(ch);
                     ch = reader.readLine();
                 }
+                System.out.println(output);
 
                 reader.close();
 
