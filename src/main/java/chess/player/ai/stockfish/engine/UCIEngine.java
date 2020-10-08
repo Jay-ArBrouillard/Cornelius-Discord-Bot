@@ -102,6 +102,9 @@ abstract class UCIEngine {
                 case BMI2:
                     path.append("_bmi2");
                     break;
+                case AVX:
+                    path.append("_avx2");
+                    break;
                 case MODERN:
                     path.append("_modern");
                     break;
