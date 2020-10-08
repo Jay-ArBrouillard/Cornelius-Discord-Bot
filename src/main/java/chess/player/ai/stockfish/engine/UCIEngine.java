@@ -16,11 +16,11 @@ abstract class UCIEngine {
     UCIEngine(String path, Variant variant, Option... options) throws StockfishInitException {
         try {
                 Process process = new ProcessBuilder().command("bin/stockfish_20090216_x64_bmi2.exe").start();
-                while (!process.isAlive()) {
-                    Thread.sleep(1000);
-                }
+//                while (!process.isAlive()) {
+//                    Thread.sleep(1000);
+//                }
 
-                System.out.println("Process is alive");
+                System.out.println("Process is : " + process.isAlive());
 
                 StringBuilder output = new StringBuilder();
                 BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
