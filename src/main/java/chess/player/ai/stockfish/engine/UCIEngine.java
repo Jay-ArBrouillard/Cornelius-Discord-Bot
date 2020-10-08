@@ -1,6 +1,5 @@
 package chess.player.ai.stockfish.engine;
 
-import chess.pieces.Pawn;
 import chess.player.ai.stockfish.engine.enums.Option;
 import chess.player.ai.stockfish.engine.enums.Variant;
 import chess.player.ai.stockfish.exception.StockfishEngineException;
@@ -10,17 +9,11 @@ import java.io.*;
 import java.util.*;
 
 abstract class UCIEngine {
-    BufferedReader input;
-    BufferedWriter output;
-    Process process;
-    List<Option> options;
+    final BufferedReader input;
+    final BufferedWriter output;
+    final Process process;
 
     UCIEngine(String path, Variant variant, Option... options) throws StockfishInitException {
-        this.options = Arrays.asList(Option.values());
-        createProcess();
-    }
-
-    void createProcess() throws StockfishInitException {
         try {
             process = Runtime.getRuntime().exec("bin/stockfish_20090216_x64_bmi2.exe");
             input = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -46,8 +39,7 @@ abstract class UCIEngine {
         try {
             output.write(command + "\n");
             output.flush();
-            createProcess();
-        } catch (IOException | StockfishInitException e) {
+        } catch (IOException e) {
             throw new StockfishEngineException(e);
         }
     }

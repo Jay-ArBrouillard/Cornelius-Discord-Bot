@@ -162,9 +162,21 @@ public class ChessGame {
 
             //Update eval score
             //+position eval is good for white, -negative eval is good for black
-            evalScore = stockFishClient.submit(new Query.Builder(QueryType.EVAL)
-                    .setFen(FenUtils.parseFEN(this.board))
-                    .build()).substring(22);
+            try {
+                StockFishClient client = new StockFishClient.Builder()
+                    .setOption(Option.Minimum_Thinking_Time, 1000) // Minimum thinking time Stockfish will take
+                    .setOption(Option.Skill_Level, 20) // Stockfish skill level 0-20
+                    .setVariant(Variant.BMI2) // Stockfish Variant
+                    .build();
+                evalScore = client.submit(new Query.Builder(QueryType.EVAL)
+                        .setFen(FenUtils.parseFEN(this.board))
+                        .build()).substring(22);
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+
+
 
             transition = null;
             return "Success!" + move.toString();
