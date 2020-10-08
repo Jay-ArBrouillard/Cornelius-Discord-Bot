@@ -1,5 +1,6 @@
 package chess;
 
+import Utils.GoogleSheets;
 import chess.board.Board;
 import chess.board.Move;
 import chess.board.Tile;
@@ -11,6 +12,7 @@ import chess.player.ai.stockfish.engine.enums.Query;
 import chess.player.ai.stockfish.engine.enums.QueryType;
 import chess.player.ai.stockfish.engine.enums.Variant;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,13 +21,18 @@ import java.util.concurrent.ThreadLocalRandom;
 public class ChessGame {
     public Board board;
     private ChessMessageHandler messageHandler;
-    public String evalScore;
     private StockFishClient client;
+    private GoogleSheets db;
+    private ChessGameState state;
 
     public ChessGame() {
+        db = new GoogleSheets();
+        board = Board.createStandardBoard();
+        messageHandler = new ChessMessageHandler();
+        state = new ChessGameState();
+
         try {
             client = new StockFishClient.Builder()
-//                    .setInstances(4) //Only 1 chess game can be played at any time so I don't think increase instances will make any difference
                     .setOption(Option.Minimum_Thinking_Time, 1000) // Minimum thinking time Stockfish will take
                     .setOption(Option.Skill_Level, 1) // Stockfish skill level 0-20
                     .setVariant(Variant.MODERN) // As of 10/8/2020 Modern is the fastest variant that works on Heroku
@@ -33,45 +40,47 @@ public class ChessGame {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        board = Board.createStandardBoard();
-        messageHandler = new ChessMessageHandler();
     }
 
     public boolean isWhitePlayerTurn() {
         return board.getCurrentPlayer().getAlliance().isWhite();
     }
 
-    public String setupPlayers(String input) {
-        if (input.equals("1")) {
+    public String setupPlayers(MessageReceivedEvent event, String message) {
+        if (message.equals("1")) {
             board.getWhitePlayer().setIsRobot(false);
             board.getBlackPlayer().setIsRobot(false);
-            return GameMode.PVP.toString();
+            return GameType.PVP.toString();
         }
-        else if (input.equals("2")) {
+        else if (message.equals("2")) {
             board.getWhitePlayer().setIsRobot(false);
             board.getBlackPlayer().setIsRobot(true);
-            return GameMode.PVC.toString();
+            return GameType.PVC.toString();
         }
-        else if (input.equals("3")) {
+        else if (message.equals("3")) {
             board.getWhitePlayer().setIsRobot(true);
             board.getBlackPlayer().setIsRobot(false);
-            return GameMode.CVP.toString();
+            return GameType.CVP.toString();
         }
         else {
-            return new StringBuilder("`").append(input).append("` is not a valid option. Please choose an option (1-3)").toString();
+            return new StringBuilder("`").append(message).append("` is not a valid option. Please choose an option (1-3)").toString();
         }
     }
 
-    public String processMove(String input)
+    public ChessGameState processMove(String input)
     {
         //////////////////////// Get all possible moves ////////////////////////////////
         if (messageHandler.showAllLegalMoves(input)) {
-             return "`All Legal Moves (" + this.board.getCurrentPlayer().getAlliance() + ")`: " + this.board.getCurrentPlayer().getLegalMoves().toString();
+            state.setMessage("`All Legal Moves (" + this.board.getCurrentPlayer().getAlliance() + ")`: " + this.board.getCurrentPlayer().getLegalMoves().toString());
+            state.setStateShowAllLegalMoves();
+            return state;
         }
         if (messageHandler.handleErrorMessage().equals(messageHandler.ERROR)) {
-            return messageHandler.getLastErrorMessage();
+            state.setMessage(messageHandler.getLastErrorMessage());
+            state.setStateError();
+            return state;
         }
+
         //////////////////////// Get all possible moves for specific tile ////////////////////////////////
         if (messageHandler.showAllLegalMovesForTile(input)) {
             String removeHelpString = input.replace("help", "");
@@ -87,32 +96,22 @@ public class ChessGame {
                 }
             }
 
-            return "`Legal Moves for "  + filteredInput + " on " + this.board.getCurrentPlayer().getAlliance() + " side`: " + legalMovesForTile.toString();
+            state.setMessage("`Legal Moves for "  + filteredInput + " on " + this.board.getCurrentPlayer().getAlliance() + " side`: " + legalMovesForTile.toString());
+            state.setStateShowAllLegalMovesForTile();
+            return state;
         }
         if (messageHandler.handleErrorMessage().equals(messageHandler.ERROR)) {
-            return messageHandler.getLastErrorMessage();
+            state.setMessage(messageHandler.getLastErrorMessage());
+            state.setStateError();
+            return state;
         }
-        //////////////////////// Special Case for castling //////////////////////////
-        String inputNoSpaces = input.replaceAll("\\s+", "");
-        if (input.equals("o-o")) { //King side castle
-            if (this.board.getCurrentPlayer().getAlliance().isBlack()) {
-                return handleMove(3, 1, inputNoSpaces, false);
-            } else {
-                return handleMove(59, 57, inputNoSpaces, false);
-            }
-        }
-        else if (input.equals("o-o-o")) { //Queen side castle
-            if (this.board.getCurrentPlayer().getAlliance().isBlack()) {
-                return handleMove(3, 5, inputNoSpaces, false);
-            } else {
-                return handleMove(59, 61, inputNoSpaces, false);
-            }
-        }
-
         //////////////////////// Validate Move Input ////////////////////////////////
+        String inputNoSpaces = input.replaceAll("\\s+", "");
         messageHandler.validateInputLengthFour(input);
         if (messageHandler.handleErrorMessage().equals(messageHandler.ERROR)) {
-            return messageHandler.getLastErrorMessage();
+            state.setMessage(messageHandler.getLastErrorMessage());
+            state.setStateError();
+            return state;
         }
 
         String x1Str = Character.toString(inputNoSpaces.charAt(0)).toLowerCase();
@@ -122,7 +121,9 @@ public class ChessGame {
 
         messageHandler.validateRowAndColumn(x1Str+y1Str, x2Str+y2Str);
         if (messageHandler.handleErrorMessage().equals(messageHandler.ERROR)) {
-            return messageHandler.getLastErrorMessage();
+            state.setMessage(messageHandler.getLastErrorMessage());
+            state.setStateError();
+            return state;
         }
 
         ///////////////////////// Get board coordinates from input ////////////////////////////////
@@ -133,71 +134,140 @@ public class ChessGame {
         Tile tileAtStart = this.board.getTile(startCoordinate);
         messageHandler.validateIsLegalMove((x1Str+y1Str), tileAtStart, this.board.getCurrentPlayer());
         if (messageHandler.handleErrorMessage().equals(messageHandler.ERROR)) {
-            return messageHandler.getLastErrorMessage();
+            state.setMessage(messageHandler.getLastErrorMessage());
+            state.setStateError();
+            return state;
         }
 
         return handleMove(startCoordinate, destinationCoordinate, inputNoSpaces, false);
     }
 
-    private String handleMove(int startCoordinate, int destinationCoordinate, String filtered, boolean isComputer) {
+    private ChessGameState handleMove(int startCoordinate, int destinationCoordinate, String moveCmd, boolean isComputer) {
         final Move move = Move.MoveFactory.createMove(this.board, startCoordinate, destinationCoordinate);
         MoveTransition transition = this.board.getCurrentPlayer().makeMove(move);
         if (transition.getMoveStatus().isDone()) {
-            this.board = null;
             this.board = transition.getTransitionBoard();
             this.board.buildImage();
 
             // Is someone in check mate?
             if (this.board.getCurrentPlayer().isInCheckMate()) {
-                return "CHECKMATE";
+                if (this.board.getCurrentPlayer().getOpponent().getAlliance().isWhite()) { // Black checkmated White
+                    state.setMessage("`" + state.getBlackPlayerName() + "` has CHECKMATED `" + state.getWhitePlayerName() + "`");
+                    updateDatabaseBlackSideWin();
+                }
+                else { // White checkmated Black
+                    state.setMessage("`" + state.getWhitePlayerName() + "` has CHECKMATED `" + state.getBlackPlayerName() + "`");
+                    updateDatabaseWhiteSideWin();
+                }
+                state.setStateCheckmate();
+                return state;
             }
 
             // Is game in a draw?
             if (this.board.isDraw50MoveRule()) {
-                return "DRAW (50 move rule)! The previous 50 moves resulted in no captures or pawn movements.";
+                state.setMessage("DRAW (50 move rule)! The previous 50 moves resulted in no captures or pawn movements.");
+                state.setStateDraw();
+                updateDatabaseDraw();
+                return state;
             }
 
             if (this.board.isDrawImpossibleToCheckMate()) {
-                return "DRAW! Neither player can reach checkmate in the current game state... " +
-                        "This occurred from one of the following combinations:\n1.King versus King\n2.King and Bishop versus king\n3.King and Knight versus King\n4.King and Bishop versus King and Bishop with the bishops on the same color.";
+                state.setMessage("DRAW! Neither player can reach checkmate in the current game state... " +
+                        "This occurred from one of the following combinations:\n1.King versus King\n2.King and Bishop versus king\n3.King and Knight versus King\n4.King and Bishop versus King and Bishop with the bishops on the same color.");
+                state.setStateDraw();
+                updateDatabaseDraw();
+                return state;
             }
 
             // Is game in stalement?
             if (this.board.getCurrentPlayer().isInStaleMate()) {
-                return "DRAW (Stalement)! " + this.board.getCurrentPlayer().getAlliance() + " is not in check and has no legal moves they can make. Game Over!";
+                state.setMessage("DRAW (Stalement)! " + this.board.getCurrentPlayer().getAlliance() + " is not in check and has no legal moves they can make. Game Over!");
+                state.setStateDraw();
+                updateDatabaseDraw();
+                return state;
             }
 
             // Is someone in check?
             if (this.board.getCurrentPlayer().isInCheck()) {
-                return "CHECK" + move.toString();
+                if (this.board.getCurrentPlayer().getOpponent().getAlliance().isWhite()) {
+                    state.setMessage("`" + state.getBlackPlayerName() + "` SELECTS " + moveCmd + " `" + state.getWhitePlayerName() + "` is in check!");
+                }
+                else {
+                    state.setMessage("`" + state.getWhitePlayerName() + "` SELECTS " + moveCmd + " `" + state.getBlackPlayerName() + "` is in check!");
+                }
+                state.setStateCheck();
+                return state;
             }
 
             //Update eval score
             //+position eval is good for white, -negative eval is good for black
-            evalScore = client.submit(new Query.Builder(QueryType.EVAL).setFen(FenUtils.parseFEN(this.board)).build()).substring(22);
+            state.setBoardEvaluationMessage(client.submit(new Query.Builder(QueryType.EVAL).setFen(FenUtils.parseFEN(this.board)).build()).substring(22));
             //Should computer resign?
             if (isComputer) {
-                double evaluationScore = Double.parseDouble(evalScore.replaceAll("(white side)", "").trim());
-                if ((this.board.getCurrentPlayer().getOpponent().getAlliance().isWhite() && evaluationScore >= 10.0) ||
-                        (this.board.getCurrentPlayer().getOpponent().getAlliance().isBlack() && evaluationScore >= -10.0)) {
-                    System.out.println("Cornelius has resigned");
-                    return "Cornelius has RESIGNED!";
+                System.out.println("Computers turn");
+                double evaluationScore = Double.parseDouble(state.getBoardEvaluationMessage().replaceAll("(white side)", "").trim());
+                System.out.println("eval score: " + evaluationScore);
+                if ((this.board.getCurrentPlayer().getAlliance().isWhite() && evaluationScore <= -10.0) ||
+                        (this.board.getCurrentPlayer().getAlliance().isBlack() && evaluationScore >= 10.0)) {
+                    state.setMessage("Cornelius has RESIGNED!");
+                    if (this.board.getCurrentPlayer().getOpponent().getAlliance().isWhite()) {
+                        updateDatabaseBlackSideWin();
+                    }
+                    else { // White checkmated Black
+                        updateDatabaseWhiteSideWin();
+                    }
+                    state.setStateComputerResign();
+                    return state;
                 }
             }
 
-            return "Success!" + move.toString();
+            //If we get to this point then player made a legal move
+            if (this.board.getCurrentPlayer().getOpponent().getAlliance().isWhite()) {
+                state.setMessage("`" + state.getBlackPlayerName() + "` SELECTS " + move.toString());
+            }
+            else {
+                state.setMessage("`" + state.getWhitePlayerName() + "` SELECTS " + move.toString());
+            }
+            state.setStateSuccessfulMove();
+            return state;
         }
         else {
             if (transition.getMoveStatus().leavesPlayerInCheck()) {
-                return "`"+filtered + "` leaves " + this.board.getCurrentPlayer().getAlliance() + " player in check";
+                state.setMessage("`"+moveCmd + "` leaves " + this.board.getCurrentPlayer().getAlliance() + " player in check");
+                state.setStateLeavesPlayerInCheck();
+                return state;
             }
             else {
-                return "`"+filtered + "` is not a legal move for " + this.board.getCurrentPlayer().getAlliance();
+                state.setMessage("`"+moveCmd + "` is not a legal move for " + this.board.getCurrentPlayer().getAlliance());
+                state.setStateIllegalMove();
+                return state;
             }
         }
     }
 
-    private int convertInputToInteger(String column, String row) {
+    public int addUser(String id, String name) {
+        return db.addUser(id, name);
+    }
+
+    private void updateDatabaseDraw() {
+        db.updateUser(state.getBlackPlayerId(), false, true, state.getBlackPlayerElo(), state.getWhitePlayerElo());
+        db.updateUser(state.getWhitePlayerId(), false, true, state.getWhitePlayerElo(), state.getBlackPlayerElo());
+        db.addCompletedMatch(state.getWhitePlayerName(), state.getBlackPlayerName(), state.getWhitePlayerId(), state.getBlackPlayerId(), "", "", true, state.getMatchStartTime());
+    }
+
+    public void updateDatabaseWhiteSideWin() {
+        db.updateUser(state.getBlackPlayerId(), false, false, state.getBlackPlayerElo(), state.getWhitePlayerElo());
+        db.updateUser(state.getWhitePlayerId(), true, false, state.getWhitePlayerElo(), state.getBlackPlayerElo());
+        db.addCompletedMatch(state.getWhitePlayerName(), state.getBlackPlayerName(), state.getWhitePlayerId(), state.getBlackPlayerId(), state.getWhitePlayerName(), state.getBlackPlayerName(), false, state.getMatchStartTime());
+    }
+
+    public void updateDatabaseBlackSideWin() {
+        db.updateUser(state.getBlackPlayerId(), true, false, state.getBlackPlayerElo(), state.getWhitePlayerElo());
+        db.updateUser(state.getWhitePlayerId(), false, false, state.getWhitePlayerElo(), state.getBlackPlayerElo());
+        db.addCompletedMatch(state.getWhitePlayerName(), state.getBlackPlayerName(), state.getWhitePlayerId(), state.getBlackPlayerId(), state.getBlackPlayerName(), state.getWhitePlayerName(), false, state.getMatchStartTime());
+    }
+
+    public int convertInputToInteger(String column, String row) {
         int r = transformRowNumber(row);
         int c = convertStringLetterToNumber(column);
         return r + c;
@@ -271,7 +341,7 @@ public class ChessGame {
         return intValue;
     }
 
-    public String ai(MessageChannel mc) {
+    public ChessGameState ai(MessageChannel mc) {
         int randomThinkTime = ThreadLocalRandom.current().nextInt(5000, 10000 + 1); //Between 5-10 seconds
         mc.sendTyping().queue();
 
@@ -288,6 +358,6 @@ public class ChessGame {
         int startCoordinate = convertInputToInteger(x1Str, y1Str);
         int destinationCoordinate = convertInputToInteger(x2Str, y2Str);
 
-        return handleMove(startCoordinate, destinationCoordinate, null, true);
+        return handleMove(startCoordinate, destinationCoordinate, bestMoveString, true);
     }
 }
