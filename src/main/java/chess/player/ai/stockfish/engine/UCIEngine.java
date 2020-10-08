@@ -9,26 +9,27 @@ import java.io.*;
 import java.util.*;
 
 abstract class UCIEngine {
-    final BufferedReader input;
-    final BufferedWriter output;
-    final Process process;
+    private BufferedReader input;
+    private BufferedWriter output;
+    private Process process;
 
     UCIEngine(String path, Variant variant, Option... options) throws StockfishInitException {
         try {
-            process = new ProcessBuilder().command("bin/stockfish_20090216_x64_bmi2.exe")
-                    .directory(new File("bin"))
-                    .redirectInput(new File("bin", "input.txt"))
-                    .redirectOutput(new File("bin", "output.txt"))
-                    .redirectError(new File("bin", "runtime_error.txt"))
-                    .start();
-            process.waitFor();
+            String[] command = {"chmod +x", "bin/stockfish_20090216_x64_bmi2.exe"};
 
-            input = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+            process = new ProcessBuilder().command(command).start();
+
+            OutputStream os = process.getOutputStream();
+            PrintStream ps = new PrintStream(os);
+            ps.println(os);
+
+
+//            input = new BufferedReader(new InputStreamReader(process.getInputStream()));
+//            output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
 //            for (Option option : options)
 //                passOption(option);
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             throw new StockfishInitException("Unable to start and bind Stockfish process: ", e);
         }
     }
