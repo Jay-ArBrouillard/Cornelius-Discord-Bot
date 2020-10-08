@@ -11,7 +11,7 @@ import java.util.Set;
 
 public class StockFishClient {
     private Stockfish engine;
-
+/*
     public StockFishClient(String path, int instances, Variant variant, Set<Option> options) throws StockfishInitException {
         engine = new Stockfish(path, variant, options.toArray(new Option[options.size()]));
     }
@@ -72,5 +72,5 @@ public class StockFishClient {
         public final StockFishClient build() throws StockfishInitException {
             return new StockFishClient(path, instances, variant, options);
         }
-    }
+    }*/
 }

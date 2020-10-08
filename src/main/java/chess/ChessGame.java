@@ -6,6 +6,7 @@ import chess.board.Tile;
 import chess.pgn.FenUtils;
 import chess.player.MoveTransition;
 import chess.player.ai.stockfish.StockFishClient;
+import chess.player.ai.stockfish.engine.Stockfish;
 import chess.player.ai.stockfish.engine.enums.Option;
 import chess.player.ai.stockfish.engine.enums.Query;
 import chess.player.ai.stockfish.engine.enums.QueryType;
@@ -19,20 +20,27 @@ import java.util.concurrent.ThreadLocalRandom;
 public class ChessGame {
     public Board board;
     private ChessMessageHandler messageHandler;
-    private StockFishClient stockFishClient;
+//    private StockFishClient stockFishClient;
     public String evalScore;
+    private Stockfish client;
 
     public ChessGame(MessageChannel messageChannel) {
         board = Board.createStandardBoard();
         messageHandler = new ChessMessageHandler();
         try {
-            stockFishClient = new StockFishClient.Builder()
-//                    .setInstances(1)
-//                    .setOption(Option.Threads, 4) // Number of threads that Stockfish will use
-                    .setOption(Option.Minimum_Thinking_Time, 1000) // Minimum thinking time Stockfish will take
-                    .setOption(Option.Skill_Level, 20) // Stockfish skill level 0-20
-                    .setVariant(Variant.BMI2) // Stockfish Variant
-                    .build();
+            // initialize and connect to engine
+            if (client.startEngine()) {
+                System.out.println("Engine has started..");
+            } else {
+                System.out.println("Oops! Something went wrong..");
+            }
+//            stockFishClient = new StockFishClient.Builder()
+////                    .setInstances(1)
+////                    .setOption(Option.Threads, 4) // Number of threads that Stockfish will use
+//                    .setOption(Option.Minimum_Thinking_Time, 1000) // Minimum thinking time Stockfish will take
+//                    .setOption(Option.Skill_Level, 20) // Stockfish skill level 0-20
+//                    .setVariant(Variant.BMI2) // Stockfish Variant
+//                    .build();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -174,9 +182,9 @@ public class ChessGame {
 
             //Update eval score
             //+position eval is good for white, -negative eval is good for black
-            evalScore = stockFishClient.submit(new Query.Builder(QueryType.EVAL)
-                    .setFen(FenUtils.parseFEN(this.board))
-                    .build());
+//            evalScore = stockFishClient.submit(new Query.Builder(QueryType.EVAL)
+//                    .setFen(FenUtils.parseFEN(this.board))
+//                    .build());
             if (evalScore != null) {
                 evalScore = evalScore.substring(22);
             }
@@ -273,11 +281,12 @@ public class ChessGame {
     public String ai(MessageChannel mc) {
         int randomThinkTime = ThreadLocalRandom.current().nextInt(5000, 10000 + 1); //Between 5-10 seconds
         mc.sendTyping().queue();
-        String bestMoveString = stockFishClient.submit(new Query.Builder(QueryType.Best_Move)
-                                        .setMovetime(randomThinkTime)
-                                        .setFen(FenUtils.parseFEN(this.board))
-                                        .build());
-        mc.sendTyping().queue();
+        String bestMoveString = client.getBestMove(FenUtils.parseFEN(this.board), 1000);
+//        String bestMoveString = stockFishClient.submit(new Query.Builder(QueryType.Best_Move)
+//                                        .setMovetime(randomThinkTime)
+//                                        .setFen(FenUtils.parseFEN(this.board))
+//                                        .build());
+//        mc.sendTyping().queue();
 
         String x1Str = Character.toString(bestMoveString.charAt(0));
         String y1Str = Character.toString(bestMoveString.charAt(1));
