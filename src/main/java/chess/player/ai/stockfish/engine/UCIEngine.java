@@ -18,7 +18,7 @@ abstract class UCIEngine {
             String[] command = {"bin/stockfish_20090216_x64_bmi2.exe"};
 
             process = new ProcessBuilder().command(command).start();
-
+            process.waitFor();
             OutputStream os = process.getOutputStream();
             PrintStream ps = new PrintStream(os);
             ps.println(os);
@@ -34,7 +34,7 @@ abstract class UCIEngine {
 
 //            for (Option option : options)
 //                passOption(option);
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             throw new StockfishInitException("Unable to start and bind Stockfish process: ", e);
         }
     }
