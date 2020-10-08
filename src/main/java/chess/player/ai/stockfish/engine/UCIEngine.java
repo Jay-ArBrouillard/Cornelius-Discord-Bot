@@ -16,17 +16,7 @@ abstract class UCIEngine {
     UCIEngine(String path, Variant variant, Option... options) throws StockfishInitException {
         try {
                 //Build command
-                List<String> commands = new ArrayList<>();
-                commands.add("/stockfish_20090216_x64_bmi2.exe");
-                //Add arguments
-//                commands.add("/home/narek/pk.txt");
-                System.out.println(commands);
-
-                //Run macro on target
-                ProcessBuilder pb = new ProcessBuilder(commands);
-                pb.directory(new File("/bin"));
-                pb.redirectErrorStream(true);
-                Process process = pb.start();
+                Process process = Runtime.getRuntime().exec("bin/stockfish_20090216_x64_bmi2");
 
                 //Read output
                 StringBuilder out = new StringBuilder();
@@ -42,13 +32,10 @@ abstract class UCIEngine {
                 //Check result
                 if (process.waitFor() == 0) {
                     System.out.println("Success!");
-                    System.exit(0);
                 }
 
                 //Abnormal termination: Log command parameters and output and throw ExecutionException
-                System.err.println(commands);
                 System.err.println(out.toString());
-                System.exit(1);
 
 
 //                writer.write("position fen rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
