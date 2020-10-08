@@ -9,27 +9,19 @@ import java.io.*;
 import java.util.*;
 
 abstract class UCIEngine {
-    private OutputStream os;
-    private PrintStream ps;
-
     private BufferedReader input;
     private BufferedWriter writer;
     private Process process;
 
     UCIEngine(String path, Variant variant, Option... options) throws StockfishInitException {
         try {
-            String[] cmd = {"bin/stockfish_20090216_x64_bmi2.exe"};
-
-            process = new ProcessBuilder().command(cmd).start();
-            for (Option option : options)
-                passOption(option);
+            Process process = new ProcessBuilder().command("bin/stockfish_20090216_x64_bmi2.exe").start();
 
             StringBuilder output = new StringBuilder();
-            input = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+            BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
             writer.write("position fen rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" + "\n");
             writer.write("go movetime 1000");
-//            sendCommand("position fen rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
             writer.flush();
 
             String line;

@@ -45,7 +45,6 @@ public class Main {
 //                .setFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
 //                .build());
 
-        System.out.println("SUCCESS!");
 //        System.out.println(bestMoveString);
 
 
