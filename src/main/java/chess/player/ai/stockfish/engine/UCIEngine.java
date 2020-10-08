@@ -23,27 +23,25 @@ abstract class UCIEngine {
                 System.out.println("Process is : " + process.isAlive());
 
                 StringBuilder output = new StringBuilder();
-                BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                PrintWriter writer = new PrintWriter(process.getOutputStream());
-                writer.println("position fen rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-                writer.println("go movetime 1000");
-                writer.flush();
+                InputStream stdout = process.getInputStream();
+                InputStreamReader isr = new InputStreamReader(stdout);
+                OutputStream stdin = process.getOutputStream();
+                OutputStreamWriter osr = new OutputStreamWriter(stdin);
+                BufferedWriter writer = new BufferedWriter(osr);
+                BufferedReader reader = new BufferedReader(isr);
 
-                String line;
-                while ((line = input.readLine()) != null) {
-                    output.append(line + "\n");
+                writer.write("position fen rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+                writer.write("\n");
+                writer.write("go movetime 1000");
+                writer.close();
+
+                String ch = reader.readLine();
+                while (ch != null) {
+                    output.append(ch);
+                    ch = reader.readLine();
                 }
 
-                int exitVal = process.waitFor();
-                if (exitVal == 0) {
-                    System.out.println("exitVal: success");
-                    System.out.println(output);
-                }
-                else {
-                    System.out.println("exitVal: error");
-                    System.out.println(output);
-                }
-
+                reader.close();
 
 
 //            input = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -51,7 +49,7 @@ abstract class UCIEngine {
 
 //            for (Option option : options)
 //                passOption(option);
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             throw new StockfishInitException("Unable to start and bind Stockfish process: ", e);
         }
     }

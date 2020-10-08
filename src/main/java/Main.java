@@ -29,20 +29,16 @@ public class Main {
 
         System.out.println("Hello... Starting logic");
 
-        new Thread(() -> {
-            try {
-
-                StockFishClient stockFishClient  = new StockFishClient.Builder()
+        StockFishClient stockFishClient = null;
+        try {
+             stockFishClient = new StockFishClient.Builder()
                     .setOption(Option.Minimum_Thinking_Time, 1000) // Minimum thinking time Stockfish will take
                     .setOption(Option.Skill_Level, 20) // Stockfish skill level 0-20
                     .setVariant(Variant.BMI2) // Stockfish Variant
                     .build();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
-
-
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
 //        String bestMoveString = stockFishClient.submit(new Query.Builder(QueryType.Best_Move)
 //                .setMovetime(1000)
