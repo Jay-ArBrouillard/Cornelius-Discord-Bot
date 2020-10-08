@@ -33,7 +33,6 @@ public class ChessCommand {
     private static String belowMessage;
     private static File boardImageFile;
     private static Long matchStartTime;
-    private static StockFishClient stockFishClient;
 
 
     public static boolean isRunning() {
@@ -110,7 +109,7 @@ public class ChessCommand {
                     break;
                 }
                 //Start move
-                reply = chessGame.processMove(message, stockFishClient);
+                reply = chessGame.processMove(message);
                 if (reply.contains("CHECKMATE") || reply.contains("DRAW")) {
                     boardImageFile = new File(gameBoardImageLoc);
                     belowMessage = "GG";
@@ -302,7 +301,7 @@ public class ChessCommand {
     }
 
     public static void computerAction(MessageReceivedEvent event) {
-        reply = chessGame.ai(event.getChannel(), stockFishClient);
+        reply = chessGame.ai(event.getChannel());
         if (reply.contains("CHECKMATE") || reply.contains("DRAW")) {
             boardImageFile = new File(gameBoardImageLoc);
             belowMessage = "GG";

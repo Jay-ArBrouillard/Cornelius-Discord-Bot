@@ -51,7 +51,7 @@ public class ChessGame {
         }
     }
 
-    public String processMove(String input, StockFishClient stockFishClient)
+    public String processMove(String input)
     {
         //////////////////////// Get all possible moves ////////////////////////////////
         if (messageHandler.showAllLegalMoves(input)) {
@@ -84,16 +84,16 @@ public class ChessGame {
         String inputNoSpaces = input.replaceAll("\\s+", "");
         if (input.equals("o-o")) { //King side castle
             if (this.board.getCurrentPlayer().getAlliance().isBlack()) {
-                return handleMove(3, 1, inputNoSpaces, stockFishClient);
+                return handleMove(3, 1, inputNoSpaces);
             } else {
-                return handleMove(59, 57, inputNoSpaces, stockFishClient);
+                return handleMove(59, 57, inputNoSpaces);
             }
         }
         else if (input.equals("o-o-o")) { //Queen side castle
             if (this.board.getCurrentPlayer().getAlliance().isBlack()) {
-                return handleMove(3, 5, inputNoSpaces, stockFishClient);
+                return handleMove(3, 5, inputNoSpaces);
             } else {
-                return handleMove(59, 61, inputNoSpaces, stockFishClient);
+                return handleMove(59, 61, inputNoSpaces);
             }
         }
 
@@ -124,10 +124,10 @@ public class ChessGame {
             return messageHandler.getLastErrorMessage();
         }
 
-        return handleMove(startCoordinate, destinationCoordinate, inputNoSpaces, stockFishClient);
+        return handleMove(startCoordinate, destinationCoordinate, inputNoSpaces);
     }
 
-    private String handleMove(int startCoordinate, int destinationCoordinate, String filtered, StockFishClient stockFishClient) {
+    private String handleMove(int startCoordinate, int destinationCoordinate, String filtered) {
         final Move move = Move.MoveFactory.createMove(this.board, startCoordinate, destinationCoordinate);
         MoveTransition transition = this.board.getCurrentPlayer().makeMove(move);
         if (transition.getMoveStatus().isDone()) {
@@ -268,7 +268,7 @@ public class ChessGame {
         return intValue;
     }
 
-    public String ai(MessageChannel mc, StockFishClient stockFishClient) {
+    public String ai(MessageChannel mc) {
         int randomThinkTime = ThreadLocalRandom.current().nextInt(5000, 10000 + 1); //Between 5-10 seconds
         mc.sendTyping().queue();
 
@@ -300,6 +300,6 @@ public class ChessGame {
         int startCoordinate = convertInputToInteger(x1Str, y1Str);
         int destinationCoordinate = convertInputToInteger(x2Str, y2Str);
 
-        return handleMove(startCoordinate, destinationCoordinate, null, stockFishClient);
+        return handleMove(startCoordinate, destinationCoordinate, null);
     }
 }

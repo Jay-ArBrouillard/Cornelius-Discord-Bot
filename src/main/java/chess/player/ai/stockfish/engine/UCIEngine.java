@@ -10,46 +10,19 @@ import java.util.*;
 
 abstract class UCIEngine {
     private BufferedReader input;
-    private BufferedWriter writer;
+    private BufferedWriter output;
     private Process process;
 
     UCIEngine(String path, Variant variant, Option... options) throws StockfishInitException {
         try {
-                Process process = new ProcessBuilder().command("bin/stockfish_20090216_x64").start();
+            process = new ProcessBuilder().command("bin/stockfish_20090216_x64").start();
 
-                StringBuilder output = new StringBuilder();
-                BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
-                writer.write("position fen rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-                writer.newLine();
-                writer.write("go movetime 1000");
-                writer.flush();
+            input = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
-                String line;
-                while ((line = input.readLine()) != null) {
-                    output.append(line + "\n");
-                }
-
-                int exitVal = process.waitFor();
-                if (exitVal == 0) {
-                    System.out.println("success");
-                    System.out.println(output.toString());
-                }
-                else {
-                    System.out.println("error");
-                }
-
-
-//                writer.write("position fen rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-
-
-
-//            input = new BufferedReader(new InputStreamReader(process.getInputStream()));
-//            output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
-
-//            for (Option option : options)
-//                passOption(option);
-        } catch (IOException | InterruptedException e) {
+            for (Option option : options)
+                passOption(option);
+        } catch (IOException e) {
             throw new StockfishInitException("Unable to start and bind Stockfish process: ", e);
         }
     }
@@ -64,12 +37,12 @@ abstract class UCIEngine {
     }
 
     void sendCommand(String command) {
-//        try {
-//            output.write(command + "\n");
-//            output.flush();
-//        } catch (IOException e) {
-//            throw new StockfishEngineException(e);
-//        }
+        try {
+            output.write(command + "\n");
+            output.flush();
+        } catch (IOException e) {
+            throw new StockfishEngineException(e);
+        }
     }
 
     String readLine(String expected) {
