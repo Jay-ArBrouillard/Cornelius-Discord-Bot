@@ -19,7 +19,9 @@ public class Stockfish {
      */
     public boolean startEngine() {
         try {
-            engineProcess = Runtime.getRuntime().exec(PATH);
+            ProcessBuilder builder = new ProcessBuilder(PATH);
+            builder.redirectErrorStream(true);
+            engineProcess = builder.start();
             processReader = new BufferedReader(new InputStreamReader(engineProcess.getInputStream()));
             processWriter = new OutputStreamWriter(engineProcess.getOutputStream());
         } catch (Exception e) {
@@ -35,7 +37,7 @@ public class Stockfish {
      */
     public void sendCommand(String command) {
         try {
-            System.out.println(command);
+            System.out.println("sendCommand: " +command);
             processWriter.write(command + "\n");
             processWriter.flush();
         } catch (IOException e) {
@@ -60,7 +62,7 @@ public class Stockfish {
             sendCommand("isready");
             while (true) {
                 String text = processReader.readLine();
-                System.out.println(text);
+                System.out.println("getOutput: " + text);
                 if (text.equals("readyok"))
                     break;
                 else
