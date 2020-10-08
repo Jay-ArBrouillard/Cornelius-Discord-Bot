@@ -22,7 +22,7 @@ abstract class UCIEngine {
             OutputStream os = process.getOutputStream();
             PrintStream ps = new PrintStream(os);
             ps.println(os);
-
+            ps.flush();
 
 //            input = new BufferedReader(new InputStreamReader(process.getInputStream()));
 //            output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
