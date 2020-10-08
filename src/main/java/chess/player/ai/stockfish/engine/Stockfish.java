@@ -1,158 +1,100 @@
 package chess.player.ai.stockfish.engine;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import chess.player.ai.stockfish.engine.enums.Option;
+import chess.player.ai.stockfish.engine.enums.Query;
+import chess.player.ai.stockfish.engine.enums.Variant;
+import chess.player.ai.stockfish.exception.StockfishInitException;
+
+import java.util.*;
 import java.io.IOException;
 
-public class Stockfish {
-    private Process engineProcess;
-    private BufferedReader processReader;
-    private OutputStreamWriter processWriter;
+public class Stockfish extends UCIEngine {
+    public Stockfish(String path, Variant variant, Option... options) throws StockfishInitException {
+        super(path, variant, options);
+    }
 
-    private static final String PATH = "bash bin/stockfish_20090216_x64_bmi2.exe";
+    public String makeMove(Query query) {
+        waitForReady();
+        sendCommand("position fen " + query.getFen() + " moves " + query.getMove());
+        return getFen();
+    }
 
-    /**
-     * Starts Stockfish engine as a process and initializes it
-     *
-     * @return True on success. False otherwise
-     */
-    public boolean startEngine() {
-        try {
-            engineProcess = Runtime.getRuntime().exec(PATH);
-            processReader = new BufferedReader(new InputStreamReader(engineProcess.getInputStream()));
-            processWriter = new OutputStreamWriter(engineProcess.getOutputStream());
-        } catch (Exception e) {
-            return false;
+    public String getCheckers(Query query) {
+        waitForReady();
+        sendCommand("position fen " + query.getFen());
+
+        waitForReady();
+        sendCommand("d");
+
+        return readLine("Checkers: ").substring(10);
+    }
+
+    public String getBestMove(Query query) {
+        if (query.getDifficulty() >= 0) {
+            waitForReady();
+            sendCommand("setoption name Skill Level value " + query.getDifficulty());
         }
-        return true;
+
+        waitForReady();
+        sendCommand("position fen " + query.getFen());
+
+        StringBuilder command = new StringBuilder("go ");
+
+        if (query.getDepth() >= 0)
+            command.append("depth ").append(query.getDepth()).append(" ");
+
+        if (query.getMovetime() >= 0)
+            command.append("movetime ").append(query.getMovetime());
+
+        waitForReady();
+        sendCommand(command.toString());
+
+        return readLine("bestmove").substring(9).split("\\s+")[0];
     }
 
-    /**
-     * Takes in any valid UCI command and executes it
-     *
-     * @param command
-     */
-    public void sendCommand(String command) {
-        try {
-            System.out.println("sendCommand: " +command);
-            processWriter.write(command + "\n");
-            processWriter.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public String getEvaluation(Query query) {
+        waitForReady();
+        sendCommand("position fen " + query.getFen());
+
+        StringBuilder command = new StringBuilder("eval ");
+
+        waitForReady();
+        sendCommand(command.toString());
+
+        return readLine("Final evaluation:");
     }
 
-    /**
-     * This is generally called right after 'sendCommand' for getting the raw
-     * output from Stockfish
-     *
-     * @param waitTime
-     *            Time in milliseconds for which the function waits before
-     *            reading the output. Useful when a long running command is
-     *            executed
-     * @return Raw output from Stockfish
-     */
-    public String getOutput(int waitTime) {
-        StringBuffer buffer = new StringBuffer();
-        try {
-            Thread.sleep(waitTime);
-            sendCommand("isready");
-            while (true) {
-                String text = processReader.readLine();
-                System.out.println("getOutput: " + text);
-                if (text.equals("readyok"))
-                    break;
-                else
-                    buffer.append(text + "\n");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return buffer.toString();
+    public String getLegalMoves(Query query) {
+        waitForReady();
+        sendCommand("position fen " + query.getFen());
+
+        waitForReady();
+        sendCommand("go perft 1");
+
+        StringBuilder legal = new StringBuilder();
+        List<String> response = readResponse("Nodes");
+
+        for (String line : response)
+            if (!line.isEmpty() && !line.contains("Nodes") && line.contains(":"))
+                legal.append(line.split(":")[0]).append(" ");
+
+        return legal.toString();
     }
 
-    /**
-     * This function returns the best move for a given position after
-     * calculating for 'waitTime' ms
-     *
-     * @param fen
-     *            Position string
-     * @param waitTime
-     *            in milliseconds
-     * @return Best Move in PGN format
-     */
-    public String getBestMove(String fen, int waitTime) {
-        sendCommand("position fen " + fen);
-        sendCommand("go movetime " + waitTime);
-        return getOutput(waitTime + 20).split("bestmove ")[1].split(" ")[0];
-    }
-
-    /**
-     * Stops Stockfish and cleans up before closing it
-     */
-    public void stopEngine() {
+    public void close() throws IOException {
         try {
             sendCommand("quit");
-            processReader.close();
-            processWriter.close();
-        } catch (IOException e) {
+        } finally {
+            process.destroy();
+            input.close();
+            output.close();
         }
     }
 
-    /**
-     * Get a list of all legal moves from the given position
-     *
-     * @param fen
-     *            Position string
-     * @return String of moves
-     */
-    public String getLegalMoves(String fen) {
-        sendCommand("position fen " + fen);
-        sendCommand("d");
-        return getOutput(0).split("Legal moves: ")[1];
-    }
-
-    /**
-     * Draws the current state of the chess board
-     *
-     * @param fen
-     *            Position string
-     */
-    public void drawBoard(String fen) {
-        sendCommand("position fen " + fen);
+    private String getFen() {
+        waitForReady();
         sendCommand("d");
 
-        String[] rows = getOutput(0).split("\n");
-
-        for (int i = 1; i < 18; i++) {
-            System.out.println(rows[i]);
-        }
-    }
-
-    /**
-     * Get the evaluation score of a given board position
-     * @param fen Position string
-     * @param waitTime in milliseconds
-     * @return evalScore
-     */
-    public float getEvalScore(String fen, int waitTime) {
-        sendCommand("position fen " + fen);
-        sendCommand("go movetime " + waitTime);
-
-        float evalScore = 0.0f;
-        String[] dump = getOutput(waitTime + 20).split("\n");
-        for (int i = dump.length - 1; i >= 0; i--) {
-            if (dump[i].startsWith("info depth ")) {
-                try {
-                    evalScore = Float.parseFloat(dump[i].split("score cp ")[1]
-                            .split(" nodes")[0]);
-                } catch(Exception e) {
-                    evalScore = Float.parseFloat(dump[i].split("score cp ")[1]
-                            .split(" upperbound nodes")[0]);
-                }
-            }
-        }
-        return evalScore/100;
+        return readLine("Fen: ").substring(5);
     }
 }

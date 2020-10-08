@@ -3,6 +3,9 @@ package commands;
 import Utils.GoogleSheets;
 import chess.*;
 import chess.pgn.FenUtils;
+import chess.player.ai.stockfish.StockFishClient;
+import chess.player.ai.stockfish.engine.enums.Option;
+import chess.player.ai.stockfish.engine.enums.Variant;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -30,6 +33,8 @@ public class ChessCommand {
     private static String belowMessage;
     private static File boardImageFile;
     private static Long matchStartTime;
+    private static StockFishClient stockFishClient;
+
 
     public static boolean isRunning() {
         return chessGame != null && gameState != GameStatus.INACTIVE;
@@ -85,6 +90,15 @@ public class ChessCommand {
             chessGame.board.buildImage();
             gameState = GameStatus.SETUP;
             db = new GoogleSheets();
+            try {
+                stockFishClient = new StockFishClient.Builder()
+                        .setOption(Option.Minimum_Thinking_Time, 1000) // Minimum thinking time Stockfish will take
+                        .setOption(Option.Skill_Level, 20) // Stockfish skill level 0-20
+                        .setVariant(Variant.BMI2) // Stockfish Variant
+                        .build();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         //State machine game mechanics
@@ -105,7 +119,7 @@ public class ChessCommand {
                     break;
                 }
                 //Start move
-                reply = chessGame.processMove(message);
+                reply = chessGame.processMove(message, stockFishClient);
                 if (reply.contains("CHECKMATE") || reply.contains("DRAW")) {
                     boardImageFile = new File(gameBoardImageLoc);
                     belowMessage = "GG";
@@ -297,7 +311,7 @@ public class ChessCommand {
     }
 
     public static void computerAction(MessageReceivedEvent event) {
-        reply = chessGame.ai(event.getChannel());
+        reply = chessGame.ai(event.getChannel(), stockFishClient);
         if (reply.contains("CHECKMATE") || reply.contains("DRAW")) {
             boardImageFile = new File(gameBoardImageLoc);
             belowMessage = "GG";

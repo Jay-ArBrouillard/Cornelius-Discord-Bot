@@ -7,16 +7,22 @@ import chess.player.ai.stockfish.engine.enums.Variant;
 import chess.player.ai.stockfish.exception.StockfishInitException;
 
 import java.util.HashSet;
+import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
 
 public class StockFishClient {
-    private Stockfish engine;
-/*
+    private Queue<Stockfish> engines;
+
     public StockFishClient(String path, int instances, Variant variant, Set<Option> options) throws StockfishInitException {
-        engine = new Stockfish(path, variant, options.toArray(new Option[options.size()]));
+        engines = new ArrayBlockingQueue<>(instances);
+
+        for (int i = 0; i < instances; i++)
+            engines.add(new Stockfish(path, variant, options.toArray(new Option[options.size()])));
     }
 
     public String submit(Query query) {
+        Stockfish engine = engines.remove();
         String output;
 
         switch (query.getType()) {
@@ -40,6 +46,7 @@ public class StockFishClient {
                 break;
         }
 
+        engines.add(engine);
         return output;
     }
 
@@ -72,5 +79,5 @@ public class StockFishClient {
         public final StockFishClient build() throws StockfishInitException {
             return new StockFishClient(path, instances, variant, options);
         }
-    }*/
+    }
 }

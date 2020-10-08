@@ -6,7 +6,6 @@ import chess.board.Tile;
 import chess.pgn.FenUtils;
 import chess.player.MoveTransition;
 import chess.player.ai.stockfish.StockFishClient;
-import chess.player.ai.stockfish.engine.Stockfish;
 import chess.player.ai.stockfish.engine.enums.Option;
 import chess.player.ai.stockfish.engine.enums.Query;
 import chess.player.ai.stockfish.engine.enums.QueryType;
@@ -20,31 +19,11 @@ import java.util.concurrent.ThreadLocalRandom;
 public class ChessGame {
     public Board board;
     private ChessMessageHandler messageHandler;
-//    private StockFishClient stockFishClient;
     public String evalScore;
-    private Stockfish client;
 
     public ChessGame(MessageChannel messageChannel) {
         board = Board.createStandardBoard();
         messageHandler = new ChessMessageHandler();
-        try {
-            client = new Stockfish();
-            // initialize and connect to engine
-            if (client.startEngine()) {
-                System.out.println("Engine has started..");
-            } else {
-                System.out.println("Oops! Something went wrong..");
-            }
-//            stockFishClient = new StockFishClient.Builder()
-////                    .setInstances(1)
-////                    .setOption(Option.Threads, 4) // Number of threads that Stockfish will use
-//                    .setOption(Option.Minimum_Thinking_Time, 1000) // Minimum thinking time Stockfish will take
-//                    .setOption(Option.Skill_Level, 20) // Stockfish skill level 0-20
-//                    .setVariant(Variant.BMI2) // Stockfish Variant
-//                    .build();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public boolean isWhitePlayerTurn() {
@@ -72,7 +51,7 @@ public class ChessGame {
         }
     }
 
-    public String processMove(String input)
+    public String processMove(String input, StockFishClient stockFishClient)
     {
         //////////////////////// Get all possible moves ////////////////////////////////
         if (messageHandler.showAllLegalMoves(input)) {
@@ -105,16 +84,16 @@ public class ChessGame {
         String inputNoSpaces = input.replaceAll("\\s+", "");
         if (input.equals("o-o")) { //King side castle
             if (this.board.getCurrentPlayer().getAlliance().isBlack()) {
-                return handleMove(3, 1, inputNoSpaces);
+                return handleMove(3, 1, inputNoSpaces, stockFishClient);
             } else {
-                return handleMove(59, 57, inputNoSpaces);
+                return handleMove(59, 57, inputNoSpaces, stockFishClient);
             }
         }
         else if (input.equals("o-o-o")) { //Queen side castle
             if (this.board.getCurrentPlayer().getAlliance().isBlack()) {
-                return handleMove(3, 5, inputNoSpaces);
+                return handleMove(3, 5, inputNoSpaces, stockFishClient);
             } else {
-                return handleMove(59, 61, inputNoSpaces);
+                return handleMove(59, 61, inputNoSpaces, stockFishClient);
             }
         }
 
@@ -145,10 +124,10 @@ public class ChessGame {
             return messageHandler.getLastErrorMessage();
         }
 
-        return handleMove(startCoordinate, destinationCoordinate, inputNoSpaces);
+        return handleMove(startCoordinate, destinationCoordinate, inputNoSpaces, stockFishClient);
     }
 
-    private String handleMove(int startCoordinate, int destinationCoordinate, String filtered) {
+    private String handleMove(int startCoordinate, int destinationCoordinate, String filtered, StockFishClient stockFishClient) {
         final Move move = Move.MoveFactory.createMove(this.board, startCoordinate, destinationCoordinate);
         MoveTransition transition = this.board.getCurrentPlayer().makeMove(move);
         if (transition.getMoveStatus().isDone()) {
@@ -183,12 +162,9 @@ public class ChessGame {
 
             //Update eval score
             //+position eval is good for white, -negative eval is good for black
-//            evalScore = stockFishClient.submit(new Query.Builder(QueryType.EVAL)
-//                    .setFen(FenUtils.parseFEN(this.board))
-//                    .build());
-            if (evalScore != null) {
-                evalScore = evalScore.substring(22);
-            }
+            evalScore = stockFishClient.submit(new Query.Builder(QueryType.EVAL)
+                    .setFen(FenUtils.parseFEN(this.board))
+                    .build()).substring(22);
 
             transition = null;
             return "Success!" + move.toString();
@@ -279,15 +255,14 @@ public class ChessGame {
         return intValue;
     }
 
-    public String ai(MessageChannel mc) {
+    public String ai(MessageChannel mc, StockFishClient stockFishClient) {
         int randomThinkTime = ThreadLocalRandom.current().nextInt(5000, 10000 + 1); //Between 5-10 seconds
         mc.sendTyping().queue();
-        String bestMoveString = client.getBestMove(FenUtils.parseFEN(this.board), 1000);
-//        String bestMoveString = stockFishClient.submit(new Query.Builder(QueryType.Best_Move)
-//                                        .setMovetime(randomThinkTime)
-//                                        .setFen(FenUtils.parseFEN(this.board))
-//                                        .build());
-//        mc.sendTyping().queue();
+        String bestMoveString = stockFishClient.submit(new Query.Builder(QueryType.Best_Move)
+                                        .setMovetime(randomThinkTime)
+                                        .setFen(FenUtils.parseFEN(this.board))
+                                        .build());
+        mc.sendTyping().queue();
 
         String x1Str = Character.toString(bestMoveString.charAt(0));
         String y1Str = Character.toString(bestMoveString.charAt(1));
@@ -298,6 +273,6 @@ public class ChessGame {
         int startCoordinate = convertInputToInteger(x1Str, y1Str);
         int destinationCoordinate = convertInputToInteger(x2Str, y2Str);
 
-        return handleMove(startCoordinate, destinationCoordinate, null);
+        return handleMove(startCoordinate, destinationCoordinate, null, stockFishClient);
     }
 }
