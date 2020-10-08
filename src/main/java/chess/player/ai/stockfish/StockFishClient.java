@@ -6,7 +6,6 @@ import chess.player.ai.stockfish.engine.enums.Query;
 import chess.player.ai.stockfish.engine.enums.Variant;
 import chess.player.ai.stockfish.exception.StockfishInitException;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
