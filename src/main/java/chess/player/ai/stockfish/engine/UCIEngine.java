@@ -13,7 +13,7 @@ abstract class UCIEngine {
     private PrintStream ps;
 
     private BufferedReader input;
-    private BufferedWriter output;
+    private BufferedWriter writer;
     private Process process;
 
     UCIEngine(String path, Variant variant, Option... options) throws StockfishInitException {
@@ -21,25 +21,32 @@ abstract class UCIEngine {
             String[] cmd = {"bin/stockfish_20090216_x64_bmi2.exe"};
 
             process = new ProcessBuilder().command(cmd).start();
-            process.waitFor();
-            os = process.getOutputStream();
-            ps = new PrintStream(os);
             for (Option option : options)
                 passOption(option);
 
-            waitForReady();
-            sendCommand("position fen rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-
-            StringBuilder command = new StringBuilder("go movetime 1000");
-
-            waitForReady();
-            sendCommand(command.toString());
-
+            StringBuilder output = new StringBuilder();
             input = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String cOutput;
-            while ((cOutput = input.readLine()) != null) {
-                System.out.println(cOutput);
+            writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+            writer.write("position fen rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" + "\n");
+            writer.write("go movetime 1000");
+//            sendCommand("position fen rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+            writer.flush();
+
+            String line;
+            while ((line = input.readLine()) != null) {
+                output.append(line + "\n");
             }
+
+            int exitVal = process.waitFor();
+            if (exitVal == 0) {
+                System.out.println("success");
+                System.out.println(output.toString());
+            }
+            else {
+                System.out.println("error");
+            }
+
+
 
 //            input = new BufferedReader(new InputStreamReader(process.getInputStream()));
 //            output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
@@ -62,8 +69,6 @@ abstract class UCIEngine {
 
     void sendCommand(String command) {
 //        try {
-            ps.println(command);
-            ps.flush();
 //            output.write(command + "\n");
 //            output.flush();
 //        } catch (IOException e) {
