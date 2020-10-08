@@ -312,13 +312,15 @@ public class ChessCommand {
             else { //CHECKMATE or RESIGNED
                 String result = reply.contains("CHECKMATE") ? "CHECKMATED" : "RESIGNED";
                 if (chessGame.isWhitePlayerTurn()) { // Black checkmated White
-                    reply = "`" + blackPlayerName + "` has "+result+" `" + whitePlayerName + "`";
+                    reply = result.equals("CHECKMATED") ? "`" + blackPlayerName + "` has checkmated `" + whitePlayerName + "`" :
+                                                          "`" + blackPlayerName + "` has resigned `";
                     db.updateUser(blackPlayerId, true, false, blackPlayerElo, whitePlayerElo);
                     db.updateUser(whitePlayerId, false, false, whitePlayerElo, blackPlayerElo);
                     db.addCompletedMatch(whitePlayerName, blackPlayerName, whitePlayerId, blackPlayerId, blackPlayerName, whitePlayerName, false, matchStartTime);
                 }
                 else { // White checkmated Black
-                    reply = "`" + whitePlayerName + "` has "+result+" `" + blackPlayerName + "`";
+                    reply = result.equals("CHECKMATED") ? "`" + whitePlayerName + "` has checkmated `" + blackPlayerName + "`" :
+                                                          "`" + whitePlayerName + "` has resigned `";
                     db.updateUser(blackPlayerId, false, false, blackPlayerElo, whitePlayerElo);
                     db.updateUser(whitePlayerId, true, false, whitePlayerElo, blackPlayerElo);
                     db.addCompletedMatch(whitePlayerName, blackPlayerName, whitePlayerId, blackPlayerId, whitePlayerName, blackPlayerName, false, matchStartTime);

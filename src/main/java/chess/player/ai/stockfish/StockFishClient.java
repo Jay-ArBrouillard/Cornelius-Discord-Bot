@@ -23,6 +23,9 @@ public class StockFishClient {
             case Best_Move:
                 output = engine.getBestMove(query);
                 break;
+            case EVAL:
+                output = engine.getEvaluation(query);
+                break;
             case Make_Move:
                 output = engine.makeMove(query);
                 break;
