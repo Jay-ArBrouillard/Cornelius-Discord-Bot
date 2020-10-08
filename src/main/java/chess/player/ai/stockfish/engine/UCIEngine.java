@@ -16,6 +16,12 @@ abstract class UCIEngine {
     UCIEngine(String path, Variant variant, Option... options) throws StockfishInitException {
         try {
                 Process process = new ProcessBuilder().command("bin/stockfish_20090216_x64_bmi2.exe").start();
+                while (!process.isAlive()) {
+                    Thread.sleep(1000);
+                }
+
+                System.out.println("Process is alive");
+
                 StringBuilder output = new StringBuilder();
                 BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
                 PrintWriter writer = new PrintWriter(process.getOutputStream());
@@ -30,11 +36,12 @@ abstract class UCIEngine {
 
                 int exitVal = process.waitFor();
                 if (exitVal == 0) {
-                    System.out.println("success");
-                    System.out.println(output.toString());
+                    System.out.println("exitVal: success");
+                    System.out.println(output);
                 }
                 else {
-                    System.out.println("error");
+                    System.out.println("exitVal: error");
+                    System.out.println(output);
                 }
 
 
