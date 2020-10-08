@@ -168,16 +168,6 @@ public class BoardUtils {
         return Piece.PieceType.KING.getPieceValue() - movingPiece.getPieceType().getPieceValue();
     }
 
-    public static List<Move> lastNMoves(final Board board, int N) {
-        final List<Move> moveHistory = board.getMovesPlayed();
-        final List<Move> lastNMoves = new ArrayList<>();
-        for (int i = moveHistory.size()-1; i >= N; i--) {
-            Move move = moveHistory.get(i);
-            lastNMoves.add(move);
-        }
-        return Collections.unmodifiableList(lastNMoves);
-    }
-
     public static boolean isEndGame(final Board board) {
         return board.getCurrentPlayer().isInCheckMate() ||
                 board.getCurrentPlayer().isInStaleMate();

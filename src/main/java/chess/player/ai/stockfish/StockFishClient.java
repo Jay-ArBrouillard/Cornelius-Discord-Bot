@@ -6,14 +6,15 @@ import chess.player.ai.stockfish.engine.enums.Query;
 import chess.player.ai.stockfish.engine.enums.Variant;
 import chess.player.ai.stockfish.exception.StockfishInitException;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
 public class StockFishClient {
     private Stockfish engine;
 
-    public StockFishClient(String path, int instances, Variant variant, Set<Option> options) throws StockfishInitException {
-        engine = new Stockfish(path, variant, options.toArray(new Option[options.size()]));
+    public StockFishClient(Variant variant, Set<Option> options) throws StockfishInitException {
+        engine = new Stockfish(variant, options.toArray(new Option[options.size()]));
     }
 
     public String submit(Query query) {
@@ -32,9 +33,6 @@ public class StockFishClient {
             case Legal_Moves:
                 output = engine.getLegalMoves(query);
                 break;
-            case Checkers:
-                output = engine.getCheckers(query);
-                break;
             default:
                 output = null;
                 break;
@@ -46,13 +44,6 @@ public class StockFishClient {
     public static class Builder {
         private Set<Option> options = new HashSet<>();
         private Variant variant = Variant.DEFAULT;
-        private String path = null;
-        private int instances = 1;
-
-        public final Builder setInstances(int num) {
-            instances = num;
-            return this;
-        }
 
         public final Builder setVariant(Variant v) {
             variant = v;
@@ -64,13 +55,8 @@ public class StockFishClient {
             return this;
         }
 
-        public final Builder setPath(String path) {
-            this.path = path;
-            return this;
-        }
-
         public final StockFishClient build() throws StockfishInitException {
-            return new StockFishClient(path, instances, variant, options);
+            return new StockFishClient(variant, options);
         }
     }
 }

@@ -25,14 +25,14 @@ public class Board {
     private final Player currentPlayer;
 
     private final Pawn enPassantPawn;
-    private final List<Move> movesPlayed; //Will contain no more than the last 50 moves
+    private final List<Boolean> movesPlayed; //If a move captures a piece or moves a pawn value is true else false
 
     private static final int START_X_COORDINATE = 70;
     private static final int START_Y_COORDINATE = 43;
     private static final int X_OFFSET = 162;
     private static final int Y_OFFSET = 162;
 
-    public Board(Builder builder, List<Move> movesPlayed) {
+    public Board(Builder builder, List<Boolean> movesPlayed) {
         this.gameBoard = createGameBoard(builder);
         this.whitePieces = calculateActivePieces(this.gameBoard, Alliance.WHITE);
         this.blackPieces = calculateActivePieces(this.gameBoard, Alliance.BLACK);
@@ -72,7 +72,7 @@ public class Board {
         return this.enPassantPawn;
     }
 
-    public List<Move> getMovesPlayed() {
+    public List<Boolean> getMovesPlayed() {
         return movesPlayed;
     }
 
@@ -80,16 +80,7 @@ public class Board {
         if (movesPlayed.size() < 50) {
             return false;
         }
-        for (int i = 0; i < movesPlayed.size(); i++) {
-            final Move move = movesPlayed.get(i);
-            if (move instanceof PawnMove ||
-                    move instanceof PawnAttackMove ||
-                    move instanceof PawnEnPassantAttackMove ||
-                    move instanceof MajorAttackMove) {
-                return false;
-            }
-        }
-        return true;
+        return movesPlayed.stream().allMatch(x -> x.booleanValue() == false);
     }
 
     public boolean isDrawImpossibleToCheckMate() {
@@ -315,7 +306,7 @@ public class Board {
             return this;
         }
 
-        public Board build(List<Move> movesPlayed) {
+        public Board build(List<Boolean> movesPlayed) {
             if (movesPlayed.size() >= 51) {
                 movesPlayed.remove(0); //IMPORTANT: never let the size exceed 50 moves. Remove the first move in the list
             }

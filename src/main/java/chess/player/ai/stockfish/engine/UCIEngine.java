@@ -9,13 +9,13 @@ import java.io.*;
 import java.util.*;
 
 abstract class UCIEngine {
-    private BufferedReader input;
-    private BufferedWriter output;
-    private Process process;
+    final BufferedReader input;
+    final BufferedWriter output;
+    final Process process;
 
-    UCIEngine(String path, Variant variant, Option... options) throws StockfishInitException {
+    UCIEngine(Variant variant, Option... options) throws StockfishInitException {
         try {
-            process = new ProcessBuilder().command("bin/stockfish_20090216_x64").start();
+            process = new ProcessBuilder().command(getPath(variant)).start();
 
             input = new BufferedReader(new InputStreamReader(process.getInputStream()));
             output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
@@ -76,5 +76,39 @@ abstract class UCIEngine {
         } catch (IOException e) {
             throw new StockfishEngineException(e);
         }
+    }
+
+    String getPath(Variant variant) {
+        StringBuilder path = new StringBuilder("bin/stockfish_20090216_x64");
+
+        if (System.getProperty("os.name").toLowerCase().contains("win"))
+            switch (variant) {
+                case DEFAULT:
+                    path.append(".exe");
+                    break;
+                case BMI2:
+                    path.append("_bmi2.exe");
+                    break;
+                case POPCNT:
+                    path.append("_popcnt.exe");
+                    break;
+                default:
+                    throw new StockfishEngineException("Illegal variant provided.");
+            }
+        else
+            switch (variant) {
+                case DEFAULT:
+                    break;
+                case BMI2:
+                    path.append("_bmi2");
+                    break;
+                case MODERN:
+                    path.append("_modern");
+                    break;
+                default:
+                    throw new StockfishEngineException("Illegal variant provided.");
+            }
+
+        return path.toString();
     }
 }

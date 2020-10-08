@@ -9,24 +9,14 @@ import java.util.*;
 import java.io.IOException;
 
 public class Stockfish extends UCIEngine {
-    public Stockfish(String path, Variant variant, Option... options) throws StockfishInitException {
-        super(path, variant, options);
+    public Stockfish(Variant variant, Option... options) throws StockfishInitException {
+        super(variant, options);
     }
 
     public String makeMove(Query query) {
         waitForReady();
         sendCommand("position fen " + query.getFen() + " moves " + query.getMove());
         return getFen();
-    }
-
-    public String getCheckers(Query query) {
-        waitForReady();
-        sendCommand("position fen " + query.getFen());
-
-        waitForReady();
-        sendCommand("d");
-
-        return readLine("Checkers: ").substring(10);
     }
 
     public String getBestMove(Query query) {
@@ -82,13 +72,13 @@ public class Stockfish extends UCIEngine {
     }
 
     public void close() throws IOException {
-//        try {
-//            sendCommand("quit");
-//        } finally {
-//            process.destroy();
-//            input.close();
-//            output.close();
-//        }
+        try {
+            sendCommand("quit");
+        } finally {
+            process.destroy();
+            input.close();
+            output.close();
+        }
     }
 
     private String getFen() {

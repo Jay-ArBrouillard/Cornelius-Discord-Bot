@@ -85,7 +85,7 @@ public class ChessCommand {
 
         //If game is INACTIVE then a new game should be initalized
         if (gameState.equals(GameStatus.INACTIVE)) {
-            chessGame = new ChessGame(event.getChannel());
+            chessGame = new ChessGame();
             chessGame.board.buildImage();
             gameState = GameStatus.SETUP;
             db = new GoogleSheets();
@@ -268,13 +268,13 @@ public class ChessCommand {
         sendMessages(event, reply, boardImageFile, belowMessage);
         if (gameState.equals(GameStatus.COMPUTER_MOVE)) {
             computerAction(event);
-//            new Thread(() -> {
-//                try {
-//                    computerAction(event);
-//                } catch (Exception e) {
-//                    //Do nothing
-//                }
-//            }).start();
+            new Thread(() -> {
+                try {
+                    computerAction(event);
+                } catch (Exception e) {
+                    //Do nothing
+                }
+            }).start();
         }
     }
 

@@ -20,8 +20,19 @@ public class ChessGame {
     public Board board;
     private ChessMessageHandler messageHandler;
     public String evalScore;
+    private StockFishClient client;
 
-    public ChessGame(MessageChannel messageChannel) {
+    public ChessGame() {
+        try {
+            client = new StockFishClient.Builder()
+                    .setOption(Option.Minimum_Thinking_Time, 1000) // Minimum thinking time Stockfish will take
+                    .setOption(Option.Skill_Level, 20) // Stockfish skill level 0-20
+                    .setVariant(Variant.BMI2) // Stockfish Variant
+                    .build();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         board = Board.createStandardBoard();
         messageHandler = new ChessMessageHandler();
     }
@@ -162,22 +173,9 @@ public class ChessGame {
 
             //Update eval score
             //+position eval is good for white, -negative eval is good for black
-            try {
-                StockFishClient client = new StockFishClient.Builder()
-                    .setInstances(1)
-                    .setOption(Option.Minimum_Thinking_Time, 1000) // Minimum thinking time Stockfish will take
-                    .setOption(Option.Skill_Level, 20) // Stockfish skill level 0-20
-                    .setVariant(Variant.BMI2) // Stockfish Variant
-                    .build();
-                evalScore = client.submit(new Query.Builder(QueryType.EVAL)
-                        .setFen(FenUtils.parseFEN(this.board))
-                        .build()).substring(22);
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-            }
-
-
+            evalScore = client.submit(new Query.Builder(QueryType.EVAL)
+                    .setFen(FenUtils.parseFEN(this.board))
+                    .build()).substring(22);
 
             transition = null;
             return "Success!" + move.toString();
@@ -272,22 +270,10 @@ public class ChessGame {
         int randomThinkTime = ThreadLocalRandom.current().nextInt(5000, 10000 + 1); //Between 5-10 seconds
         mc.sendTyping().queue();
 
-        String bestMoveString = null;
-        try {
-            StockFishClient client = new StockFishClient.Builder()
-                    .setInstances(1)
-                    .setOption(Option.Minimum_Thinking_Time, 1000) // Minimum thinking time Stockfish will take
-                    .setOption(Option.Skill_Level, 20) // Stockfish skill level 0-20
-                    .setVariant(Variant.BMI2) // Stockfish Variant
-                    .build();
-            bestMoveString = client.submit(new Query.Builder(QueryType.Best_Move)
+        String bestMoveString = client.submit(new Query.Builder(QueryType.Best_Move)
                     .setMovetime(randomThinkTime)
                     .setFen(FenUtils.parseFEN(this.board))
                     .build());
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
 
         mc.sendTyping().queue();
 
