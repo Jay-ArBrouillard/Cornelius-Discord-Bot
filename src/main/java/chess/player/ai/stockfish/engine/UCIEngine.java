@@ -15,7 +15,7 @@ abstract class UCIEngine {
 
     UCIEngine(String path, Variant variant, Option... options) throws StockfishInitException {
         try {
-                Process process = Runtime.getRuntime().exec(new String[]{"bash", "-c", "bin/stockfish_20090216_x64_bmi2.exe"}); //new ProcessBuilder().command("bin/stockfish_20090216_x64_bmi2.exe").start();
+                Process process = Runtime.getRuntime().exec(new String[]{"csh", "-c", "bin/stockfish_20090216_x64_bmi2.exe"}); //new ProcessBuilder().command("bin/stockfish_20090216_x64_bmi2.exe").start();
 //                while (!process.isAlive()) {
 //                    Thread.sleep(1000);
 //                }
