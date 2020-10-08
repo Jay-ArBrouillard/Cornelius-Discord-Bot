@@ -9,6 +9,9 @@ import java.io.*;
 import java.util.*;
 
 abstract class UCIEngine {
+    private OutputStream os;
+    private PrintStream ps;
+
     private BufferedReader input;
     private BufferedWriter output;
     private Process process;
@@ -19,13 +22,15 @@ abstract class UCIEngine {
 
             process = new ProcessBuilder().command(command).start();
             process.waitFor();
-            OutputStream os = process.getOutputStream();
-            PrintStream ps = new PrintStream(os);
-            ps.println(os);
-            ps.flush();
-            BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            os = process.getOutputStream();
+            ps = new PrintStream(os);
+            for (Option option : options)
+                passOption(option);
+
+
+            input = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String cOutput;
-            while ((cOutput = br.readLine()) != null) {
+            while ((cOutput = input.readLine()) != null) {
                 System.out.println(cOutput);
             }
 
@@ -49,12 +54,14 @@ abstract class UCIEngine {
     }
 
     void sendCommand(String command) {
-        try {
-            output.write(command + "\n");
-            output.flush();
-        } catch (IOException e) {
-            throw new StockfishEngineException(e);
-        }
+//        try {
+            ps.println(command);
+            ps.flush();
+//            output.write(command + "\n");
+//            output.flush();
+//        } catch (IOException e) {
+//            throw new StockfishEngineException(e);
+//        }
     }
 
     String readLine(String expected) {
