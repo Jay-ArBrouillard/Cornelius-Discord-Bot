@@ -15,27 +15,28 @@ abstract class UCIEngine {
 
     UCIEngine(String path, Variant variant, Option... options) throws StockfishInitException {
         try {
-                //Build command
-                Process process = Runtime.getRuntime().exec("bin/stockfish_20090216_x64_bmi2");
+                Process process = new ProcessBuilder().command("bin/stockfish_20090216_x64_bmi2").start();
 
-                //Read output
-                StringBuilder out = new StringBuilder();
-                BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                String line = null, previous = null;
-                while ((line = br.readLine()) != null)
-                    if (!line.equals(previous)) {
-                        previous = line;
-                        out.append(line).append('\n');
-                        System.out.println(line);
-                    }
+                StringBuilder output = new StringBuilder();
+                BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+                writer.write("position fen rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" + "\n");
+                writer.write("go movetime 1000");
+                writer.flush();
 
-                //Check result
-                if (process.waitFor() == 0) {
-                    System.out.println("Success!");
+                String line;
+                while ((line = input.readLine()) != null) {
+                    output.append(line + "\n");
                 }
 
-                //Abnormal termination: Log command parameters and output and throw ExecutionException
-                System.err.println(out.toString());
+                int exitVal = process.waitFor();
+                if (exitVal == 0) {
+                    System.out.println("success");
+                    System.out.println(output.toString());
+                }
+                else {
+                    System.out.println("error");
+                }
 
 
 //                writer.write("position fen rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
