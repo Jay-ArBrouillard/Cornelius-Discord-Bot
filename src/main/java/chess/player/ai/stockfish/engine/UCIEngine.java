@@ -17,14 +17,14 @@ abstract class UCIEngine {
         try {
                 //Build command
                 List<String> commands = new ArrayList<>();
-                commands.add("/bin/stockfish_20090216_x64_bmi2.exe");
+                commands.add("stockfish_20090216_x64_bmi2.exe");
                 //Add arguments
 //                commands.add("/home/narek/pk.txt");
                 System.out.println(commands);
 
                 //Run macro on target
                 ProcessBuilder pb = new ProcessBuilder(commands);
-                pb.directory(new File("/bin"));
+                pb.directory(new File("bin"));
                 pb.redirectErrorStream(true);
                 Process process = pb.start();
 
