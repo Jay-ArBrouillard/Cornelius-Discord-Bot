@@ -27,7 +27,7 @@ public class ChessGame {
             client = new StockFishClient.Builder()
                     .setOption(Option.Minimum_Thinking_Time, 1000) // Minimum thinking time Stockfish will take
                     .setOption(Option.Skill_Level, 20) // Stockfish skill level 0-20
-                    .setVariant(Variant.AVX) // Stockfish Variant
+                    .setVariant(Variant.MODERN) // Stockfish Variant
                     .build();
         } catch (Exception e) {
             e.printStackTrace();
