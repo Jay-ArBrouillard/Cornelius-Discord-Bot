@@ -15,13 +15,20 @@ abstract class UCIEngine {
 
     UCIEngine(String path, Variant variant, Option... options) throws StockfishInitException {
         try {
-            process = Runtime.getRuntime().exec("bin/stockfish_20090216_x64_bmi2.exe");
+            process = new ProcessBuilder().command("bin/stockfish_20090216_x64_bmi2.exe")
+                    .directory(new File(path))
+                    .redirectInput(new File("bin", "input.txt"))
+                    .redirectOutput(new File("bin", "output.txt"))
+                    .redirectError(new File("bin", "runtime_error.txt"))
+                    .start();
+            process.waitFor();
+
             input = new BufferedReader(new InputStreamReader(process.getInputStream()));
             output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
             for (Option option : options)
                 passOption(option);
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             throw new StockfishInitException("Unable to start and bind Stockfish process: ", e);
         }
     }
