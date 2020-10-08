@@ -27,7 +27,7 @@ public class ChessGame {
             client = new StockFishClient.Builder()
 //                    .setInstances(4) //Only 1 chess game can be played at any time so I don't think increase instances will make any difference
                     .setOption(Option.Minimum_Thinking_Time, 1000) // Minimum thinking time Stockfish will take
-                    .setOption(Option.Skill_Level, 0) // Stockfish skill level 0-20
+                    .setOption(Option.Skill_Level, 1) // Stockfish skill level 0-20
                     .setVariant(Variant.MODERN) // As of 10/8/2020 Modern is the fastest variant that works on Heroku
                     .build();                   // on Local Windows BMI2 is the festest
         } catch (Exception e) {
@@ -275,6 +275,7 @@ public class ChessGame {
         mc.sendTyping().queue();
 
         String bestMoveString = client.submit(new Query.Builder(QueryType.Best_Move).setMovetime(randomThinkTime).setFen(FenUtils.parseFEN(this.board)).build());
+        System.out.println("found best move: " + bestMoveString);
         mc.sendTyping().queue();
 
         String x1Str = Character.toString(bestMoveString.charAt(0));

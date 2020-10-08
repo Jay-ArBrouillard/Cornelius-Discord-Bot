@@ -6,7 +6,6 @@ import chess.player.ai.stockfish.engine.enums.Variant;
 import chess.player.ai.stockfish.exception.StockfishInitException;
 
 import java.util.*;
-import java.io.IOException;
 
 public class Stockfish extends UCIEngine {
     public Stockfish(Variant variant, Option... options) throws StockfishInitException {
