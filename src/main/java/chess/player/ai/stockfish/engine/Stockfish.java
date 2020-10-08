@@ -10,7 +10,7 @@ public class Stockfish {
     private BufferedReader processReader;
     private OutputStreamWriter processWriter;
 
-    private static final String PATH = "chmod 755 bin/stockfish_20090216_x64_bmi2.exe";
+    private static final String PATH = "bash bin/stockfish_20090216_x64_bmi2.exe";
 
     /**
      * Starts Stockfish engine as a process and initializes it
