@@ -19,9 +19,7 @@ public class Stockfish {
      */
     public boolean startEngine() {
         try {
-            ProcessBuilder builder = new ProcessBuilder(PATH);
-            builder.redirectErrorStream(true);
-            engineProcess = builder.start();
+            engineProcess = Runtime.getRuntime().exec(PATH);
             processReader = new BufferedReader(new InputStreamReader(engineProcess.getInputStream()));
             processWriter = new OutputStreamWriter(engineProcess.getOutputStream());
         } catch (Exception e) {
