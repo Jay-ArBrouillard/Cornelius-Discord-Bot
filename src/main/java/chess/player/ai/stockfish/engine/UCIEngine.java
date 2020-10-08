@@ -105,6 +105,9 @@ abstract class UCIEngine {
                 case AVX:
                     path.append("_avx2");
                     break;
+                case SSE:
+                    path.append("_ssse");
+                    break;
                 case MODERN:
                     path.append("_modern");
                     break;
