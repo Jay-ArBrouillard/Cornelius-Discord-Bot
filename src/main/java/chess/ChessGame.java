@@ -164,6 +164,7 @@ public class ChessGame {
             //+position eval is good for white, -negative eval is good for black
             try {
                 StockFishClient client = new StockFishClient.Builder()
+                    .setInstances(1)
                     .setOption(Option.Minimum_Thinking_Time, 1000) // Minimum thinking time Stockfish will take
                     .setOption(Option.Skill_Level, 20) // Stockfish skill level 0-20
                     .setVariant(Variant.BMI2) // Stockfish Variant
