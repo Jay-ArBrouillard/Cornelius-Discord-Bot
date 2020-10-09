@@ -16,7 +16,6 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ChessGame {
@@ -38,7 +37,7 @@ public class ChessGame {
             client = new StockFishClient.Builder()
                     .setOption(Option.Minimum_Thinking_Time, 1000) // Minimum thinking time Stockfish will take
                     .setOption(Option.Skill_Level, 20) // Stockfish skill level 0-20
-                    .setVariant(Variant.BMI2) // As of 10/8/2020 Modern is the fastest variant that works on Heroku
+                    .setVariant(Variant.MODERN) // As of 10/8/2020 Modern is the fastest variant that works on Heroku
                     .build();                   // on Local Windows BMI2 is the festest
         } catch (Exception e) {
             e.printStackTrace();
@@ -373,8 +372,6 @@ public class ChessGame {
 
     public ChessGameState ai(MessageChannel mc) {
         int randomThinkTime = ThreadLocalRandom.current().nextInt(5000, 10000 + 1); //Between 5-10 seconds
-        mc.sendTyping().queue();
-
         String bestMoveString = client.submit(new Query.Builder(QueryType.Best_Move).setMovetime(randomThinkTime).setFen(FenUtils.parseFEN(this.board)).build());
         mc.sendTyping().queue();
 
