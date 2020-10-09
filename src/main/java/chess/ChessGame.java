@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ChessGame {
@@ -24,26 +25,40 @@ public class ChessGame {
     private StockFishClient client;
     private GoogleSheets db;
     private ChessGameState state;
+    public boolean threadRunning;
 
-    public ChessGame() {
+
+    public ChessGame(ChessGameState state) {
         db = new GoogleSheets();
         board = Board.createStandardBoard();
         messageHandler = new ChessMessageHandler();
-        state = new ChessGameState();
+        this.state = state;
 
         try {
             client = new StockFishClient.Builder()
                     .setOption(Option.Minimum_Thinking_Time, 1000) // Minimum thinking time Stockfish will take
-                    .setOption(Option.Skill_Level, 1) // Stockfish skill level 0-20
-                    .setVariant(Variant.MODERN) // As of 10/8/2020 Modern is the fastest variant that works on Heroku
+                    .setOption(Option.Skill_Level, 20) // Stockfish skill level 0-20
+                    .setVariant(Variant.BMI2) // As of 10/8/2020 Modern is the fastest variant that works on Heroku
                     .build();                   // on Local Windows BMI2 is the festest
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    public boolean didWhiteJustMove() {
+        return this.board.getCurrentPlayer().getOpponent().getAlliance().isWhite();
+    }
+
+    public boolean didBlackJustMove() {
+        return this.board.getCurrentPlayer().getOpponent().getAlliance().isBlack();
+    }
+
     public boolean isWhitePlayerTurn() {
-        return board.getCurrentPlayer().getAlliance().isWhite();
+        return this.board.getCurrentPlayer().getAlliance().isWhite();
+    }
+
+    public boolean isBlackPlayerTurn() {
+        return this.board.getCurrentPlayer().getAlliance().isBlack();
     }
 
     public String setupPlayers(MessageReceivedEvent event, String message) {
@@ -146,18 +161,19 @@ public class ChessGame {
         final Move move = Move.MoveFactory.createMove(this.board, startCoordinate, destinationCoordinate);
         MoveTransition transition = this.board.getCurrentPlayer().makeMove(move);
         if (transition.getMoveStatus().isDone()) {
+            state.setTotalMoves(state.getTotalMoves() + 0.5);
             this.board = transition.getTransitionBoard();
             this.board.buildImage();
 
             // Is someone in check mate?
             if (this.board.getCurrentPlayer().isInCheckMate()) {
-                if (this.board.getCurrentPlayer().getOpponent().getAlliance().isWhite()) { // Black checkmated White
-                    state.setMessage("`" + state.getBlackPlayerName() + "` has CHECKMATED `" + state.getWhitePlayerName() + "`");
-                    updateDatabaseBlackSideWin();
-                }
-                else { // White checkmated Black
+                if (didWhiteJustMove()) {
                     state.setMessage("`" + state.getWhitePlayerName() + "` has CHECKMATED `" + state.getBlackPlayerName() + "`");
                     updateDatabaseWhiteSideWin();
+                }
+                else {
+                    state.setMessage("`" + state.getBlackPlayerName() + "` has CHECKMATED `" + state.getWhitePlayerName() + "`");
+                    updateDatabaseBlackSideWin();
                 }
                 state.setStateCheckmate();
                 return state;
@@ -189,11 +205,11 @@ public class ChessGame {
 
             // Is someone in check?
             if (this.board.getCurrentPlayer().isInCheck()) {
-                if (this.board.getCurrentPlayer().getOpponent().getAlliance().isWhite()) {
-                    state.setMessage("`" + state.getBlackPlayerName() + "` SELECTS " + moveCmd + " `" + state.getWhitePlayerName() + "` is in check!");
+                if (didWhiteJustMove()) {
+                    state.setMessage("`" + state.getWhitePlayerName() + "` SELECTS " + moveCmd + " `" + state.getBlackPlayerName() + "` is in check!");
                 }
                 else {
-                    state.setMessage("`" + state.getWhitePlayerName() + "` SELECTS " + moveCmd + " `" + state.getBlackPlayerName() + "` is in check!");
+                    state.setMessage("`" + state.getBlackPlayerName() + "` SELECTS " + moveCmd + " `" + state.getWhitePlayerName() + "` is in check!");
                 }
                 state.setStateCheck();
                 return state;
@@ -204,29 +220,27 @@ public class ChessGame {
             state.setBoardEvaluationMessage(client.submit(new Query.Builder(QueryType.EVAL).setFen(FenUtils.parseFEN(this.board)).build()).substring(22));
             //Should computer resign?
             if (isComputer) {
-                System.out.println("Computers turn");
-                double evaluationScore = Double.parseDouble(state.getBoardEvaluationMessage().replaceAll("(white side)", "").trim());
-                System.out.println("eval score: " + evaluationScore);
-                if ((this.board.getCurrentPlayer().getAlliance().isWhite() && evaluationScore <= -10.0) ||
-                        (this.board.getCurrentPlayer().getAlliance().isBlack() && evaluationScore >= 10.0)) {
+                double evaluationScore = Double.parseDouble(state.getBoardEvaluationMessage().replace("(white side)", "").trim());
+                if (didWhiteJustMove() && evaluationScore <= -10.0) {
                     state.setMessage("Cornelius has RESIGNED!");
-                    if (this.board.getCurrentPlayer().getOpponent().getAlliance().isWhite()) {
-                        updateDatabaseBlackSideWin();
-                    }
-                    else { // White checkmated Black
-                        updateDatabaseWhiteSideWin();
-                    }
                     state.setStateComputerResign();
+                    updateDatabaseBlackSideWin();
+                    return state;
+                }
+                if (didBlackJustMove() && evaluationScore >= 10.0) {
+                    state.setMessage("Cornelius has RESIGNED!");
+                    state.setStateComputerResign();
+                    updateDatabaseWhiteSideWin();
                     return state;
                 }
             }
 
             //If we get to this point then player made a legal move
-            if (this.board.getCurrentPlayer().getOpponent().getAlliance().isWhite()) {
-                state.setMessage("`" + state.getBlackPlayerName() + "` SELECTS " + move.toString());
+            if (didWhiteJustMove()) {
+                state.setMessage("`" + state.getWhitePlayerName() + "` SELECTS " + move.toString());
             }
             else {
-                state.setMessage("`" + state.getWhitePlayerName() + "` SELECTS " + move.toString());
+                state.setMessage("`" + state.getBlackPlayerName() + "` SELECTS " + move.toString());
             }
             state.setStateSuccessfulMove();
             return state;
@@ -245,26 +259,42 @@ public class ChessGame {
         }
     }
 
-    public int addUser(String id, String name) {
+    public synchronized int addUser(String id, String name) {
         return db.addUser(id, name);
     }
 
-    private void updateDatabaseDraw() {
+    private synchronized void updateDatabaseDraw() {
         db.updateUser(state.getBlackPlayerId(), false, true, state.getBlackPlayerElo(), state.getWhitePlayerElo());
         db.updateUser(state.getWhitePlayerId(), false, true, state.getWhitePlayerElo(), state.getBlackPlayerElo());
-        db.addCompletedMatch(state.getWhitePlayerName(), state.getBlackPlayerName(), state.getWhitePlayerId(), state.getBlackPlayerId(), "", "", true, state.getMatchStartTime());
+        db.addCompletedMatch(state.getWhitePlayerName(), state.getBlackPlayerName(), state.getWhitePlayerId(), state.getBlackPlayerId(), state.getWhitePlayerElo(), state.getBlackPlayerElo(),"", "", true, state.getMatchStartTime(), state.getTotalMoves());
+        db.updateAvgGameLength(state.getBlackPlayerId());
+        db.updateAvgGameLength(state.getWhitePlayerId());
     }
 
-    public void updateDatabaseWhiteSideWin() {
+    public synchronized void updateDatabaseWhiteSideWin() {
+        updateDatabaseWhiteSideWin(state);
+    }
+
+    public synchronized void updateDatabaseWhiteSideWin(ChessGameState state) {
         db.updateUser(state.getBlackPlayerId(), false, false, state.getBlackPlayerElo(), state.getWhitePlayerElo());
         db.updateUser(state.getWhitePlayerId(), true, false, state.getWhitePlayerElo(), state.getBlackPlayerElo());
-        db.addCompletedMatch(state.getWhitePlayerName(), state.getBlackPlayerName(), state.getWhitePlayerId(), state.getBlackPlayerId(), state.getWhitePlayerName(), state.getBlackPlayerName(), false, state.getMatchStartTime());
+        db.addCompletedMatch(state.getWhitePlayerName(), state.getBlackPlayerName(), state.getWhitePlayerId(), state.getBlackPlayerId(), state.getWhitePlayerElo(), state.getBlackPlayerElo(), state.getWhitePlayerName(), state.getBlackPlayerName(), false, state.getMatchStartTime(), state.getTotalMoves());
+        db.updateAvgGameLength(state.getBlackPlayerId());
+        db.updateAvgGameLength(state.getWhitePlayerId());
+        threadRunning = false;
     }
 
-    public void updateDatabaseBlackSideWin() {
+    public synchronized void updateDatabaseBlackSideWin() {
+        updateDatabaseBlackSideWin(state);
+    }
+
+    public synchronized void updateDatabaseBlackSideWin(ChessGameState state) {
         db.updateUser(state.getBlackPlayerId(), true, false, state.getBlackPlayerElo(), state.getWhitePlayerElo());
         db.updateUser(state.getWhitePlayerId(), false, false, state.getWhitePlayerElo(), state.getBlackPlayerElo());
-        db.addCompletedMatch(state.getWhitePlayerName(), state.getBlackPlayerName(), state.getWhitePlayerId(), state.getBlackPlayerId(), state.getBlackPlayerName(), state.getWhitePlayerName(), false, state.getMatchStartTime());
+        db.addCompletedMatch(state.getWhitePlayerName(), state.getBlackPlayerName(), state.getWhitePlayerId(), state.getBlackPlayerId(), state.getWhitePlayerElo(), state.getBlackPlayerElo(), state.getBlackPlayerName(), state.getWhitePlayerName(), false, state.getMatchStartTime(), state.getTotalMoves());
+        db.updateAvgGameLength(state.getBlackPlayerId());
+        db.updateAvgGameLength(state.getWhitePlayerId());
+        threadRunning = false;
     }
 
     public int convertInputToInteger(String column, String row) {
@@ -346,7 +376,6 @@ public class ChessGame {
         mc.sendTyping().queue();
 
         String bestMoveString = client.submit(new Query.Builder(QueryType.Best_Move).setMovetime(randomThinkTime).setFen(FenUtils.parseFEN(this.board)).build());
-        System.out.println("found best move: " + bestMoveString);
         mc.sendTyping().queue();
 
         String x1Str = Character.toString(bestMoveString.charAt(0));

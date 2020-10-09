@@ -6,9 +6,10 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+
+import static chess.ChessConstants.*;
+import static commands.ChessCommand.Decision.COMPUTER_MOVE;
 
 public class ChessCommand {
 
@@ -23,7 +24,7 @@ public class ChessCommand {
     }
 
     private static ChessGame chessGame; //Contains business logic - Model
-    private static ChessGameState state; //Contains inbetween logic about players and the business logic
+    private static ChessGameState state = new ChessGameState(); //Contains inbetween logic about players and the business logic
     private static GameType gameType; //Player vs Player or Player vs Computer or Computer vs Player
     private static Decision decision = Decision.INACTIVE;
     private static List<String> currentMessageIds = new ArrayList<>();
@@ -43,21 +44,30 @@ public class ChessCommand {
     public static void execute(MessageReceivedEvent event, String message) {
         if (Arrays.asList(ChessConstants.QUIT).contains(message)) {
             if (isMessageFromPlayer(event.getAuthor().getId())) {
-                if (gameType != null && gameType.isPlayerVsComputer() && (decision == Decision.PLAYER_MOVE || decision == Decision.COMPUTER_MOVE)) { //Player vs Computer game
+                ChessGameState copy = state.clone();
+                if (gameType != null && gameType.isPlayerVsComputer() && (decision == Decision.PLAYER_MOVE || decision == COMPUTER_MOVE)) { //Player vs Computer game
                     if (event.getAuthor().getId().equals(state.getBlackPlayerId())) { // Black quit
-                        chessGame.updateDatabaseWhiteSideWin();
+                        Thread t = new Thread(() -> chessGame.updateDatabaseWhiteSideWin(copy));
+                        chessGame.threadRunning = true;
+                        t.start();
                     }
                     else if (event.getAuthor().getId().equals(state.getWhitePlayerId())) { // White quit
-                        chessGame.updateDatabaseBlackSideWin();
+                        Thread t = new Thread(() -> chessGame.updateDatabaseBlackSideWin(copy));
+                        chessGame.threadRunning = true;
+                        t.start();
                     }
                 }
                 else { //Player vs Player Game
                     if (state.getWhitePlayerId() != null && state.getBlackPlayerId() != null && decision == Decision.PLAYER_MOVE) {
                         if (event.getAuthor().getId().equals(state.getBlackPlayerId())) { // Black quit
-                            chessGame.updateDatabaseWhiteSideWin();
+                            Thread t = new Thread(() -> chessGame.updateDatabaseWhiteSideWin(copy));
+                            chessGame.threadRunning = true;
+                            t.start();
                         }
                         else if (event.getAuthor().getId().equals(state.getWhitePlayerId())) { // White quit
-                            chessGame.updateDatabaseBlackSideWin();
+                            Thread t = new Thread(() -> chessGame.updateDatabaseBlackSideWin(copy));
+                            chessGame.threadRunning = true;
+                            t.start();
                         }
                     }
                 }
@@ -67,18 +77,22 @@ public class ChessCommand {
             return;
         }
 
-        if (state.getStatus().equals(ChessConstants.BOARD)) {
-            event.getChannel().sendFile(new File(ChessConstants.GAME_BOARD_IMAGE_LOCATION)).queue();
-            return;
-        }
-
         //If game is INACTIVE then a new game should be initalized
         if (decision.equals(Decision.INACTIVE)) {
-            chessGame = new ChessGame();
+            state = new ChessGameState();
+            chessGame = new ChessGame(state);
             chessGame.board.buildImage();
             decision = Decision.SETUP;
         }
 
+        if (ChessConstants.BOARD.equals(state.getStatus())) {
+            event.getChannel().sendFile(new File(GAME_BOARD_IMAGE_LOCATION)).queue();
+            return;
+        }
+
+        reply = null;
+        belowMessage = null;
+        boardImageFile = null;
         //State machine game mechanics
         switch (decision) {
             case PLAYER_MOVE:
@@ -90,7 +104,7 @@ public class ChessCommand {
                     boardImageFile = null;
                     break;
                 }
-                else if (!chessGame.isWhitePlayerTurn() && !event.getAuthor().getId().equals(state.getBlackPlayerId())) {
+                else if (chessGame.isBlackPlayerTurn() && !event.getAuthor().getId().equals(state.getBlackPlayerId())) {
                     reply = "It's `" + state.getBlackPlayerName() + "'s` turn";
                     belowMessage = null;
                     boardImageFile = null;
@@ -99,17 +113,19 @@ public class ChessCommand {
                 //Start move
                 state = chessGame.processMove(message);
                 reply = state.getMessage();
-                if (state.getStatus().equals(ChessConstants.CHECKMATE) || state.getStatus().equals(ChessConstants.DRAW)) {
-                    boardImageFile = new File(ChessConstants.GAME_BOARD_IMAGE_LOCATION);
+                String status = state.getStatus();
+                if (CHECKMATE.equals(status) || DRAW.equals(status)) {
+                    boardImageFile = new File(GAME_BOARD_IMAGE_LOCATION);
                     belowMessage = "GG";
-                } else if (state.getStatus().equals(ChessConstants.CHECK) || state.getStatus().equals(ChessConstants.SUCCESSFUL_MOVE)) {
-                    boardImageFile = new File(ChessConstants.GAME_BOARD_IMAGE_LOCATION);
+                } else if (CHECK.equals(status) || SUCCESSFUL_MOVE.equals(status)) {
+                    boardImageFile = new File(GAME_BOARD_IMAGE_LOCATION);
                     if (state.getBoardEvaluationMessage() != null) reply += " : " + state.getBoardEvaluationMessage();
                     if (gameType.isPlayerVsPlayer()) {
-                        belowMessage += "Make a move (ex: `c2c4` or `help` or `helpb2` to see possible moves or `q` to forfeit the game)";
+                        belowMessage = "Make a move (ex: `c2c4` or `help` or `helpb2` to see possible moves or `q` to forfeit the game)";
                     }
                     if (gameType.isPlayerVsComputer()) {
-                        decision = Decision.COMPUTER_MOVE;
+                        decision = COMPUTER_MOVE;
+                        belowMessage = "It's `Cornelius`'s turn";
                     }
                 }
                 break;
@@ -128,7 +144,7 @@ public class ChessCommand {
                     gameType = GameType.PVP;
                 }
                 else if (reply.equals(GameType.PVC.toString())) {
-                    boardImageFile = new File(ChessConstants.GAME_BOARD_IMAGE_LOCATION);
+                    boardImageFile = new File(GAME_BOARD_IMAGE_LOCATION);
                     state.setWhitePlayerName(event.getAuthor().getName());
                     state.setBlackPlayerName("Cornelius");
                     state.setWhitePlayerElo(chessGame.addUser(event.getAuthor().getId(), event.getAuthor().getName()));
@@ -141,21 +157,20 @@ public class ChessCommand {
                     reply = "`Starting " + state.getWhitePlayerName() + " (" + state.getWhitePlayerElo() + ")" + " vs. Cornelius (" + state.getBlackPlayerElo() + ") Chess Game`\nMake a move (ex: `c2 c4`)";
                 }
                 else if (reply.equals(GameType.CVP.toString())) {
-
-                    boardImageFile = new File(ChessConstants.GAME_BOARD_IMAGE_LOCATION);
+                    boardImageFile = new File(GAME_BOARD_IMAGE_LOCATION);
                     state.setWhitePlayerName("Cornelius");
                     state.setBlackPlayerName(event.getAuthor().getName());
                     state.setWhitePlayerElo(chessGame.addUser(System.getenv("OWNER_ID"), "Cornelius"));
                     state.setBlackPlayerElo(chessGame.addUser(event.getAuthor().getId(), event.getAuthor().getName()));
                     state.setWhitePlayerId(System.getenv("OWNER_ID")); //Cornelius Discord Id
                     state.setBlackPlayerId(event.getAuthor().getId());
-                    decision = Decision.COMPUTER_MOVE;
+                    decision = COMPUTER_MOVE;
                     gameType = GameType.CVP;
                     state.setMatchStartTime(System.currentTimeMillis());
                     reply = "`Starting Cornelius (" + state.getWhitePlayerElo() + ")" + " vs. " + state.getBlackPlayerName() + " (" + state.getBlackPlayerElo() + ") Chess Game`\nCornelius will go first...";
                 }
                 else {
-                    reply = "Please choose from player options `(1-4)`:";
+                    reply = "Please choose from player options `(1-3)`:";
                 }
                 break;
             case CHALLENGE_OPPONENT:
@@ -189,7 +204,7 @@ public class ChessCommand {
                 if (event.getAuthor().getId().equals(state.getBlackPlayerId())) {
                     if (message.equalsIgnoreCase("y")) {
                         reply = "<@" + state.getWhitePlayerId() + "> ("+state.getWhitePlayerElo()+") vs <@" + state.getBlackPlayerId() + "> ("+state.getBlackPlayerElo()+") Chess Game";
-                        boardImageFile = new File(ChessConstants.GAME_BOARD_IMAGE_LOCATION);
+                        boardImageFile = new File(GAME_BOARD_IMAGE_LOCATION);
                         belowMessage = "`"+ state.getWhitePlayerName() + "` goes first. Make a move (ex: `c2 c4`)";
                         decision = Decision.PLAYER_MOVE;
                         state.setMatchStartTime(System.currentTimeMillis());
@@ -214,7 +229,7 @@ public class ChessCommand {
         }
 
         sendMessages(event, reply, boardImageFile, belowMessage);
-        if (decision.equals(Decision.COMPUTER_MOVE)) {
+        if (decision.equals(COMPUTER_MOVE)) {
             new Thread(() -> {
                 try {
                     computerAction(event);
@@ -230,7 +245,7 @@ public class ChessCommand {
             event.getChannel().purgeMessagesById(oldMessageIds);
             oldMessageIds.clear();
         }
-
+        if ((reply != null) && reply.contains("null")) return;
         event.getChannel().sendMessage(reply).queue((msg) -> currentMessageIds.add(msg.getId()));
         if (file != null) {
             event.getChannel().sendFile(file).queue((msg) -> currentMessageIds.add(msg.getId()));
@@ -242,10 +257,8 @@ public class ChessCommand {
         oldMessageIds.addAll(currentMessageIds);
         currentMessageIds.clear();
 
-        if (reply.toLowerCase().contains("checkmate") ||
-                reply.toLowerCase().contains("draw") ||
-                reply.toLowerCase().contains("resign") ||
-                reply.toLowerCase().contains("decline")) {
+        String status = state.getStatus();
+        if (CHECKMATE.equals(status) || DRAW.equals(status) || COMPUTER_RESIGN.equals(status) || reply.contains("decline")) {
             endGame(event.getChannel());
         }
     }
@@ -253,17 +266,16 @@ public class ChessCommand {
     public static void computerAction(MessageReceivedEvent event) {
         state = chessGame.ai(event.getChannel());
         reply = state.getMessage();
-        if (state.getStatus().equals(ChessConstants.CHECKMATE) ||
-                state.getStatus().equals(ChessConstants.DRAW) ||
-                state.getStatus().equals(ChessConstants.COMPUTER_RESIGN)) {
-            boardImageFile = new File(ChessConstants.GAME_BOARD_IMAGE_LOCATION);
+        String status = state.getStatus();
+        if (CHECKMATE.equals(status) || DRAW.equals(status) || COMPUTER_RESIGN.equals(status)) {
+            boardImageFile = new File(GAME_BOARD_IMAGE_LOCATION);
             belowMessage = "GG";
-        } else if (state.getStatus().equals(ChessConstants.CHECK) || state.getStatus().equals(ChessConstants.SUCCESSFUL_MOVE)) {
-            boardImageFile = new File(ChessConstants.GAME_BOARD_IMAGE_LOCATION);
+        } else if (CHECK.equals(status) || SUCCESSFUL_MOVE.equals(status)) {
+            boardImageFile = new File(GAME_BOARD_IMAGE_LOCATION);
             if (chessGame.isWhitePlayerTurn()) {
                 belowMessage = "`" + state.getWhitePlayerName() + "'s` turn. Make a move (ex: `c2c4` or `help` or `helpb2` to see possible moves or `q` to forfeit the game)";
             }
-            else {
+            if (chessGame.isBlackPlayerTurn()) {
                 belowMessage = "`" + state.getBlackPlayerName() + "'s` turn. Make a move (ex: `c2c4` or `help` or `helpb2` to see possible moves or `q` to forfeit the game)";
             }
             decision = Decision.PLAYER_MOVE;
@@ -273,7 +285,17 @@ public class ChessCommand {
     }
 
     public static void endGame(MessageChannel messageChannel) {
-        chessGame = null;
+        new Thread(() -> {
+            while (chessGame.threadRunning) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    messageChannel.sendMessage("Error saving Chess Stats to GoogleSheets: " + e).queue();
+                }
+            }
+            chessGame = null;
+        }).start();
         decision = Decision.INACTIVE;
         gameType = null;
         currentMessageIds.clear();

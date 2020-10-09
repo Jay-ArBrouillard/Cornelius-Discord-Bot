@@ -11,8 +11,25 @@ public class ChessGameState {
     private int blackPlayerElo;
     private long matchStartTime;
     private String boardEvaluationMessage;
+    private double totalMoves = 0; //Half moves that's why we need a double
 
-    ChessGameState () {
+    public ChessGameState() {
+    }
+
+    public ChessGameState clone() {
+        ChessGameState shallowCopy = new ChessGameState();
+        shallowCopy.setMessage(this.message);
+        shallowCopy.setStatus(this.status);
+        shallowCopy.setWhitePlayerName(this.whitePlayerName);
+        shallowCopy.setBlackPlayerName(this.blackPlayerName);
+        shallowCopy.setWhitePlayerId(this.whitePlayerId);
+        shallowCopy.setBlackPlayerId(this.blackPlayerId);
+        shallowCopy.setWhitePlayerElo(this.whitePlayerElo);
+        shallowCopy.setBlackPlayerElo(this.blackPlayerElo);
+        shallowCopy.setMatchStartTime(this.matchStartTime);
+        shallowCopy.setBoardEvaluationMessage(this.boardEvaluationMessage);
+        shallowCopy.setTotalMoves(this.totalMoves);
+        return shallowCopy;
     }
 
     public void setMessage(String message) {
@@ -21,6 +38,10 @@ public class ChessGameState {
 
     public String getMessage() {
         return this.message;
+    }
+
+    private void setStatus(String status) {
+        this.status = status;
     }
 
     public String getStatus() {
@@ -91,6 +112,14 @@ public class ChessGameState {
         this.boardEvaluationMessage = boardEvaluationMessage;
     }
 
+    public double getTotalMoves() {
+        return totalMoves;
+    }
+
+    public void setTotalMoves(double totalMoves) {
+        this.totalMoves = totalMoves;
+    }
+
     public void setStateShowAllLegalMoves() {
         this.status = ChessConstants.SHOW_ALL_LEGAL_MOVES;
     }
@@ -109,10 +138,6 @@ public class ChessGameState {
 
     public void setStateCheckmate() {
         this.status = ChessConstants.CHECKMATE;
-    }
-
-    public void setStateShowBoard() {
-        this.status = ChessConstants.BOARD;
     }
 
     public void setStateDraw() {

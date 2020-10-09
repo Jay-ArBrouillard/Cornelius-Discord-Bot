@@ -23,7 +23,8 @@ public class GoogleSheets {
     private static HttpTransport HTTP_TRANSPORT;
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private static Sheets service;
-    private static DecimalFormat df = new DecimalFormat("##.00");
+    private static DecimalFormat formatPercent = new DecimalFormat("##0.0000");
+    private static DecimalFormat formatRatio = new DecimalFormat("##.00");
 
     public GoogleSheets() {
         getSheetsService();
@@ -102,7 +103,7 @@ public class GoogleSheets {
             //New users get default elo of 1000
             ValueRange appendBody = new ValueRange()
                 .setValues(Arrays.asList(
-                        Arrays.asList(id, name, 1000, "0", "0", "0", "0", now, now)
+                        Arrays.asList(id, name, 1000, "Class E", "0", "0", "0", "0", 0, "0 days 0 hours 0 minutes 0 seconds", now, now)
                 ));
             service.spreadsheets().values()
                 .append(SPREAD_SHEET_ID, "players", appendBody)
@@ -130,12 +131,13 @@ public class GoogleSheets {
                 int rowNumber = 1;
                 for (List row : allUsers) {
                     if (row.get(0).equals(id)) {
-                        int wins = Integer.parseInt((String) row.get(3));
-                        double losses = Double.parseDouble((String) row.get(4));
-                        int draws = Integer.parseInt((String) row.get(5));
+                        int wins = Integer.parseInt((String) row.get(4));
+                        double losses = Double.parseDouble((String) row.get(5));
+                        int draws = Integer.parseInt((String) row.get(6));
+                        int totalGames = wins + (int) losses + draws;
 
                         //Calculate new elo
-                        double probabilityWin = (1.0 / (1.0 + Math.pow(10, ((thisElo-otherElo) / 400)))); // Probability winning
+                        double probWin = (1.0 / (1.0 + Math.pow(10, ((otherElo-thisElo) / 400)))); // Probability winning
                         double newEloRating = thisElo;
 
                         if (isWin) {
@@ -143,13 +145,13 @@ public class GoogleSheets {
                             wins++;
                             ValueRange body = new ValueRange().setValues(Arrays.asList(Arrays.asList(wins)));
                             service.spreadsheets().values()
-                                    .update(SPREAD_SHEET_ID, "D"+rowNumber, body)
-                                    .setValueInputOption("USER_ENTERED")
+                                    .update(SPREAD_SHEET_ID, "E"+rowNumber, body)
+                                    .setValueInputOption("RAW")
                                     .execute();
                             //Update Elo
                             if (newEloRating != -1) {
-                                newEloRating = newEloRating + determineK(thisElo) * (1 - probabilityWin);
-                                updateElo(rowNumber, newEloRating);
+                                newEloRating = newEloRating + determineK(thisElo, totalGames) * (1 - probWin);
+                                updateEloAndTitle(rowNumber, newEloRating);
                             }
                             //Update "Updated On" Column
                             changeUpdatedOnColumn(rowNumber);
@@ -159,13 +161,13 @@ public class GoogleSheets {
                             losses++;
                             ValueRange body = new ValueRange().setValues(Arrays.asList(Arrays.asList(losses)));
                             service.spreadsheets().values()
-                                    .update(SPREAD_SHEET_ID, "E"+rowNumber, body)
-                                    .setValueInputOption("USER_ENTERED")
+                                    .update(SPREAD_SHEET_ID, "F"+rowNumber, body)
+                                    .setValueInputOption("RAW")
                                     .execute();
                             //Update Elo
                             if (newEloRating != -1) {
-                                newEloRating = thisElo + determineK(thisElo) * (0 - probabilityWin);
-                                updateElo(rowNumber, newEloRating);
+                                newEloRating = thisElo + determineK(thisElo, totalGames) * (0 - probWin);
+                                updateEloAndTitle(rowNumber, newEloRating);
                             }
                             //Update "Updated On" Column
                             changeUpdatedOnColumn(rowNumber);
@@ -175,13 +177,13 @@ public class GoogleSheets {
                             draws++;
                             ValueRange body = new ValueRange().setValues(Arrays.asList(Arrays.asList(draws)));
                             service.spreadsheets().values()
-                                    .update(SPREAD_SHEET_ID, "F"+rowNumber, body)
-                                    .setValueInputOption("USER_ENTERED")
+                                    .update(SPREAD_SHEET_ID, "G"+rowNumber, body)
+                                    .setValueInputOption("RAW")
                                     .execute();
                             //Update Elo
                             if (newEloRating != -1) {
-                                newEloRating = thisElo + determineK(thisElo) * (0.5 - probabilityWin);
-                                updateElo(rowNumber, newEloRating);
+                                newEloRating = thisElo + determineK(thisElo, totalGames) * (0.5 - probWin);
+                                updateEloAndTitle(rowNumber, newEloRating);
                             }
                             //Update "Updated On" Column
                             changeUpdatedOnColumn(rowNumber);
@@ -189,10 +191,17 @@ public class GoogleSheets {
 
                         //Update Win Loss Ratio
                         if (losses == 0) losses = 1;
-                        ValueRange body = new ValueRange().setValues(Arrays.asList(Arrays.asList(df.format((wins+draws)/losses))));
+                        ValueRange body = new ValueRange().setValues(Arrays.asList(Arrays.asList(formatRatio.format((wins+draws)/losses))));
                         service.spreadsheets().values()
-                                .update(SPREAD_SHEET_ID, "G"+rowNumber, body)
+                                .update(SPREAD_SHEET_ID, "H"+rowNumber, body)
                                 .setValueInputOption("USER_ENTERED")
+                                .execute();
+                        //Update Total Games Played
+                        totalGames++;
+                        body = new ValueRange().setValues(Arrays.asList(Arrays.asList(totalGames)));
+                        service.spreadsheets().values()
+                                .update(SPREAD_SHEET_ID, "I"+rowNumber, body)
+                                .setValueInputOption("RAW")
                                 .execute();
                         return true;
                     }
@@ -206,7 +215,71 @@ public class GoogleSheets {
         }
     }
 
-    public static boolean addCompletedMatch(String player1, String player2, String id1, String id2, String winnerName, String loserName, boolean isDraw, Long startTime) {
+
+    public static boolean updateAvgGameLength(String id) {
+        try {
+            if (service == null) getSheetsService();
+            long days = 0;
+            long hours = 0;
+            long minutes = 0;
+            long seconds = 0;
+            int totalMatches = 0;
+            ValueRange response = service.spreadsheets().values()
+                    .get(SPREAD_SHEET_ID, "matches")
+                    .execute();
+            List<List<Object>> allMatches = response.getValues();
+            if (allMatches != null || !allMatches.isEmpty()) {
+                for (List row : allMatches) {
+                    if (row.get(2).equals(id) || row.get(3).equals(id)) {
+                        String[] split = ((String) row.get(10)).split("\\s+"); //Example: 0 days 0 hours 0 minutes 7 seconds
+                        days += Integer.parseInt(split[0].trim());
+                        hours += Integer.parseInt(split[2].trim());
+                        minutes += Integer.parseInt(split[4].trim());
+                        seconds +=  Integer.parseInt(split[6].trim());
+                        totalMatches++;
+                    }
+                }
+            }
+
+            //Process values
+            if (totalMatches == 0) totalMatches = 1;
+            long totalTimeSeconds = Math.round((TimeUnit.DAYS.toSeconds(days) + TimeUnit.HOURS.toSeconds(hours) +
+                                    TimeUnit.MINUTES.toSeconds(minutes) + seconds) / totalMatches);
+
+            days = TimeUnit.SECONDS.toDays(totalTimeSeconds);
+            hours = TimeUnit.SECONDS.toHours(totalTimeSeconds) - (days *24);
+            minutes = TimeUnit.SECONDS.toMinutes(totalTimeSeconds) - (TimeUnit.SECONDS.toHours(totalTimeSeconds)* 60);
+            seconds = TimeUnit.SECONDS.toSeconds(totalTimeSeconds) - (TimeUnit.SECONDS.toMinutes(totalTimeSeconds) *60);
+
+            response = service.spreadsheets().values()
+                    .get(SPREAD_SHEET_ID, "players")
+                    .execute();
+            List<List<Object>> allPlayers = response.getValues();
+            if (allPlayers != null || !allPlayers.isEmpty()) {
+                int rowNumber = 1;
+                for (List row : allPlayers) {
+                    if (row.get(0).equals(id)) {
+                        String matchLength = "" + days + " days " + hours + " hours " + minutes + " minutes " + seconds + " seconds";
+                        ValueRange body = new ValueRange().setValues(Arrays.asList(Arrays.asList(matchLength)));
+
+                        service.spreadsheets().values()
+                                .update(SPREAD_SHEET_ID, "J"+rowNumber, body)
+                                .setValueInputOption("RAW")
+                                .execute();
+                        return true;
+                    }
+                    rowNumber++;
+                }
+            }
+            
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static boolean addCompletedMatch(String player1, String player2, String id1, String id2, int elo1, int elo2, String winnerName, String loserName, boolean isDraw, Long startTime, double moveCount) {
         try {
             if (service == null) getSheetsService();
 
@@ -217,7 +290,9 @@ public class GoogleSheets {
             long second = TimeUnit.SECONDS.toSeconds(seconds) - (TimeUnit.SECONDS.toMinutes(seconds) *60);
 
             String matchLength = "" + day + " days " + hours + " hours " + minute + " minutes " + second + " seconds";
-            ValueRange appendBody = new ValueRange().setValues(Arrays.asList(Arrays.asList(player1, player2, id1, id2, winnerName, loserName, isDraw, matchLength, getCurrentDateTime())));
+            double p1WinChance = (1.0 / (1.0 + Math.pow(10, ((elo2-elo1) / 400)))) * 100;
+            double p2WinChance = (1.0 / (1.0 + Math.pow(10, ((elo1-elo2) / 400)))) * 100;
+            ValueRange appendBody = new ValueRange().setValues(Arrays.asList(Arrays.asList(player1, player2, id1, id2, formatPercent.format(p1WinChance)+"%", formatPercent.format(p2WinChance)+"%", winnerName, loserName, isDraw, moveCount, matchLength, getCurrentDateTime())));
 
             service.spreadsheets().values()
                     .append(SPREAD_SHEET_ID, "matches", appendBody)
@@ -232,8 +307,8 @@ public class GoogleSheets {
         }
     }
 
-    private static void updateElo(int rowNumber, double newElo) throws IOException {
-        ValueRange body = new ValueRange().setValues(Arrays.asList(Arrays.asList((int)newElo)));
+    private static void updateEloAndTitle(int rowNumber, double newElo) throws IOException {
+        ValueRange body = new ValueRange().setValues(Arrays.asList(Arrays.asList((int)newElo, determineTitle((int)newElo))));
         service.spreadsheets().values()
                 .update(SPREAD_SHEET_ID, "C"+rowNumber, body)
                 .setValueInputOption("RAW")
@@ -243,7 +318,7 @@ public class GoogleSheets {
     private static void changeUpdatedOnColumn(int rowNumber) throws IOException {
         ValueRange body = new ValueRange().setValues(Arrays.asList(Arrays.asList(getCurrentDateTime())));
         service.spreadsheets().values()
-                .update(SPREAD_SHEET_ID, "I"+rowNumber, body)
+                .update(SPREAD_SHEET_ID, "K"+rowNumber, body)
                 .setValueInputOption("RAW")
                 .execute();
     }
@@ -261,15 +336,67 @@ public class GoogleSheets {
      *            Player rating
      * @return K-factor
      */
-    public static int determineK(int rating) {
+    public static int determineK(int rating, int totalGames) {
         int K;
         if (rating < 2000) {
-            K = 32;
+            if (totalGames == 0) totalGames = 1;
+            K = 800 / totalGames; //Round down
         } else if (rating >= 2000 && rating < 2400) {
             K = 24;
         } else {
             K = 16;
         }
         return K;
+    }
+
+    public static String determineTitle(int rating) {
+        if (rating >= 2500) {
+            return "Grandmaster (GM)";
+        }
+        else if (rating >= 2400) {
+            return "International Master (IM)";
+        }
+        else if (rating >= 2300) {
+            return "FIDE Master (FM)";
+        }
+        else if (rating >= 2200) {
+            return "Senior Master (SM)";
+        }
+        else if (rating >= 2100) {
+            return "Master (M)";
+        }
+        else if (rating >= 2000) {
+            return "Candidate Master (CM)";
+        }
+        else if (rating >= 1800) {
+            return "Class A";
+        }
+        else if (rating >= 1600) {
+            return "Class B";
+        }
+        else if (rating >= 1400) {
+            return "Class C";
+        }
+        else if (rating >= 1200) {
+            return "Class D";
+        }
+        else if (rating >= 1000) {
+            return "Class E";
+        }
+        else if (rating >= 800) {
+            return "Class F";
+        }
+        else if (rating >= 600) {
+            return "Class G";
+        }
+        else if (rating >= 400) {
+            return "Class H";
+        }
+        else if (rating >= 200) {
+            return "Class I";
+        }
+        else {
+            return "Class J";
+        }
     }
 }
