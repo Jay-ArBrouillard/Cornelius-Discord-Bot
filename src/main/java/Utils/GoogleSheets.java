@@ -12,9 +12,8 @@ import com.google.api.services.sheets.v4.model.ValueRange;
 
 import java.io.*;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -24,7 +23,7 @@ public class GoogleSheets {
     private static HttpTransport HTTP_TRANSPORT;
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private static Sheets service;
-    private static DecimalFormat formatPercent = new DecimalFormat("##0.0000");
+    private static DecimalFormat formatPercent = new DecimalFormat("##0.00");
     private static DecimalFormat formatRatio = new DecimalFormat("##.00");
 
     public GoogleSheets() {
@@ -128,7 +127,7 @@ public class GoogleSheets {
      * @param otherElo
      * @return
      */
-    public static int updateUser(String id, boolean isWin, boolean isDraw, int thisElo, int otherElo) {
+    public static EloStatus updateUser(String id, boolean isWin, boolean isDraw, int thisElo, int otherElo) {
         try {
             if (service == null) getSheetsService();
             ValueRange response = service.spreadsheets().values()
@@ -136,7 +135,7 @@ public class GoogleSheets {
                     .execute();
             List<List<Object>> allUsers = response.getValues();
             if (allUsers == null || allUsers.isEmpty()) {
-                return -1;
+                return null;
             } else {
                 int rowNumber = 1;
                 for (List row : allUsers) {
@@ -145,6 +144,8 @@ public class GoogleSheets {
                         double losses = Double.parseDouble((String) row.get(5));
                         int draws = Integer.parseInt((String) row.get(6));
                         int totalGames = wins + (int) losses + draws;
+                        EloStatus eloStatus = new EloStatus();
+                        eloStatus.prevElo = thisElo;
 
                         //Calculate new elo
                         double probWin = (1.0 / (1.0 + Math.pow(10, ((otherElo-thisElo) / 400)))); // Probability winning
@@ -160,7 +161,7 @@ public class GoogleSheets {
                                     .execute();
                             //Update Elo
                             if (newEloRating != -1) {
-                                newEloRating = newEloRating + determineK(thisElo, totalGames) * (1 - probWin);
+                                newEloRating = Math.round(newEloRating + determineK(thisElo, totalGames) * (1 - probWin));
                                 updateEloAndTitle(rowNumber, newEloRating);
                             }
                             //Update "Updated On" Column
@@ -176,7 +177,7 @@ public class GoogleSheets {
                                     .execute();
                             //Update Elo
                             if (newEloRating != -1) {
-                                newEloRating = thisElo + determineK(thisElo, totalGames) * (0 - probWin);
+                                newEloRating = Math.round(thisElo + determineK(thisElo, totalGames) * (0 - probWin));
                                 updateEloAndTitle(rowNumber, newEloRating);
                             }
                             //Update "Updated On" Column
@@ -192,12 +193,13 @@ public class GoogleSheets {
                                     .execute();
                             //Update Elo
                             if (newEloRating != -1) {
-                                newEloRating = thisElo + determineK(thisElo, totalGames) * (0.5 - probWin);
+                                newEloRating = Math.round(thisElo + determineK(thisElo, totalGames) * (0.5 - probWin));
                                 updateEloAndTitle(rowNumber, newEloRating);
                             }
                             //Update "Updated On" Column
                             changeUpdatedOnColumn(rowNumber);
                         }
+                        eloStatus.currElo = newEloRating;
 
                         //Update Win Loss Ratio
                         if (losses == 0) losses = 1;
@@ -208,20 +210,21 @@ public class GoogleSheets {
                                 .execute();
                         //Update Total Games Played
                         totalGames++;
+                        eloStatus.totalGamesPlayed = totalGames;
                         body = new ValueRange().setValues(Arrays.asList(Arrays.asList(totalGames)));
                         service.spreadsheets().values()
                                 .update(SPREAD_SHEET_ID, "I"+rowNumber, body)
                                 .setValueInputOption("RAW")
                                 .execute();
-                        return totalGames;
+                        return eloStatus;
                     }
                     rowNumber++;
                 }
             }
-            return -1;
+            return null;
         } catch (Exception e) {
             e.printStackTrace();
-            return -1;
+            return null;
         }
     }
 
@@ -241,7 +244,7 @@ public class GoogleSheets {
             if (allMatches != null || !allMatches.isEmpty()) {
                 for (List row : allMatches) {
                     if (row.get(2).equals(id) || row.get(3).equals(id)) {
-                        String[] split = ((String) row.get(10)).split("\\s+"); //Example: 0 days 0 hours 0 minutes 7 seconds
+                        String[] split = ((String) row.get(12)).split("\\s+"); //Example: 0 days 0 hours 0 minutes 7 seconds
                         days += Integer.parseInt(split[0].trim());
                         hours += Integer.parseInt(split[2].trim());
                         minutes += Integer.parseInt(split[4].trim());
@@ -289,7 +292,7 @@ public class GoogleSheets {
         }
     }
 
-    public static boolean addCompletedMatch(String player1, String player2, String id1, String id2, int elo1, int elo2, String winnerId, boolean isDraw, Long startTime, double moveCount, int p1TotalGames, int p2TotalGames) {
+    public static boolean addCompletedMatch(String player1, String player2, String id1, String id2, String winnerId, boolean isDraw, Long startTime, double moveCount, EloStatus p1EloStatus, EloStatus p2EloStatus) {
         try {
             if (service == null) getSheetsService();
 
@@ -300,31 +303,25 @@ public class GoogleSheets {
             long second = TimeUnit.SECONDS.toSeconds(seconds) - (TimeUnit.SECONDS.toMinutes(seconds) *60);
 
             String matchLength = "" + day + " days " + hours + " hours " + minute + " minutes " + second + " seconds";
-            double p1WinChance = (1.0 / (1.0 + Math.pow(10, ((elo2-elo1) / 400)))) * 100;
-            double p2WinChance = (1.0 / (1.0 + Math.pow(10, ((elo1-elo2) / 400)))) * 100;
+            double p1Odds = 1.0 / (1.0 + Math.pow(10.0, ((p2EloStatus.prevElo-p1EloStatus.prevElo) / 400.0)));
+            double p2Odds = 1.0 - p1Odds;
             String p1EloDiff;
             String p2EloDiff;
             ValueRange appendBody;
             if (winnerId.equals(id1)) {
-                double p1NewElo = elo1 + determineK(elo1, p1TotalGames) * (1 - p1WinChance);
-                double p2NewElo = elo2 + determineK(elo2, p2TotalGames) * (0 - p2WinChance);
-                p1EloDiff = p1NewElo >= elo1 ? "+"+(p1NewElo-elo1) : ""+(elo1+p1NewElo);
-                p2EloDiff = ""+(elo2+p2NewElo);
-                appendBody = new ValueRange().setValues(Arrays.asList(Arrays.asList(player1, player2, id1, id2, elo1+" ("+p1EloDiff+")", elo2+" ("+p2EloDiff+")", formatPercent.format(p1WinChance)+"%", formatPercent.format(p2WinChance)+"%", player1, player2, isDraw, moveCount, matchLength, getCurrentDateTime())));
+                p1EloDiff = generateEloDiffString(p1EloStatus.prevElo, p1EloStatus.currElo);
+                p2EloDiff = generateEloDiffString(p2EloStatus.prevElo, p2EloStatus.currElo);
+                appendBody = new ValueRange().setValues(Arrays.asList(Arrays.asList(player1, id1, Math.round(p2EloStatus.currElo)+" ("+p2EloDiff+")", formatPercent.format(p2Odds*100)+"%", player2,  id2, Math.round(p1EloStatus.currElo)+" ("+p1EloDiff+")", formatPercent.format(p1Odds*100)+"%", player1, player2, isDraw, moveCount, matchLength, getCurrentDateTime())));
             }
             else if (winnerId.equals(id2)) {
-                double p1NewElo = elo1 + determineK(elo1, p1TotalGames) * (0 - p1WinChance);
-                double p2NewElo = elo2 + determineK(elo2, p2TotalGames) * (1 - p2WinChance);
-                p1EloDiff = ""+(elo1+p1NewElo);
-                p2EloDiff = p2NewElo >= elo2 ? "+"+(p2NewElo-elo2) : ""+(elo2+p2NewElo);
-                appendBody = new ValueRange().setValues(Arrays.asList(Arrays.asList(player1, player2, id1, id2, elo1+" ("+p1EloDiff+")", elo2+" ("+p2EloDiff+")", formatPercent.format(p1WinChance)+"%", formatPercent.format(p2WinChance)+"%", player2, player1, isDraw, moveCount, matchLength, getCurrentDateTime())));
+                p1EloDiff = generateEloDiffString(p1EloStatus.prevElo, p1EloStatus.currElo);
+                p2EloDiff = generateEloDiffString(p2EloStatus.prevElo, p2EloStatus.currElo);
+                appendBody = new ValueRange().setValues(Arrays.asList(Arrays.asList(player1, id1, Math.round(p2EloStatus.currElo)+" ("+p2EloDiff+")", formatPercent.format(p2Odds*100)+"%", player2,  id2,  Math.round(p1EloStatus.currElo)+" ("+p1EloDiff+")", formatPercent.format(p1Odds *100)+"%", player2, player1, isDraw, moveCount, matchLength, getCurrentDateTime())));
             }
             else { //draw
-                double p1NewElo = elo1 + determineK(elo1, p1TotalGames) * (0.5 - p1WinChance);
-                double p2NewElo = elo2 + determineK(elo2, p2TotalGames) * (0.5 - p2WinChance);
-                p1EloDiff = p1NewElo >= elo1 ? "+"+(p1NewElo-elo1) : ""+(elo1+p1NewElo);
-                p2EloDiff = p2NewElo >= elo2 ? "+"+(p2NewElo-elo2) : ""+(elo2+p2NewElo);
-                appendBody = new ValueRange().setValues(Arrays.asList(Arrays.asList(player1, player2, id1, id2, elo1+" ("+p1EloDiff+")", elo2+" ("+p2EloDiff+")", formatPercent.format(p1WinChance)+"%", formatPercent.format(p2WinChance)+"%", "", "", isDraw, moveCount, matchLength, getCurrentDateTime())));
+                p1EloDiff = generateEloDiffString(p1EloStatus.prevElo, p1EloStatus.currElo);
+                p2EloDiff = generateEloDiffString(p2EloStatus.prevElo, p2EloStatus.currElo);
+                appendBody = new ValueRange().setValues(Arrays.asList(Arrays.asList(player1, id1, Math.round(p1EloStatus.currElo)+" ("+p1EloDiff+")", formatPercent.format(p1Odds*100)+"%", player2,  id2,  Math.round(p2EloStatus.currElo)+" ("+p2EloDiff+")", formatPercent.format(p2Odds*100)+"%", "-", "-", isDraw, moveCount, matchLength, getCurrentDateTime())));
             }
 
             service.spreadsheets().values()
@@ -338,6 +335,17 @@ public class GoogleSheets {
             e.printStackTrace();
             return false;
         }
+    }
+
+    private static String generateEloDiffString(double startingElo, double newElo) {
+        String eloDiff = null;
+        if (newElo >= startingElo) {
+            eloDiff = "+"+Math.round(newElo-startingElo);
+        }
+        else if (newElo < startingElo) {
+            eloDiff = "-"+Math.round(startingElo-newElo);
+        }
+        return eloDiff;
     }
 
     private static void updateEloAndTitle(int rowNumber, double newElo) throws IOException {
@@ -358,8 +366,7 @@ public class GoogleSheets {
 
     public static String getCurrentDateTime() {
         ZonedDateTime myDate = ZonedDateTime.now();
-        SimpleDateFormat formatter = new SimpleDateFormat("MM-dd-yyyy hh:mm aa");
-        return formatter.format(myDate);
+        return DateTimeFormatter.ofPattern("MM-dd-yyyy hh:mm a").format(myDate);
     }
 
     /**

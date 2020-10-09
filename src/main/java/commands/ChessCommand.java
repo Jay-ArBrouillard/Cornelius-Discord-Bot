@@ -10,6 +10,7 @@ import java.util.*;
 
 import static chess.ChessConstants.*;
 import static commands.ChessCommand.Decision.COMPUTER_MOVE;
+import static commands.ChessCommand.Decision.INACTIVE;
 
 public class ChessCommand {
 
@@ -26,7 +27,7 @@ public class ChessCommand {
     private static ChessGame chessGame; //Contains business logic - Model
     private static ChessGameState state = new ChessGameState(); //Contains inbetween logic about players and the business logic
     private static GameType gameType; //Player vs Player or Player vs Computer or Computer vs Player
-    private static Decision decision = Decision.INACTIVE;
+    private static Decision decision = INACTIVE;
     private static List<String> currentMessageIds = new ArrayList<>();
     private static List<String> oldMessageIds = new ArrayList<>();
     private static String reply;
@@ -34,7 +35,7 @@ public class ChessCommand {
     private static File boardImageFile;
 
     public static boolean isRunning() {
-        return chessGame != null && decision != Decision.INACTIVE;
+        return chessGame != null && decision != INACTIVE;
     }
 
     public static boolean isMessageFromPlayer(String id) {
@@ -78,7 +79,7 @@ public class ChessCommand {
         }
 
         //If game is INACTIVE then a new game should be initalized
-        if (decision.equals(Decision.INACTIVE)) {
+        if (decision.equals(INACTIVE)) {
             state = new ChessGameState();
             chessGame = new ChessGame(state);
             chessGame.board.buildImage();
@@ -90,9 +91,15 @@ public class ChessCommand {
             return;
         }
 
+        if (!decision.equals(INACTIVE) && chessGame == null) {
+            event.getChannel().sendMessage("Threads for previous match are still executing please retry `!chess` in 10 seconds or so").queue();
+            return;
+        }
+
         reply = null;
         belowMessage = null;
         boardImageFile = null;
+        boolean executeComputerMove = true;
         //State machine game mechanics
         switch (decision) {
             case PLAYER_MOVE:
@@ -127,6 +134,23 @@ public class ChessCommand {
                         decision = COMPUTER_MOVE;
                         belowMessage = "It's `Cornelius`'s turn";
                     }
+                }
+                break;
+            case COMPUTER_MOVE:
+                //Game logic Handled outside of switch
+                if (chessGame.isWhitePlayerTurn() && !event.getAuthor().getId().equals(state.getWhitePlayerId())) {
+                    reply = "It's `" + state.getWhitePlayerName() + "'s` turn";
+                    belowMessage = null;
+                    boardImageFile = null;
+                    executeComputerMove = false;
+                    break;
+                }
+                else if (chessGame.isBlackPlayerTurn() && !event.getAuthor().getId().equals(state.getBlackPlayerId())) {
+                    reply = "It's `" + state.getBlackPlayerName() + "'s` turn";
+                    belowMessage = null;
+                    boardImageFile = null;
+                    executeComputerMove = false;
+                    break;
                 }
                 break;
             case SETUP:
@@ -227,9 +251,8 @@ public class ChessCommand {
             default:
                 reply = "Game logic error. Ask Jay-Ar what happened";
         }
-
         sendMessages(event, reply, boardImageFile, belowMessage);
-        if (decision.equals(COMPUTER_MOVE)) {
+        if (decision.equals(COMPUTER_MOVE) && executeComputerMove) {
             new Thread(() -> {
                 try {
                     computerAction(event);
@@ -286,7 +309,7 @@ public class ChessCommand {
 
     public static void endGame(MessageChannel messageChannel) {
         new Thread(() -> {
-            while (chessGame.threadRunning) {
+            while (chessGame != null && chessGame.threadRunning) {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
@@ -295,8 +318,8 @@ public class ChessCommand {
                 }
             }
             chessGame = null;
+            decision = INACTIVE;
         }).start();
-        decision = Decision.INACTIVE;
         gameType = null;
         currentMessageIds.clear();
         oldMessageIds.clear();
@@ -304,7 +327,6 @@ public class ChessCommand {
         state.setBlackPlayerName(null);
         state.setWhitePlayerId(null);
         state.setBlackPlayerId(null);
-//        state.setMatchStartTime(null);
         reply = null;
         belowMessage = null;
         boardImageFile = null;

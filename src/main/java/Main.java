@@ -19,7 +19,7 @@ import javax.security.auth.login.LoginException;
 
 public class Main {
 
-    public static void main(String[] args) throws LoginException, InterruptedException {//
+    public static void main(String[] args) throws LoginException, InterruptedException {
         String token = System.getenv("TOKEN");
         // the second is the bot's owner's id
         String ownerId = System.getenv("OWNER_ID");
@@ -28,7 +28,7 @@ public class Main {
         String unsplashAccessKey = System.getenv("UNSPLASH_ACCESS_KEY");
 
 
-        // start getting a bot account set up
+//         start getting a bot account set up
         JDA jda = JDABuilder.createDefault(token)
                   .setStatus(OnlineStatus.ONLINE)
                   .setActivity(Activity.playing("!help or @Cornelius !help"))

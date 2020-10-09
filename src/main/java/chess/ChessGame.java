@@ -1,5 +1,6 @@
 package chess;
 
+import Utils.EloStatus;
 import Utils.GoogleSheets;
 import chess.board.Board;
 import chess.board.Move;
@@ -24,7 +25,7 @@ public class ChessGame {
     private StockFishClient client;
     private GoogleSheets db;
     private ChessGameState state;
-    public boolean threadRunning;
+    public boolean threadRunning = true;
 
 
     public ChessGame(ChessGameState state) {
@@ -37,7 +38,7 @@ public class ChessGame {
             client = new StockFishClient.Builder()
                     .setOption(Option.Minimum_Thinking_Time, 1000) // Minimum thinking time Stockfish will take
                     .setOption(Option.Skill_Level, 20) // Stockfish skill level 0-20
-                    .setVariant(Variant.MODERN) // As of 10/8/2020 Modern is the fastest variant that works on Heroku
+                    .setVariant(Variant.BMI2) // As of 10/8/2020 Modern is the fastest variant that works on Heroku
                     .build();                   // on Local Windows BMI2 is the festest
         } catch (Exception e) {
             e.printStackTrace();
@@ -263,9 +264,9 @@ public class ChessGame {
     }
 
     private synchronized void updateDatabaseDraw() {
-        int games1 = db.updateUser(state.getBlackPlayerId(), false, true, state.getBlackPlayerElo(), state.getWhitePlayerElo());
-        int games2 = db.updateUser(state.getWhitePlayerId(), false, true, state.getWhitePlayerElo(), state.getBlackPlayerElo());
-        db.addCompletedMatch(state.getWhitePlayerName(), state.getBlackPlayerName(), state.getWhitePlayerId(), state.getBlackPlayerId(), state.getWhitePlayerElo(), state.getBlackPlayerElo(),"",true, state.getMatchStartTime(), state.getTotalMoves(), games1, games2);
+        EloStatus eloStatus1 = db.updateUser(state.getBlackPlayerId(), false, true, state.getBlackPlayerElo(), state.getWhitePlayerElo());
+        EloStatus eloStatus2 = db.updateUser(state.getWhitePlayerId(), false, true, state.getWhitePlayerElo(), state.getBlackPlayerElo());
+        db.addCompletedMatch(state.getWhitePlayerName(), state.getBlackPlayerName(), state.getWhitePlayerId(), state.getBlackPlayerId(), "", true, state.getMatchStartTime(), state.getTotalMoves(), eloStatus1, eloStatus2);
         db.updateAvgGameLength(state.getBlackPlayerId());
         db.updateAvgGameLength(state.getWhitePlayerId());
     }
@@ -275,9 +276,9 @@ public class ChessGame {
     }
 
     public synchronized void updateDatabaseWhiteSideWin(ChessGameState state) {
-        int games1 = db.updateUser(state.getBlackPlayerId(), false, false, state.getBlackPlayerElo(), state.getWhitePlayerElo());
-        int games2 = db.updateUser(state.getWhitePlayerId(), true, false, state.getWhitePlayerElo(), state.getBlackPlayerElo());
-        db.addCompletedMatch(state.getWhitePlayerName(), state.getBlackPlayerName(), state.getWhitePlayerId(), state.getBlackPlayerId(), state.getWhitePlayerElo(), state.getBlackPlayerElo(), state.getWhitePlayerId(),true, state.getMatchStartTime(), state.getTotalMoves(), games1, games2);
+        EloStatus eloStatus1 = db.updateUser(state.getBlackPlayerId(), false, false, state.getBlackPlayerElo(), state.getWhitePlayerElo());
+        EloStatus eloStatus2 = db.updateUser(state.getWhitePlayerId(), true, false, state.getWhitePlayerElo(), state.getBlackPlayerElo());
+        db.addCompletedMatch(state.getWhitePlayerName(), state.getBlackPlayerName(), state.getWhitePlayerId(), state.getBlackPlayerId(), state.getWhitePlayerId(), false, state.getMatchStartTime(), state.getTotalMoves(), eloStatus1, eloStatus2);
         db.updateAvgGameLength(state.getBlackPlayerId());
         db.updateAvgGameLength(state.getWhitePlayerId());
         threadRunning = false;
@@ -288,9 +289,9 @@ public class ChessGame {
     }
 
     public synchronized void updateDatabaseBlackSideWin(ChessGameState state) {
-        int games1 = db.updateUser(state.getBlackPlayerId(), true, false, state.getBlackPlayerElo(), state.getWhitePlayerElo());
-        int games2 = db.updateUser(state.getWhitePlayerId(), false, false, state.getWhitePlayerElo(), state.getBlackPlayerElo());
-        db.addCompletedMatch(state.getWhitePlayerName(), state.getBlackPlayerName(), state.getWhitePlayerId(), state.getBlackPlayerId(), state.getWhitePlayerElo(), state.getBlackPlayerElo(), state.getBlackPlayerId(),true, state.getMatchStartTime(), state.getTotalMoves(), games1, games2);
+        EloStatus eloStatus1 = db.updateUser(state.getBlackPlayerId(), true, false, state.getBlackPlayerElo(), state.getWhitePlayerElo());
+        EloStatus eloStatus2 = db.updateUser(state.getWhitePlayerId(), false, false, state.getWhitePlayerElo(), state.getBlackPlayerElo());
+        db.addCompletedMatch(state.getWhitePlayerName(), state.getBlackPlayerName(), state.getWhitePlayerId(), state.getBlackPlayerId(), state.getBlackPlayerId(), false, state.getMatchStartTime(), state.getTotalMoves(), eloStatus1, eloStatus2);
         db.updateAvgGameLength(state.getBlackPlayerId());
         db.updateAvgGameLength(state.getWhitePlayerId());
         threadRunning = false;
