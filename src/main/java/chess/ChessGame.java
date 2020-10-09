@@ -263,9 +263,9 @@ public class ChessGame {
     }
 
     private synchronized void updateDatabaseDraw() {
-        db.updateUser(state.getBlackPlayerId(), false, true, state.getBlackPlayerElo(), state.getWhitePlayerElo());
-        db.updateUser(state.getWhitePlayerId(), false, true, state.getWhitePlayerElo(), state.getBlackPlayerElo());
-        db.addCompletedMatch(state.getWhitePlayerName(), state.getBlackPlayerName(), state.getWhitePlayerId(), state.getBlackPlayerId(), state.getWhitePlayerElo(), state.getBlackPlayerElo(),"", "", true, state.getMatchStartTime(), state.getTotalMoves());
+        int games1 = db.updateUser(state.getBlackPlayerId(), false, true, state.getBlackPlayerElo(), state.getWhitePlayerElo());
+        int games2 = db.updateUser(state.getWhitePlayerId(), false, true, state.getWhitePlayerElo(), state.getBlackPlayerElo());
+        db.addCompletedMatch(state.getWhitePlayerName(), state.getBlackPlayerName(), state.getWhitePlayerId(), state.getBlackPlayerId(), state.getWhitePlayerElo(), state.getBlackPlayerElo(),"",true, state.getMatchStartTime(), state.getTotalMoves(), games1, games2);
         db.updateAvgGameLength(state.getBlackPlayerId());
         db.updateAvgGameLength(state.getWhitePlayerId());
     }
@@ -275,9 +275,9 @@ public class ChessGame {
     }
 
     public synchronized void updateDatabaseWhiteSideWin(ChessGameState state) {
-        db.updateUser(state.getBlackPlayerId(), false, false, state.getBlackPlayerElo(), state.getWhitePlayerElo());
-        db.updateUser(state.getWhitePlayerId(), true, false, state.getWhitePlayerElo(), state.getBlackPlayerElo());
-        db.addCompletedMatch(state.getWhitePlayerName(), state.getBlackPlayerName(), state.getWhitePlayerId(), state.getBlackPlayerId(), state.getWhitePlayerElo(), state.getBlackPlayerElo(), state.getWhitePlayerName(), state.getBlackPlayerName(), false, state.getMatchStartTime(), state.getTotalMoves());
+        int games1 = db.updateUser(state.getBlackPlayerId(), false, false, state.getBlackPlayerElo(), state.getWhitePlayerElo());
+        int games2 = db.updateUser(state.getWhitePlayerId(), true, false, state.getWhitePlayerElo(), state.getBlackPlayerElo());
+        db.addCompletedMatch(state.getWhitePlayerName(), state.getBlackPlayerName(), state.getWhitePlayerId(), state.getBlackPlayerId(), state.getWhitePlayerElo(), state.getBlackPlayerElo(), state.getWhitePlayerId(),true, state.getMatchStartTime(), state.getTotalMoves(), games1, games2);
         db.updateAvgGameLength(state.getBlackPlayerId());
         db.updateAvgGameLength(state.getWhitePlayerId());
         threadRunning = false;
@@ -288,9 +288,9 @@ public class ChessGame {
     }
 
     public synchronized void updateDatabaseBlackSideWin(ChessGameState state) {
-        db.updateUser(state.getBlackPlayerId(), true, false, state.getBlackPlayerElo(), state.getWhitePlayerElo());
-        db.updateUser(state.getWhitePlayerId(), false, false, state.getWhitePlayerElo(), state.getBlackPlayerElo());
-        db.addCompletedMatch(state.getWhitePlayerName(), state.getBlackPlayerName(), state.getWhitePlayerId(), state.getBlackPlayerId(), state.getWhitePlayerElo(), state.getBlackPlayerElo(), state.getBlackPlayerName(), state.getWhitePlayerName(), false, state.getMatchStartTime(), state.getTotalMoves());
+        int games1 = db.updateUser(state.getBlackPlayerId(), true, false, state.getBlackPlayerElo(), state.getWhitePlayerElo());
+        int games2 = db.updateUser(state.getWhitePlayerId(), false, false, state.getWhitePlayerElo(), state.getBlackPlayerElo());
+        db.addCompletedMatch(state.getWhitePlayerName(), state.getBlackPlayerName(), state.getWhitePlayerId(), state.getBlackPlayerId(), state.getWhitePlayerElo(), state.getBlackPlayerElo(), state.getBlackPlayerId(),true, state.getMatchStartTime(), state.getTotalMoves(), games1, games2);
         db.updateAvgGameLength(state.getBlackPlayerId());
         db.updateAvgGameLength(state.getWhitePlayerId());
         threadRunning = false;

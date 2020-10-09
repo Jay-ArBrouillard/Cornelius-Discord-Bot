@@ -14,6 +14,7 @@ import java.io.*;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -118,7 +119,16 @@ public class GoogleSheets {
         }
     }
 
-    public static boolean updateUser(String id, boolean isWin, boolean isDraw, int thisElo, int otherElo) {
+    /**
+     * Returns total games user played
+     * @param id
+     * @param isWin
+     * @param isDraw
+     * @param thisElo
+     * @param otherElo
+     * @return
+     */
+    public static int updateUser(String id, boolean isWin, boolean isDraw, int thisElo, int otherElo) {
         try {
             if (service == null) getSheetsService();
             ValueRange response = service.spreadsheets().values()
@@ -126,7 +136,7 @@ public class GoogleSheets {
                     .execute();
             List<List<Object>> allUsers = response.getValues();
             if (allUsers == null || allUsers.isEmpty()) {
-                return false;
+                return -1;
             } else {
                 int rowNumber = 1;
                 for (List row : allUsers) {
@@ -203,15 +213,15 @@ public class GoogleSheets {
                                 .update(SPREAD_SHEET_ID, "I"+rowNumber, body)
                                 .setValueInputOption("RAW")
                                 .execute();
-                        return true;
+                        return totalGames;
                     }
                     rowNumber++;
                 }
             }
-            return false;
+            return -1;
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return -1;
         }
     }
 
@@ -271,7 +281,7 @@ public class GoogleSheets {
                     rowNumber++;
                 }
             }
-            
+
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -279,7 +289,7 @@ public class GoogleSheets {
         }
     }
 
-    public static boolean addCompletedMatch(String player1, String player2, String id1, String id2, int elo1, int elo2, String winnerName, String loserName, boolean isDraw, Long startTime, double moveCount) {
+    public static boolean addCompletedMatch(String player1, String player2, String id1, String id2, int elo1, int elo2, String winnerId, boolean isDraw, Long startTime, double moveCount, int p1TotalGames, int p2TotalGames) {
         try {
             if (service == null) getSheetsService();
 
@@ -292,7 +302,30 @@ public class GoogleSheets {
             String matchLength = "" + day + " days " + hours + " hours " + minute + " minutes " + second + " seconds";
             double p1WinChance = (1.0 / (1.0 + Math.pow(10, ((elo2-elo1) / 400)))) * 100;
             double p2WinChance = (1.0 / (1.0 + Math.pow(10, ((elo1-elo2) / 400)))) * 100;
-            ValueRange appendBody = new ValueRange().setValues(Arrays.asList(Arrays.asList(player1, player2, id1, id2, formatPercent.format(p1WinChance)+"%", formatPercent.format(p2WinChance)+"%", winnerName, loserName, isDraw, moveCount, matchLength, getCurrentDateTime())));
+            String p1EloDiff;
+            String p2EloDiff;
+            ValueRange appendBody;
+            if (winnerId.equals(id1)) {
+                double p1NewElo = elo1 + determineK(elo1, p1TotalGames) * (1 - p1WinChance);
+                double p2NewElo = elo2 + determineK(elo2, p2TotalGames) * (0 - p2WinChance);
+                p1EloDiff = p1NewElo >= elo1 ? "+"+(p1NewElo-elo1) : ""+(elo1+p1NewElo);
+                p2EloDiff = ""+(elo2+p2NewElo);
+                appendBody = new ValueRange().setValues(Arrays.asList(Arrays.asList(player1, player2, id1, id2, elo1+" ("+p1EloDiff+")", elo2+" ("+p2EloDiff+")", formatPercent.format(p1WinChance)+"%", formatPercent.format(p2WinChance)+"%", player1, player2, isDraw, moveCount, matchLength, getCurrentDateTime())));
+            }
+            else if (winnerId.equals(id2)) {
+                double p1NewElo = elo1 + determineK(elo1, p1TotalGames) * (0 - p1WinChance);
+                double p2NewElo = elo2 + determineK(elo2, p2TotalGames) * (1 - p2WinChance);
+                p1EloDiff = ""+(elo1+p1NewElo);
+                p2EloDiff = p2NewElo >= elo2 ? "+"+(p2NewElo-elo2) : ""+(elo2+p2NewElo);
+                appendBody = new ValueRange().setValues(Arrays.asList(Arrays.asList(player1, player2, id1, id2, elo1+" ("+p1EloDiff+")", elo2+" ("+p2EloDiff+")", formatPercent.format(p1WinChance)+"%", formatPercent.format(p2WinChance)+"%", player2, player1, isDraw, moveCount, matchLength, getCurrentDateTime())));
+            }
+            else { //draw
+                double p1NewElo = elo1 + determineK(elo1, p1TotalGames) * (0.5 - p1WinChance);
+                double p2NewElo = elo2 + determineK(elo2, p2TotalGames) * (0.5 - p2WinChance);
+                p1EloDiff = p1NewElo >= elo1 ? "+"+(p1NewElo-elo1) : ""+(elo1+p1NewElo);
+                p2EloDiff = p2NewElo >= elo2 ? "+"+(p2NewElo-elo2) : ""+(elo2+p2NewElo);
+                appendBody = new ValueRange().setValues(Arrays.asList(Arrays.asList(player1, player2, id1, id2, elo1+" ("+p1EloDiff+")", elo2+" ("+p2EloDiff+")", formatPercent.format(p1WinChance)+"%", formatPercent.format(p2WinChance)+"%", "", "", isDraw, moveCount, matchLength, getCurrentDateTime())));
+            }
 
             service.spreadsheets().values()
                     .append(SPREAD_SHEET_ID, "matches", appendBody)
@@ -318,14 +351,14 @@ public class GoogleSheets {
     private static void changeUpdatedOnColumn(int rowNumber) throws IOException {
         ValueRange body = new ValueRange().setValues(Arrays.asList(Arrays.asList(getCurrentDateTime())));
         service.spreadsheets().values()
-                .update(SPREAD_SHEET_ID, "K"+rowNumber, body)
+                .update(SPREAD_SHEET_ID, "L"+rowNumber, body)
                 .setValueInputOption("RAW")
                 .execute();
     }
 
     public static String getCurrentDateTime() {
-        Date myDate = Date.from(Instant.now());
-        SimpleDateFormat formatter = new SimpleDateFormat("MM-dd-yyyy hh:mm aa", Locale.ENGLISH);
+        ZonedDateTime myDate = ZonedDateTime.now();
+        SimpleDateFormat formatter = new SimpleDateFormat("MM-dd-yyyy hh:mm aa");
         return formatter.format(myDate);
     }
 
