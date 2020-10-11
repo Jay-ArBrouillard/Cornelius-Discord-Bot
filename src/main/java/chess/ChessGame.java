@@ -1,6 +1,5 @@
 package chess;
 
-import Utils.EloStatus;
 import Utils.GoogleSheets;
 import chess.board.Board;
 import chess.board.Move;
@@ -12,6 +11,7 @@ import chess.player.ai.stockfish.engine.enums.Option;
 import chess.player.ai.stockfish.engine.enums.Query;
 import chess.player.ai.stockfish.engine.enums.QueryType;
 import chess.player.ai.stockfish.engine.enums.Variant;
+import chess.tables.ChessPlayer;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -25,7 +25,9 @@ public class ChessGame {
     private StockFishClient client;
     private GoogleSheets db;
     private ChessGameState state;
-    public boolean threadRunning = true;
+    private ChessPlayer whiteSidePlayer;
+    private ChessPlayer blackSidePlayer;
+    public boolean threadRunning = false;
 
 
     public ChessGame(ChessGameState state) {
@@ -38,11 +40,19 @@ public class ChessGame {
             client = new StockFishClient.Builder()
                     .setOption(Option.Minimum_Thinking_Time, 1000) // Minimum thinking time Stockfish will take
                     .setOption(Option.Skill_Level, 20) // Stockfish skill level 0-20
-                    .setVariant(Variant.MODERN) // As of 10/8/2020 Modern is the fastest variant that works on Heroku
+                    .setVariant(Variant.BMI2) // As of 10/8/2020 Modern is the fastest variant that works on Heroku
                     .build();                   // on Local Windows BMI2 is the festest
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void setWhiteSidePlayer(ChessPlayer whiteSidePlayer) {
+        this.whiteSidePlayer = whiteSidePlayer;
+    }
+
+    public void setBlackSidePlayer(ChessPlayer blackSidePlayer) {
+        this.blackSidePlayer = blackSidePlayer;
     }
 
     public boolean didWhiteJustMove() {
@@ -167,12 +177,15 @@ public class ChessGame {
 
             // Is someone in check mate?
             if (this.board.getCurrentPlayer().isInCheckMate()) {
+                state.setStateCheckmate();
                 if (didWhiteJustMove()) {
-                    state.setMessage("`" + state.getWhitePlayerName() + "` has CHECKMATED `" + state.getBlackPlayerName() + "`");
+                    state.setMessage("`" + whiteSidePlayer.name + "` has CHECKMATED `" + blackSidePlayer.name + "`");
+                    state.setWinnerId(whiteSidePlayer.discordId);
                     updateDatabaseWhiteSideWin();
                 }
                 else {
-                    state.setMessage("`" + state.getBlackPlayerName() + "` has CHECKMATED `" + state.getWhitePlayerName() + "`");
+                    state.setMessage("`" + blackSidePlayer.name + "` has CHECKMATED `" + whiteSidePlayer.name + "`");
+                    state.setWinnerId(blackSidePlayer.discordId);
                     updateDatabaseBlackSideWin();
                 }
                 state.setStateCheckmate();
@@ -206,10 +219,10 @@ public class ChessGame {
             // Is someone in check?
             if (this.board.getCurrentPlayer().isInCheck()) {
                 if (didWhiteJustMove()) {
-                    state.setMessage("`" + state.getWhitePlayerName() + "` SELECTS " + moveCmd + " `" + state.getBlackPlayerName() + "` is in check!");
+                    state.setMessage("`" + whiteSidePlayer.name + "` SELECTS " + moveCmd + " `" + blackSidePlayer.name + "` is in check!");
                 }
                 else {
-                    state.setMessage("`" + state.getBlackPlayerName() + "` SELECTS " + moveCmd + " `" + state.getWhitePlayerName() + "` is in check!");
+                    state.setMessage("`" + blackSidePlayer.name + "` SELECTS " + moveCmd + " `" + whiteSidePlayer.name + "` is in check!");
                 }
                 state.setStateCheck();
                 return state;
@@ -224,12 +237,14 @@ public class ChessGame {
                 if (didWhiteJustMove() && evaluationScore <= -10.0) {
                     state.setMessage("Cornelius has RESIGNED!");
                     state.setStateComputerResign();
+                    state.setWinnerId(whiteSidePlayer.discordId);
                     updateDatabaseBlackSideWin();
                     return state;
                 }
                 if (didBlackJustMove() && evaluationScore >= 10.0) {
                     state.setMessage("Cornelius has RESIGNED!");
                     state.setStateComputerResign();
+                    state.setWinnerId(blackSidePlayer.discordId);
                     updateDatabaseWhiteSideWin();
                     return state;
                 }
@@ -237,10 +252,10 @@ public class ChessGame {
 
             //If we get to this point then player made a legal move
             if (didWhiteJustMove()) {
-                state.setMessage("`" + state.getWhitePlayerName() + "` SELECTS " + move.toString());
+                state.setMessage("`" + whiteSidePlayer.name + "` SELECTS " + move.toString());
             }
             else {
-                state.setMessage("`" + state.getBlackPlayerName() + "` SELECTS " + move.toString());
+                state.setMessage("`" + blackSidePlayer.name + "` SELECTS " + move.toString());
             }
             state.setStateSuccessfulMove();
             return state;
@@ -259,41 +274,72 @@ public class ChessGame {
         }
     }
 
-    public synchronized int addUser(String id, String name) {
+    public synchronized ChessPlayer addUser(String id, String name) {
         return db.addUser(id, name);
     }
 
     private synchronized void updateDatabaseDraw() {
-        EloStatus eloStatus1 = db.updateUser(state.getBlackPlayerId(), false, true, state.getBlackPlayerElo(), state.getWhitePlayerElo());
-        EloStatus eloStatus2 = db.updateUser(state.getWhitePlayerId(), false, true, state.getWhitePlayerElo(), state.getBlackPlayerElo());
-        db.addCompletedMatch(state.getWhitePlayerName(), state.getBlackPlayerName(), state.getWhitePlayerId(), state.getBlackPlayerId(), "", true, state.getMatchStartTime(), state.getTotalMoves(), eloStatus1, eloStatus2);
-        db.updateAvgGameLength(state.getBlackPlayerId());
-        db.updateAvgGameLength(state.getWhitePlayerId());
+        whiteSidePlayer.incrementDraws();
+        whiteSidePlayer.calculateElo(true, false, blackSidePlayer);
+        db.updateUser(whiteSidePlayer);
+
+        blackSidePlayer.incrementDraws();
+        blackSidePlayer.calculateElo(true, false, whiteSidePlayer);
+        db.updateUser(blackSidePlayer);
+
+        db.addMatch(whiteSidePlayer, blackSidePlayer, state);
+
+        db.updateAvgGameLength(whiteSidePlayer.discordId);
+        db.updateAvgGameLength(blackSidePlayer.discordId);
     }
 
+    /**
+     * If no moves are made treat this as a draw
+     */
     public synchronized void updateDatabaseWhiteSideWin() {
-        updateDatabaseWhiteSideWin(state);
-    }
+        if (state.getTotalMoves() > 0) {
+            whiteSidePlayer.incrementWins();
+            whiteSidePlayer.calculateElo(false, true, blackSidePlayer);
+            db.updateUser(whiteSidePlayer);
 
-    public synchronized void updateDatabaseWhiteSideWin(ChessGameState state) {
-        EloStatus eloStatus1 = db.updateUser(state.getBlackPlayerId(), false, false, state.getBlackPlayerElo(), state.getWhitePlayerElo());
-        EloStatus eloStatus2 = db.updateUser(state.getWhitePlayerId(), true, false, state.getWhitePlayerElo(), state.getBlackPlayerElo());
-        db.addCompletedMatch(state.getWhitePlayerName(), state.getBlackPlayerName(), state.getWhitePlayerId(), state.getBlackPlayerId(), state.getWhitePlayerId(), false, state.getMatchStartTime(), state.getTotalMoves(), eloStatus1, eloStatus2);
-        db.updateAvgGameLength(state.getBlackPlayerId());
-        db.updateAvgGameLength(state.getWhitePlayerId());
+            blackSidePlayer.incrementLosses();
+            blackSidePlayer.calculateElo(false, false, whiteSidePlayer);
+            db.updateUser(blackSidePlayer);
+
+            db.addMatch(whiteSidePlayer, blackSidePlayer, state);
+
+            db.updateAvgGameLength(whiteSidePlayer.discordId);
+            db.updateAvgGameLength(blackSidePlayer.discordId);
+        }
+        else {
+            state.setStateDraw();
+            updateDatabaseDraw();
+        }
         threadRunning = false;
     }
 
+    /**
+     * If no moves are made treat this as a draw
+     */
     public synchronized void updateDatabaseBlackSideWin() {
-        updateDatabaseBlackSideWin(state);
-    }
+        if (state.getTotalMoves() > 0) {
+            whiteSidePlayer.incrementLosses();
+            whiteSidePlayer.calculateElo(false, false, blackSidePlayer);
+            db.updateUser(whiteSidePlayer);
 
-    public synchronized void updateDatabaseBlackSideWin(ChessGameState state) {
-        EloStatus eloStatus1 = db.updateUser(state.getBlackPlayerId(), true, false, state.getBlackPlayerElo(), state.getWhitePlayerElo());
-        EloStatus eloStatus2 = db.updateUser(state.getWhitePlayerId(), false, false, state.getWhitePlayerElo(), state.getBlackPlayerElo());
-        db.addCompletedMatch(state.getWhitePlayerName(), state.getBlackPlayerName(), state.getWhitePlayerId(), state.getBlackPlayerId(), state.getBlackPlayerId(), false, state.getMatchStartTime(), state.getTotalMoves(), eloStatus1, eloStatus2);
-        db.updateAvgGameLength(state.getBlackPlayerId());
-        db.updateAvgGameLength(state.getWhitePlayerId());
+            blackSidePlayer.incrementWins();
+            blackSidePlayer.calculateElo(false, true, whiteSidePlayer);
+            db.updateUser(blackSidePlayer);
+
+            db.addMatch(whiteSidePlayer, blackSidePlayer, state);
+
+            db.updateAvgGameLength(whiteSidePlayer.discordId);
+            db.updateAvgGameLength(blackSidePlayer.discordId);
+        }
+        else {
+            state.setStateDraw();
+            updateDatabaseDraw();
+        }
         threadRunning = false;
     }
 

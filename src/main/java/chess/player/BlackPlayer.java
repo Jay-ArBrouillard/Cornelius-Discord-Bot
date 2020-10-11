@@ -61,7 +61,7 @@ public class BlackPlayer extends Player{
                 }
             }
             //blacks queen side castle
-            if (!this.board.getTile(1).isTileOccupied() && this.board.getTile(2).isTileOccupied() &&
+            if (!this.board.getTile(1).isTileOccupied() && !this.board.getTile(2).isTileOccupied() &&
                     !this.board.getTile(3).isTileOccupied()) {
                 final Piece queenSideRook = this.board.getTile(0).getPiece();
                 if (queenSideRook != null && queenSideRook.isFirstMove() &&

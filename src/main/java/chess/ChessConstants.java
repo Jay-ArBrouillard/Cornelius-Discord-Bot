@@ -5,6 +5,7 @@ public class ChessConstants {
     public static final String CHECK = "check";
     public static final String CHECKMATE = "checkmate";
     public static final String COMPUTER_RESIGN = "computer_resign";
+    public static final String CHALLENGEE_DECLINE = "challengee_decline";
     public static final String DRAW = "draw";
     public static final String ERROR = "error";
     public static final String ILLEGAL_MOVE = "illegal_move";
@@ -12,6 +13,7 @@ public class ChessConstants {
     public static final String SHOW_ALL_LEGAL_MOVES = "show_all_legal_moves";
     public static final String SHOW_ALL_LEGAL_MOVES_FOR_TILE = "show_all_legal_moves_for_tile";
     public static final String SUCCESSFUL_MOVE = "successful_move";
+    public static final String WAITING_ACCEPT_CHALLENGE = "waiting_accept_challenge";
     public static final String[] QUIT = {"q", "Q", "quit", "QUIT"};
 
     public static final String GAME_BOARD_IMAGE_LOCATION = "src/main/java/chess/gameState.png";
