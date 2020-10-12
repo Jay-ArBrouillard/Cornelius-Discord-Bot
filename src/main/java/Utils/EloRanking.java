@@ -9,23 +9,23 @@ package Utils;
  */
 public class EloRanking {
     public static double calculateProbabilityOfWin(int rA, int rB) {
-        return 1 / (1.0 + Math.pow(10, ((rB - rA) / 400.0) ));
+        return 1.0 / (1.0 + Math.pow(10.0, ((rB - rA) / 400.0) ));
     }
 
-    public static long calculateProvisionalVsProvisional(int rA, int nA, int rB, int s1) {
-        return Math.round((rA * nA + (rA + rB)/2.0 + 100 * s1) / (nA + 1.0));
+    public static int calculateProvisionalVsProvisional(int rA, int nA, int rB, int s1) {
+        return (int)( (rA * nA + (rA + rB)/2.0 + 100 * s1) / (nA + 1.0));
     }
 
-    public static long calculateProvisionalVsEstablished(int rA, int nA, int rB, int s1) {
-        return Math.round((rA * nA + rB + 200 * s1) / (nA + 1.0));
+    public static int calculateProvisionalVsEstablished(int rA, int nA, int rB, int s1) {
+        return (int)( (rA * nA + rB + 200.0 * s1) / (nA + 1.0));
     }
 
-    public static long calculateEstablishedVsProvisional(int rA, int rB, int nB, double s2) {
-        return Math.round(rA + 32 * (nB / 20) * (s2 - (1 / (1.0 + Math.pow(10,((rB - rA) / 400.0)) ) )) );
+    public static int calculateEstablishedVsProvisional(int rA, int rB, int nB, double s2) {
+        return (int)(rA + 32.0 * (nB / 20.0) * (s2 - (1.0 / (1.0 + Math.pow(10.0,((rB - rA) / 400.0)) ) )));
     }
 
-    public static long calculateEstablishedVsEstablished(int rA, int rB, double s2) {
-        return Math.round(rA + determineK(rA) * (s2 - (1 / (1.0 + Math.pow(10,((rB - rA) / 400.0)) ) )) );
+    public static int calculateEstablishedVsEstablished(int rA, int rB, double s2) {
+        return (int)(rA + determineK(rA) * (s2 - (1.0 / (1.0 + Math.pow(10.0,((rB - rA) / 400.0)) ) )) );
     }
 
     /**

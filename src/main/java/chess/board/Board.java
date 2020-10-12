@@ -77,9 +77,7 @@ public class Board {
     }
 
     public boolean isDraw50MoveRule() {
-        if (movesPlayed.size() < 50) {
-            return false;
-        }
+        if (movesPlayed.size() < 50) return false;
         return movesPlayed.stream().allMatch(x -> x.booleanValue() == false);
     }
 
@@ -160,7 +158,6 @@ public class Board {
             }
 
             if (hasBlackKing && hasBlackBishop && hasWhiteKing && hasWhiteBishop && blackBishopTileColor == whiteBishopTileColor) {
-                System.out.println("Draw: " + blackBishopTileColor + ", " + whiteBishopTileColor);
                 return true;
             }
         }

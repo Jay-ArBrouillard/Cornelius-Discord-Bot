@@ -5,6 +5,7 @@ import chess.player.ai.stockfish.engine.enums.Query;
 import chess.player.ai.stockfish.engine.enums.Variant;
 import chess.player.ai.stockfish.exception.StockfishInitException;
 
+import java.io.IOException;
 import java.util.*;
 
 public class Stockfish extends UCIEngine {
@@ -12,13 +13,13 @@ public class Stockfish extends UCIEngine {
         super(variant, options);
     }
 
-    public String makeMove(Query query) {
+    public String makeMove(Query query) throws IOException {
         waitForReady();
         sendCommand("position fen " + query.getFen() + " moves " + query.getMove());
         return getFen();
     }
 
-    public String getBestMove(Query query) {
+    public String getBestMove(Query query) throws IOException {
         if (query.getDifficulty() >= 0) {
             waitForReady();
             sendCommand("setoption name Skill Level value " + query.getDifficulty());
@@ -38,10 +39,12 @@ public class Stockfish extends UCIEngine {
         waitForReady();
         sendCommand(command.toString());
 
-        return readLine("bestmove").substring(9).split("\\s+")[0];
+        String result = readLine("bestmove");
+        if (result != null) return result.substring(9).split("\\s+")[0];
+        return null;
     }
 
-    public String getEvaluation(Query query) {
+    public String getEvaluation(Query query) throws IOException {
         waitForReady();
         sendCommand("position fen " + query.getFen());
 
@@ -53,7 +56,7 @@ public class Stockfish extends UCIEngine {
         return readLine("Final evaluation:");
     }
 
-    public String getLegalMoves(Query query) {
+    public String getLegalMoves(Query query) throws IOException {
         waitForReady();
         sendCommand("position fen " + query.getFen());
 
@@ -70,7 +73,7 @@ public class Stockfish extends UCIEngine {
         return legal.toString();
     }
 
-    private String getFen() {
+    private String getFen() throws IOException {
         waitForReady();
         sendCommand("d");
 

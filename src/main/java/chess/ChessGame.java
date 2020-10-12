@@ -2,6 +2,7 @@ package chess;
 
 import Utils.GoogleSheets;
 import chess.board.Board;
+import chess.board.BoardUtils;
 import chess.board.Move;
 import chess.board.Tile;
 import chess.pgn.FenUtils;
@@ -15,8 +16,7 @@ import chess.tables.ChessPlayer;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ChessGame {
@@ -35,12 +35,14 @@ public class ChessGame {
         board = Board.createStandardBoard();
         messageHandler = new ChessMessageHandler();
         this.state = state;
+    }
 
+    public void setupComputerClient() {
         try {
             client = new StockFishClient.Builder()
-                    .setOption(Option.Minimum_Thinking_Time, 1000) // Minimum thinking time Stockfish will take
-                    .setOption(Option.Skill_Level, 20) // Stockfish skill level 0-20
-                    .setVariant(Variant.BMI2) // As of 10/8/2020 Modern is the fastest variant that works on Heroku
+                    .setOption(Option.Minimum_Thinking_Time, 500) // Minimum thinking time Stockfish will take
+                    .setOption(Option.Skill_Level, 20)
+                    .setVariant(Variant.MODERN) // As of 10/8/2020 Modern is the fastest variant that works on Heroku
                     .build();                   // on Local Windows BMI2 is the festest
         } catch (Exception e) {
             e.printStackTrace();
@@ -90,6 +92,29 @@ public class ChessGame {
         else {
             return new StringBuilder("`").append(message).append("` is not a valid option. Please choose an option (1-3)").toString();
         }
+    }
+
+    public ChessGameState processDifficulty(String message) {
+        messageHandler.validateComputerDifficulty(message);
+        if (messageHandler.handleErrorMessage().equals(messageHandler.ERROR)) {
+            state.setMessage(messageHandler.getLastErrorMessage());
+            state.setStateInvalidDifficulty();
+            return state;
+        }
+
+        state.setStatus(null);
+        try {
+            client = new StockFishClient.Builder()
+                    .setOption(Option.Minimum_Thinking_Time, 1000) // Minimum thinking time Stockfish will take
+                    .setOption(Option.Ponder, 2000)
+                    .setOption(Option.Skill_Level, Integer.parseInt(message))
+                    .setVariant(Variant.BMI2) // As of 10/8/2020 Modern is the fastest variant that works on Heroku
+                    .build();                   // on Local Windows BMI2 is the festest
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return state;
     }
 
     public ChessGameState processMove(String input)
@@ -188,7 +213,6 @@ public class ChessGame {
                     state.setWinnerId(blackSidePlayer.discordId);
                     updateDatabaseBlackSideWin();
                 }
-                state.setStateCheckmate();
                 return state;
             }
 
@@ -230,22 +254,32 @@ public class ChessGame {
 
             //Update eval score
             //+position eval is good for white, -negative eval is good for black
-            state.setBoardEvaluationMessage(client.submit(new Query.Builder(QueryType.EVAL).setFen(FenUtils.parseFEN(this.board)).build()).substring(22));
+            try {
+                String evaluationMessage = client.submit(new Query.Builder(QueryType.EVAL).setFen(FenUtils.parseFEN(this.board)).build());
+                if (evaluationMessage != null) state.setBoardEvaluationMessage(evaluationMessage.substring(22));
+            } catch (Exception e) {
+                client = null;
+                setupComputerClient();
+                e.printStackTrace();
+            }
+
             //Should computer resign?
-            if (isComputer) {
+            if (isComputer && state.getBoardEvaluationMessage() != null) {
                 double evaluationScore = Double.parseDouble(state.getBoardEvaluationMessage().replace("(white side)", "").trim());
                 if (didWhiteJustMove() && evaluationScore <= -10.0) {
-                    state.setMessage("Cornelius has RESIGNED!");
+                    state.setMessage(whiteSidePlayer.name + " has RESIGNED!");
                     state.setStateComputerResign();
-                    state.setWinnerId(whiteSidePlayer.discordId);
-                    updateDatabaseBlackSideWin();
+                    state.setWinnerId(blackSidePlayer.discordId);
+                    state.setPlayerForfeit();
+                    updateDatabaseBlackSideWin(true);
                     return state;
                 }
                 if (didBlackJustMove() && evaluationScore >= 10.0) {
-                    state.setMessage("Cornelius has RESIGNED!");
+                    state.setMessage(blackSidePlayer.name + " has RESIGNED!");
                     state.setStateComputerResign();
-                    state.setWinnerId(blackSidePlayer.discordId);
-                    updateDatabaseWhiteSideWin();
+                    state.setWinnerId(whiteSidePlayer.discordId);
+                    state.setPlayerForfeit();
+                    updateDatabaseWhiteSideWin(true);
                     return state;
                 }
             }
@@ -293,11 +327,15 @@ public class ChessGame {
         db.updateAvgGameLength(blackSidePlayer.discordId);
     }
 
-    /**
-     * If no moves are made treat this as a draw
-     */
     public synchronized void updateDatabaseWhiteSideWin() {
-        if (state.getTotalMoves() > 0) {
+        updateDatabaseWhiteSideWin(false);
+    }
+
+    /**
+     * If no moves are made treat this as a draw as long as someone didn't forfeit
+     */
+    public synchronized void updateDatabaseWhiteSideWin(boolean isForfeit) {
+        if (isForfeit || state.getTotalMoves() > 0) {
             whiteSidePlayer.incrementWins();
             whiteSidePlayer.calculateElo(false, true, blackSidePlayer);
             db.updateUser(whiteSidePlayer);
@@ -318,11 +356,15 @@ public class ChessGame {
         threadRunning = false;
     }
 
-    /**
-     * If no moves are made treat this as a draw
-     */
+
     public synchronized void updateDatabaseBlackSideWin() {
-        if (state.getTotalMoves() > 0) {
+        updateDatabaseBlackSideWin(false);
+    }
+    /**
+     * If no moves are made treat this as a draw as long as someone didn't forfeit
+     */
+    public synchronized void updateDatabaseBlackSideWin(boolean isForfeit) {
+        if (isForfeit || state.getTotalMoves() > 0) {
             whiteSidePlayer.incrementLosses();
             whiteSidePlayer.calculateElo(false, false, blackSidePlayer);
             db.updateUser(whiteSidePlayer);
@@ -417,9 +459,53 @@ public class ChessGame {
         return intValue;
     }
 
+    public ChessGameState ai(int difficulty) {
+        long thinkTime = 500;
+        String bestMoveString = null;
+        do {
+            try {
+                bestMoveString = client.submit(new Query.Builder(QueryType.Best_Move)
+                        .setMovetime(thinkTime)
+                        .setDifficulty(difficulty)
+                        .setFen(FenUtils.parseFEN(this.board)).build());
+            } catch (Exception e) {
+                client = null;
+                setupComputerClient();
+                e.printStackTrace();
+            } finally {
+                thinkTime *= 2;
+            }
+        } while (bestMoveString == null);
+
+        String x1Str = Character.toString(bestMoveString.charAt(0));
+        String y1Str = Character.toString(bestMoveString.charAt(1));
+        String x2Str = Character.toString(bestMoveString.charAt(2));
+        String y2Str = Character.toString(bestMoveString.charAt(3));
+
+        ///////////////////////// Get board coordinates from input ////////////////////////////////
+        int startCoordinate = convertInputToInteger(x1Str, y1Str);
+        int destinationCoordinate = convertInputToInteger(x2Str, y2Str);
+
+        return handleMove(startCoordinate, destinationCoordinate, bestMoveString, true);
+    }
+
     public ChessGameState ai(MessageChannel mc) {
         int randomThinkTime = ThreadLocalRandom.current().nextInt(5000, 10000 + 1); //Between 5-10 seconds
-        String bestMoveString = client.submit(new Query.Builder(QueryType.Best_Move).setMovetime(randomThinkTime).setFen(FenUtils.parseFEN(this.board)).build());
+        String bestMoveString;
+        do {
+            try {
+                bestMoveString = client.submit(new Query.Builder(QueryType.Best_Move)
+                        .setMovetime(randomThinkTime)
+                        .setFen(FenUtils.parseFEN(this.board)).build());
+                randomThinkTime *= 2;
+            } catch (Exception e) {
+                List<Move> moves = this.board.getCurrentPlayer().getLegalMoves();
+                Move randomMove = moves.get(new Random().nextInt(moves.size()-1));
+                String moveCmd = BoardUtils.getPositionAtCoordinate(randomMove.getCurrentCoordinate()) +
+                        BoardUtils.getPositionAtCoordinate(randomMove.getDestinationCoordinate());
+                return handleMove(randomMove.getCurrentCoordinate(), randomMove.getDestinationCoordinate(), moveCmd, true);
+            }
+        } while (bestMoveString == null);
         mc.sendTyping().queue();
 
         String x1Str = Character.toString(bestMoveString.charAt(0));

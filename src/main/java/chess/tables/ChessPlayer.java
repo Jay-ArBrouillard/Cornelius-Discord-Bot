@@ -58,45 +58,45 @@ public class ChessPlayer {
     public void calculateElo(boolean isDraw, boolean isWin, ChessPlayer o) {
         if (isDraw) {
             if (!this.provisional && !o.provisional) {
-                this.elo = (int)EloRanking.calculateEstablishedVsEstablished(this.elo, o.elo, 0.5);
+                this.elo = EloRanking.calculateEstablishedVsEstablished(this.elo, o.elo, 0.5);
             }
             else if (!this.provisional && o.provisional) {
-                this.elo = (int)EloRanking.calculateEstablishedVsProvisional(this.elo, this.totalGames, o.elo, 0.5);
+                this.elo = EloRanking.calculateEstablishedVsProvisional(this.elo, o.elo, o.totalGames,0.5);
             }
             else if (this.provisional && !o.provisional) {
-                this.elo = (int)EloRanking.calculateProvisionalVsEstablished(this.elo, this.totalGames, o.elo, 0);
+                this.elo = EloRanking.calculateProvisionalVsEstablished(this.elo, this.totalGames, o.elo, 0);
             }
             else {
-                this.elo = (int)EloRanking.calculateProvisionalVsProvisional(this.elo, this.totalGames, o.elo, 0);
+                this.elo = EloRanking.calculateProvisionalVsProvisional(this.elo, this.totalGames, o.elo, 0);
             }
         }
         else {
             if (isWin) {
                 if (!this.provisional && !o.provisional) {
-                    this.elo = (int)EloRanking.calculateEstablishedVsEstablished(this.elo, o.elo, 1);
+                    this.elo = EloRanking.calculateEstablishedVsEstablished(this.elo, o.elo, 1);
                 }
                 else if (!this.provisional && o.provisional) {
-                    this.elo = (int)EloRanking.calculateEstablishedVsProvisional(this.elo, this.totalGames, o.elo, 1);
+                    this.elo = EloRanking.calculateEstablishedVsProvisional(this.elo, o.elo, o.totalGames,1);
                 }
                 else if (this.provisional && !o.provisional) {
-                    this.elo = (int)EloRanking.calculateProvisionalVsEstablished(this.elo, this.totalGames, o.elo, 1);
+                    this.elo = EloRanking.calculateProvisionalVsEstablished(this.elo, this.totalGames, o.elo, 1);
                 }
                 else {
-                    this.elo = (int)EloRanking.calculateProvisionalVsProvisional(this.elo, this.totalGames, o.elo, 1);
+                    this.elo = EloRanking.calculateProvisionalVsProvisional(this.elo, this.totalGames, o.elo, 1);
                 }
             }
             else { //Loss
                 if (!this.provisional && !o.provisional) {
-                    this.elo = (int)EloRanking.calculateEstablishedVsEstablished(this.elo, o.elo, 0);
+                    this.elo = EloRanking.calculateEstablishedVsEstablished(this.elo, o.elo, 0);
                 }
                 else if (!this.provisional && o.provisional) {
-                    this.elo = (int)EloRanking.calculateEstablishedVsProvisional(this.elo, this.totalGames, o.elo, 0);
+                    this.elo = EloRanking.calculateEstablishedVsProvisional(this.elo, o.elo, o.totalGames,0);
                 }
                 else if (this.provisional && !o.provisional) {
-                    this.elo = (int)EloRanking.calculateProvisionalVsEstablished(this.elo, this.totalGames, o.elo, -1);
+                    this.elo = EloRanking.calculateProvisionalVsEstablished(this.elo, this.totalGames, o.elo, -1);
                 }
                 else {
-                    this.elo = (int)EloRanking.calculateProvisionalVsProvisional(this.elo, this.totalGames, o.elo, -1);
+                    this.elo = EloRanking.calculateProvisionalVsProvisional(this.elo, this.totalGames, o.elo, -1);
                 }
             }
         }

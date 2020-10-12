@@ -26,55 +26,43 @@ abstract class UCIEngine {
         }
     }
 
-    void passOption(Option option) {
+    void passOption(Option option) throws IOException {
         sendCommand(option.toString());
     }
 
-    void waitForReady() {
+    void waitForReady() throws IOException {
         sendCommand("isready");
         readResponse("readyok");
     }
 
-    void sendCommand(String command) {
-        try {
-            output.write(command + "\n");
-            output.flush();
-        } catch (IOException e) {
-            throw new StockfishEngineException(e);
-        }
+    void sendCommand(String command) throws IOException {
+        output.write(command + "\n");
+        output.flush();
     }
 
-    String readLine(String expected) {
-        try {
-            String line;
+    String readLine(String expected) throws IOException {
+        String line;
 
-            while ((line = input.readLine()) != null) {
-                if (line.startsWith(expected))
-                    return line;
-            }
-
-            return null;
-        } catch (IOException e) {
-            throw new StockfishEngineException(e);
+        while ((line = input.readLine()) != null) {
+            if (line.startsWith(expected))
+                return line;
         }
+
+        return line;
     }
 
-    List<String> readResponse(String expected) {
-        try {
-            List<String> lines = new ArrayList<>();
-            String line;
+    List<String> readResponse(String expected) throws IOException {
+        List<String> lines = new ArrayList<>();
+        String line;
 
-            while ((line = input.readLine()) != null) {
-                lines.add(line);
+        while ((line = input.readLine()) != null) {
+            lines.add(line);
 
-                if (line.startsWith(expected))
-                    break;
-            }
-
-            return lines;
-        } catch (IOException e) {
-            throw new StockfishEngineException(e);
+            if (line.startsWith(expected))
+                break;
         }
+
+        return lines;
     }
 
     String getPath(Variant variant) {

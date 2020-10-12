@@ -11,6 +11,7 @@ public class ChessGameState {
     private String boardEvaluationMessage;
     private double totalMoves = 0; //Half moves that's why we need a double
     private String winnerId;
+    private boolean playerForfeited = false;
 
     public ChessGameState() {
         prevElo = new HashMap<>();
@@ -26,6 +27,10 @@ public class ChessGameState {
 
     public String getStatus() {
         return this.status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public Map<String, Integer> getPrevElo() {
@@ -62,6 +67,10 @@ public class ChessGameState {
 
     public void setTotalMoves(double totalMoves) {
         this.totalMoves = totalMoves;
+    }
+
+    public boolean isPlayerForfeited() {
+        return playerForfeited;
     }
 
     public void setStateShowAllLegalMoves() {
@@ -110,5 +119,13 @@ public class ChessGameState {
 
     public void setStateChallengeeDecline() {
         this.status = ChessConstants.CHALLENGEE_DECLINE;
+    }
+
+    public void setPlayerForfeit() {
+        this.playerForfeited = true;
+    }
+
+    public void setStateInvalidDifficulty() {
+        this.status = ChessConstants.INVALID_DIFFICULTY;
     }
 }

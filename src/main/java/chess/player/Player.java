@@ -3,6 +3,7 @@ package chess.player;
 import chess.Alliance;
 import chess.board.Board;
 import chess.board.Move;
+import chess.board.Move.*;
 import chess.pieces.King;
 import chess.pieces.Piece;
 
@@ -95,7 +96,7 @@ public abstract class Player {
 
     public boolean hasEscapeMoves() {
         for (final Move move : this.legalMoves) {
-            final MoveTransition transition = makeMove(move);
+            final MoveTransition transition = makeMove(move, true);
             if (transition.getMoveStatus().isDone()) {
                 return true;
             }
@@ -105,6 +106,10 @@ public abstract class Player {
     }
 
     public MoveTransition makeMove(final Move move) {
+        return makeMove(move, false);
+    }
+
+    public MoveTransition makeMove(final Move move, final boolean isDummyMove) {
         if (!isMoveLegal(move)) {
             return new MoveTransition(this.board, move, MoveStatus.ILLEGAL_MOVE);
         }
@@ -116,6 +121,21 @@ public abstract class Player {
         if (!kingAttacks.isEmpty()) {
             return new MoveTransition(this.board, move, MoveStatus.LEAVES_PLAYER_CHECK);
         }
+        //Add to moves played
+        if (!isDummyMove) {
+            if (move instanceof PawnEnPassantAttackMove ||
+                    move instanceof PawnMove ||
+                    move instanceof PawnJump ||
+                    move instanceof MajorAttackMove ||
+                    move instanceof AttackMove ||
+                    move instanceof PawnAttackMove)   {
+                transitionBoard.getMovesPlayed().add(true);
+            }
+            else {
+                transitionBoard.getMovesPlayed().add(false);
+            }
+        }
+
         return new MoveTransition(transitionBoard, move, MoveStatus.DONE);
     }
 

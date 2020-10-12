@@ -10,7 +10,7 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
-import com.google.api.services.sheets.v4.model.ValueRange;
+import com.google.api.services.sheets.v4.model.*;
 
 import java.io.*;
 import java.text.DecimalFormat;
@@ -23,15 +23,15 @@ import static chess.ChessConstants.DRAW;
 
 public class GoogleSheets {
     private static String APPLICATION_NAME = "Chess Records";
-    private static String SPREAD_SHEET_ID = "1lSYTcv2Bucg5OBrGjLvPoi5kWoHos9GqORW9wATqzr4";//System.getenv("SPREAD_SHEET_ID");
+    private static String SPREAD_SHEET_ID = System.getenv("SPREAD_SHEET_ID");
     private static HttpTransport HTTP_TRANSPORT;
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private static Sheets service;
     private static DecimalFormat formatPercent = new DecimalFormat("##0.00");
-    private static DecimalFormat formatRatio = new DecimalFormat("##.00");
     private static final String RANKED_TAB = "ranked";
     private static final String MATCHES_TAB = "matches";
     private static int rowNumber;
+    private static int totalRows;
 
     public GoogleSheets() {
         getSheetsService();
@@ -61,8 +61,8 @@ public class GoogleSheets {
      */
     public static Credential authorize() throws IOException {
         // Load client secrets.
-        //InputStream targetStream = new ByteArrayInputStream(System.getenv("GOOGLE_CREDENTIALS").getBytes());
-        InputStream targetStream = GoogleSheets.class.getResourceAsStream("/credentials.json"); //For local testing
+        InputStream targetStream = new ByteArrayInputStream(System.getenv("GOOGLE_CREDENTIALS").getBytes());
+        //InputStream targetStream = GoogleSheets.class.getResourceAsStream("/credentials.json"); //For local testing
         Credential credential = GoogleCredential.fromStream(targetStream, HTTP_TRANSPORT, JSON_FACTORY).createScoped(SCOPES);
         return credential;
     }
@@ -120,6 +120,21 @@ public class GoogleSheets {
                         .setInsertDataOption("INSERT_ROWS")
                         .execute();
 
+                // Update ranked sheet by elo rating
+                BatchUpdateSpreadsheetRequest busReq = new BatchUpdateSpreadsheetRequest();
+                SortSpec sortSpec = new SortSpec();
+                sortSpec.setDimensionIndex(2);
+                sortSpec.setSortOrder("DESCENDING");
+                SortRangeRequest sortRangeRequest = new SortRangeRequest();
+                GridRange gridRange = new GridRange();
+                gridRange.setSheetId(1906592208);
+                sortRangeRequest.setRange(gridRange);
+                sortRangeRequest.setSortSpecs(Arrays.asList(sortSpec));
+                Request request = new Request();
+                request.setSortRange(sortRangeRequest);
+                busReq.setRequests(Arrays.asList(request));
+                service.spreadsheets().batchUpdate(SPREAD_SHEET_ID, busReq).execute();
+
                 return new ChessPlayer(id, name, 1200, true, "Class D", 0, 0, 0, 0.0, 0, "0 days 0 hours 0 minutes 0 seconds", now, now);
             }
         } catch (Exception e) {
@@ -131,6 +146,7 @@ public class GoogleSheets {
     private static List isRanked(String id) throws IOException {
         ValueRange response = service.spreadsheets().values().get(SPREAD_SHEET_ID, RANKED_TAB).execute();
         rowNumber = 1;
+        totalRows = response.getValues().size();
         for (List row : response.getValues()) {
             if (row.get(0).equals(id)) {
                 return row;
@@ -171,6 +187,21 @@ public class GoogleSheets {
                     .update(SPREAD_SHEET_ID, RANKED_TAB+"!A"+rowNumber, body)
                     .setValueInputOption("RAW")
                     .execute();
+
+            // Update ranked sheet by elo rating
+            BatchUpdateSpreadsheetRequest busReq = new BatchUpdateSpreadsheetRequest();
+            SortSpec sortSpec = new SortSpec();
+            sortSpec.setDimensionIndex(2);
+            sortSpec.setSortOrder("DESCENDING");
+            SortRangeRequest sortRangeRequest = new SortRangeRequest();
+            GridRange gridRange = new GridRange();
+            gridRange.setSheetId(1906592208);
+            sortRangeRequest.setRange(gridRange);
+            sortRangeRequest.setSortSpecs(Arrays.asList(sortSpec));
+            Request request = new Request();
+            request.setSortRange(sortRangeRequest);
+            busReq.setRequests(Arrays.asList(request));
+            service.spreadsheets().batchUpdate(SPREAD_SHEET_ID, busReq).execute();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -191,7 +222,7 @@ public class GoogleSheets {
             if (allMatches != null || !allMatches.isEmpty()) {
                 for (List row : allMatches) {
                     if (row.get(1).equals(id) || row.get(5).equals(id)) {
-                        String[] split = ((String) row.get(12)).split("\\s+"); //Example: 0 days 0 hours 0 minutes 7 seconds
+                        String[] split = ((String) row.get(13)).split("\\s+"); //Example: 0 days 0 hours 0 minutes 7 seconds
                         days += Integer.parseInt(split[0].trim());
                         hours += Integer.parseInt(split[2].trim());
                         minutes += Integer.parseInt(split[4].trim());
@@ -256,27 +287,27 @@ public class GoogleSheets {
             double p2Odds = 1.0 - p1Odds;
             String p1EloDiff;
             String p2EloDiff;
-            ValueRange appendBody;
-            if (state.getWinnerId().equals(whiteSidePlayer.discordId)) {
+            ValueRange appendBody = null;
+            String status = state.getStatus();
+            if (DRAW.equals(status)) {
+                p1EloDiff = generateEloDiffString(whiteSidePrevElo, whiteSidePlayer.elo);
+                p2EloDiff = generateEloDiffString(blackSidePrevElo, blackSidePlayer.elo);
+                appendBody = new ValueRange().setValues(Arrays.asList(Arrays.asList(whiteSidePlayer.name, whiteSidePlayer.discordId, Math.round(whiteSidePlayer.elo)+" ("+p1EloDiff+")", formatPercent.format(p1Odds*100)+"%",
+                                                                                    blackSidePlayer.name,  blackSidePlayer.discordId,  Math.round(blackSidePlayer.elo)+" ("+p2EloDiff+")", formatPercent.format(p2Odds*100)+"%",
+                                                                                    "-", "-", DRAW.equals(status), state.isPlayerForfeited(), state.getTotalMoves(), matchLength, getCurrentDateTime())));
+            } else if (state.getWinnerId().equals(whiteSidePlayer.discordId)) {
                 p1EloDiff = generateEloDiffString(whiteSidePrevElo, whiteSidePlayer.elo);
                 p2EloDiff = generateEloDiffString(blackSidePrevElo, blackSidePlayer.elo);
                 appendBody = new ValueRange().setValues(Arrays.asList(Arrays.asList(whiteSidePlayer.name, whiteSidePlayer.discordId, Math.round(whiteSidePlayer.elo)+" ("+p1EloDiff+")", formatPercent.format(p1Odds*100)+"%",
                                                                                     blackSidePlayer.name,  blackSidePlayer.discordId, Math.round(blackSidePlayer.elo)+" ("+p2EloDiff+")", formatPercent.format(p2Odds*100)+"%",
-                                                                                    whiteSidePlayer.name, blackSidePlayer.name, DRAW.equals(state.getStatus()), state.getTotalMoves(), matchLength, getCurrentDateTime())));
+                                                                                    whiteSidePlayer.name, blackSidePlayer.name, DRAW.equals(status), state.isPlayerForfeited(), state.getTotalMoves(), matchLength, getCurrentDateTime())));
             }
             else if (state.getWinnerId().equals(blackSidePlayer.discordId)) {
                 p1EloDiff = generateEloDiffString(whiteSidePrevElo, whiteSidePlayer.elo);
                 p2EloDiff = generateEloDiffString(blackSidePrevElo, blackSidePlayer.elo);
                 appendBody = new ValueRange().setValues(Arrays.asList(Arrays.asList(whiteSidePlayer.name, whiteSidePlayer.discordId, Math.round(whiteSidePlayer.elo)+" ("+p1EloDiff+")", formatPercent.format(p1Odds *100)+"%",
                                                                                     blackSidePlayer.name,  blackSidePlayer.discordId, Math.round(blackSidePlayer.elo)+" ("+p2EloDiff+")", formatPercent.format(p2Odds*100)+"%",
-                                                                                    blackSidePlayer.name, whiteSidePlayer.name, DRAW.equals(state.getStatus()), state.getTotalMoves(), matchLength, getCurrentDateTime())));
-            }
-            else { //draw
-                p1EloDiff = generateEloDiffString(whiteSidePrevElo, whiteSidePlayer.elo);
-                p2EloDiff = generateEloDiffString(blackSidePrevElo, blackSidePlayer.elo);
-                appendBody = new ValueRange().setValues(Arrays.asList(Arrays.asList(whiteSidePlayer.name, whiteSidePlayer.discordId, Math.round(whiteSidePlayer.elo)+" ("+p1EloDiff+")", formatPercent.format(p1Odds*100)+"%",
-                                                                                    blackSidePlayer.name,  blackSidePlayer.discordId,  Math.round(blackSidePlayer.elo)+" ("+p2EloDiff+")", formatPercent.format(p2Odds*100)+"%", "-", "-",
-                                                                                    DRAW.equals(state.getStatus()), state.getTotalMoves(), matchLength, getCurrentDateTime())));
+                                                                                    blackSidePlayer.name, whiteSidePlayer.name, DRAW.equals(status), state.isPlayerForfeited(), state.getTotalMoves(), matchLength, getCurrentDateTime())));
             }
 
             service.spreadsheets().values()
@@ -285,6 +316,20 @@ public class GoogleSheets {
                     .setInsertDataOption("INSERT_ROWS")
                     .execute();
 
+            //Sort Matches by updated on column
+            BatchUpdateSpreadsheetRequest busReq = new BatchUpdateSpreadsheetRequest();
+            SortSpec sortSpec = new SortSpec();
+            sortSpec.setDimensionIndex(14);
+            sortSpec.setSortOrder("DESCENDING");
+            SortRangeRequest sortRangeRequest = new SortRangeRequest();
+            GridRange gridRange = new GridRange();
+            gridRange.setSheetId(2021381704);
+            sortRangeRequest.setRange(gridRange);
+            sortRangeRequest.setSortSpecs(Arrays.asList(sortSpec));
+            Request request = new Request();
+            request.setSortRange(sortRangeRequest);
+            busReq.setRequests(Arrays.asList(request));
+            service.spreadsheets().batchUpdate(SPREAD_SHEET_ID, busReq).execute();
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -305,6 +350,6 @@ public class GoogleSheets {
 
     public static String getCurrentDateTime() {
         ZonedDateTime myDate = ZonedDateTime.now();
-        return DateTimeFormatter.ofPattern("MM-dd-yyyy hh:mm a").format(myDate);
+        return DateTimeFormatter.ofPattern("MM-dd-yyyy hh:mm:ss a").format(myDate);
     }
 }

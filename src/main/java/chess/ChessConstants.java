@@ -9,6 +9,7 @@ public class ChessConstants {
     public static final String DRAW = "draw";
     public static final String ERROR = "error";
     public static final String ILLEGAL_MOVE = "illegal_move";
+    public static final String INVALID_DIFFICULTY = "invalid_difficulty";
     public static final String MOVE_LEAVES_PLAYER_IN_CHECK = "move_leaves_player_in_check";
     public static final String SHOW_ALL_LEGAL_MOVES = "show_all_legal_moves";
     public static final String SHOW_ALL_LEGAL_MOVES_FOR_TILE = "show_all_legal_moves_for_tile";

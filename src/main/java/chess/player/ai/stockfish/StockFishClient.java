@@ -6,6 +6,7 @@ import chess.player.ai.stockfish.engine.enums.Query;
 import chess.player.ai.stockfish.engine.enums.Variant;
 import chess.player.ai.stockfish.exception.StockfishInitException;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,7 +17,7 @@ public class StockFishClient {
         engine = new Stockfish(variant, options.toArray(new Option[options.size()]));
     }
 
-    public String submit(Query query) {
+    public String submit(Query query) throws IOException {
         String output;
 
         switch (query.getType()) {

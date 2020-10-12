@@ -46,9 +46,20 @@ public class ChessMessageHandler {
         return false;
     }
 
+    public void validateComputerDifficulty(String input) {
+        try {
+            int num = Integer.parseInt(input);
+            if (num < 0 || num > 20) {
+                lastErrorMessage = new StringBuilder("Difficulty level must be between 0 and 20.");
+            }
+        } catch (NumberFormatException e) {
+            lastErrorMessage = new StringBuilder("Invalid difficulty format. Re-enter a difficulty level between 0 and 20.");
+        }
+    }
+
     public void validateInputLengthFour(String input) {
         if (input.replaceAll("\\s+", "").length() != 4) {
-            lastErrorMessage = new StringBuilder("Invalid move input format. Use format such as `c2 c4` or `c2c4` or (`o-o` and `o-o-o` for castling)");
+            lastErrorMessage = new StringBuilder("Invalid move input format. Use format such as `c2 c4` or `c2c4`");
         }
     }
 

@@ -238,7 +238,6 @@ public abstract class Move {
             builder.setPiece(movedPawn);
             builder.setEnPassantPawn(movedPawn);
             builder.setMoveMaker(this.board.getCurrentPlayer().getOpponent().getAlliance());
-            this.board.getMovesPlayed().add(true);
             return builder.build(this.board.getMovesPlayed()); //Return a new board
         }
 
@@ -298,7 +297,6 @@ public abstract class Move {
             }
             builder.setPiece(this.movedPiece.movePiece(this));
             builder.setMoveMaker(this.board.getCurrentPlayer().getOpponent().getAlliance());
-            this.board.getMovesPlayed().add(true);
             return builder.build(this.board.getMovesPlayed()); //Return a new board
         }
 
@@ -347,7 +345,6 @@ public abstract class Move {
             }
             builder.setPiece(this.promotedPawn.getPromotionPiece().movePiece(this));
             builder.setMoveMaker(this.board.getCurrentPlayer().getOpponent().getAlliance());
-            this.board.getMovesPlayed().add(true);
             return builder.build(this.board.getMovesPlayed()); //Return a new board
         }
 
@@ -426,7 +423,6 @@ public abstract class Move {
             builder.setPiece(this.movedPiece.movePiece(this));
             builder.setPiece(new Rook(this.castleRookDestination, this.castleRook.getPieceAlliance()));
             builder.setMoveMaker(this.board.getCurrentPlayer().getOpponent().getAlliance());
-            this.board.getMovesPlayed().add(false);
             return builder.build(this.board.getMovesPlayed()); //Return a new board
         }
 
