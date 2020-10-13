@@ -14,6 +14,7 @@ import com.google.api.services.sheets.v4.model.*;
 
 import java.io.*;
 import java.text.DecimalFormat;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -349,7 +350,7 @@ public class GoogleSheets {
     }
 
     public static String getCurrentDateTime() {
-        ZonedDateTime myDate = ZonedDateTime.now();
+        ZonedDateTime myDate = ZonedDateTime.now(ZoneId.of("America/Chicago"));
         return DateTimeFormatter.ofPattern("MM-dd-yyyy hh:mm:ss a").format(myDate);
     }
 }

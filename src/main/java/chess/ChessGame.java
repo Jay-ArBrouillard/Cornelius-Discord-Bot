@@ -197,6 +197,7 @@ public class ChessGame {
         MoveTransition transition = this.board.getCurrentPlayer().makeMove(move);
         if (transition.getMoveStatus().isDone()) {
             state.setTotalMoves(state.getTotalMoves() + 0.5);
+            this.board = null;
             this.board = transition.getTransitionBoard();
             this.board.buildImage();
 
@@ -292,17 +293,20 @@ public class ChessGame {
                 state.setMessage("`" + blackSidePlayer.name + "` SELECTS " + move.toString());
             }
             state.setStateSuccessfulMove();
+            transition = null;
             return state;
         }
         else {
             if (transition.getMoveStatus().leavesPlayerInCheck()) {
                 state.setMessage("`"+moveCmd + "` leaves " + this.board.getCurrentPlayer().getAlliance() + " player in check");
                 state.setStateLeavesPlayerInCheck();
+                transition = null;
                 return state;
             }
             else {
                 state.setMessage("`"+moveCmd + "` is not a legal move for " + this.board.getCurrentPlayer().getAlliance());
                 state.setStateIllegalMove();
+                transition = null;
                 return state;
             }
         }
