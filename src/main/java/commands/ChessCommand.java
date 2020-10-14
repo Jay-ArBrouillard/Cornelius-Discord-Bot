@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 import static chess.ChessConstants.*;
@@ -136,10 +137,18 @@ public class ChessCommand {
                         status = state.getStatus();
 
                         if (CHECKMATE.equals(status) || DRAW.equals(status) || COMPUTER_RESIGN.equals(status)) {
+                            if (chessGame.client != null) {
+                                try {
+                                    chessGame.client.close();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
                             chessGame = null;
                             whiteSidePlayer = null;
                             blackSidePlayer = null;
                             state = null;
+                            System.gc(); //Attempt to call garbage collector to clear memory
                             event.getChannel().sendMessage(reply).queue();
                             gamesCompleted++;
                             break;

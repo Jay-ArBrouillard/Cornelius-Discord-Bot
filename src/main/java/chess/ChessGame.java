@@ -24,7 +24,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class ChessGame {
     public Board board;
     private ChessMessageHandler messageHandler;
-    private StockFishClient client;
+    public StockFishClient client;
     private GoogleSheets db;
     private ChessGameState state;
     private ChessPlayer whiteSidePlayer;
