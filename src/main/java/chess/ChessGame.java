@@ -7,6 +7,7 @@ import chess.board.Move;
 import chess.board.Tile;
 import chess.pgn.FenUtils;
 import chess.player.MoveTransition;
+import chess.player.ai.IterativeDeepening;
 import chess.player.ai.stockfish.StockFishClient;
 import chess.player.ai.stockfish.engine.enums.Option;
 import chess.player.ai.stockfish.engine.enums.Query;
@@ -16,6 +17,7 @@ import chess.tables.ChessPlayer;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -27,6 +29,7 @@ public class ChessGame {
     private ChessGameState state;
     private ChessPlayer whiteSidePlayer;
     private ChessPlayer blackSidePlayer;
+    private IterativeDeepening id;
     public boolean threadRunning = false;
 
 
@@ -473,9 +476,17 @@ public class ChessGame {
                         .setDifficulty(difficulty)
                         .setFen(FenUtils.parseFEN(this.board)).build());
             } catch (Exception e) {
-                client = null;
-                setupComputerClient();
-                e.printStackTrace();
+                try {
+                    if (client != null) client.close();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                finally {
+                    if (id == null) id = new IterativeDeepening(6);
+                    final Move bestMove = id.execute(this.board);
+                    bestMoveString = BoardUtils.getPositionAtCoordinate(bestMove.getCurrentCoordinate()) + BoardUtils.getPositionAtCoordinate(bestMove.getDestinationCoordinate());
+                    return handleMove(bestMove.getCurrentCoordinate(), bestMove.getDestinationCoordinate(), bestMoveString, true);
+                }
             } finally {
                 thinkTime *= 2;
             }
@@ -501,13 +512,20 @@ public class ChessGame {
                 bestMoveString = client.submit(new Query.Builder(QueryType.Best_Move)
                         .setMovetime(randomThinkTime)
                         .setFen(FenUtils.parseFEN(this.board)).build());
-                randomThinkTime *= 2;
             } catch (Exception e) {
-                List<Move> moves = this.board.getCurrentPlayer().getLegalMoves();
-                Move randomMove = moves.get(new Random().nextInt(moves.size()-1));
-                String moveCmd = BoardUtils.getPositionAtCoordinate(randomMove.getCurrentCoordinate()) +
-                        BoardUtils.getPositionAtCoordinate(randomMove.getDestinationCoordinate());
-                return handleMove(randomMove.getCurrentCoordinate(), randomMove.getDestinationCoordinate(), moveCmd, true);
+                try {
+                    if (client != null) client.close();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                finally {
+                    if (id == null) id = new IterativeDeepening(6);
+                    final Move bestMove = id.execute(this.board);
+                    bestMoveString = BoardUtils.getPositionAtCoordinate(bestMove.getCurrentCoordinate()) + BoardUtils.getPositionAtCoordinate(bestMove.getDestinationCoordinate());
+                    return handleMove(bestMove.getCurrentCoordinate(), bestMove.getDestinationCoordinate(), bestMoveString, true);
+                }
+            } finally {
+                randomThinkTime *= 2;
             }
         } while (bestMoveString == null);
         mc.sendTyping().queue();

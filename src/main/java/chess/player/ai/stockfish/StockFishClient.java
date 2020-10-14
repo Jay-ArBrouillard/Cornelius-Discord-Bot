@@ -41,6 +41,10 @@ public class StockFishClient {
         return output;
     }
 
+    public void close() throws IOException {
+        engine.close();
+    }
+
     public static class Builder {
         private Set<Option> options = new HashSet<>();
         private Variant variant = Variant.DEFAULT;

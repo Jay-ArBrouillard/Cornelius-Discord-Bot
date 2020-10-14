@@ -24,7 +24,7 @@ public class IterativeDeepening implements MoveStrategy {
     private int cutOffsProduced;
 
     private MessageChannel messageChannel;
-    public int MAXIMUM_TIME = 10000; //millis
+    public int MAXIMUM_TIME = 5000; //millis
 
     private enum MoveSorter {
 
@@ -61,10 +61,9 @@ public class IterativeDeepening implements MoveStrategy {
         abstract  Collection<Move> sort(Collection<Move> moves);
     }
 
-    public IterativeDeepening(final int searchDepth, MessageChannel messageChannel) {
+    public IterativeDeepening(final int searchDepth) {
         this.evaluator = new StandardBoardEvaluator();
         this.searchDepth = searchDepth;
-        this.messageChannel = messageChannel;
         this.boardsEvaluated = 0;
         this.cutOffsProduced = 0;
     }
@@ -120,11 +119,11 @@ public class IterativeDeepening implements MoveStrategy {
                     if (board.getCurrentPlayer().getAlliance().isWhite() && currentValue > highestSeenValue) {
                         highestSeenValue = currentValue;
                         bestMove = move;
-                         messageChannel.sendTyping().queue();
+//                         messageChannel.sendTyping().queue();
                     } else if (board.getCurrentPlayer().getAlliance().isBlack() && currentValue < lowestSeenValue) {
                         lowestSeenValue = currentValue;
                         bestMove = move;
-                        messageChannel.sendTyping().queue();
+//                        messageChannel.sendTyping().queue();
                     }
                 }
 
