@@ -21,27 +21,30 @@ public class EloRanking {
     }
 
     public static int calculateEstablishedVsProvisional(int rA, int rB, int nB, double s2) {
-        return (int)(rA + 32.0 * (nB / 20.0) * (s2 - (1.0 / (1.0 + Math.pow(10.0,((rB - rA) / 400.0)) ) )));
+        return (int)(rA + determineK(rA) * (nB / 20.0) * (s2 - (1.0 / (1.0 + Math.pow(10.0,((rB - rA) / 400.0)) ) )));
     }
 
     public static int calculateEstablishedVsEstablished(int rA, int rB, double s2) {
-        return (int)(rA + determineK(rA) * (s2 - (1.0 / (1.0 + Math.pow(10.0,((rB - rA) / 400.0)) ) )) );
+        return (int) (rA + determineK(rA) * (s2 - (1.0 / (1.0 + Math.pow(10.0, ((rB - rA) / 400.0))))));
     }
 
     /**
-     * As used by the USCF
+     * Modified K factor from similarly used by the USCF
      * @param rating
      * @return
      */
     public static int determineK(int rating) {
         int K;
-        if (rating < 2100) {
+        if (rating < 2100) { // 0-2099
+            K = 40;
+        }
+        else if (rating < 2200) { //2100 - 2199
             K = 32;
         }
-        else if (rating <= 2400) { //2100 - 2400
+        else if (rating < 2400) { //2200 - 2399
             K = 24;
         }
-        else { // > 2400
+        else { // >= 2400
             K = 16;
         }
 
