@@ -118,9 +118,9 @@ public class ChessCommand {
                     chessGame = new ChessGame(state);
                     whiteSidePlayer = chessGame.addUser(players[i][0], players[i][1]);
                     blackSidePlayer = chessGame.addUser(players[j][0], players[j][1]);
-                    chessGame.setupComputerClient();
                     chessGame.setBlackSidePlayer(blackSidePlayer);
                     chessGame.setWhiteSidePlayer(whiteSidePlayer);
+                    chessGame.setupComputerClient();
                     state.getPrevElo().put(whiteSidePlayer.discordId, whiteSidePlayer.elo);
                     state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
                     state.setMatchStartTime(Instant.now().toEpochMilli());
