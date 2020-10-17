@@ -139,6 +139,13 @@ public class ChessCommand {
                         status = state.getStatus();
 
                         if (CHECKMATE.equals(status) || DRAW.equals(status) || COMPUTER_RESIGN.equals(status)) {
+                            try {
+                                chessGame.client1.close();
+                                chessGame.client2.close();
+                                chessGame.stockFishClient.close();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                             chessGame = null;
                             whiteSidePlayer = null;
                             blackSidePlayer = null;
