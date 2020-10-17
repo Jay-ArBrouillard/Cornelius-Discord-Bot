@@ -39,13 +39,16 @@ public class ChessGame {
         board = Board.createStandardBoard();
         messageHandler = new ChessMessageHandler();
         this.state = state;
+        setupStockFishClient();
+    }
 
+    public void setupStockFishClient() {
         try {
             stockFishClient = new StockFishClient.Builder()
-                            .setOption(Option.Minimum_Thinking_Time, 500) // Minimum thinking time Stockfish will take
-                            .setOption(Option.Skill_Level, 20)
-                            .setVariant(Variant.MODERN) // As of 10/8/2020 Modern is the fastest variant that works on Heroku
-                            .build();
+                    .setOption(Option.Minimum_Thinking_Time, 500) // Minimum thinking time Stockfish will take
+                    .setOption(Option.Skill_Level, 20)
+                    .setVariant(Variant.MODERN) // As of 10/8/2020 Modern is the fastest variant that works on Heroku
+                    .build();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -295,7 +298,7 @@ public class ChessGame {
                 if (evaluationMessage != null) state.setBoardEvaluationMessage(evaluationMessage.substring(22));
             } catch (Exception e) {
                 stockFishClient = null;
-                setupComputerClient();
+                setupStockFishClient();
                 e.printStackTrace();
             }
 
