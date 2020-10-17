@@ -8,30 +8,31 @@ import chess.board.Tile;
 import chess.pgn.FenUtils;
 import chess.player.MoveTransition;
 import chess.player.ai.IterativeDeepening;
-import chess.player.ai.stockfish.StockFishClient;
-import chess.player.ai.stockfish.engine.enums.Option;
-import chess.player.ai.stockfish.engine.enums.Query;
-import chess.player.ai.stockfish.engine.enums.QueryType;
-import chess.player.ai.stockfish.engine.enums.Variant;
+import chess.player.ai.uci.BaseAiClient;
+import chess.player.ai.uci.StockFishClient;
+import chess.player.ai.uci.XiphosClient;
+import chess.player.ai.uci.engine.enums.Option;
+import chess.player.ai.uci.engine.enums.Query;
+import chess.player.ai.uci.engine.enums.QueryType;
+import chess.player.ai.uci.engine.enums.Variant;
 import chess.tables.ChessPlayer;
 import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ChessGame {
     public Board board;
     private ChessMessageHandler messageHandler;
-    public StockFishClient client;
     private GoogleSheets db;
     private ChessGameState state;
     private ChessPlayer whiteSidePlayer;
     private ChessPlayer blackSidePlayer;
     private IterativeDeepening id;
     public boolean threadRunning = false;
-
+    public StockFishClient stockFishClient;
+    public BaseAiClient client1;
+    public BaseAiClient client2;
 
     public ChessGame(ChessGameState state) {
         db = new GoogleSheets();
@@ -42,13 +43,35 @@ public class ChessGame {
 
     public void setupComputerClient() {
         try {
-            client = new StockFishClient.Builder()
-                    .setOption(Option.Minimum_Thinking_Time, 500) // Minimum thinking time Stockfish will take
-                    .setOption(Option.Skill_Level, 20)
-                    .setVariant(Variant.MODERN) // As of 10/8/2020 Modern is the fastest variant that works on Heroku
-                    .build();                   // on Local Windows BMI2 is the festest
+            ChessPlayer [] players = {whiteSidePlayer, blackSidePlayer};
+            for (ChessPlayer p : players) {
+                if (p.name.contains("Stockfish")) {
+                    setClient(new StockFishClient.Builder()
+                            .setOption(Option.Minimum_Thinking_Time, 500) // Minimum thinking time Stockfish will take
+                            .setOption(Option.Skill_Level, 20)
+                            .setVariant(Variant.MODERN) // As of 10/8/2020 Modern is the fastest variant that works on Heroku
+                            .build());                   // on Local Windows BMI2 is the festest
+                }
+                else if (p.name.contains("Xiphos")) {
+                    setClient(new XiphosClient.Builder()
+                            .setOption(Option.Minimum_Thinking_Time, 500) // Minimum thinking time Stockfish will take
+                            .setVariant(Variant.SSE) // As of 10/8/2020 Modern is the fastest variant that works on Heroku
+                            .build());                   // on Local Windows BMI2 is the festest
+                }
+            }
+
+
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void setClient(BaseAiClient client) {
+        if (client1 == null) {
+            client1 = client;
+        }
+        else if (client2 == null) {
+            client2 = client;
         }
     }
 
@@ -76,7 +99,7 @@ public class ChessGame {
         return this.board.getCurrentPlayer().getAlliance().isBlack();
     }
 
-    public String setupPlayers(MessageReceivedEvent event, String message) {
+    public String setupPlayers(String message) {
         if (message.equals("1")) {
             board.getWhitePlayer().setIsRobot(false);
             board.getBlackPlayer().setIsRobot(false);
@@ -107,12 +130,10 @@ public class ChessGame {
 
         state.setStatus(null);
         try {
-            client = new StockFishClient.Builder()
+            client1 = new XiphosClient.Builder()
                     .setOption(Option.Minimum_Thinking_Time, 1000) // Minimum thinking time Stockfish will take
-                    .setOption(Option.Ponder, 2000)
-                    .setOption(Option.Skill_Level, Integer.parseInt(message))
-                    .setVariant(Variant.BMI2) // As of 10/8/2020 Modern is the fastest variant that works on Heroku
-                    .build();                   // on Local Windows BMI2 is the festest
+                    .setVariant(Variant.SSE) // As of 10/8/2020 Modern is the fastest variant that works on Heroku
+                    .build();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -259,10 +280,10 @@ public class ChessGame {
             //Update eval score
             //+position eval is good for white, -negative eval is good for black
             try {
-                String evaluationMessage = client.submit(new Query.Builder(QueryType.EVAL).setFen(FenUtils.parseFEN(this.board)).build());
+                String evaluationMessage = stockFishClient.submit(new Query.Builder(QueryType.EVAL).setFen(FenUtils.parseFEN(this.board)).build());
                 if (evaluationMessage != null) state.setBoardEvaluationMessage(evaluationMessage.substring(22));
             } catch (Exception e) {
-                client = null;
+                stockFishClient = null;
                 setupComputerClient();
                 e.printStackTrace();
             }
@@ -471,13 +492,26 @@ public class ChessGame {
         String bestMoveString = null;
         do {
             try {
-                bestMoveString = client.submit(new Query.Builder(QueryType.Best_Move)
-                        .setMovetime(thinkTime)
-                        .setDifficulty(difficulty)
-                        .setFen(FenUtils.parseFEN(this.board)).build());
+                if (isWhitePlayerTurn()) {
+                    bestMoveString = client1.submit(new Query.Builder(QueryType.Best_Move)
+                            .setMovetime(thinkTime)
+                            .setDifficulty(difficulty)
+                            .setFen(FenUtils.parseFEN(this.board)).build());
+                }
+                else if (isBlackPlayerTurn()) {
+                    bestMoveString = client2.submit(new Query.Builder(QueryType.Best_Move)
+                            .setMovetime(thinkTime)
+                            .setDifficulty(difficulty)
+                            .setFen(FenUtils.parseFEN(this.board)).build());
+                }
             } catch (Exception e) {
                 try {
-                    if (client != null) client.close();
+                    if (isWhitePlayerTurn()) {
+                        if (client1 != null) client1.close();
+                    }
+                    else if (isBlackPlayerTurn()) {
+                        if (client2 != null) client2.close();
+                    }
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -506,15 +540,27 @@ public class ChessGame {
 
     public ChessGameState ai(MessageChannel mc) {
         int randomThinkTime = ThreadLocalRandom.current().nextInt(5000, 10000 + 1); //Between 5-10 seconds
-        String bestMoveString;
+        String bestMoveString = null;
         do {
             try {
-                bestMoveString = client.submit(new Query.Builder(QueryType.Best_Move)
-                        .setMovetime(randomThinkTime)
-                        .setFen(FenUtils.parseFEN(this.board)).build());
+                if (isWhitePlayerTurn()) {
+                    bestMoveString = client1.submit(new Query.Builder(QueryType.Best_Move)
+                            .setMovetime(randomThinkTime)
+                            .setFen(FenUtils.parseFEN(this.board)).build());
+                }
+                else if (isBlackPlayerTurn()) {
+                    bestMoveString = client2.submit(new Query.Builder(QueryType.Best_Move)
+                            .setMovetime(randomThinkTime)
+                            .setFen(FenUtils.parseFEN(this.board)).build());
+                }
             } catch (Exception e) {
                 try {
-                    if (client != null) client.close();
+                    if (isWhitePlayerTurn()) {
+                        if (client1 != null) client1.close();
+                    }
+                    else if (isBlackPlayerTurn()) {
+                        if (client2 != null) client2.close();
+                    }
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }

@@ -14,6 +14,7 @@ import com.google.api.services.sheets.v4.model.*;
 
 import java.io.*;
 import java.text.DecimalFormat;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -108,7 +109,7 @@ public class GoogleSheets {
                 return user;
             } else {
                 // Player doesn't exist. Add them as a provisional player
-                String now = getCurrentDateTime();
+                String now = getDate(Instant.now().toEpochMilli());
                 // New users get default elo of 1200 - Class D
                 ValueRange appendBody = new ValueRange()
                         .setValues(Arrays.asList(
@@ -181,7 +182,7 @@ public class GoogleSheets {
             values.add(user.totalGames);
             values.add(user.avgGameLength);
             values.add(user.createdOn);
-            values.add(getCurrentDateTime());
+            values.add(getDate(Instant.now().toEpochMilli()));
 
             ValueRange body = new ValueRange().setValues(Arrays.asList(values));
             service.spreadsheets().values()
@@ -275,7 +276,8 @@ public class GoogleSheets {
         try {
             if (service == null) getSheetsService();
 
-            Long seconds = (System.currentTimeMillis() - state.getMatchStartTime()) / 1000;
+            Long millis = Instant.now().toEpochMilli();
+            Long seconds = (millis - state.getMatchStartTime()) / 1000;
             int day = (int) TimeUnit.SECONDS.toDays(seconds);
             long hours = TimeUnit.SECONDS.toHours(seconds) - (day *24);
             long minute = TimeUnit.SECONDS.toMinutes(seconds) - (TimeUnit.SECONDS.toHours(seconds)* 60);
@@ -295,20 +297,20 @@ public class GoogleSheets {
                 p2EloDiff = generateEloDiffString(blackSidePrevElo, blackSidePlayer.elo);
                 appendBody = new ValueRange().setValues(Arrays.asList(Arrays.asList(whiteSidePlayer.name, whiteSidePlayer.discordId, Math.round(whiteSidePlayer.elo)+" ("+p1EloDiff+")", formatPercent.format(p1Odds*100)+"%",
                                                                                     blackSidePlayer.name,  blackSidePlayer.discordId,  Math.round(blackSidePlayer.elo)+" ("+p2EloDiff+")", formatPercent.format(p2Odds*100)+"%",
-                                                                                    "-", "-", DRAW.equals(status), state.isPlayerForfeited(), state.getTotalMoves(), matchLength, getCurrentDateTime())));
+                                                                                    "-", "-", DRAW.equals(status), state.isPlayerForfeited(), state.getTotalMoves(), matchLength, getDate(millis))));
             } else if (state.getWinnerId().equals(whiteSidePlayer.discordId)) {
                 p1EloDiff = generateEloDiffString(whiteSidePrevElo, whiteSidePlayer.elo);
                 p2EloDiff = generateEloDiffString(blackSidePrevElo, blackSidePlayer.elo);
                 appendBody = new ValueRange().setValues(Arrays.asList(Arrays.asList(whiteSidePlayer.name, whiteSidePlayer.discordId, Math.round(whiteSidePlayer.elo)+" ("+p1EloDiff+")", formatPercent.format(p1Odds*100)+"%",
                                                                                     blackSidePlayer.name,  blackSidePlayer.discordId, Math.round(blackSidePlayer.elo)+" ("+p2EloDiff+")", formatPercent.format(p2Odds*100)+"%",
-                                                                                    whiteSidePlayer.name, blackSidePlayer.name, DRAW.equals(status), state.isPlayerForfeited(), state.getTotalMoves(), matchLength, getCurrentDateTime())));
+                                                                                    whiteSidePlayer.name, blackSidePlayer.name, DRAW.equals(status), state.isPlayerForfeited(), state.getTotalMoves(), matchLength, getDate(millis))));
             }
             else if (state.getWinnerId().equals(blackSidePlayer.discordId)) {
                 p1EloDiff = generateEloDiffString(whiteSidePrevElo, whiteSidePlayer.elo);
                 p2EloDiff = generateEloDiffString(blackSidePrevElo, blackSidePlayer.elo);
                 appendBody = new ValueRange().setValues(Arrays.asList(Arrays.asList(whiteSidePlayer.name, whiteSidePlayer.discordId, Math.round(whiteSidePlayer.elo)+" ("+p1EloDiff+")", formatPercent.format(p1Odds *100)+"%",
                                                                                     blackSidePlayer.name,  blackSidePlayer.discordId, Math.round(blackSidePlayer.elo)+" ("+p2EloDiff+")", formatPercent.format(p2Odds*100)+"%",
-                                                                                    blackSidePlayer.name, whiteSidePlayer.name, DRAW.equals(status), state.isPlayerForfeited(), state.getTotalMoves(), matchLength, getCurrentDateTime())));
+                                                                                    blackSidePlayer.name, whiteSidePlayer.name, DRAW.equals(status), state.isPlayerForfeited(), state.getTotalMoves(), matchLength, getDate(millis))));
             }
 
             service.spreadsheets().values()
@@ -349,8 +351,8 @@ public class GoogleSheets {
         return eloDiff;
     }
 
-    public static String getCurrentDateTime() {
-        ZonedDateTime myDate = ZonedDateTime.now(ZoneId.of("America/Chicago"));
-        return DateTimeFormatter.ofPattern("MM-dd-yyyy hh:mm:ss a").format(myDate);
+    public static String getDate(Long pCurrentTimeMs) {
+        Instant i = Instant.ofEpochMilli(pCurrentTimeMs);
+        return DateTimeFormatter.ofPattern("MM-dd-yyyy hh:mm:ss a").format(ZonedDateTime.ofInstant(i, ZoneId.of("America/Chicago")));
     }
 }

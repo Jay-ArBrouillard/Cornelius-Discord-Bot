@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.*;
 
 import static chess.ChessConstants.*;
@@ -84,7 +85,8 @@ public class ChessCommand {
         //TODO fix this method
         if (message.startsWith("!chess") && message.contains("train")) {
 
-            String[][] players = {{"693282099167494225SF"+"0", "Cornelius Stockfish 0"},
+            String[][] players = { {"693282099167494225X06", "Cornelius Xiphos 0.6"},
+                    {"693282099167494225SF"+"0", "Cornelius Stockfish 0"},
                     {"693282099167494225SF"+"1", "Cornelius Stockfish 1"},
                     {"693282099167494225SF"+"2", "Cornelius Stockfish 2"},
                     {"693282099167494225SF"+"3", "Cornelius Stockfish 3"},
@@ -114,14 +116,14 @@ public class ChessCommand {
                     if (i == j) continue; //Don't play itself
                     state = new ChessGameState();
                     chessGame = new ChessGame(state);
-                    chessGame.setupComputerClient();
                     whiteSidePlayer = chessGame.addUser(players[i][0], players[i][1]);
                     blackSidePlayer = chessGame.addUser(players[j][0], players[j][1]);
+                    chessGame.setupComputerClient();
                     chessGame.setBlackSidePlayer(blackSidePlayer);
                     chessGame.setWhiteSidePlayer(whiteSidePlayer);
                     state.getPrevElo().put(whiteSidePlayer.discordId, whiteSidePlayer.elo);
                     state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
-                    state.setMatchStartTime(System.currentTimeMillis());
+                    state.setMatchStartTime(Instant.now().toEpochMilli());
                     decision = COMPUTER_MOVE;
 
                     event.getChannel().sendMessage("Beginning match (" + gamesCompleted + "/" + totalGames + ") : " + whiteSidePlayer.name + " vs " + blackSidePlayer.name).queue();
@@ -137,13 +139,6 @@ public class ChessCommand {
                         status = state.getStatus();
 
                         if (CHECKMATE.equals(status) || DRAW.equals(status) || COMPUTER_RESIGN.equals(status)) {
-                            if (chessGame.client != null) {
-                                try {
-                                    chessGame.client.close();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                            }
                             chessGame = null;
                             whiteSidePlayer = null;
                             blackSidePlayer = null;
@@ -244,7 +239,7 @@ public class ChessCommand {
                 decision = Decision.SETUP_RESPONSE;
                 break;
             case SETUP_RESPONSE:
-                reply = chessGame.setupPlayers(event, message);
+                reply = chessGame.setupPlayers(message);
                 if (reply.equals(GameType.PVP.toString())) {
                     reply = "`Player vs Player Chess Game`\nPlease challenge another player by entering their `userId` (Click on user and Copy ID)";
                     whiteSidePlayer = chessGame.addUser(event.getAuthor().getId(), event.getAuthor().getName());
@@ -286,7 +281,7 @@ public class ChessCommand {
                         state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
                         chessGame.setBlackSidePlayer(blackSidePlayer);
                         decision = Decision.PLAYER_MOVE;
-                        state.setMatchStartTime(System.currentTimeMillis());
+                        state.setMatchStartTime(Instant.now().toEpochMilli());
                         reply = "`Starting " + whiteSidePlayer.name + " (" + whiteSidePlayer.elo + ")" + " vs. Cornelius Stockfish " + message.trim() + " (" + blackSidePlayer.elo + ") Chess Game`\nMake a move (ex: `c2 c4`)";
 
                     }
@@ -296,7 +291,7 @@ public class ChessCommand {
                         chessGame.setWhiteSidePlayer(whiteSidePlayer);
                         state.getPrevElo().put(whiteSidePlayer.discordId, whiteSidePlayer.elo);
                         decision = COMPUTER_MOVE;
-                        state.setMatchStartTime(System.currentTimeMillis());
+                        state.setMatchStartTime(Instant.now().toEpochMilli());
                         reply = "`Starting Cornelius Stockfish " + message.trim() + " (" + whiteSidePlayer.elo + ")" + " vs. " + blackSidePlayer.name + " (" + blackSidePlayer.elo + ") Chess Game`\nCornelius will go first...";
                     }
                 }
@@ -336,7 +331,7 @@ public class ChessCommand {
                         boardImageFile = new File(GAME_BOARD_IMAGE_LOCATION);
                         belowMessage = "`"+ whiteSidePlayer.name + "` goes first. Make a move (ex: `c2 c4`)";
                         decision = Decision.PLAYER_MOVE;
-                        state.setMatchStartTime(System.currentTimeMillis());
+                        state.setMatchStartTime(Instant.now().toEpochMilli());
                     }
                     else {
                         reply = "`" + blackSidePlayer.name + "` has declined the chess match";

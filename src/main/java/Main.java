@@ -1,11 +1,5 @@
 import Utils.CommandHelper;
 import Utils.MovieWatcher;
-import chess.pgn.FenUtils;
-import chess.player.ai.stockfish.StockFishClient;
-import chess.player.ai.stockfish.engine.enums.Option;
-import chess.player.ai.stockfish.engine.enums.Query;
-import chess.player.ai.stockfish.engine.enums.QueryType;
-import chess.player.ai.stockfish.engine.enums.Variant;
 import commands.Holiday;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
