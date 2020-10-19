@@ -98,6 +98,13 @@ public class ChessGame {
                             .setOption(Option.Hash, 16)
                             .build());
                 }
+                else if (p.name.contains("Wyld")) {
+                    setClient(new WyldClient.Builder()
+                            .setOption(Option.Minimum_Thinking_Time, 500)
+                            .setVariant(Variant.POPCNT) //Always set to Default for linux
+                            .setOption(Option.Hash, 16)
+                            .build());
+                }
 
             }
 
@@ -532,6 +539,10 @@ public class ChessGame {
         String bestMoveString = null;
         do {
             try {
+                System.out.println(client1);
+                System.out.println(client2);
+                System.out.println("Current player: " + this.board.getCurrentPlayer().getAlliance().toString());
+
                 if (isWhitePlayerTurn()) {
                     bestMoveString = client1.submit(new Query.Builder(QueryType.Best_Move)
                             .setMovetime(thinkTime)

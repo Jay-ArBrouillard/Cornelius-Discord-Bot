@@ -97,6 +97,9 @@ abstract class UCIEngine {
                 case MODERN:
                     path.append("_modern");
                     break;
+                case POPCNT:
+                    path.append("_popcnt");
+                    break;
                 default:
                     throw new RuntimeException("Illegal variant provided.");
             }

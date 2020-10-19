@@ -85,6 +85,7 @@ public class ChessCommand {
             event.getChannel().sendMessage("Adding all AI's to Chess Records...").queue();
 
             String[][] players = {
+                    {"693282099167494225W15", "Cornelius Wyld 1.51"},
                     {"693282099167494225C25", "Cornelius Crafty 25.4"},
                     {"693282099167494225L17", "Cornelius Laser 1.7"},
                     {"693282099167494225ST", "Cornelius SmarThink"},
@@ -125,6 +126,7 @@ public class ChessCommand {
         if (message.startsWith("!chess") && message.contains("train")) {
 
             String[][] players = {
+                    {"693282099167494225W15", "Cornelius Wyld 1.51"},
                     {"693282099167494225C25", "Cornelius Crafty 25.4"},
                     {"693282099167494225L17", "Cornelius Laser 1.7"},
                     {"693282099167494225ST", "Cornelius SmarThink"},
@@ -297,6 +299,7 @@ public class ChessCommand {
             case SETUP_RESPONSE:
                 ChessPlayer humanPlayer = chessGame.addUser(event.getAuthor().getId(), event.getAuthor().getName());
                 reply = chessGame.setupPlayers(message, humanPlayer.elo);
+                System.gc();
                 if (reply.startsWith(GameType.PVP.toString())) {
                     reply = "`Player vs Player Chess Game`\nPlease challenge another player by entering their `userId` (Click on user and Copy ID)";
                     whiteSidePlayer = humanPlayer;

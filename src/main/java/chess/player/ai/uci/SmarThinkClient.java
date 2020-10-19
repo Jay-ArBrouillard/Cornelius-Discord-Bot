@@ -1,6 +1,5 @@
 package chess.player.ai.uci;
 
-import chess.player.ai.uci.engine.Komodo;
 import chess.player.ai.uci.engine.SmarThink;
 import chess.player.ai.uci.engine.enums.Option;
 import chess.player.ai.uci.engine.enums.Query;
