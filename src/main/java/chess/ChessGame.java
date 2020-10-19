@@ -42,6 +42,7 @@ public class ChessGame {
     public void setupStockfishClient() {
         try {
             stockFishClient = new StockFishClient.Builder()
+                                .setOption(Option.Minimum_Thinking_Time, 500)
                                 .setOption(Option.Hash, 16)
                                 .setVariant(Variant.MODERN)  // BMI for windows, Modern for linux
                                 .build();
@@ -56,7 +57,7 @@ public class ChessGame {
             for (ChessPlayer p : players) {
                 if (p.name.contains("Stockfish")) {
                     setClient(new StockFishClient.Builder()
-                            .setOption(Option.Minimum_Thinking_Time, 1000) // Minimum thinking time Stockfish will take
+                            .setOption(Option.Minimum_Thinking_Time, 500) // Minimum thinking time Stockfish will take
                             .setOption(Option.Skill_Level, 20)
                             .setOption(Option.Hash, 16)
                             .setVariant(Variant.MODERN) // BMI for windows, Modern for linux
@@ -64,35 +65,35 @@ public class ChessGame {
             }
                 else if (p.name.contains("Xiphos")) {
                     setClient(new XiphosClient.Builder()
-                            .setOption(Option.Minimum_Thinking_Time, 1000)
+                            .setOption(Option.Minimum_Thinking_Time, 500)
                             .setVariant(Variant.SSE) //BMI or windows, SSE for linux
                             .setOption(Option.Hash, 16)
                             .build());
                 }
                 else if (p.name.contains("Komodo")) {
                     setClient(new KomodoClient.Builder()
-                            .setOption(Option.Minimum_Thinking_Time, 1000)
+                            .setOption(Option.Minimum_Thinking_Time, 500)
                             .setVariant(Variant.DEFAULT) //Always set to Default for linux
                             .setOption(Option.Hash, 16)
                             .build());
                 }
                 else if (p.name.contains("SmarThink")) {
                     setClient(new SmarThinkClient.Builder()
-                            .setOption(Option.Minimum_Thinking_Time, 1000)
+                            .setOption(Option.Minimum_Thinking_Time, 500)
                             .setVariant(Variant.DEFAULT) //Always set to Default for linux
                             .setOption(Option.Hash, 16)
                             .build());
                 }
                 else if (p.name.contains("Crafty")) {
                     setClient(new CraftyClient.Builder()
-                            .setOption(Option.Minimum_Thinking_Time, 1000)
+                            .setOption(Option.Minimum_Thinking_Time, 500)
                             .setVariant(Variant.DEFAULT) //Always set to Default for linux
                             .setOption(Option.Hash, 16)
                             .build());
                 }
                 else if (p.name.contains("Laser")) {
                     setClient(new LaserClient.Builder()
-                            .setOption(Option.Minimum_Thinking_Time, 1000)
+                            .setOption(Option.Minimum_Thinking_Time, 500)
                             .setVariant(Variant.DEFAULT) //Always set to Default for linux
                             .setOption(Option.Hash, 16)
                             .build());
@@ -555,6 +556,7 @@ public class ChessGame {
                     ex.printStackTrace();
                 }
                 finally { //If ai breaks then rely on simple ai for rest of the game
+                    System.out.println("Using iterative deeping");
                     if (id == null) id = new IterativeDeepening(6);
                     final Move bestMove = id.execute(this.board);
                     bestMoveString = BoardUtils.getPositionAtCoordinate(bestMove.getCurrentCoordinate()) + BoardUtils.getPositionAtCoordinate(bestMove.getDestinationCoordinate());
@@ -604,6 +606,7 @@ public class ChessGame {
                     ex.printStackTrace();
                 }
                 finally {
+                    System.out.println("Using iterative deeping");
                     if (id == null) id = new IterativeDeepening(6);
                     final Move bestMove = id.execute(this.board);
                     bestMoveString = BoardUtils.getPositionAtCoordinate(bestMove.getCurrentCoordinate()) + BoardUtils.getPositionAtCoordinate(bestMove.getDestinationCoordinate());
