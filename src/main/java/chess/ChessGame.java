@@ -51,9 +51,23 @@ public class ChessGame {
         }
     }
 
-    public void setupComputerClient() {
+    public void setupComputerClient(GameType gameType) {
         try {
-            ChessPlayer [] players = {whiteSidePlayer, blackSidePlayer};
+            ChessPlayer [] players = new ChessPlayer[0];
+            if (gameType.isPlayerVsComputer()) {
+                if (whiteSidePlayer.discordId.contains(System.getenv("OWNER_ID"))) { //White side is ai
+                    players = new ChessPlayer[]{whiteSidePlayer};
+                }
+                else { //black side is ai
+                    players = new ChessPlayer[]{blackSidePlayer};
+                }
+            } else if (gameType.isComputerVsComputer()) {
+                players = new ChessPlayer[]{whiteSidePlayer, blackSidePlayer};
+            } else { //Player vs player
+                //Don't initialize clients
+                return;
+            }
+
             for (ChessPlayer p : players) {
                 if (p.name.contains("Stockfish")) {
                     setClient(new StockFishClient.Builder()
@@ -61,49 +75,49 @@ public class ChessGame {
                             .setOption(Option.Skill_Level, 20)
                             .setOption(Option.Hash, 16)
                             .setVariant(Variant.MODERN) // BMI for windows, Modern for linux
-                            .build());
+                            .build(), p);
             }
                 else if (p.name.contains("Xiphos")) {
                     setClient(new XiphosClient.Builder()
                             .setOption(Option.Minimum_Thinking_Time, 500)
                             .setVariant(Variant.SSE) //BMI or windows, SSE for linux
                             .setOption(Option.Hash, 16)
-                            .build());
+                            .build(), p);
                 }
                 else if (p.name.contains("Komodo")) {
                     setClient(new KomodoClient.Builder()
                             .setOption(Option.Minimum_Thinking_Time, 500)
                             .setVariant(Variant.DEFAULT) //Always set to Default for linux
                             .setOption(Option.Hash, 16)
-                            .build());
+                            .build(), p);
                 }
                 else if (p.name.contains("SmarThink")) {
                     setClient(new SmarThinkClient.Builder()
                             .setOption(Option.Minimum_Thinking_Time, 500)
                             .setVariant(Variant.DEFAULT) //Always set to Default for linux
                             .setOption(Option.Hash, 16)
-                            .build());
+                            .build(), p);
                 }
                 else if (p.name.contains("Crafty")) {
                     setClient(new CraftyClient.Builder()
                             .setOption(Option.Minimum_Thinking_Time, 500)
                             .setVariant(Variant.DEFAULT) //Always set to Default for linux
                             .setOption(Option.Hash, 16)
-                            .build());
+                            .build(), p);
                 }
                 else if (p.name.contains("Laser")) {
                     setClient(new LaserClient.Builder()
                             .setOption(Option.Minimum_Thinking_Time, 500)
                             .setVariant(Variant.DEFAULT) //Always set to Default for linux
                             .setOption(Option.Hash, 16)
-                            .build());
+                            .build(), p);
                 }
                 else if (p.name.contains("Wyld")) {
                     setClient(new WyldClient.Builder()
                             .setOption(Option.Minimum_Thinking_Time, 500)
                             .setVariant(Variant.POPCNT) //Always set to Default for linux
                             .setOption(Option.Hash, 16)
-                            .build());
+                            .build(), p);
                 }
 
             }
@@ -114,12 +128,12 @@ public class ChessGame {
         }
     }
 
-    private void setClient(BaseAiClient client) {
-        if (client1 == null) {
-            client1 = client;
+    private void setClient(BaseAiClient client, ChessPlayer p) {
+        if (p.discordId.equals(whiteSidePlayer.discordId)) {
+            client1 = client; //White side player will always be client1
         }
-        else if (client2 == null) {
-            client2 = client;
+        else if (p.discordId.equals(blackSidePlayer.discordId)) {
+            client2 = client; //Black side player will always be client 2
         }
 
         System.out.println(client1);

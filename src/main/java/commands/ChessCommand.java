@@ -166,8 +166,9 @@ public class ChessCommand {
                     blackSidePlayer = chessGame.addUser(players[j][0], players[j][1]);
                     chessGame.setBlackSidePlayer(blackSidePlayer);
                     chessGame.setWhiteSidePlayer(whiteSidePlayer);
+                    gameType = GameType.CVC;
                     chessGame.setupStockfishClient();
-                    chessGame.setupComputerClient();
+                    chessGame.setupComputerClient(gameType);
                     state.getPrevElo().put(whiteSidePlayer.discordId, whiteSidePlayer.elo);
                     state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
                     state.setMatchStartTime(Instant.now().toEpochMilli());
@@ -322,7 +323,7 @@ public class ChessCommand {
                     reply = "`Starting Chess Game " + whiteSidePlayer.name + " (" + whiteSidePlayer.elo + ")" + " vs. " + blackSidePlayer.name + " (" + blackSidePlayer.elo + ")`\nMake a move (ex: `c2 c4`)";
                     gameType = GameType.PVC;
                     decision = PLAYER_MOVE;
-                    chessGame.setupComputerClient();
+                    chessGame.setupComputerClient(gameType);
                     chessGame.setupStockfishClient();
                     state.setMatchStartTime(Instant.now().toEpochMilli());
                 }
@@ -340,7 +341,7 @@ public class ChessCommand {
                     reply = "`Starting Chess Game " + whiteSidePlayer.name + " (" + whiteSidePlayer.elo + ")" + " vs. " + blackSidePlayer.name + " (" + blackSidePlayer.elo + ")`\n" + whiteSidePlayer.name + " will go first...";
                     gameType = GameType.CVP;
                     decision = COMPUTER_MOVE;
-                    chessGame.setupComputerClient();
+                    chessGame.setupComputerClient(gameType);
                     chessGame.setupStockfishClient();
                     state.setMatchStartTime(Instant.now().toEpochMilli());
                 }
@@ -380,7 +381,7 @@ public class ChessCommand {
                         boardImageFile = new File(GAME_BOARD_IMAGE_LOCATION);
                         belowMessage = "`"+ whiteSidePlayer.name + "` goes first. Make a move (ex: `c2 c4`)";
                         decision = Decision.PLAYER_MOVE;
-                        chessGame.setupComputerClient();
+                        chessGame.setupComputerClient(gameType);
                         chessGame.setupStockfishClient();
                         state.setMatchStartTime(Instant.now().toEpochMilli());
                     }

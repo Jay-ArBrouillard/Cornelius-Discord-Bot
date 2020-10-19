@@ -11,6 +11,11 @@ public enum GameType {
         public boolean isPlayerVsPlayer() {
             return true;
         }
+
+        @Override
+        public boolean isComputerVsComputer() {
+            return false;
+        }
     },
     PVC {
         @Override
@@ -20,6 +25,11 @@ public enum GameType {
 
         @Override
         public boolean isPlayerVsPlayer() {
+            return false;
+        }
+
+        @Override
+        public boolean isComputerVsComputer() {
             return false;
         }
     },
@@ -33,8 +43,30 @@ public enum GameType {
         public boolean isPlayerVsPlayer() {
             return false;
         }
+
+        @Override
+        public boolean isComputerVsComputer() {
+            return false;
+        }
+    },
+    CVC {
+        @Override
+        public boolean isPlayerVsComputer() {
+            return false;
+        }
+
+        @Override
+        public boolean isPlayerVsPlayer() {
+            return false;
+        }
+
+        @Override
+        public boolean isComputerVsComputer() {
+            return true;
+        }
     };
 
     public abstract boolean isPlayerVsComputer();
     public abstract boolean isPlayerVsPlayer();
+    public abstract boolean isComputerVsComputer();
 }
