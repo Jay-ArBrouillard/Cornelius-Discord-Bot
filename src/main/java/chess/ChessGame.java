@@ -569,6 +569,7 @@ public class ChessGame {
                             .setFen(FenUtils.parseFEN(this.board)).build());
                 }
             } catch (Exception e) {
+                e.printStackTrace();
                 try {
                     if (isWhitePlayerTurn()) {
                         if (client1 != null) client1.close();
@@ -628,6 +629,7 @@ public class ChessGame {
                     System.out.println("Black players best move is: " + bestMoveString);
                 }
             } catch (Exception e) {
+                e.printStackTrace();
                 try {
                     if (isWhitePlayerTurn()) {
                         if (client1 != null) client1.close();

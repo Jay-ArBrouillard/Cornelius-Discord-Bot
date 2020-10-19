@@ -43,7 +43,7 @@ public class XiphosClient extends BaseAiClient {
     public static class Builder {
         private Set<Option> options = new HashSet<>();
         private Variant variant = Variant.DEFAULT;
-        private String path = "bin/xiphos_0.6_w64";
+        private String path = "bin/xiphos_0.6_linux";
 
         public final XiphosClient.Builder setVariant(Variant v) {
             variant = v;
