@@ -125,8 +125,8 @@ public class ChessGame {
     }
 
     public String setupPlayers(String message, int elo) {
-        String option = message.contains(" ") ? message.substring(0, message.indexOf(" ")) : message;
-        String opponent = message.contains(" ") ? message.substring(message.indexOf(" ")) : null;
+        String option = message.contains(" ") ? message.substring(0, message.indexOf(" ")).trim() : message;
+        String opponent = message.contains(" ") ? message.substring(message.indexOf(" ")).trim() : null;
 
         if (!option.equals("1") && !option.equals("2") && !option.equals("3")) {
             return new StringBuilder("`").append(message).append("` is not a valid option. Please choose an option (1-3). For 2 or 3, optional add an opponent name ex: `3 Cornelius Stockfish 20`").toString();
