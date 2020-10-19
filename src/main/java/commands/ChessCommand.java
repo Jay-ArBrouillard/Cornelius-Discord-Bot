@@ -85,6 +85,8 @@ public class ChessCommand {
             event.getChannel().sendMessage("Adding all AI's to Chess Records...").queue();
 
             String[][] players = {
+                    {"693282099167494225C25", "Cornelius Crafty 25.4"},
+                    {"693282099167494225L17", "Cornelius Laser 1.7"},
                     {"693282099167494225ST", "Cornelius SmarThink"},
                     {"693282099167494225X06", "Cornelius Xiphos 0.6"},
                     {"693282099167494225K11", "Cornelius Komodo 11"},
@@ -123,6 +125,8 @@ public class ChessCommand {
         if (message.startsWith("!chess") && message.contains("train")) {
 
             String[][] players = {
+                    {"693282099167494225C25", "Cornelius Crafty 25.4"},
+                    {"693282099167494225L17", "Cornelius Laser 1.7"},
                     {"693282099167494225ST", "Cornelius SmarThink"},
                     {"693282099167494225X06", "Cornelius Xiphos 0.6"},
                     {"693282099167494225K11", "Cornelius Komodo 11"},
@@ -300,7 +304,6 @@ public class ChessCommand {
                     state.getPrevElo().put(whiteSidePlayer.discordId, whiteSidePlayer.elo);
                     decision = Decision.CHALLENGE_OPPONENT;
                     gameType = GameType.PVP;
-                    chessGame.setupComputerClient();
                 }
                 else if (reply.startsWith(GameType.PVC.toString())) {
                     boardImageFile = new File(GAME_BOARD_IMAGE_LOCATION);
@@ -316,6 +319,8 @@ public class ChessCommand {
                     reply = "`Starting Chess Game " + whiteSidePlayer.name + " (" + whiteSidePlayer.elo + ")" + " vs. " + blackSidePlayer.name + " (" + blackSidePlayer.elo + ")`\nMake a move (ex: `c2 c4`)";
                     gameType = GameType.PVC;
                     decision = PLAYER_MOVE;
+                    chessGame.setupComputerClient();
+                    chessGame.setupStockfishClient();
                     state.setMatchStartTime(Instant.now().toEpochMilli());
                 }
                 else if (reply.startsWith(GameType.CVP.toString())) {
@@ -332,6 +337,8 @@ public class ChessCommand {
                     reply = "`Starting Chess Game " + whiteSidePlayer.name + " (" + whiteSidePlayer.elo + ")" + " vs. " + blackSidePlayer.name + " (" + blackSidePlayer.elo + ")`\n" + whiteSidePlayer.name + " will go first...";
                     gameType = GameType.CVP;
                     decision = COMPUTER_MOVE;
+                    chessGame.setupComputerClient();
+                    chessGame.setupStockfishClient();
                     state.setMatchStartTime(Instant.now().toEpochMilli());
                 }
                 break;
@@ -370,6 +377,8 @@ public class ChessCommand {
                         boardImageFile = new File(GAME_BOARD_IMAGE_LOCATION);
                         belowMessage = "`"+ whiteSidePlayer.name + "` goes first. Make a move (ex: `c2 c4`)";
                         decision = Decision.PLAYER_MOVE;
+                        chessGame.setupComputerClient();
+                        chessGame.setupStockfishClient();
                         state.setMatchStartTime(Instant.now().toEpochMilli());
                     }
                     else {

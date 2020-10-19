@@ -83,6 +83,21 @@ public class ChessGame {
                             .setOption(Option.Hash, 16)
                             .build());
                 }
+                else if (p.name.contains("Crafty")) {
+                    setClient(new CraftyClient.Builder()
+                            .setOption(Option.Minimum_Thinking_Time, 1000)
+                            .setVariant(Variant.DEFAULT) //Always set to Default for linux
+                            .setOption(Option.Hash, 16)
+                            .build());
+                }
+                else if (p.name.contains("Laser")) {
+                    setClient(new LaserClient.Builder()
+                            .setOption(Option.Minimum_Thinking_Time, 1000)
+                            .setVariant(Variant.DEFAULT) //Always set to Default for linux
+                            .setOption(Option.Hash, 16)
+                            .build());
+                }
+
             }
 
 
