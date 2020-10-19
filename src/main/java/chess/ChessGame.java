@@ -43,8 +43,8 @@ public class ChessGame {
         try {
             stockFishClient = new StockFishClient.Builder()
                                 .setOption(Option.Hash, 16)
-                                .setVariant(Variant.BMI2) // As of 10/8/2020 Modern is the fastest variant that works on Heroku
-                                .build();                   // on Local Windows BMI2 is the fastest
+                                .setVariant(Variant.MODERN)  // BMI for windows, Modern for linux
+                                .build();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -59,13 +59,13 @@ public class ChessGame {
                             .setOption(Option.Minimum_Thinking_Time, 1000) // Minimum thinking time Stockfish will take
                             .setOption(Option.Skill_Level, 20)
                             .setOption(Option.Hash, 16)
-                            .setVariant(Variant.BMI2) // As of 10/8/2020 Modern is the fastest variant that works on Heroku
-                            .build());                   // on Local Windows BMI2 is the fastest
-                }
+                            .setVariant(Variant.MODERN) // BMI for windows, Modern for linux
+                            .build());
+            }
                 else if (p.name.contains("Xiphos")) {
                     setClient(new XiphosClient.Builder()
                             .setOption(Option.Minimum_Thinking_Time, 1000)
-                            .setVariant(Variant.BMI2)
+                            .setVariant(Variant.SSE) //BMI or windows, SSE for linux
                             .setOption(Option.Hash, 16)
                             .build());
                 }

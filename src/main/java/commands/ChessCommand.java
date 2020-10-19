@@ -261,7 +261,9 @@ public class ChessCommand {
                     }
                     if (gameType.isPlayerVsComputer()) {
                         decision = COMPUTER_MOVE;
-                        belowMessage = "It's `Cornelius`'s turn";
+
+                        belowMessage = chessGame.isWhitePlayerTurn() ? "It's `" + whiteSidePlayer.name + "`'s turn" :
+                                                                       "It's `" + blackSidePlayer.name + "`'s turn" ;
                     }
                 }
                 break;
