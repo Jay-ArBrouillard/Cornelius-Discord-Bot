@@ -125,7 +125,4 @@ public class ChessGameState {
         this.playerForfeited = true;
     }
 
-    public void setStateInvalidDifficulty() {
-        this.status = ChessConstants.INVALID_DIFFICULTY;
-    }
 }

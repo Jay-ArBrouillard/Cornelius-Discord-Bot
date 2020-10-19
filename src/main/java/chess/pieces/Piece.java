@@ -91,6 +91,26 @@ public abstract class Piece {
             public boolean isRook() {
                 return false;
             }
+
+            @Override
+            public boolean isPawn() {
+                return true;
+            }
+
+            @Override
+            public boolean isBishop() {
+                return false;
+            }
+
+            @Override
+            public boolean isKnight() {
+                return false;
+            }
+
+            @Override
+            public boolean isQueen() {
+                return false;
+            }
         },
         KNIGHT(300, "N", "Knight") {
             @Override
@@ -100,6 +120,26 @@ public abstract class Piece {
 
             @Override
             public boolean isRook() {
+                return false;
+            }
+
+            @Override
+            public boolean isPawn() {
+                return false;
+            }
+
+            @Override
+            public boolean isBishop() {
+                return false;
+            }
+
+            @Override
+            public boolean isKnight() {
+                return true;
+            }
+
+            @Override
+            public boolean isQueen() {
                 return false;
             }
         },
@@ -113,6 +153,26 @@ public abstract class Piece {
             public boolean isRook() {
                 return false;
             }
+
+            @Override
+            public boolean isPawn() {
+                return false;
+            }
+
+            @Override
+            public boolean isBishop() {
+                return true;
+            }
+
+            @Override
+            public boolean isKnight() {
+                return false;
+            }
+
+            @Override
+            public boolean isQueen() {
+                return false;
+            }
         },
         ROOK(500, "R", "Rook") {
             @Override
@@ -123,6 +183,26 @@ public abstract class Piece {
             @Override
             public boolean isRook() {
                 return true;
+            }
+
+            @Override
+            public boolean isPawn() {
+                return false;
+            }
+
+            @Override
+            public boolean isBishop() {
+                return false;
+            }
+
+            @Override
+            public boolean isKnight() {
+                return false;
+            }
+
+            @Override
+            public boolean isQueen() {
+                return false;
             }
         },
         QUEEN(900, "Q", "Queen") {
@@ -135,6 +215,26 @@ public abstract class Piece {
             public boolean isRook() {
                 return false;
             }
+
+            @Override
+            public boolean isPawn() {
+                return false;
+            }
+
+            @Override
+            public boolean isBishop() {
+                return false;
+            }
+
+            @Override
+            public boolean isKnight() {
+                return false;
+            }
+
+            @Override
+            public boolean isQueen() {
+                return true;
+            }
         },
         KING(10000, "K", "King") {
             @Override
@@ -144,6 +244,26 @@ public abstract class Piece {
 
             @Override
             public boolean isRook() {
+                return false;
+            }
+
+            @Override
+            public boolean isPawn() {
+                return false;
+            }
+
+            @Override
+            public boolean isBishop() {
+                return false;
+            }
+
+            @Override
+            public boolean isKnight() {
+                return false;
+            }
+
+            @Override
+            public boolean isQueen() {
                 return false;
             }
         };
@@ -176,5 +296,9 @@ public abstract class Piece {
 
         public abstract boolean isKing();
         public abstract boolean isRook();
+        public abstract boolean isPawn();
+        public abstract boolean isBishop();
+        public abstract boolean isKnight();
+        public abstract boolean isQueen();
     }
 }

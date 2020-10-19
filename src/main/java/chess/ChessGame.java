@@ -8,9 +8,7 @@ import chess.board.Tile;
 import chess.pgn.FenUtils;
 import chess.player.MoveTransition;
 import chess.player.ai.IterativeDeepening;
-import chess.player.ai.uci.BaseAiClient;
-import chess.player.ai.uci.StockFishClient;
-import chess.player.ai.uci.XiphosClient;
+import chess.player.ai.uci.*;
 import chess.player.ai.uci.engine.enums.Option;
 import chess.player.ai.uci.engine.enums.Query;
 import chess.player.ai.uci.engine.enums.QueryType;
@@ -39,16 +37,14 @@ public class ChessGame {
         board = Board.createStandardBoard();
         messageHandler = new ChessMessageHandler();
         this.state = state;
-        setupStockFishClient();
     }
 
-    public void setupStockFishClient() {
+    public void setupStockfishClient() {
         try {
             stockFishClient = new StockFishClient.Builder()
-                    .setOption(Option.Minimum_Thinking_Time, 500) // Minimum thinking time Stockfish will take
-                    .setOption(Option.Skill_Level, 20)
-                    .setVariant(Variant.MODERN) // As of 10/8/2020 Modern is the fastest variant that works on Heroku
-                    .build();
+                                .setOption(Option.Hash, 16)
+                                .setVariant(Variant.BMI2) // As of 10/8/2020 Modern is the fastest variant that works on Heroku
+                                .build();                   // on Local Windows BMI2 is the fastest
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -60,17 +56,32 @@ public class ChessGame {
             for (ChessPlayer p : players) {
                 if (p.name.contains("Stockfish")) {
                     setClient(new StockFishClient.Builder()
-                            .setOption(Option.Minimum_Thinking_Time, 500) // Minimum thinking time Stockfish will take
+                            .setOption(Option.Minimum_Thinking_Time, 1000) // Minimum thinking time Stockfish will take
                             .setOption(Option.Skill_Level, 20)
-                            .setVariant(Variant.MODERN) // As of 10/8/2020 Modern is the fastest variant that works on Heroku
-                            .build());                   // on Local Windows BMI2 is the festest
+                            .setOption(Option.Hash, 16)
+                            .setVariant(Variant.BMI2) // As of 10/8/2020 Modern is the fastest variant that works on Heroku
+                            .build());                   // on Local Windows BMI2 is the fastest
                 }
                 else if (p.name.contains("Xiphos")) {
                     setClient(new XiphosClient.Builder()
-                            .setOption(Option.Minimum_Thinking_Time, 500) // Minimum thinking time Stockfish will take
-                            .setVariant(Variant.SSE) // As of 10/8/2020 Modern is the fastest variant that works on Heroku
-                            .setOption(Option.Hash, 32)
-                            .build());                   // on Local Windows BMI2 is the festest
+                            .setOption(Option.Minimum_Thinking_Time, 1000)
+                            .setVariant(Variant.BMI2)
+                            .setOption(Option.Hash, 16)
+                            .build());
+                }
+                else if (p.name.contains("Komodo")) {
+                    setClient(new KomodoClient.Builder()
+                            .setOption(Option.Minimum_Thinking_Time, 1000)
+                            .setVariant(Variant.DEFAULT) //Always set to Default for linux
+                            .setOption(Option.Hash, 16)
+                            .build());
+                }
+                else if (p.name.contains("SmarThink")) {
+                    setClient(new SmarThinkClient.Builder()
+                            .setOption(Option.Minimum_Thinking_Time, 1000)
+                            .setVariant(Variant.DEFAULT) //Always set to Default for linux
+                            .setOption(Option.Hash, 16)
+                            .build());
                 }
             }
 
@@ -113,46 +124,36 @@ public class ChessGame {
         return this.board.getCurrentPlayer().getAlliance().isBlack();
     }
 
-    public String setupPlayers(String message) {
-        if (message.equals("1")) {
-            board.getWhitePlayer().setIsRobot(false);
-            board.getBlackPlayer().setIsRobot(false);
+    public String setupPlayers(String message, int elo) {
+        String option = message.contains(" ") ? message.substring(0, message.indexOf(" ")) : message;
+        String opponent = message.contains(" ") ? message.substring(message.indexOf(" ")) : null;
+
+        if (!option.equals("1") && !option.equals("2") && !option.equals("3")) {
+            return new StringBuilder("`").append(message).append("` is not a valid option. Please choose an option (1-3). For 2 or 3, optional add an opponent name ex: `3 Cornelius Stockfish 20`").toString();
+        }
+
+        if (message.startsWith("1")) { // Option 1
             return GameType.PVP.toString();
         }
-        else if (message.equals("2")) {
-            board.getWhitePlayer().setIsRobot(false);
-            board.getBlackPlayer().setIsRobot(true);
-            return GameType.PVC.toString();
-        }
-        else if (message.equals("3")) {
-            board.getWhitePlayer().setIsRobot(true);
-            board.getBlackPlayer().setIsRobot(false);
-            return GameType.CVP.toString();
-        }
-        else {
-            return new StringBuilder("`").append(message).append("` is not a valid option. Please choose an option (1-3)").toString();
-        }
-    }
 
-    public ChessGameState processDifficulty(String message) {
-        messageHandler.validateComputerDifficulty(message);
-        if (messageHandler.handleErrorMessage().equals(messageHandler.ERROR)) {
-            state.setMessage(messageHandler.getLastErrorMessage());
-            state.setStateInvalidDifficulty();
-            return state;
+        ChessPlayer player = null;
+        if (opponent == null || (opponent != null && opponent.isEmpty())) { //Find a random opponent with a similar elo if possible
+            player = findUserByElo(elo); //Should never be null
+        }
+        else if (option.equals("2") || option.equals("3")){
+            player = findUserByName(opponent);
+            if (player == null) {
+                return new StringBuilder("Opponent by the name of `").append(opponent).append("` does not exist in the database. Try again and/or check the chess record spreadsheets for exact name").toString();
+            }
+            //Valid opponent
         }
 
-        state.setStatus(null);
-        try {
-            client1 = new XiphosClient.Builder()
-                    .setOption(Option.Minimum_Thinking_Time, 1000) // Minimum thinking time Stockfish will take
-                    .setVariant(Variant.SSE) // As of 10/8/2020 Modern is the fastest variant that works on Heroku
-                    .build();
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (message.startsWith("2")) { // Option 2
+            return GameType.PVC.toString() + " " + player.discordId + " " + player.name;
         }
-
-        return state;
+        else { //option 3
+            return GameType.CVP.toString() + " " + player.discordId + " " + player.name;
+        }
     }
 
     public ChessGameState processMove(String input)
@@ -294,18 +295,19 @@ public class ChessGame {
             //Update eval score
             //+position eval is good for white, -negative eval is good for black
             try {
+                state.setBoardEvaluationMessage(null);
                 String evaluationMessage = stockFishClient.submit(new Query.Builder(QueryType.EVAL).setFen(FenUtils.parseFEN(this.board)).build());
                 if (evaluationMessage != null) state.setBoardEvaluationMessage(evaluationMessage.substring(22));
             } catch (Exception e) {
                 stockFishClient = null;
-                setupStockFishClient();
+                setupStockfishClient();
                 e.printStackTrace();
             }
 
             //Should computer resign?
             if (isComputer && state.getBoardEvaluationMessage() != null) {
                 double evaluationScore = Double.parseDouble(state.getBoardEvaluationMessage().replace("(white side)", "").trim());
-                if (didWhiteJustMove() && evaluationScore <= -10.0) {
+                if (didWhiteJustMove() && evaluationScore <= -10) {
                     state.setMessage(whiteSidePlayer.name + " has RESIGNED!");
                     state.setStateComputerResign();
                     state.setWinnerId(blackSidePlayer.discordId);
@@ -313,7 +315,7 @@ public class ChessGame {
                     updateDatabaseBlackSideWin(true);
                     return state;
                 }
-                if (didBlackJustMove() && evaluationScore >= 10.0) {
+                if (didBlackJustMove() && evaluationScore >= 10) {
                     state.setMessage(blackSidePlayer.name + " has RESIGNED!");
                     state.setStateComputerResign();
                     state.setWinnerId(whiteSidePlayer.discordId);
@@ -348,6 +350,14 @@ public class ChessGame {
                 return state;
             }
         }
+    }
+
+    public synchronized ChessPlayer findUserByElo(int elo) {
+        return db.findUserClosestElo(elo);
+    }
+
+    public synchronized ChessPlayer findUserByName(String name) {
+        return db.findUserByName(name);
     }
 
     public synchronized ChessPlayer addUser(String id, String name) {
@@ -529,7 +539,7 @@ public class ChessGame {
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
-                finally {
+                finally { //If ai breaks then rely on simple ai for rest of the game
                     if (id == null) id = new IterativeDeepening(6);
                     final Move bestMove = id.execute(this.board);
                     bestMoveString = BoardUtils.getPositionAtCoordinate(bestMove.getCurrentCoordinate()) + BoardUtils.getPositionAtCoordinate(bestMove.getDestinationCoordinate());

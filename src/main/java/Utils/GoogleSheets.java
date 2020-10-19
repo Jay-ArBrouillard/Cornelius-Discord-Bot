@@ -145,12 +145,99 @@ public class GoogleSheets {
         }
     }
 
+    public static ChessPlayer findUserByName(String name) {
+        try {
+            if (service == null) getSheetsService();
+
+            ChessPlayer user;
+            //Check if player exists
+            List row = isRankedByName(name);
+            if (row != null) { // Player exists in ranked table
+                user = new ChessPlayer((String)row.get(0), (String)row.get(1), Integer.parseInt((String)row.get(2)),
+                        Boolean.valueOf((String)row.get(3)), (String)row.get(4), Integer.parseInt((String)row.get(5)),
+                        Integer.parseInt((String)row.get(6)), Integer.parseInt((String)row.get(7)),
+                        Double.parseDouble((String)row.get(8)), Integer.parseInt((String)row.get(9)), (String)row.get(10),
+                        (String)row.get(11), (String)row.get(12));
+                return user;
+            } else {
+                // Player doesn't exist. Add them as a provisional player
+                return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static ChessPlayer findUserClosestElo(int elo) {
+        try {
+            if (service == null) getSheetsService();
+
+            ValueRange response = service.spreadsheets().values().get(SPREAD_SHEET_ID, RANKED_TAB).execute();
+
+            List closest = null;
+            int closestDiff = Integer.MAX_VALUE;
+            Random rand = new Random();
+            boolean isFirstRow = true;
+            for (List row : response.getValues()) {
+                if (isFirstRow) {
+                    isFirstRow = false;
+                    continue;
+                };
+                int currElo = Integer.parseInt((String)row.get(2));
+                int currDiff = Math.abs(elo - currElo);
+                if (currDiff < closestDiff) {
+                    closest = row;
+                    closestDiff = currDiff;
+                }
+                else if (currDiff == closestDiff && rand.nextBoolean()) { //If multiple opponents of same elo then randomly select them
+                    closest = row;
+                    closestDiff = currDiff;
+                }
+            }
+
+            return new ChessPlayer((String)closest.get(0), (String)closest.get(1), Integer.parseInt((String)closest.get(2)),
+                    Boolean.valueOf((String)closest.get(3)), (String)closest.get(4), Integer.parseInt((String)closest.get(5)),
+                    Integer.parseInt((String)closest.get(6)), Integer.parseInt((String)closest.get(7)),
+                    Double.parseDouble((String)closest.get(8)), Integer.parseInt((String)closest.get(9)), (String)closest.get(10),
+                    (String)closest.get(11), (String)closest.get(12));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Find player in ranked tab by id
+     * @param id
+     * @return
+     * @throws IOException
+     */
     private static List isRanked(String id) throws IOException {
         ValueRange response = service.spreadsheets().values().get(SPREAD_SHEET_ID, RANKED_TAB).execute();
         rowNumber = 1;
         totalRows = response.getValues().size();
         for (List row : response.getValues()) {
             if (row.get(0).equals(id)) {
+                return row;
+            }
+            rowNumber++;
+        }
+        return null;
+    }
+
+    /**
+     * Find player in ranked tab by name
+     * @param name
+     * @return
+     * @throws IOException
+     */
+    private static List isRankedByName(String name) throws IOException {
+        ValueRange response = service.spreadsheets().values().get(SPREAD_SHEET_ID, RANKED_TAB).execute();
+        rowNumber = 1;
+        totalRows = response.getValues().size();
+        for (List row : response.getValues()) {
+            if (row.get(1).equals(name)) {
                 return row;
             }
             rowNumber++;

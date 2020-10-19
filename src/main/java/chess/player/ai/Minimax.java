@@ -76,7 +76,7 @@ public class Minimax implements MoveStrategy {
     
     public int min(final Board board, final int depth) {
         if (depth == 0 || isEndGameScenario(board)) {
-            return this.boardEvaluator.evaluate(board, depth);
+            return this.boardEvaluator.evaluate(board);
         }
         
         int lowestValueSeen = Integer.MAX_VALUE;
@@ -95,7 +95,7 @@ public class Minimax implements MoveStrategy {
     
     public int max(final Board board, final int depth) {
         if (depth == 0 || isEndGameScenario(board)) {
-            return this.boardEvaluator.evaluate(board, depth);
+            return this.boardEvaluator.evaluate(board);
         }
 
         int highestSeenValue = Integer.MIN_VALUE;

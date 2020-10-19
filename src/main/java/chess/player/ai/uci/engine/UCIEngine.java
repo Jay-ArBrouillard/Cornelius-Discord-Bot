@@ -83,6 +83,7 @@ abstract class UCIEngine {
         else
             switch (variant) {
                 case DEFAULT:
+                    //Add none
                     break;
                 case BMI2:
                     path.append("_bmi2");

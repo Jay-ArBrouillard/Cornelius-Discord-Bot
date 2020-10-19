@@ -17,37 +17,36 @@ public class StandardBoardEvaluator implements BoardEvaluator {
     private final static int TWO_BISHOPS_BONUS = 25;
 
     @Override
-    public int evaluate(final Board board,
-                        final int depth) {
-        return score(board.getWhitePlayer(), depth) - score(board.getBlackPlayer(), depth);
+    public int evaluate(final Board board) {
+        return score(board.getWhitePlayer()) - score(board.getBlackPlayer());
     }
 
     public String evaluationDetails(final Board board, final int depth) {
         return
                 ("White Mobility : " + mobility(board.getWhitePlayer()) + "\n") +
-                        "White kingThreats : " + kingThreats(board.getWhitePlayer(), depth) + "\n" +
+                        "White kingThreats : " + kingThreats(board.getWhitePlayer()) + "\n" +
                         "White attacks : " + attacks(board.getWhitePlayer()) + "\n" +
                         "White castle : " + castle(board.getWhitePlayer()) + "\n" +
                         "White pieceEval : " + pieceEvaluations(board.getWhitePlayer()) + "\n" +
                         "White pawnStructure : " + pawnStructure(board.getWhitePlayer()) + "\n" +
                         "---------------------\n" +
                         "Black Mobility : " + mobility(board.getBlackPlayer()) + "\n" +
-                        "Black kingThreats : " + kingThreats(board.getBlackPlayer(), depth) + "\n" +
+                        "Black kingThreats : " + kingThreats(board.getBlackPlayer()) + "\n" +
                         "Black attacks : " + attacks(board.getBlackPlayer()) + "\n" +
                         "Black castle : " + castle(board.getBlackPlayer()) + "\n" +
                         "Black pieceEval : " + pieceEvaluations(board.getBlackPlayer()) + "\n" +
                         "Black pawnStructure : " + pawnStructure(board.getBlackPlayer()) + "\n\n" +
-                        "Final Score = " + evaluate(board, depth);
+                        "Final Score = " + evaluate(board);
     }
 
-    private static int score(final Player player,
-                             final int depth) {
+    private static int score(final Player player) {
         return mobility(player) +
-                kingThreats(player, depth) +
+                kingThreats(player) +
                 attacks(player) +
                 castle(player) +
                 pieceEvaluations(player) +
-                pawnStructure(player);
+                pawnStructure(player) +
+                kingSafety(player);
     }
 
     private static int attacks(final Player player) {
@@ -84,9 +83,8 @@ public class StandardBoardEvaluator implements BoardEvaluator {
         return (int)((player.getLegalMoves().size() * 10.0f) / player.getOpponent().getLegalMoves().size());
     }
 
-    private static int kingThreats(final Player player,
-                                   final int depth) {
-        return player.getOpponent().isInCheckMate() ? CHECK_MATE_BONUS  * depthBonus(depth) : check(player);
+    private static int kingThreats(final Player player) {
+        return player.getOpponent().isInCheckMate() ? CHECK_MATE_BONUS : check(player);
     }
 
     private static int check(final Player player) {

@@ -26,7 +26,6 @@ public class ChessCommand {
         CHALLENGE_OPPONENT,
         OPPONENT_ACCEPT_DECLINE,
         DATABASE_SAVING,
-        SET_COMPUTER_DIFFICULTY
     }
 
     private static ChessGame chessGame; //Contains business logic - Model
@@ -82,10 +81,51 @@ public class ChessCommand {
             return;
         }
 
-        //TODO fix this method
+        if (message.startsWith("!chess") && message.contains("addAll")) {
+            event.getChannel().sendMessage("Adding all AI's to Chess Records...").queue();
+
+            String[][] players = {
+                    {"693282099167494225ST", "Cornelius SmarThink"},
+                    {"693282099167494225X06", "Cornelius Xiphos 0.6"},
+                    {"693282099167494225K11", "Cornelius Komodo 11"},
+                    {"693282099167494225SF"+"0", "Cornelius Stockfish 0"},
+                    {"693282099167494225SF"+"1", "Cornelius Stockfish 1"},
+                    {"693282099167494225SF"+"2", "Cornelius Stockfish 2"},
+                    {"693282099167494225SF"+"3", "Cornelius Stockfish 3"},
+                    {"693282099167494225SF"+"4", "Cornelius Stockfish 4"},
+                    {"693282099167494225SF"+"5", "Cornelius Stockfish 5"},
+                    {"693282099167494225SF"+"6", "Cornelius Stockfish 6"},
+                    {"693282099167494225SF"+"7", "Cornelius Stockfish 7"},
+                    {"693282099167494225SF"+"8", "Cornelius Stockfish 8"},
+                    {"693282099167494225SF"+"9", "Cornelius Stockfish 9"},
+                    {"693282099167494225SF"+"10", "Cornelius Stockfish 10"},
+                    {"693282099167494225SF"+"11", "Cornelius Stockfish 11"},
+                    {"693282099167494225SF"+"12", "Cornelius Stockfish 12"},
+                    {"693282099167494225SF"+"13", "Cornelius Stockfish 13"},
+                    {"693282099167494225SF"+"14", "Cornelius Stockfish 14"},
+                    {"693282099167494225SF"+"15", "Cornelius Stockfish 15"},
+                    {"693282099167494225SF"+"16", "Cornelius Stockfish 16"},
+                    {"693282099167494225SF"+"17", "Cornelius Stockfish 17"},
+                    {"693282099167494225SF"+"18", "Cornelius Stockfish 18"},
+                    {"693282099167494225SF"+"19", "Cornelius Stockfish 19"},
+                    {"693282099167494225SF"+"20", "Cornelius Stockfish 20"}};
+
+            chessGame = new ChessGame(null);
+            for (int i = 0; i < players.length; i++) {
+                chessGame.addUser(players[i][0], players[i][1]);
+            }
+
+            event.getChannel().sendMessage("Completed").queue();
+            endGame(event.getChannel());
+            return;
+        }
+
         if (message.startsWith("!chess") && message.contains("train")) {
 
-            String[][] players = { {"693282099167494225X06", "Cornelius Xiphos 0.6"},
+            String[][] players = {
+                    {"693282099167494225ST", "Cornelius SmarThink"},
+                    {"693282099167494225X06", "Cornelius Xiphos 0.6"},
+                    {"693282099167494225K11", "Cornelius Komodo 11"},
                     {"693282099167494225SF"+"0", "Cornelius Stockfish 0"},
                     {"693282099167494225SF"+"1", "Cornelius Stockfish 1"},
                     {"693282099167494225SF"+"2", "Cornelius Stockfish 2"},
@@ -120,6 +160,7 @@ public class ChessCommand {
                     blackSidePlayer = chessGame.addUser(players[j][0], players[j][1]);
                     chessGame.setBlackSidePlayer(blackSidePlayer);
                     chessGame.setWhiteSidePlayer(whiteSidePlayer);
+                    chessGame.setupStockfishClient();
                     chessGame.setupComputerClient();
                     state.getPrevElo().put(whiteSidePlayer.discordId, whiteSidePlayer.elo);
                     state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
@@ -140,9 +181,9 @@ public class ChessCommand {
 
                         if (CHECKMATE.equals(status) || DRAW.equals(status) || COMPUTER_RESIGN.equals(status)) {
                             try {
+                                chessGame.stockFishClient.close();
                                 chessGame.client1.close();
                                 chessGame.client2.close();
-                                chessGame.stockFishClient.close();
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -242,65 +283,54 @@ public class ChessCommand {
                 }
                 break;
             case SETUP:
-                reply = "New `Chess` game started. Please choose from player options `(1-3)`:\n1. Player (WHITE) vs. Player (BLACK)\n2. Player vs. Computer\n3. Computer vs. Player";
+                reply = "`Chess` Initialized. Please choose from player options `(1-3)`:\n1. Player (WHITE) vs. Player (BLACK)\n2. Player vs. Computer\n3. Computer vs. Player\n\n" +
+                        "When playing against the computer you can select your computer opponent by adding their name after the option for example `2 Cornelius Xiphos 0.6`\n" +
+                        "Otherwise a computer about the same elo as you will be chosen at random.";
                 decision = Decision.SETUP_RESPONSE;
                 break;
             case SETUP_RESPONSE:
-                reply = chessGame.setupPlayers(message);
-                if (reply.equals(GameType.PVP.toString())) {
+                ChessPlayer humanPlayer = chessGame.addUser(event.getAuthor().getId(), event.getAuthor().getName());
+                reply = chessGame.setupPlayers(message, humanPlayer.elo);
+                if (reply.startsWith(GameType.PVP.toString())) {
                     reply = "`Player vs Player Chess Game`\nPlease challenge another player by entering their `userId` (Click on user and Copy ID)";
-                    whiteSidePlayer = chessGame.addUser(event.getAuthor().getId(), event.getAuthor().getName());
+                    whiteSidePlayer = humanPlayer;
                     chessGame.setWhiteSidePlayer(whiteSidePlayer);
                     state.getPrevElo().put(whiteSidePlayer.discordId, whiteSidePlayer.elo);
                     decision = Decision.CHALLENGE_OPPONENT;
                     gameType = GameType.PVP;
                     chessGame.setupComputerClient();
                 }
-                else if (reply.equals(GameType.PVC.toString())) {
-                    whiteSidePlayer = chessGame.addUser(event.getAuthor().getId(), event.getAuthor().getName());
+                else if (reply.startsWith(GameType.PVC.toString())) {
+                    boardImageFile = new File(GAME_BOARD_IMAGE_LOCATION);
+                    //Set up white side
+                    whiteSidePlayer = humanPlayer;
                     chessGame.setWhiteSidePlayer(whiteSidePlayer);
                     state.getPrevElo().put(whiteSidePlayer.discordId, whiteSidePlayer.elo);
+                    //Set up black side
+                    String [] gameidName = reply.split("\\s++");
+                    blackSidePlayer = chessGame.addUser(gameidName[1], gameidName[2]);  //Note: Difficulty value is appended to id and name
+                    state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
+                    chessGame.setBlackSidePlayer(blackSidePlayer);
+                    reply = "`Starting Chess Game " + whiteSidePlayer.name + " (" + whiteSidePlayer.elo + ")" + " vs. " + blackSidePlayer.name + " (" + blackSidePlayer.elo + ")`\nMake a move (ex: `c2 c4`)";
                     gameType = GameType.PVC;
-                    reply = "Set a difficulty level for Cornelius (0 - 20)";
-                    decision = Decision.SET_COMPUTER_DIFFICULTY;
+                    decision = PLAYER_MOVE;
+                    state.setMatchStartTime(Instant.now().toEpochMilli());
                 }
-                else if (reply.equals(GameType.CVP.toString())) {
-                    blackSidePlayer = chessGame.addUser(event.getAuthor().getId(), event.getAuthor().getName());
+                else if (reply.startsWith(GameType.CVP.toString())) {
+                    boardImageFile = new File(GAME_BOARD_IMAGE_LOCATION);
+                    //Set up white side
+                    String [] gameidName = reply.split("\\s++");
+                    whiteSidePlayer = chessGame.addUser(gameidName[1], gameidName[2]);   //Note: Difficulty value is appended to id and name
+                    chessGame.setWhiteSidePlayer(whiteSidePlayer);
+                    state.getPrevElo().put(whiteSidePlayer.discordId, whiteSidePlayer.elo);
+                    //Set up black side
+                    blackSidePlayer = humanPlayer;
                     chessGame.setBlackSidePlayer(blackSidePlayer);
                     state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
+                    reply = "`Starting Chess Game " + whiteSidePlayer.name + " (" + whiteSidePlayer.elo + ")" + " vs. " + blackSidePlayer.name + " (" + blackSidePlayer.elo + ")`\n" + whiteSidePlayer.name + " will go first...";
                     gameType = GameType.CVP;
-                    reply = "Set a difficulty level Cornelius (0 - 20)";
-                    decision = Decision.SET_COMPUTER_DIFFICULTY;
-                }
-                else {
-                    reply = "Please choose from player options `(1-3)`:";
-                }
-                break;
-            case SET_COMPUTER_DIFFICULTY:
-                state = chessGame.processDifficulty(message);
-                if (INVALID_DIFFICULTY.equals(state.getStatus())) {
-                    reply = state.getMessage();
-                }
-                else {
-                    if (GameType.PVC.toString().equals(gameType.name())) {
-                        boardImageFile = new File(GAME_BOARD_IMAGE_LOCATION);
-                        blackSidePlayer = chessGame.addUser("693282099167494225SF"+message.trim(), "Cornelius Stockfish "+message.trim());  //Note: Difficulty value is appended to id and name
-                        state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
-                        chessGame.setBlackSidePlayer(blackSidePlayer);
-                        decision = Decision.PLAYER_MOVE;
-                        state.setMatchStartTime(Instant.now().toEpochMilli());
-                        reply = "`Starting " + whiteSidePlayer.name + " (" + whiteSidePlayer.elo + ")" + " vs. Cornelius Stockfish " + message.trim() + " (" + blackSidePlayer.elo + ") Chess Game`\nMake a move (ex: `c2 c4`)";
-
-                    }
-                    else if (GameType.CVP.toString().equals(gameType.name())) {
-                        boardImageFile = new File(GAME_BOARD_IMAGE_LOCATION);
-                        whiteSidePlayer = chessGame.addUser("693282099167494225SF"+message.trim(), "Cornelius Stockfish "+message.trim());  //Note: Difficulty value is appended to id and name
-                        chessGame.setWhiteSidePlayer(whiteSidePlayer);
-                        state.getPrevElo().put(whiteSidePlayer.discordId, whiteSidePlayer.elo);
-                        decision = COMPUTER_MOVE;
-                        state.setMatchStartTime(Instant.now().toEpochMilli());
-                        reply = "`Starting Cornelius Stockfish " + message.trim() + " (" + whiteSidePlayer.elo + ")" + " vs. " + blackSidePlayer.name + " (" + blackSidePlayer.elo + ") Chess Game`\nCornelius will go first...";
-                    }
+                    decision = COMPUTER_MOVE;
+                    state.setMatchStartTime(Instant.now().toEpochMilli());
                 }
                 break;
             case CHALLENGE_OPPONENT:

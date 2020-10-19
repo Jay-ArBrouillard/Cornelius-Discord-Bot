@@ -78,14 +78,6 @@ public abstract class Player {
         return this.isInCheck;
     }
 
-    public boolean isRobot() {
-        return isRobot;
-    }
-
-    public void setIsRobot(boolean isRobot) {
-        this.isRobot = isRobot;
-    }
-
     public boolean isInCheckMate() {
         return this.isInCheck && !hasEscapeMoves();
     }

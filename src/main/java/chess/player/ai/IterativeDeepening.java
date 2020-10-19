@@ -147,7 +147,7 @@ public class IterativeDeepening implements MoveStrategy {
                    final int lowest) {
         if (depth == 0 || BoardUtils.isEndGame(board)) {
             this.boardsEvaluated++;
-            return this.evaluator.evaluate(board, depth);
+            return this.evaluator.evaluate(board);
         }
         int currentHighest = highest;
         for (final Move move : MoveSorter.STANDARD.sort((board.getCurrentPlayer().getLegalMoves()))) {
@@ -170,7 +170,7 @@ public class IterativeDeepening implements MoveStrategy {
                    final int lowest) {
         if (depth == 0 || BoardUtils.isEndGame(board)) {
             this.boardsEvaluated++;
-            return this.evaluator.evaluate(board, depth);
+            return this.evaluator.evaluate(board);
         }
         int currentLowest = lowest;
         for (final Move move : MoveSorter.STANDARD.sort((board.getCurrentPlayer().getLegalMoves()))) {
