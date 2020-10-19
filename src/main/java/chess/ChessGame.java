@@ -604,23 +604,28 @@ public class ChessGame {
     }
 
     public ChessGameState ai(MessageChannel mc) {
-        int randomThinkTime = ThreadLocalRandom.current().nextInt(5000, 10000 + 1); //Between 5-10 seconds
+        int randomThinkTime = 1000;//ThreadLocalRandom.current().nextInt(5000, 10000 + 1); //Between 5-10 seconds
         String bestMoveString = null;
         do {
+            System.out.println(randomThinkTime);
             try {
                 System.out.println(client1);
                 System.out.println(client2);
                 System.out.println("Current player: " + this.board.getCurrentPlayer().getAlliance().toString());
 
                 if (isWhitePlayerTurn()) {
+                    System.out.println("White player is choosing their move");
                     bestMoveString = client1.submit(new Query.Builder(QueryType.Best_Move)
                             .setMovetime(randomThinkTime)
                             .setFen(FenUtils.parseFEN(this.board)).build());
+                    System.out.println("White players best move is: " + bestMoveString);
                 }
                 else if (isBlackPlayerTurn()) {
+                    System.out.println("Black player is choosing their move");
                     bestMoveString = client2.submit(new Query.Builder(QueryType.Best_Move)
                             .setMovetime(randomThinkTime)
                             .setFen(FenUtils.parseFEN(this.board)).build());
+                    System.out.println("Black players best move is: " + bestMoveString);
                 }
             } catch (Exception e) {
                 try {
