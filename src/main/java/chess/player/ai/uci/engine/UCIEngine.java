@@ -20,7 +20,7 @@ abstract class UCIEngine {
             for (Option option : options)
                 passOption(option);
         } catch (IOException e) {
-            throw new IOException("Unable to start and bind Stockfish process: ", e);
+            throw new IOException("Unable to start and bind process: ", e);
         }
     }
 
@@ -34,6 +34,7 @@ abstract class UCIEngine {
     }
 
     void sendCommand(String command) throws IOException {
+        System.out.println(command); //To remove
         output.write(command + "\n");
         output.flush();
     }
@@ -42,6 +43,7 @@ abstract class UCIEngine {
         String line;
 
         while ((line = input.readLine()) != null) {
+            System.out.println(line); //To remove
             if (line.startsWith(expected))
                 return line;
         }
@@ -54,6 +56,7 @@ abstract class UCIEngine {
         String line;
 
         while ((line = input.readLine()) != null) {
+            System.out.println(line); //To remove
             lines.add(line);
 
             if (line.startsWith(expected))
