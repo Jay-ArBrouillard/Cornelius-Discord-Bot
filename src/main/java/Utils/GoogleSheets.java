@@ -234,10 +234,10 @@ public class GoogleSheets {
      */
     private static List isRankedByName(String name) throws IOException {
         ValueRange response = service.spreadsheets().values().get(SPREAD_SHEET_ID, RANKED_TAB).execute();
-        rowNumber = 1;
+        rowNumber = 0;
         totalRows = response.getValues().size();
         for (List row : response.getValues()) {
-            if (row.get(0).equals(name)) {
+            if (row.get(1).equals(name)) {
                 return row;
             }
             rowNumber++;
