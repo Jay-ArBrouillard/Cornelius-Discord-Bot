@@ -121,6 +121,9 @@ public class ChessGame {
         else if (client2 == null) {
             client2 = client;
         }
+
+        System.out.println(client1);
+        System.out.println(client2);
     }
 
     public void setWhiteSidePlayer(ChessPlayer whiteSidePlayer) {
@@ -539,10 +542,6 @@ public class ChessGame {
         String bestMoveString = null;
         do {
             try {
-                System.out.println(client1);
-                System.out.println(client2);
-                System.out.println("Current player: " + this.board.getCurrentPlayer().getAlliance().toString());
-
                 if (isWhitePlayerTurn()) {
                     bestMoveString = client1.submit(new Query.Builder(QueryType.Best_Move)
                             .setMovetime(thinkTime)
@@ -595,6 +594,10 @@ public class ChessGame {
         String bestMoveString = null;
         do {
             try {
+                System.out.println(client1);
+                System.out.println(client2);
+                System.out.println("Current player: " + this.board.getCurrentPlayer().getAlliance().toString());
+
                 if (isWhitePlayerTurn()) {
                     bestMoveString = client1.submit(new Query.Builder(QueryType.Best_Move)
                             .setMovetime(randomThinkTime)

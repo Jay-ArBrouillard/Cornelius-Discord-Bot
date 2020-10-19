@@ -35,6 +35,11 @@ public class SmarThinkClient extends BaseAiClient{
         engine.close();
     }
 
+    @Override
+    public String toString() {
+        return "SmarThinkClient";
+    }
+
     public static class Builder {
         private Set<Option> options = new HashSet<>();
         private Variant variant = Variant.DEFAULT;
