@@ -131,8 +131,8 @@ public class ChessGame {
                             .setOption(Option.Hash, 16)
                             .build(), p);
                 }
-                else if (p.name.contains("Drofa")) {
-                    setClient(new DrofaClient.Builder()
+                else if (p.name.contains("Pigeon")) {
+                    setClient(new PigeonClient.Builder()
                             .setOption(Option.Hash, 16)
                             .build(), p);
                 }
@@ -626,6 +626,7 @@ public class ChessGame {
         do {
             System.out.println(randomThinkTime);
             try {
+                System.out.println("client1 is using " + client1 + ", client 2 is using " + client2);
                 System.out.println("Current player: " + this.board.getCurrentPlayer().getAlliance().toString());
 
                 if (isWhitePlayerTurn()) {
