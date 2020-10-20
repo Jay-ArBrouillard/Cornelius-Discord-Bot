@@ -13,11 +13,11 @@ public class ChessPlayer {
     public int draws;
     public double ratio;
     public int totalGames;
-    public String avgGameLength;
+    public String totalGameTimeStr;
     public final String createdOn;
     public String updatedOn;
 
-    public ChessPlayer(String discordId, String name, int elo, boolean provisional, String title, int wins, int losses, int draws, double ratio, int totalGames, String avgGameLength, String createdOn, String updatedOn) {
+    public ChessPlayer(String discordId, String name, int elo, boolean provisional, String title, int wins, int losses, int draws, double ratio, int totalGames, String totalGameTimeStr, String createdOn, String updatedOn) {
         this.discordId = discordId;
         this.name = name;
         this.elo = elo;
@@ -28,7 +28,7 @@ public class ChessPlayer {
         this.draws = draws;
         this.ratio = ratio;
         this.totalGames = totalGames;
-        this.avgGameLength = avgGameLength;
+        this.totalGameTimeStr = totalGameTimeStr;
         this.createdOn = createdOn;
         this.updatedOn = updatedOn;
     }

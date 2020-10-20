@@ -270,7 +270,7 @@ public class GoogleSheets {
             values.add(user.draws);
             values.add(formatPercent.format(user.ratio));
             values.add(user.totalGames);
-            values.add(user.avgGameLength);
+            values.add(user.totalGameTimeStr);
             values.add(user.createdOn);
             values.add(getDate(Instant.now().toEpochMilli()));
 
@@ -299,81 +299,18 @@ public class GoogleSheets {
         }
     }
 
-    public static boolean updateAvgGameLength(String id) {
-        try {
-            if (service == null) getSheetsService();
-            long days = 0;
-            long hours = 0;
-            long minutes = 0;
-            long seconds = 0;
-            int totalMatches = 0;
-            ValueRange response = service.spreadsheets().values()
-                    .get(SPREAD_SHEET_ID, MATCHES_TAB)
-                    .execute();
-            List<List<Object>> allMatches = response.getValues();
-            if (allMatches != null || !allMatches.isEmpty()) {
-                for (List row : allMatches) {
-                    if (row.get(1).equals(id) || row.get(5).equals(id)) {
-                        String[] split = ((String) row.get(13)).split("\\s+"); //Example: 0 days 0 hours 0 minutes 7 seconds
-                        days += Integer.parseInt(split[0].trim());
-                        hours += Integer.parseInt(split[2].trim());
-                        minutes += Integer.parseInt(split[4].trim());
-                        seconds +=  Integer.parseInt(split[6].trim());
-                        totalMatches++;
-                    }
-                }
-            }
-
-            //Process values
-            if (totalMatches == 0) totalMatches = 1;
-            long totalTimeSeconds = Math.round((TimeUnit.DAYS.toSeconds(days) + TimeUnit.HOURS.toSeconds(hours) +
-                                    TimeUnit.MINUTES.toSeconds(minutes) + seconds) / totalMatches);
-
-            days = TimeUnit.SECONDS.toDays(totalTimeSeconds);
-            hours = TimeUnit.SECONDS.toHours(totalTimeSeconds) - (days *24);
-            minutes = TimeUnit.SECONDS.toMinutes(totalTimeSeconds) - (TimeUnit.SECONDS.toHours(totalTimeSeconds)* 60);
-            seconds = TimeUnit.SECONDS.toSeconds(totalTimeSeconds) - (TimeUnit.SECONDS.toMinutes(totalTimeSeconds) *60);
-
-            response = service.spreadsheets().values()
-                    .get(SPREAD_SHEET_ID, RANKED_TAB)
-                    .execute();
-            List<List<Object>> allPlayers = response.getValues();
-            if (allPlayers != null || !allPlayers.isEmpty()) {
-                int rowNumber = 1;
-                for (List row : allPlayers) {
-                    if (row.get(0).equals(id)) {
-                        String matchLength = "" + days + " days " + hours + " hours " + minutes + " minutes " + seconds + " seconds";
-                        ValueRange body = new ValueRange().setValues(Arrays.asList(Arrays.asList(matchLength)));
-
-                        service.spreadsheets().values()
-                                .update(SPREAD_SHEET_ID, RANKED_TAB+"!K"+rowNumber, body)
-                                .setValueInputOption("RAW")
-                                .execute();
-                        return true;
-                    }
-                    rowNumber++;
-                }
-            }
-
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
     public static boolean addMatch(ChessPlayer whiteSidePlayer, ChessPlayer blackSidePlayer, ChessGameState state) {
         try {
             if (service == null) getSheetsService();
 
             Long millis = Instant.now().toEpochMilli();
             Long seconds = (millis - state.getMatchStartTime()) / 1000;
-            int day = (int) TimeUnit.SECONDS.toDays(seconds);
-            long hours = TimeUnit.SECONDS.toHours(seconds) - (day *24);
-            long minute = TimeUnit.SECONDS.toMinutes(seconds) - (TimeUnit.SECONDS.toHours(seconds)* 60);
-            long second = TimeUnit.SECONDS.toSeconds(seconds) - (TimeUnit.SECONDS.toMinutes(seconds) *60);
+            long days = TimeUnit.SECONDS.toDays(seconds);
+            long hours = TimeUnit.SECONDS.toHours(seconds) - (days *24);
+            long mins = TimeUnit.SECONDS.toMinutes(seconds) - (TimeUnit.SECONDS.toHours(seconds)* 60);
+            long secs = TimeUnit.SECONDS.toSeconds(seconds) - (TimeUnit.SECONDS.toMinutes(seconds) *60);
 
-            String matchLength = "" + day + " days " + hours + " hours " + minute + " minutes " + second + " seconds";
+            String matchLength = "" + days + " days " + hours + " hours " + mins + " minutes " + secs + " seconds";
             double whiteSidePrevElo = (double) state.getPrevElo().get(whiteSidePlayer.discordId);
             double blackSidePrevElo = (double) state.getPrevElo().get(blackSidePlayer.discordId);
             double p1Odds = EloRanking.calculateProbabilityOfWin((int)whiteSidePrevElo, (int)blackSidePrevElo);
@@ -423,11 +360,46 @@ public class GoogleSheets {
             request.setSortRange(sortRangeRequest);
             busReq.setRequests(Arrays.asList(request));
             service.spreadsheets().batchUpdate(SPREAD_SHEET_ID, busReq).execute();
+
+            //Update total game time
+            updateTotalGameTime(whiteSidePlayer, days, hours, mins, secs);
+            updateTotalGameTime(blackSidePlayer, days, hours, mins, secs);
+
             return true;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public static boolean updateTotalGameTime(ChessPlayer p, long days, long hours, long mins, long secs) throws IOException {
+        String timePlayedSoFar = p.totalGameTimeStr;
+        String[] split = timePlayedSoFar.split("\\s+"); //Example: 0 days 0 hours 0 minutes 7 seconds
+        days += Integer.parseInt(split[0].trim());
+        hours += Integer.parseInt(split[2].trim());
+        mins += Integer.parseInt(split[4].trim());
+        secs +=  Integer.parseInt(split[6].trim());
+
+        if (isRanked(p.discordId) != null) {
+            return false;
+        }
+
+        long totalTimeSeconds = Math.round((TimeUnit.DAYS.toSeconds(days) + TimeUnit.HOURS.toSeconds(hours) +
+                TimeUnit.MINUTES.toSeconds(mins) + secs) / p.totalGames);
+
+        days = TimeUnit.SECONDS.toDays(totalTimeSeconds);
+        hours = TimeUnit.SECONDS.toHours(totalTimeSeconds) - (days *24);
+        mins = TimeUnit.SECONDS.toMinutes(totalTimeSeconds) - (TimeUnit.SECONDS.toHours(totalTimeSeconds)* 60);
+        secs = TimeUnit.SECONDS.toSeconds(totalTimeSeconds) - (TimeUnit.SECONDS.toMinutes(totalTimeSeconds) *60);
+
+        String matchLength = "" + days + " days " + hours + " hours " + mins + " minutes " + secs + " seconds";
+        ValueRange body = new ValueRange().setValues(Arrays.asList(Arrays.asList(matchLength)));
+
+        service.spreadsheets().values()
+                .update(SPREAD_SHEET_ID, RANKED_TAB+"!K"+rowNumber, body)
+                .setValueInputOption("RAW")
+                .execute();
+        return true;
     }
 
     private static String generateEloDiffString(double startingElo, double newElo) {

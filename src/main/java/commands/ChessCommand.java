@@ -166,7 +166,7 @@ public class ChessCommand {
                     {"69328209916749422520", "Cornelius v20"}};
 
             //Randomize list
-            /*Random random = new Random();
+            Random random = new Random();
             for (int i = players.length - 1; i > 0; i--) {
                 for (int j = players[i].length - 1; j > 0; j--) {
                     int m = random.nextInt(i + 1);
@@ -176,7 +176,7 @@ public class ChessCommand {
                     players[i][j] = players[m][n];
                     players[m][n] = temp;
                 }
-            }*/
+            }
 
             int gamesCompleted = 0;
             int totalGames = players.length * players.length;
@@ -231,10 +231,11 @@ public class ChessCommand {
 
                         if (CHECKMATE.equals(status) || DRAW.equals(status) || COMPUTER_RESIGN.equals(status)) {
                             try {
-                                chessGame.stockFishClient.close();
-                                chessGame.client1.close();
-                                chessGame.client2.close();
-                            } catch (IOException e) {
+                                if (chessGame.stockFishClient != null) chessGame.stockFishClient.close();
+                                if (chessGame.client1 != null) chessGame.client1.close();
+                                if (chessGame.client2 != null) chessGame.client2.close();
+                                Thread.sleep(5000); //Wait to ensure clients are closed
+                            } catch (Exception e) {
                                 e.printStackTrace();
                             }
                             chessGame.id = null;

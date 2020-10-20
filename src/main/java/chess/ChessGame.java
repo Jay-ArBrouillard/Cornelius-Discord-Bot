@@ -79,7 +79,7 @@ public class ChessGame {
     }
 
     private void setClient(ChessPlayer p) throws IOException {
-        if (p.name.contains("Stockfish")) {
+        if (p.name.contains("Cornelius")) { //Cornelius will default to use stockfish client
             setClient(new StockFishClient.Builder()
                     .setOption(Option.Minimum_Thinking_Time, 500) // Minimum thinking time Stockfish will take
                     .setOption(Option.Skill_Level, 20)
@@ -438,9 +438,6 @@ public class ChessGame {
         db.updateUser(blackSidePlayer);
 
         db.addMatch(whiteSidePlayer, blackSidePlayer, state);
-
-        db.updateAvgGameLength(whiteSidePlayer.discordId);
-        db.updateAvgGameLength(blackSidePlayer.discordId);
     }
 
     public synchronized void updateDatabaseWhiteSideWin() {
@@ -461,9 +458,6 @@ public class ChessGame {
             db.updateUser(blackSidePlayer);
 
             db.addMatch(whiteSidePlayer, blackSidePlayer, state);
-
-            db.updateAvgGameLength(whiteSidePlayer.discordId);
-            db.updateAvgGameLength(blackSidePlayer.discordId);
         }
         else {
             state.setStateDraw();
@@ -490,9 +484,6 @@ public class ChessGame {
             db.updateUser(blackSidePlayer);
 
             db.addMatch(whiteSidePlayer, blackSidePlayer, state);
-
-            db.updateAvgGameLength(whiteSidePlayer.discordId);
-            db.updateAvgGameLength(blackSidePlayer.discordId);
         }
         else {
             state.setStateDraw();
