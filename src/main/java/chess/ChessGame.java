@@ -111,7 +111,7 @@ public class ChessGame {
                 }
                 else if (p.name.contains("Wyld")) {
                     setClient(new WyldClient.Builder()
-                            .setVariant(Variant.POPCNT)
+                            .setVariant(Variant.DEFAULT)
                             .setOption(Option.Hash, 16)
                             .build(), p);
                 }

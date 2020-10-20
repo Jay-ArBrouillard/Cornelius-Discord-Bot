@@ -43,7 +43,7 @@ public class WyldClient extends BaseAiClient{
     public static class Builder {
         private Set<Option> options = new HashSet<>();
         private Variant variant = Variant.DEFAULT;
-        private String path = "bin/wyldchess_1_51_linux";
+        private String path = "bin/wyld_1_51_linux";
 
         public final WyldClient.Builder setVariant(Variant v) {
             variant = v;
