@@ -102,6 +102,12 @@ public class ChessGame {
                             .setOption(Option.Hash, 16)
                             .build(), p);
                 }
+                else if (p.name.contains("Chenglite")) {
+                    setClient(new ChengliteClient.Builder()
+                            .setVariant(Variant.DEFAULT) //Always set to Default for linux
+                            .setOption(Option.Hash, 16)
+                            .build(), p);
+                }
             }
 
 
