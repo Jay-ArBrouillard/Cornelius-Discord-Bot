@@ -27,9 +27,6 @@ public class ChengliteClient extends BaseAiClient{
                 output = null;
                 break;
         }
-
-        output.replaceAll("bestmove", "");
-        output = output.trim();
         System.out.println("chenglite bestmove:"+output);
 
         return output;

@@ -27,7 +27,7 @@ public class Chenglite extends UCIEngine {
         sendCommand(command.toString());
 
         String result = readLine("bestmove");
-        if (result != null) return result.substring(9).split("\\s+")[0];
+        if (result != null) return result.replaceAll("bestmove", "").trim();
         return null;
     }
 
