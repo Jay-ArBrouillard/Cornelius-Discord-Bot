@@ -109,6 +109,11 @@ public class ChessGame {
                             .setOption(Option.Hash, 16)
                             .build(), p);
                 }
+                else if (p.name.contains("CounterGo")) {
+                    setClient(new CounterGoClient.Builder()
+                            .setOption(Option.Hash, 16)
+                            .build(), p);
+                }
             }
 
 
@@ -171,7 +176,10 @@ public class ChessGame {
             if (player == null) {
                 return new StringBuilder("Opponent by the name of `").append(opponent).append("` does not exist in the database. Try again and/or check the chess record spreadsheets for exact name").toString();
             }
-            //Valid opponent
+            //Ensure opponent is a bot
+            if (!player.discordId.startsWith(System.getenv("OWNER_ID"))) {
+                return new StringBuilder("Opponent by the name of `").append(opponent).append("` must be an AI such as `Cornelius 20`. Try again.").toString();
+            }
         }
 
         if (message.startsWith("2")) { // Option 2
