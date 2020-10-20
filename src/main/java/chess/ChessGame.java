@@ -90,32 +90,14 @@ public class ChessGame {
                             .setOption(Option.Hash, 16)
                             .build(), p);
                 }
-                else if (p.name.contains("SmarThink")) {
-                    setClient(new SmarThinkClient.Builder()
-                            .setVariant(Variant.DEFAULT) //Always set to Default for linux
-                            .setOption(Option.Hash, 16)
-                            .build(), p);
-                }
-                else if (p.name.contains("Crafty")) {
-                    setClient(new CraftyClient.Builder()
+                else if (p.name.contains("Cinnamon")) {
+                    setClient(new CinnamonClient.Builder()
                             .setVariant(Variant.DEFAULT) //Always set to Default for linux
                             .setOption(Option.Hash, 16)
                             .build(), p);
                 }
                 else if (p.name.contains("Laser")) {
                     setClient(new LaserClient.Builder()
-                            .setVariant(Variant.DEFAULT) //Always set to Default for linux
-                            .setOption(Option.Hash, 16)
-                            .build(), p);
-                }
-                else if (p.name.contains("Winter")) {
-                    setClient(new WinterClient.Builder()
-                            .setVariant(Variant.DEFAULT)
-                            .setOption(Option.Hash, 16)
-                            .build(), p);
-                }
-                else if (p.name.contains("Ethereal")) {
-                    setClient(new EtherealClient.Builder()
                             .setVariant(Variant.DEFAULT) //Always set to Default for linux
                             .setOption(Option.Hash, 16)
                             .build(), p);

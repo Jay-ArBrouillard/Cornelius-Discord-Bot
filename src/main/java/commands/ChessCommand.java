@@ -85,11 +85,8 @@ public class ChessCommand {
             event.getChannel().sendMessage("Adding all AI's to Chess Records...").queue();
 
             String[][] players = {
-                    {"693282099167494225E12", "Cornelius Ethereal 12.75"},
-                    {"693282099167494225W09", "Cornelius Winter 0.9"},
-                    {"693282099167494225C25", "Cornelius Crafty 25.4"},
                     {"693282099167494225L17", "Cornelius Laser 1.7"},
-                    {"693282099167494225ST", "Cornelius SmarThink"},
+                    {"693282099167494225C23", "Cornelius Cinnamon 2.3"},
                     {"693282099167494225X06", "Cornelius Xiphos 0.6"},
                     {"693282099167494225K11", "Cornelius Komodo 11"},
                     {"693282099167494225SF"+"0", "Cornelius Stockfish 0"},
@@ -127,11 +124,8 @@ public class ChessCommand {
         if (message.startsWith("!chess") && message.contains("train")) {
 
             String[][] players = {
-                    {"693282099167494225E12", "Cornelius Ethereal 12.75"},
-                    {"693282099167494225W09", "Cornelius Winter 0.9"},
-                    {"693282099167494225C25", "Cornelius Crafty 25.4"},
                     {"693282099167494225L17", "Cornelius Laser 1.7"},
-                    {"693282099167494225ST", "Cornelius SmarThink"},
+                    {"693282099167494225C23", "Cornelius Cinnamon 2.3"},
                     {"693282099167494225X06", "Cornelius Xiphos 0.6"},
                     {"693282099167494225K11", "Cornelius Komodo 11"},
                     {"693282099167494225SF"+"0", "Cornelius Stockfish 0"},
