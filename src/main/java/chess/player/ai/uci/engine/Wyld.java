@@ -12,6 +12,7 @@ public class Wyld extends UCIEngine {
     }
 
     public String getBestMove(Query query) throws IOException {
+        waitForReady();
         sendCommand("position fen " + query.getFen());
 
         StringBuilder command = new StringBuilder("go ");
