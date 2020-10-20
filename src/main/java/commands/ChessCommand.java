@@ -85,6 +85,7 @@ public class ChessCommand {
             event.getChannel().sendMessage("Adding all AI's to Chess Records...").queue();
 
             String[][] players = {
+                    {"693282099167494225E12", "Cornelius Ethereal 12.75"},
                     {"693282099167494225W15", "Cornelius Wyld 1.51"},
                     {"693282099167494225C25", "Cornelius Crafty 25.4"},
                     {"693282099167494225L17", "Cornelius Laser 1.7"},
@@ -126,6 +127,7 @@ public class ChessCommand {
         if (message.startsWith("!chess") && message.contains("train")) {
 
             String[][] players = {
+                    {"693282099167494225E12", "Cornelius Ethereal 12.75"},
                     {"693282099167494225W15", "Cornelius Wyld 1.51"},
                     {"693282099167494225C25", "Cornelius Crafty 25.4"},
                     {"693282099167494225L17", "Cornelius Laser 1.7"},
