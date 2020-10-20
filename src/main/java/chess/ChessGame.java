@@ -42,7 +42,7 @@ public class ChessGame {
         try {
             stockFishClient = new StockFishClient.Builder()
                                 .setOption(Option.Minimum_Thinking_Time, 500)
-                                .setOption(Option.Hash, 16)
+                                .setOption(Option.Hash, 8)
                                 .setVariant(Variant.MODERN)  // BMI for windows, Modern for linux
                                 .build();
         } catch (Exception e) {
@@ -133,6 +133,11 @@ public class ChessGame {
                 }
                 else if (p.name.contains("Pigeon")) {
                     setClient(new PigeonClient.Builder()
+                            .setOption(Option.Hash, 16)
+                            .build(), p);
+                }
+                else if (p.name.contains("Pulse")) {
+                    setClient(new PulseClient.Builder()
                             .setOption(Option.Hash, 16)
                             .build(), p);
                 }
