@@ -16,6 +16,7 @@ import chess.player.ai.uci.engine.enums.Variant;
 import chess.tables.ChessPlayer;
 import net.dv8tion.jda.api.entities.MessageChannel;
 
+import java.io.IOException;
 import java.util.*;
 
 public class ChessGame {
@@ -25,7 +26,7 @@ public class ChessGame {
     private ChessGameState state;
     private ChessPlayer whiteSidePlayer;
     private ChessPlayer blackSidePlayer;
-    private IterativeDeepening id;
+    public IterativeDeepening id;
     public boolean threadRunning = false;
     public StockFishClient stockFishClient;
     public BaseAiClient client1;
@@ -70,82 +71,84 @@ public class ChessGame {
             }
 
             for (ChessPlayer p : players) {
-                if (p.name.contains("Stockfish")) {
-                    setClient(new StockFishClient.Builder()
-                            .setOption(Option.Minimum_Thinking_Time, 500) // Minimum thinking time Stockfish will take
-                            .setOption(Option.Skill_Level, 20)
-                            .setOption(Option.Hash, 16)
-                            .setVariant(Variant.MODERN) // BMI for windows, Modern for linux
-                            .build(), p);
-                }
-                else if (p.name.contains("Xiphos")) {
-                    setClient(new XiphosClient.Builder()
-                            .setOption(Option.Minimum_Thinking_Time, 500)
-                            .setVariant(Variant.SSE) //BMI or windows, SSE for linux
-                            .setOption(Option.Hash, 16)
-                            .build(), p);
-                }
-                else if (p.name.contains("Komodo")) {
-                    setClient(new KomodoClient.Builder()
-                            .setOption(Option.Minimum_Thinking_Time, 500)
-                            .setOption(Option.Hash, 16)
-                            .build(), p);
-                }
-                else if (p.name.contains("Cinnamon")) {
-                    setClient(new CinnamonClient.Builder()
-                            .setOption(Option.Hash, 16)
-                            .build(), p);
-                }
-                else if (p.name.contains("Laser")) {
-                    setClient(new LaserClient.Builder()
-                            .setOption(Option.Hash, 16)
-                            .build(), p);
-                }
-                else if (p.name.contains("Chenglite")) {
-                    setClient(new ChengliteClient.Builder()
-                            .setOption(Option.Hash, 16)
-                            .build(), p);
-                }
-                else if (p.name.contains("Amoeba")) {
-                    setClient(new AmoebaClient.Builder()
-                            .setOption(Option.Hash, 16)
-                            .build(), p);
-                }
-                else if (p.name.contains("CounterGo")) {
-                    setClient(new CounterGoClient.Builder()
-                            .setOption(Option.Hash, 16)
-                            .build(), p);
-                }
-                else if (p.name.contains("Fishnet")) {
-                    setClient(new FishnetClient.Builder()
-                            .setOption(Option.Hash, 16)
-                            .build(), p);
-                }
-                else if (p.name.contains("Asymptote")) {
-                    setClient(new AsymptoteClient.Builder()
-                            .setOption(Option.Hash, 16)
-                            .build(), p);
-                }
-                else if (p.name.contains("Dumb")) {
-                    setClient(new DumbClient.Builder()
-                            .setOption(Option.Hash, 16)
-                            .build(), p);
-                }
-                else if (p.name.contains("Pigeon")) {
-                    setClient(new PigeonClient.Builder()
-                            .setOption(Option.Hash, 16)
-                            .build(), p);
-                }
-                else if (p.name.contains("Pulse")) {
-                    setClient(new PulseClient.Builder()
-                            .setOption(Option.Hash, 16)
-                            .build(), p);
-                }
+                setClient(p);
             }
-
-
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void setClient(ChessPlayer p) throws IOException {
+        if (p.name.contains("Stockfish")) {
+            setClient(new StockFishClient.Builder()
+                    .setOption(Option.Minimum_Thinking_Time, 500) // Minimum thinking time Stockfish will take
+                    .setOption(Option.Skill_Level, 20)
+                    .setOption(Option.Hash, 16)
+                    .setVariant(Variant.MODERN) // BMI for windows, Modern for linux
+                    .build(), p);
+        }
+        else if (p.name.contains("Xiphos")) {
+            setClient(new XiphosClient.Builder()
+                    .setOption(Option.Minimum_Thinking_Time, 500)
+                    .setVariant(Variant.SSE) //BMI or windows, SSE for linux
+                    .setOption(Option.Hash, 16)
+                    .build(), p);
+        }
+        else if (p.name.contains("Komodo")) {
+            setClient(new KomodoClient.Builder()
+                    .setOption(Option.Minimum_Thinking_Time, 500)
+                    .setOption(Option.Hash, 16)
+                    .build(), p);
+        }
+        else if (p.name.contains("Cinnamon")) {
+            setClient(new CinnamonClient.Builder()
+                    .setOption(Option.Hash, 16)
+                    .build(), p);
+        }
+        else if (p.name.contains("Laser")) {
+            setClient(new LaserClient.Builder()
+                    .setOption(Option.Hash, 16)
+                    .build(), p);
+        }
+        else if (p.name.contains("Chenglite")) {
+            setClient(new ChengliteClient.Builder()
+                    .setOption(Option.Hash, 16)
+                    .build(), p);
+        }
+        else if (p.name.contains("Amoeba")) {
+            setClient(new AmoebaClient.Builder()
+                    .setOption(Option.Hash, 16)
+                    .build(), p);
+        }
+        else if (p.name.contains("CounterGo")) {
+            setClient(new CounterGoClient.Builder()
+                    .setOption(Option.Hash, 16)
+                    .build(), p);
+        }
+        else if (p.name.contains("Fishnet")) {
+            setClient(new FishnetClient.Builder()
+                    .setOption(Option.Hash, 16)
+                    .build(), p);
+        }
+        else if (p.name.contains("Asymptote")) {
+            setClient(new AsymptoteClient.Builder()
+                    .setOption(Option.Hash, 16)
+                    .build(), p);
+        }
+        else if (p.name.contains("Dumb")) {
+            setClient(new DumbClient.Builder()
+                    .setOption(Option.Hash, 16)
+                    .build(), p);
+        }
+        else if (p.name.contains("Pigeon")) {
+            setClient(new PigeonClient.Builder()
+                    .setOption(Option.Hash, 16)
+                    .build(), p);
+        }
+        else if (p.name.contains("Pulse")) {
+            setClient(new PulseClient.Builder()
+                    .setOption(Option.Hash, 16)
+                    .build(), p);
         }
     }
 
@@ -601,10 +604,16 @@ public class ChessGame {
                 e.printStackTrace();
                 try {
                     if (isWhitePlayerTurn()) {
-                        if (client1 != null) client1.close();
+                        if (client1 != null) {
+                            client1.close();
+                            setClient(whiteSidePlayer);
+                        }
                     }
                     else if (isBlackPlayerTurn()) {
-                        if (client2 != null) client2.close();
+                        if (client2 != null) {
+                            client2.close();
+                            setClient(blackSidePlayer);
+                        }
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -637,40 +646,48 @@ public class ChessGame {
         int randomThinkTime = 5000;//ThreadLocalRandom.current().nextInt(5000, 10000 + 1); //Between 5-10 seconds
         String bestMoveString = null;
         do {
-            System.out.println(randomThinkTime);
+//            System.out.println(randomThinkTime);
             try {
-                System.out.println("client1 is using " + client1 + ", client 2 is using " + client2);
-                System.out.println("Current player: " + this.board.getCurrentPlayer().getAlliance().toString());
+//                System.out.println("Current player: " + this.board.getCurrentPlayer().getAlliance().toString());
 
                 if (isWhitePlayerTurn()) {
-                    System.out.println("White player is choosing their move");
+//                    System.out.println("White player is choosing their move");
                     bestMoveString = client1.submit(new Query.Builder(QueryType.Best_Move)
                             .setMovetime(randomThinkTime)
                             .setFen(FenUtils.parseFEN(this.board)).build());
-                    System.out.println("White players best move is: " + bestMoveString);
+//                    System.out.println("White players best move is: " + bestMoveString);
                 }
                 else if (isBlackPlayerTurn()) {
-                    System.out.println("Black player is choosing their move");
+//                    System.out.println("Black player is choosing their move");
                     bestMoveString = client2.submit(new Query.Builder(QueryType.Best_Move)
                             .setMovetime(randomThinkTime)
                             .setFen(FenUtils.parseFEN(this.board)).build());
-                    System.out.println("Black players best move is: " + bestMoveString);
+//                    System.out.println("Black players best move is: " + bestMoveString);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 try {
+                    System.out.println("client1 was using " + client1 + ", client 2 was using " + client2);
                     if (isWhitePlayerTurn()) {
-                        if (client1 != null) client1.close();
+                        if (client1 != null) {
+                            System.out.println("Resetting client1");
+                            client1.close();
+                            setClient(whiteSidePlayer);
+                        }
                     }
                     else if (isBlackPlayerTurn()) {
-                        if (client2 != null) client2.close();
-
+                        if (client2 != null) {
+                            System.out.println("Resetting client2");
+                            client2.close();
+                            setClient(blackSidePlayer);
+                        }
                     }
+                    System.out.println("client2 now using " + client1 + ", client 2 now using " + client2);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
                 finally {
-                    System.out.println("Using iterative deeping");
+                    System.out.println("Using iterative deeping for this turn");
                     if (id == null) id = new IterativeDeepening(6);
                     final Move bestMove = id.execute(this.board);
                     bestMoveString = BoardUtils.getPositionAtCoordinate(bestMove.getCurrentCoordinate()) + BoardUtils.getPositionAtCoordinate(bestMove.getDestinationCoordinate());

@@ -237,6 +237,7 @@ public class ChessCommand {
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
+                            chessGame.id = null;
                             chessGame = null;
                             whiteSidePlayer = null;
                             blackSidePlayer = null;
