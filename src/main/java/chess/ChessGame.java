@@ -581,45 +581,42 @@ public class ChessGame {
         do {
             System.out.println(thinkTime);
             try {
-                System.out.println("client1 is using " + client1 + ", client 2 is using " + client2);
-                System.out.println("Current player: " + this.board.getCurrentPlayer().getAlliance().toString());
-
                 if (isWhitePlayerTurn()) {
-                    System.out.println("White player is choosing their move");
                     bestMoveString = client1.submit(new Query.Builder(QueryType.Best_Move)
                             .setMovetime(thinkTime)
                             .setDifficulty(difficulty)
                             .setFen(FenUtils.parseFEN(this.board)).build());
-                    System.out.println("White players best move is: " + bestMoveString);
                 }
                 else if (isBlackPlayerTurn()) {
-                    System.out.println("Black player is choosing their move");
                     bestMoveString = client2.submit(new Query.Builder(QueryType.Best_Move)
                             .setDifficulty(difficulty)
                             .setMovetime(thinkTime)
                             .setFen(FenUtils.parseFEN(this.board)).build());
-                    System.out.println("Black players best move is: " + bestMoveString);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 try {
+                    System.out.println("client1 was using " + client1 + ", client 2 was using " + client2);
                     if (isWhitePlayerTurn()) {
                         if (client1 != null) {
+                            System.out.println("Resetting client1");
                             client1.close();
                             setClient(whiteSidePlayer);
                         }
                     }
                     else if (isBlackPlayerTurn()) {
                         if (client2 != null) {
+                            System.out.println("Resetting client2");
                             client2.close();
                             setClient(blackSidePlayer);
                         }
                     }
+                    System.out.println("client2 now using " + client1 + ", client 2 now using " + client2);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
                 finally { //If ai breaks then rely on simple ai for rest of the game
-                    System.out.println("Using iterative deeping");
+                    System.out.println("Using iterative deepening for this turn");
                     if (id == null) id = new IterativeDeepening(6);
                     final Move bestMove = id.execute(this.board);
                     bestMoveString = BoardUtils.getPositionAtCoordinate(bestMove.getCurrentCoordinate()) + BoardUtils.getPositionAtCoordinate(bestMove.getDestinationCoordinate());
@@ -646,23 +643,16 @@ public class ChessGame {
         int randomThinkTime = 5000;//ThreadLocalRandom.current().nextInt(5000, 10000 + 1); //Between 5-10 seconds
         String bestMoveString = null;
         do {
-//            System.out.println(randomThinkTime);
             try {
-//                System.out.println("Current player: " + this.board.getCurrentPlayer().getAlliance().toString());
-
                 if (isWhitePlayerTurn()) {
-//                    System.out.println("White player is choosing their move");
                     bestMoveString = client1.submit(new Query.Builder(QueryType.Best_Move)
                             .setMovetime(randomThinkTime)
                             .setFen(FenUtils.parseFEN(this.board)).build());
-//                    System.out.println("White players best move is: " + bestMoveString);
                 }
                 else if (isBlackPlayerTurn()) {
-//                    System.out.println("Black player is choosing their move");
                     bestMoveString = client2.submit(new Query.Builder(QueryType.Best_Move)
                             .setMovetime(randomThinkTime)
                             .setFen(FenUtils.parseFEN(this.board)).build());
-//                    System.out.println("Black players best move is: " + bestMoveString);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -687,7 +677,7 @@ public class ChessGame {
                     ex.printStackTrace();
                 }
                 finally {
-                    System.out.println("Using iterative deeping for this turn");
+                    System.out.println("Using iterative deepening for this turn");
                     if (id == null) id = new IterativeDeepening(6);
                     final Move bestMove = id.execute(this.board);
                     bestMoveString = BoardUtils.getPositionAtCoordinate(bestMove.getCurrentCoordinate()) + BoardUtils.getPositionAtCoordinate(bestMove.getDestinationCoordinate());
