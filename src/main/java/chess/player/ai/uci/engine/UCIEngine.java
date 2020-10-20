@@ -19,8 +19,6 @@ abstract class UCIEngine {
 
             for (Option option : options)
                 passOption(option);
-
-            sendCommand("uci");
         } catch (IOException e) {
             throw new IOException("Unable to start and bind " + super.getClass().getSimpleName() + " process: ", e);
         }

@@ -93,28 +93,24 @@ public class ChessGame {
                 }
                 else if (p.name.contains("SmarThink")) {
                     setClient(new SmarThinkClient.Builder()
-                            .setOption(Option.Minimum_Thinking_Time, 500)
                             .setVariant(Variant.DEFAULT) //Always set to Default for linux
                             .setOption(Option.Hash, 16)
                             .build(), p);
                 }
                 else if (p.name.contains("Crafty")) {
                     setClient(new CraftyClient.Builder()
-                            .setOption(Option.Minimum_Thinking_Time, 500)
                             .setVariant(Variant.DEFAULT) //Always set to Default for linux
                             .setOption(Option.Hash, 16)
                             .build(), p);
                 }
                 else if (p.name.contains("Laser")) {
                     setClient(new LaserClient.Builder()
-                            .setOption(Option.Minimum_Thinking_Time, 500)
                             .setVariant(Variant.DEFAULT) //Always set to Default for linux
                             .setOption(Option.Hash, 16)
                             .build(), p);
                 }
                 else if (p.name.contains("Wyld")) {
                     setClient(new WyldClient.Builder()
-                            .setOption(Option.Minimum_Thinking_Time, 500)
                             .setVariant(Variant.POPCNT) //Always set to Default for linux
                             .setOption(Option.Hash, 16)
                             .build(), p);
