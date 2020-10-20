@@ -238,7 +238,7 @@ public class GoogleSheets {
         rowNumber = 1;
         totalRows = response.getValues().size();
         for (List row : response.getValues()) {
-            if (row.get(1).equals(name)) {
+            if (name.equalsIgnoreCase((String)row.get(1))) {
                 return row;
             }
             rowNumber++;
@@ -255,17 +255,10 @@ public class GoogleSheets {
     public static void updateUser(ChessPlayer user) {
         try {
             if (service == null) getSheetsService();
-            if (isRanked(user.discordId) == null) return;
-
             List row = isRanked(user.discordId);
-            if (row != null) {
-                System.out.println("addUser - userFound: " + row.get(0) + ", " + row.get(1));
-                System.out.println("At row: " + rowNumber);
+            if (row == null) {
+                return;
             }
-            else {
-                System.out.println("addUser - no user was found for: " + user.discordId + ", " + user.name);
-            }
-
             List values = new ArrayList();
             values.add(user.discordId);
             values.add(user.name);

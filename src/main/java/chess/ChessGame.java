@@ -64,6 +64,8 @@ public class ChessGame {
                 players = new ChessPlayer[]{whiteSidePlayer, blackSidePlayer};
             } else { //Player vs player
                 //Don't initialize clients
+                client1 = null;
+                client2 = null;
                 return;
             }
 
@@ -116,6 +118,11 @@ public class ChessGame {
                 }
                 else if (p.name.contains("Fishnet")) {
                     setClient(new FishnetClient.Builder()
+                            .setOption(Option.Hash, 16)
+                            .build(), p);
+                }
+                else if (p.name.contains("Asymptote")) {
+                    setClient(new AsymptoteClient.Builder()
                             .setOption(Option.Hash, 16)
                             .build(), p);
                 }
