@@ -131,6 +131,11 @@ public class ChessGame {
                             .setOption(Option.Hash, 16)
                             .build(), p);
                 }
+                else if (p.name.contains("Dumb")) {
+                    setClient(new DumbClient.Builder()
+                            .setOption(Option.Hash, 16)
+                            .build(), p);
+                }
             }
 
 
