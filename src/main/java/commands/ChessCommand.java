@@ -86,7 +86,7 @@ public class ChessCommand {
 
             String[][] players = {
                     {"693282099167494225E12", "Cornelius Ethereal 12.75"},
-                    {"693282099167494225W15", "Cornelius Wyld 1.51"},
+                    {"693282099167494225W09", "Cornelius Winter 0.9"},
                     {"693282099167494225C25", "Cornelius Crafty 25.4"},
                     {"693282099167494225L17", "Cornelius Laser 1.7"},
                     {"693282099167494225ST", "Cornelius SmarThink"},
@@ -128,7 +128,7 @@ public class ChessCommand {
 
             String[][] players = {
                     {"693282099167494225E12", "Cornelius Ethereal 12.75"},
-                    {"693282099167494225W15", "Cornelius Wyld 1.51"},
+                    {"693282099167494225W09", "Cornelius Winter 0.9"},
                     {"693282099167494225C25", "Cornelius Crafty 25.4"},
                     {"693282099167494225L17", "Cornelius Laser 1.7"},
                     {"693282099167494225ST", "Cornelius SmarThink"},

@@ -17,7 +17,6 @@ import chess.tables.ChessPlayer;
 import net.dv8tion.jda.api.entities.MessageChannel;
 
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class ChessGame {
     public Board board;
@@ -109,8 +108,8 @@ public class ChessGame {
                             .setOption(Option.Hash, 16)
                             .build(), p);
                 }
-                else if (p.name.contains("Wyld")) {
-                    setClient(new WyldClient.Builder()
+                else if (p.name.contains("Winter")) {
+                    setClient(new WinterClient.Builder()
                             .setVariant(Variant.DEFAULT)
                             .setOption(Option.Hash, 16)
                             .build(), p);
