@@ -21,12 +21,16 @@ public class ChengliteClient extends BaseAiClient{
 
         switch (query.getType()) {
             case Best_Move:
-                output = engine.getBestMove(query).trim();
+                output = engine.getBestMove(query);
                 break;
             default:
                 output = null;
                 break;
         }
+
+        output.replaceAll("bestmove", "");
+        output = output.trim();
+        System.out.println("chenglite bestmove:"+output);
 
         return output;
     }

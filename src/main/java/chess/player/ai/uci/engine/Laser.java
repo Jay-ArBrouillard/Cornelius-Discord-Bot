@@ -23,6 +23,7 @@ public class Laser extends UCIEngine {
         if (query.getMovetime() >= 0)
             command.append("movetime ").append(query.getMovetime());
 
+        waitForReady();
         sendCommand(command.toString());
 
         String result = readLine("bestmove");
