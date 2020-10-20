@@ -136,9 +136,6 @@ public class ChessGame {
         else if (p.discordId.equals(blackSidePlayer.discordId)) {
             client2 = client; //Black side player will always be client 2
         }
-
-        System.out.println(client1);
-        System.out.println(client2);
     }
 
     public void setWhiteSidePlayer(ChessPlayer whiteSidePlayer) {
@@ -611,8 +608,6 @@ public class ChessGame {
         do {
             System.out.println(randomThinkTime);
             try {
-                System.out.println(client1);
-                System.out.println(client2);
                 System.out.println("Current player: " + this.board.getCurrentPlayer().getAlliance().toString());
 
                 if (isWhitePlayerTurn()) {
