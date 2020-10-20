@@ -579,7 +579,6 @@ public class ChessGame {
         long thinkTime = 500;
         String bestMoveString = null;
         do {
-            System.out.println(thinkTime);
             try {
                 if (isWhitePlayerTurn()) {
                     bestMoveString = client1.submit(new Query.Builder(QueryType.Best_Move)
