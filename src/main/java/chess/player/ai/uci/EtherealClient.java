@@ -43,7 +43,7 @@ public class EtherealClient extends BaseAiClient{
     public static class Builder {
         private Set<Option> options = new HashSet<>();
         private Variant variant = Variant.DEFAULT;
-        private String path = "bin/Ethereal_12_linux";
+        private String path = "bin/Ethereal_12.75";
 
         public final EtherealClient.Builder setVariant(Variant v) {
             variant = v;
