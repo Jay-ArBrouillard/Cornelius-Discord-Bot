@@ -126,6 +126,11 @@ public class ChessGame {
                             .setOption(Option.Hash, 16)
                             .build(), p);
                 }
+                else if (p.name.contains("Dragontooth")) {
+                    setClient(new DragontoothClient.Builder()
+                            .setOption(Option.Hash, 16)
+                            .build(), p);
+                }
             }
 
 

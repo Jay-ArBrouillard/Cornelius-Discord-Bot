@@ -84,6 +84,7 @@ public class ChessCommand {
         if (message.startsWith("!chess") && message.contains("addAll")) {
             event.getChannel().sendMessage("Adding all AI's to Chess Records...").queue();
             String[][] players = {
+                    {"693282099167494225DT0.2", "Dragontooth v0.2"},
                     {"693282099167494225A0.8", "Asymptote v0.8"},
                     {"693282099167494225F103", "Fishnet v103"}, //Release 103
                     {"693282099167494225CG3.6", "CounterGo v3.6"},
@@ -128,6 +129,7 @@ public class ChessCommand {
         if (message.startsWith("!chess") && message.contains("train")) {
 
             String[][] players = {
+                    {"693282099167494225DT0.2", "Dragontooth v0.2"},
                     {"693282099167494225A0.8", "Asymptote v0.8"},
                     {"693282099167494225F103", "Fishnet v103"},
                     {"693282099167494225CG3.6", "CounterGo v3.6"},
@@ -298,7 +300,7 @@ public class ChessCommand {
                 break;
             case SETUP:
                 reply = "`Chess` Initialized. Please choose from player options `(1-3)`:\n1. Player (WHITE) vs. Player (BLACK)\n2. Player vs. Computer\n3. Computer vs. Player\n\n" +
-                        "When playing against the computer you can select your computer opponent by adding their name after the option for example `2 Cornelius Xiphos 0.6`\n" +
+                        "When playing against the computer you can select your computer opponent by adding their name after the option for example `2 Komodo v11`\n" +
                         "Otherwise a computer about the same elo as you will be chosen at random.";
                 decision = Decision.SETUP_RESPONSE;
                 break;
