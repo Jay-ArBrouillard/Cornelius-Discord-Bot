@@ -8,7 +8,7 @@ import chess.board.Tile;
 import chess.pgn.FenUtils;
 import chess.player.MoveTransition;
 import chess.player.ai.IterativeDeepening;
-import chess.player.ai.uci.*;
+import chess.player.ai.uci.client.*;
 import chess.player.ai.uci.engine.enums.Option;
 import chess.player.ai.uci.engine.enums.Query;
 import chess.player.ai.uci.engine.enums.QueryType;
@@ -75,7 +75,7 @@ public class ChessGame {
                             .setOption(Option.Hash, 16)
                             .setVariant(Variant.MODERN) // BMI for windows, Modern for linux
                             .build(), p);
-            }
+                }
                 else if (p.name.contains("Xiphos")) {
                     setClient(new XiphosClient.Builder()
                             .setOption(Option.Minimum_Thinking_Time, 500)
@@ -86,25 +86,26 @@ public class ChessGame {
                 else if (p.name.contains("Komodo")) {
                     setClient(new KomodoClient.Builder()
                             .setOption(Option.Minimum_Thinking_Time, 500)
-                            .setVariant(Variant.DEFAULT) //Always set to Default for linux
                             .setOption(Option.Hash, 16)
                             .build(), p);
                 }
                 else if (p.name.contains("Cinnamon")) {
                     setClient(new CinnamonClient.Builder()
-                            .setVariant(Variant.DEFAULT) //Always set to Default for linux
                             .setOption(Option.Hash, 16)
                             .build(), p);
                 }
                 else if (p.name.contains("Laser")) {
                     setClient(new LaserClient.Builder()
-                            .setVariant(Variant.DEFAULT) //Always set to Default for linux
                             .setOption(Option.Hash, 16)
                             .build(), p);
                 }
                 else if (p.name.contains("Chenglite")) {
                     setClient(new ChengliteClient.Builder()
-                            .setVariant(Variant.DEFAULT) //Always set to Default for linux
+                            .setOption(Option.Hash, 16)
+                            .build(), p);
+                }
+                else if (p.name.contains("Amoeba")) {
+                    setClient(new AmoebaClient.Builder()
                             .setOption(Option.Hash, 16)
                             .build(), p);
                 }
