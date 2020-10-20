@@ -83,7 +83,7 @@ public class ChessCommand {
 
         if (message.startsWith("!chess") && message.contains("addAll")) {
             event.getChannel().sendMessage("Adding all AI's to Chess Records...").queue();
-
+it
             String[][] players = {
                     {"693282099167494225F103", "Fishnet v103"}, //Release 103
                     {"693282099167494225CG3.6", "CounterGo v3.6"},

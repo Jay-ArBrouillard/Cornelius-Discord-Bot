@@ -123,7 +123,7 @@ public class ChessGame {
 
 
         } catch (Exception e) {
-            e.printStackTrace();git
+            e.printStackTrace();
         }
     }
 

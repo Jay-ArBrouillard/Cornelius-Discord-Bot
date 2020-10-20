@@ -95,19 +95,12 @@ public class GoogleSheets {
      */
     public static ChessPlayer addUser(String id, String name) {
         try {
-            System.out.println("method addUser, param id:" + id + ", param name: " + name);
             if (service == null) getSheetsService();
 
             ChessPlayer user;
             //Check if player exists
-            List row = isRanked(id);
-            if (row != null) {
-                System.out.println("addUser - userFound: " + row.get(0) + ", " + row.get(1));
-            }
-            else {
-                System.out.println("addUser - no user was found for: " + id + ", " + name);
-            }
 
+            List row = isRanked(id);
             if (row != null) { // Player exists in ranked table
                 user = new ChessPlayer((String)row.get(0), (String)row.get(1), Integer.parseInt((String)row.get(2)),
                                 Boolean.valueOf((String)row.get(3)), (String)row.get(4), Integer.parseInt((String)row.get(5)),
@@ -263,6 +256,15 @@ public class GoogleSheets {
         try {
             if (service == null) getSheetsService();
             if (isRanked(user.discordId) == null) return;
+
+            List row = isRanked(user.discordId);
+            if (row != null) {
+                System.out.println("addUser - userFound: " + row.get(0) + ", " + row.get(1));
+                System.out.println("At row: " + rowNumber);
+            }
+            else {
+                System.out.println("addUser - no user was found for: " + user.discordId + ", " + user.name);
+            }
 
             List values = new ArrayList();
             values.add(user.discordId);
