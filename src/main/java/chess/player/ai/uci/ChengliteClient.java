@@ -21,7 +21,7 @@ public class ChengliteClient extends BaseAiClient{
 
         switch (query.getType()) {
             case Best_Move:
-                output = engine.getBestMove(query);
+                output = engine.getBestMove(query).trim();
                 break;
             default:
                 output = null;
