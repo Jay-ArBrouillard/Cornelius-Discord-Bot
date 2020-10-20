@@ -85,7 +85,8 @@ public class ChessCommand {
             event.getChannel().sendMessage("Adding all AI's to Chess Records...").queue();
 
             String[][] players = {
-                    {"693282099167494225CG3.6", "CounterGo 3.6"},
+                    {"693282099167494225F103", "Fishnet v103"}, //Release 103
+                    {"693282099167494225CG3.6", "CounterGo v3.6"},
                     {"693282099167494225A3.2", "Amoeba v3.2"},
                     {"693282099167494225CL1.0", "Chenglite v1.0"},
                     {"693282099167494225L1.7", "Laser v1.7"},
@@ -127,7 +128,8 @@ public class ChessCommand {
         if (message.startsWith("!chess") && message.contains("train")) {
 
             String[][] players = {
-                    {"693282099167494225CG3.6", "CounterGo 3.6"},
+                    {"693282099167494225F103", "Fishnet v103"},
+                    {"693282099167494225CG3.6", "CounterGo v3.6"},
                     {"693282099167494225A3.2", "Amoeba v3.2"},
                     {"693282099167494225CL1.0", "Chenglite v1.0"},
                     {"693282099167494225L1.7", "Laser v1.7"},

@@ -95,11 +95,19 @@ public class GoogleSheets {
      */
     public static ChessPlayer addUser(String id, String name) {
         try {
+            System.out.println("method addUser, param id:" + id + ", param name: " + name);
             if (service == null) getSheetsService();
 
             ChessPlayer user;
             //Check if player exists
             List row = isRanked(id);
+            if (row != null) {
+                System.out.println("addUser - userFound: " + row.get(0) + ", " + row.get(1));
+            }
+            else {
+                System.out.println("addUser - no user was found for: " + id + ", " + name);
+            }
+
             if (row != null) { // Player exists in ranked table
                 user = new ChessPlayer((String)row.get(0), (String)row.get(1), Integer.parseInt((String)row.get(2)),
                                 Boolean.valueOf((String)row.get(3)), (String)row.get(4), Integer.parseInt((String)row.get(5)),
@@ -160,7 +168,7 @@ public class GoogleSheets {
                         (String)row.get(11), (String)row.get(12));
                 return user;
             } else {
-                // Player doesn't exist. Add them as a provisional player
+                // Player doesn't exist
                 return null;
             }
         } catch (Exception e) {
@@ -215,10 +223,10 @@ public class GoogleSheets {
      */
     private static List isRanked(String id) throws IOException {
         ValueRange response = service.spreadsheets().values().get(SPREAD_SHEET_ID, RANKED_TAB).execute();
-        rowNumber = 2;
+        rowNumber = 1;
         totalRows = response.getValues().size();
         for (List row : response.getValues()) {
-            if (row.get(0).equals(id)) {
+            if (id.equalsIgnoreCase((String)row.get(0))) {
                 return row;
             }
             rowNumber++;
@@ -234,7 +242,7 @@ public class GoogleSheets {
      */
     private static List isRankedByName(String name) throws IOException {
         ValueRange response = service.spreadsheets().values().get(SPREAD_SHEET_ID, RANKED_TAB).execute();
-        rowNumber = 2;
+        rowNumber = 1;
         totalRows = response.getValues().size();
         for (List row : response.getValues()) {
             if (row.get(1).equals(name)) {

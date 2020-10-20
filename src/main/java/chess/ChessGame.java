@@ -114,11 +114,16 @@ public class ChessGame {
                             .setOption(Option.Hash, 16)
                             .build(), p);
                 }
+                else if (p.name.contains("Fishnet")) {
+                    setClient(new FishnetClient.Builder()
+                            .setOption(Option.Hash, 16)
+                            .build(), p);
+                }
             }
 
 
         } catch (Exception e) {
-            e.printStackTrace();
+            e.printStackTrace();git
         }
     }
 
