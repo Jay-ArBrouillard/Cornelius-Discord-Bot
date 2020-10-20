@@ -90,7 +90,7 @@ public class ChessGame {
         else if (p.name.contains("Xiphos")) {
             setClient(new XiphosClient.Builder()
                     .setOption(Option.Minimum_Thinking_Time, 500)
-                    .setVariant(Variant.SSE) //BMI or windows, SSE for linux
+                    .setVariant(Variant.SSE) //BMI for windows, SSE for linux
                     .setOption(Option.Hash, 16)
                     .build(), p);
         }
@@ -145,8 +145,8 @@ public class ChessGame {
                     .setOption(Option.Hash, 16)
                     .build(), p);
         }
-        else if (p.name.contains("Pulse")) {
-            setClient(new PulseClient.Builder()
+        else if (p.name.contains("Monolith")) {
+            setClient(new MonolithClient.Builder()
                     .setOption(Option.Hash, 16)
                     .build(), p);
         }
