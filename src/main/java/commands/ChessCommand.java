@@ -85,7 +85,7 @@ public class ChessCommand {
             event.getChannel().sendMessage("Adding all AI's to Chess Records...").queue();
             String[][] players = {
                     {"693282099167494225PU1.7.2", "Pulse v1.7"},
-                    {"693282099167494225PL1.5", "Pigeon v1.5"},
+                    {"693282099167494225PI1.5", "Pigeon v1.5"},
                     {"693282099167494225DU1.4", "Dumb v1.4"},
                     {"693282099167494225A0.8", "Asymptote v0.8"},
                     {"693282099167494225F103", "Fishnet v103"}, //Release 103
@@ -132,7 +132,7 @@ public class ChessCommand {
 
             String[][] players = {
                     {"693282099167494225PU1.7.2", "Pulse v1.7"},
-                    {"693282099167494225PL1.5", "Pigeon v1.5"},
+                    {"693282099167494225PI1.5", "Pigeon v1.5"},
                     {"693282099167494225DU1.4", "Dumb v1.4"},
                     {"693282099167494225A0.8", "Asymptote v0.8"},
                     {"693282099167494225F103", "Fishnet v103"},
@@ -166,7 +166,7 @@ public class ChessCommand {
                     {"69328209916749422520", "Cornelius v20"}};
 
             //Randomize list
-            Random random = new Random();
+            /*Random random = new Random();
             for (int i = players.length - 1; i > 0; i--) {
                 for (int j = players[i].length - 1; j > 0; j--) {
                     int m = random.nextInt(i + 1);
@@ -176,7 +176,7 @@ public class ChessCommand {
                     players[i][j] = players[m][n];
                     players[m][n] = temp;
                 }
-            }
+            }*/
 
             int gamesCompleted = 0;
             int totalGames = players.length * players.length;
