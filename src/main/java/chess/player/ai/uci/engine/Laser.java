@@ -12,6 +12,7 @@ public class Laser extends UCIEngine {
     }
 
     public String getBestMove(Query query) throws IOException {
+        waitForReady();
         sendCommand("position fen " + query.getFen());
 
         StringBuilder command = new StringBuilder("go ");
@@ -22,6 +23,7 @@ public class Laser extends UCIEngine {
         if (query.getMovetime() >= 0)
             command.append("movetime ").append(query.getMovetime());
 
+        waitForReady();
         sendCommand(command.toString());
 
         String result = readLine("bestmove");

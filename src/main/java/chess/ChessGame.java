@@ -601,7 +601,7 @@ public class ChessGame {
     }
 
     public ChessGameState ai(MessageChannel mc) {
-        int randomThinkTime = 1000;//ThreadLocalRandom.current().nextInt(5000, 10000 + 1); //Between 5-10 seconds
+        int randomThinkTime = 5000;//ThreadLocalRandom.current().nextInt(5000, 10000 + 1); //Between 5-10 seconds
         String bestMoveString = null;
         do {
             System.out.println(randomThinkTime);
@@ -632,6 +632,7 @@ public class ChessGame {
                     }
                     else if (isBlackPlayerTurn()) {
                         if (client2 != null) client2.close();
+
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
