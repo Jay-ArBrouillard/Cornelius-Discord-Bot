@@ -576,18 +576,26 @@ public class ChessGame {
         long thinkTime = 500;
         String bestMoveString = null;
         do {
+            System.out.println(thinkTime);
             try {
+                System.out.println("client1 is using " + client1 + ", client 2 is using " + client2);
+                System.out.println("Current player: " + this.board.getCurrentPlayer().getAlliance().toString());
+
                 if (isWhitePlayerTurn()) {
+                    System.out.println("White player is choosing their move");
                     bestMoveString = client1.submit(new Query.Builder(QueryType.Best_Move)
                             .setMovetime(thinkTime)
                             .setDifficulty(difficulty)
                             .setFen(FenUtils.parseFEN(this.board)).build());
+                    System.out.println("White players best move is: " + bestMoveString);
                 }
                 else if (isBlackPlayerTurn()) {
+                    System.out.println("Black player is choosing their move");
                     bestMoveString = client2.submit(new Query.Builder(QueryType.Best_Move)
-                            .setMovetime(thinkTime)
                             .setDifficulty(difficulty)
+                            .setMovetime(thinkTime)
                             .setFen(FenUtils.parseFEN(this.board)).build());
+                    System.out.println("Black players best move is: " + bestMoveString);
                 }
             } catch (Exception e) {
                 e.printStackTrace();

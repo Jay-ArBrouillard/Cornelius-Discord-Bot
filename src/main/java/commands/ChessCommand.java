@@ -201,11 +201,29 @@ public class ChessCommand {
                     event.getChannel().sendMessage("Beginning match (" + gamesCompleted + "/" + totalGames + ") : " + whiteSidePlayer.name + " vs " + blackSidePlayer.name).queue();
                     String status;
                     do {
+                        int difficulty = -1;
+                        int opponentDifficulty = -1;
+                        if (players[i][1].contains("Cornelius")) {
+                            difficulty = Integer.parseInt(players[i][1].split("Cornelius v")[1]);
+                        }
+                        if (players[j][1].contains("Cornelius")) {
+                            opponentDifficulty = Integer.parseInt(players[j][1].split("Cornelius v")[1]);
+                        }
                         if (chessGame.board.getCurrentPlayer().getAlliance().isWhite()) {
-                            state = chessGame.ai(i);
+                            if (difficulty != -1) {
+                                state = chessGame.ai(difficulty);
+                            }
+                            else {
+                                state = chessGame.ai(20);
+                            }
                         }
                         else {
-                            state = chessGame.ai(j);
+                            if (opponentDifficulty != -1) {
+                                state = chessGame.ai(opponentDifficulty);
+                            }
+                            else {
+                                state = chessGame.ai(20);
+                            }
                         }
                         reply = state.getMessage();
                         status = state.getStatus();
