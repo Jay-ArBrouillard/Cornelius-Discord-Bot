@@ -84,8 +84,8 @@ public class ChessCommand {
         if (message.startsWith("!chess") && message.contains("addAll")) {
             event.getChannel().sendMessage("Adding all AI's to Chess Records...").queue();
             String[][] players = {
-                    {"693282099167494225D1.4", "Dumb v1.4"},
-                    {"693282099167494225DT0.2", "Dragontooth v0.2"},
+                    {"693282099167494225DR1.0", "Drofa v1.0"},
+                    {"693282099167494225DU1.4", "Dumb v1.4"},
                     {"693282099167494225A0.8", "Asymptote v0.8"},
                     {"693282099167494225F103", "Fishnet v103"}, //Release 103
                     {"693282099167494225CG3.6", "CounterGo v3.6"},
@@ -130,8 +130,8 @@ public class ChessCommand {
         if (message.startsWith("!chess") && message.contains("train")) {
 
             String[][] players = {
-                    {"693282099167494225D1.4", "Dumb v1.4"},
-                    {"693282099167494225DT0.2", "Dragontooth v0.2"},
+                    {"693282099167494225DR1.0", "Drofa v1.0"},
+                    {"693282099167494225DU1.4", "Dumb v1.4"},
                     {"693282099167494225A0.8", "Asymptote v0.8"},
                     {"693282099167494225F103", "Fishnet v103"},
                     {"693282099167494225CG3.6", "CounterGo v3.6"},
@@ -162,6 +162,19 @@ public class ChessCommand {
                     {"69328209916749422518", "Cornelius v18"},
                     {"69328209916749422519", "Cornelius v19"},
                     {"69328209916749422520", "Cornelius v20"}};
+
+            //Randomize list
+            Random random = new Random();
+            for (int i = players.length - 1; i > 0; i--) {
+                for (int j = players[i].length - 1; j > 0; j--) {
+                    int m = random.nextInt(i + 1);
+                    int n = random.nextInt(j + 1);
+
+                    String temp = players[i][j];
+                    players[i][j] = players[m][n];
+                    players[m][n] = temp;
+                }
+            }
 
             int gamesCompleted = 0;
             int totalGames = players.length * players.length;

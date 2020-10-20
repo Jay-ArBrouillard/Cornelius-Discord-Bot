@@ -126,13 +126,13 @@ public class ChessGame {
                             .setOption(Option.Hash, 16)
                             .build(), p);
                 }
-                else if (p.name.contains("Dragontooth")) {
-                    setClient(new DragontoothClient.Builder()
+                else if (p.name.contains("Dumb")) {
+                    setClient(new DumbClient.Builder()
                             .setOption(Option.Hash, 16)
                             .build(), p);
                 }
-                else if (p.name.contains("Dumb")) {
-                    setClient(new DumbClient.Builder()
+                else if (p.name.contains("Drofa")) {
+                    setClient(new DrofaClient.Builder()
                             .setOption(Option.Hash, 16)
                             .build(), p);
                 }
