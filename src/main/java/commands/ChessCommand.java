@@ -233,11 +233,14 @@ public class ChessCommand {
                                 if (chessGame.stockFishClient != null) chessGame.stockFishClient.close();
                                 if (chessGame.client1 != null) chessGame.client1.close();
                                 if (chessGame.client2 != null) chessGame.client2.close();
+                                chessGame.stockFishClient = null;
+                                chessGame.client1 = null;
+                                chessGame.client2 = null;
                                 Thread.sleep(5000); //Wait to ensure clients are closed
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
-                            chessGame.id = null;
+                            chessGame = null;
                             chessGame = null;
                             whiteSidePlayer = null;
                             blackSidePlayer = null;
@@ -343,7 +346,7 @@ public class ChessCommand {
                 break;
             case SETUP_RESPONSE:
                 ChessPlayer humanPlayer = chessGame.addUser(event.getAuthor().getId(), event.getAuthor().getName());
-                reply = chessGame.setupPlayers(message, humanPlayer.elo);
+                reply = chessGame.setupPlayers(message, humanPlayer.elo, humanPlayer.discordId);
                 System.gc();
                 if (reply.startsWith(GameType.PVP.toString())) {
                     reply = "`Player vs Player Chess Game`\nPlease challenge another player by entering their `userId` (Click on user and Copy ID)";

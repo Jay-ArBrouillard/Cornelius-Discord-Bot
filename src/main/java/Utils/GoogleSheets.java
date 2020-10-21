@@ -170,33 +170,40 @@ public class GoogleSheets {
         }
     }
 
-    public static ChessPlayer findUserClosestElo(int elo) {
+    public static ChessPlayer findUserClosestElo(int elo, String id) {
         try {
             if (service == null) getSheetsService();
 
             ValueRange response = service.spreadsheets().values().get(SPREAD_SHEET_ID, RANKED_TAB).execute();
 
-            List closest = null;
+            List closest;
             int closestDiff = Integer.MAX_VALUE;
             Random rand = new Random();
             boolean isFirstRow = true;
+            List<List> candidates = new ArrayList<>();
             for (List row : response.getValues()) {
                 if (isFirstRow) {
                     isFirstRow = false;
                     continue;
                 };
+                if (id.equalsIgnoreCase((String)row.get(0))) { // User can't be itself
+                    continue;
+                }
                 int currElo = Integer.parseInt((String)row.get(2));
                 int currDiff = Math.abs(elo - currElo);
                 if (currDiff < closestDiff) {
-                    closest = row;
                     closestDiff = currDiff;
+                    candidates.clear();
+                    candidates.add(row);
                 }
                 else if (currDiff == closestDiff && rand.nextBoolean()) { //If multiple opponents of same elo then randomly select them
-                    closest = row;
                     closestDiff = currDiff;
+                    candidates.add(row);
                 }
             }
 
+            //Choose a random opponent from candidate list
+            closest = candidates.get(rand.nextInt(candidates.size()));
             return new ChessPlayer((String)closest.get(0), (String)closest.get(1), Integer.parseInt((String)closest.get(2)),
                     Boolean.valueOf((String)closest.get(3)), (String)closest.get(4), Integer.parseInt((String)closest.get(5)),
                     Integer.parseInt((String)closest.get(6)), Integer.parseInt((String)closest.get(7)),
@@ -380,12 +387,11 @@ public class GoogleSheets {
         mins += Integer.parseInt(split[4].trim());
         secs +=  Integer.parseInt(split[6].trim());
 
-        if (isRanked(p.discordId) != null) {
+        if (isRanked(p.discordId) == null) {
             return false;
         }
 
-        long totalTimeSeconds = Math.round((TimeUnit.DAYS.toSeconds(days) + TimeUnit.HOURS.toSeconds(hours) +
-                TimeUnit.MINUTES.toSeconds(mins) + secs) / p.totalGames);
+        long totalTimeSeconds = TimeUnit.DAYS.toSeconds(days) + TimeUnit.HOURS.toSeconds(hours) + TimeUnit.MINUTES.toSeconds(mins) + secs;
 
         days = TimeUnit.SECONDS.toDays(totalTimeSeconds);
         hours = TimeUnit.SECONDS.toHours(totalTimeSeconds) - (days *24);

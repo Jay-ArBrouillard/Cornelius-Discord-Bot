@@ -44,7 +44,7 @@ public class ChessGame {
             stockFishClient = new StockFishClient.Builder()
                                 .setOption(Option.Minimum_Thinking_Time, 500)
                                 .setOption(Option.Hash, 8)
-                                .setVariant(Variant.MODERN)  // BMI for windows, Modern for linux
+                                .setVariant(Variant.BMI2)  // BMI for windows, Modern for linux
                                 .build();
         } catch (Exception e) {
             e.printStackTrace();
@@ -53,7 +53,7 @@ public class ChessGame {
 
     public void setupComputerClient(GameType gameType) {
         try {
-            ChessPlayer [] players = new ChessPlayer[0];
+            ChessPlayer [] players;
             if (gameType.isPlayerVsComputer()) {
                 if (whiteSidePlayer.discordId.contains(System.getenv("OWNER_ID"))) { //White side is ai
                     players = new ChessPlayer[]{whiteSidePlayer};
@@ -84,7 +84,7 @@ public class ChessGame {
                     .setOption(Option.Minimum_Thinking_Time, 500) // Minimum thinking time Stockfish will take
                     .setOption(Option.Skill_Level, 20)
                     .setOption(Option.Hash, 16)
-                    .setVariant(Variant.MODERN) // BMI for windows, Modern for linux
+                    .setVariant(Variant.BMI2) // BMI for windows, Modern for linux
                     .build(), p);
         }
         else if (p.name.contains("Xiphos")) {
@@ -185,7 +185,7 @@ public class ChessGame {
         return this.board.getCurrentPlayer().getAlliance().isBlack();
     }
 
-    public String setupPlayers(String message, int elo) {
+    public String setupPlayers(String message, int elo, String id) {
         String option = message.contains(" ") ? message.substring(0, message.indexOf(" ")).trim() : message;
         String opponent = message.contains(" ") ? message.substring(message.indexOf(" ")).trim() : null;
 
@@ -199,7 +199,7 @@ public class ChessGame {
 
         ChessPlayer player = null;
         if (opponent == null || (opponent != null && opponent.isEmpty())) { //Find a random opponent with a similar elo if possible
-            player = findUserByElo(elo); //Should never be null
+            player = findUserByElo(elo, id); //Should never be null
         }
         else if (option.equals("2") || option.equals("3")){
             player = findUserByName(opponent);
@@ -416,8 +416,8 @@ public class ChessGame {
         }
     }
 
-    public synchronized ChessPlayer findUserByElo(int elo) {
-        return db.findUserClosestElo(elo);
+    public synchronized ChessPlayer findUserByElo(int elo, String id) {
+        return db.findUserClosestElo(elo, id);
     }
 
     public synchronized ChessPlayer findUserByName(String name) {
