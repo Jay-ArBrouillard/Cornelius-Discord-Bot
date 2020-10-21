@@ -258,6 +258,11 @@ public class ChessGame {
         }
         //////////////////////// Validate Move Input ////////////////////////////////
         String inputNoSpaces = input.replaceAll("\\s+", "");
+        //Is castling notation?
+        if (inputNoSpaces.equalsIgnoreCase("o-o") || inputNoSpaces.equalsIgnoreCase("o-o-o")) {
+            return convertCastlingMove(inputNoSpaces, -1,-1, false);
+        }
+
         messageHandler.validateInputLengthFour(input);
         if (messageHandler.handleErrorMessage().equals(messageHandler.ERROR)) {
             state.setMessage(messageHandler.getLastErrorMessage());
@@ -293,7 +298,7 @@ public class ChessGame {
         return handleMove(startCoordinate, destinationCoordinate, inputNoSpaces, false);
     }
 
-    private ChessGameState handleMove(int startCoordinate, int destinationCoordinate, String moveCmd, boolean isComputer) {
+    private ChessGameState convertCastlingMove(String moveCmd, int startCoordinate, int destinationCoordinate, boolean isComputer) {
         //Handle if player sends "O-O" or "O-O-O" for castling
         if (moveCmd.equalsIgnoreCase("o-o")) {
             if (this.board.getCurrentPlayer().getAlliance().isWhite()) {
@@ -319,7 +324,10 @@ public class ChessGame {
                 destinationCoordinate = 2;
             }
         }
+        return handleMove(startCoordinate, destinationCoordinate, moveCmd, isComputer);
+    }
 
+    private ChessGameState handleMove(int startCoordinate, int destinationCoordinate, String moveCmd, boolean isComputer) {
         final Move move = Move.MoveFactory.createMove(this.board, startCoordinate, destinationCoordinate);
         MoveTransition transition = this.board.getCurrentPlayer().makeMove(move);
         if (transition.getMoveStatus().isDone()) {
@@ -638,6 +646,11 @@ public class ChessGame {
             }
         } while (bestMoveString == null);
 
+        //Is castling notation?
+        if (bestMoveString.equalsIgnoreCase("o-o") || bestMoveString.equalsIgnoreCase("o-o-o")) {
+            return convertCastlingMove(bestMoveString, -1,-1, true);
+        }
+
         String x1Str = Character.toString(bestMoveString.charAt(0));
         String y1Str = Character.toString(bestMoveString.charAt(1));
         String x2Str = Character.toString(bestMoveString.charAt(2));
@@ -696,6 +709,11 @@ public class ChessGame {
             }
         } while (bestMoveString == null);
         mc.sendTyping().queue();
+
+        //Is castling notation?
+        if (bestMoveString.equalsIgnoreCase("o-o") || bestMoveString.equalsIgnoreCase("o-o-o")) {
+            return convertCastlingMove(bestMoveString, -1,-1, true);
+        }
 
         String x1Str = Character.toString(bestMoveString.charAt(0));
         String y1Str = Character.toString(bestMoveString.charAt(1));
