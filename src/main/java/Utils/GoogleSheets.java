@@ -138,7 +138,7 @@ public class GoogleSheets {
                 busReq.setRequests(Arrays.asList(request));
                 service.spreadsheets().batchUpdate(SPREAD_SHEET_ID, busReq).execute();
 
-                return new ChessPlayer(id, name, 1200.0, true, "Class D", 0, 0, 0, 0.0, 0, "0 days 0 hours 0 minutes 0 seconds", now, now);
+                return new ChessPlayer(id, name, 1200, true, "Class D", 0, 0, 0, 0.0, 0, "0 days 0 hours 0 minutes 0 seconds", now, now);
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -107,8 +107,8 @@ public class ChessGame {
                     .setOption(Option.Hash, 16)
                     .build(), p);
         }
-        else if (p.name.contains("Chenglite")) {
-            setClient(new ChengliteClient.Builder()
+        else if (p.name.contains("Eschesc")) {
+            setClient(new EschescClient.Builder()
                     .setOption(Option.Hash, 16)
                     .build(), p);
         }
