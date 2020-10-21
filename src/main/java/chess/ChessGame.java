@@ -294,6 +294,32 @@ public class ChessGame {
     }
 
     private ChessGameState handleMove(int startCoordinate, int destinationCoordinate, String moveCmd, boolean isComputer) {
+        //Handle if player sends "O-O" or "O-O-O" for castling
+        if (moveCmd.equalsIgnoreCase("o-o")) {
+            if (this.board.getCurrentPlayer().getAlliance().isWhite()) {
+                moveCmd = "e1g1";
+                startCoordinate = 60;
+                destinationCoordinate = 62;
+            }
+            else {
+                moveCmd = "e8g8";
+                startCoordinate = 4;
+                destinationCoordinate = 6;
+            }
+        }
+        else if (moveCmd.equalsIgnoreCase("o-o-o")) {
+            if (this.board.getCurrentPlayer().getAlliance().isWhite()) {
+                moveCmd = "e1c1";
+                startCoordinate = 60;
+                destinationCoordinate = 58;
+            }
+            else {
+                moveCmd = "e8c8";
+                startCoordinate = 4;
+                destinationCoordinate = 2;
+            }
+        }
+
         final Move move = Move.MoveFactory.createMove(this.board, startCoordinate, destinationCoordinate);
         MoveTransition transition = this.board.getCurrentPlayer().makeMove(move);
         if (transition.getMoveStatus().isDone()) {

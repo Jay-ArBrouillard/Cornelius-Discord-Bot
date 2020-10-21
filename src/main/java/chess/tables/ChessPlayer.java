@@ -87,17 +87,18 @@ public class ChessPlayer {
                 }
             }
             else { //Loss
+                // Never let their elo decrease lower than 100
                 if (!this.provisional && !o.provisional) {
-                    this.elo = EloRanking.calculateEstablishedVsEstablished(this.elo, o.elo, 0.0);
+                    this.elo = Math.max(100, EloRanking.calculateEstablishedVsEstablished(this.elo, o.elo, 0.0));
                 }
                 else if (!this.provisional && o.provisional) {
-                    this.elo = EloRanking.calculateEstablishedVsProvisional(this.elo, o.elo, o.totalGames,0.0);
+                    this.elo = Math.max(100, EloRanking.calculateEstablishedVsProvisional(this.elo, o.elo, o.totalGames,0.0));
                 }
                 else if (this.provisional && !o.provisional) {
-                    this.elo = EloRanking.calculateProvisionalVsEstablished(this.elo, this.totalGames, o.elo, -1.0);
+                    this.elo = Math.max(100, EloRanking.calculateProvisionalVsEstablished(this.elo, this.totalGames, o.elo, -1.0));
                 }
                 else {
-                    this.elo = EloRanking.calculateProvisionalVsProvisional(this.elo, this.totalGames, o.elo, -1.0);
+                    this.elo = Math.max(100, EloRanking.calculateProvisionalVsProvisional(this.elo, this.totalGames, o.elo, -1.0));
                 }
             }
         }
