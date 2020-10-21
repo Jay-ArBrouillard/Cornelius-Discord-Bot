@@ -44,7 +44,7 @@ public class ChessGame {
             stockFishClient = new StockFishClient.Builder()
                                 .setOption(Option.Minimum_Thinking_Time, 500)
                                 .setOption(Option.Hash, 8)
-                                .setVariant(Variant.BMI2)  // BMI for windows, Modern for linux
+                                .setVariant(Variant.MODERN)  // BMI for windows, Modern for linux
                                 .build();
         } catch (Exception e) {
             e.printStackTrace();
@@ -81,22 +81,19 @@ public class ChessGame {
     private void setClient(ChessPlayer p) throws IOException {
         if (p.name.contains("Cornelius")) { //Cornelius will default to use stockfish client
             setClient(new StockFishClient.Builder()
-                    .setOption(Option.Minimum_Thinking_Time, 500) // Minimum thinking time Stockfish will take
                     .setOption(Option.Skill_Level, 20)
                     .setOption(Option.Hash, 16)
-                    .setVariant(Variant.BMI2) // BMI for windows, Modern for linux
+                    .setVariant(Variant.MODERN) // BMI for windows, Modern for linux
                     .build(), p);
         }
         else if (p.name.contains("Xiphos")) {
             setClient(new XiphosClient.Builder()
-                    .setOption(Option.Minimum_Thinking_Time, 500)
                     .setVariant(Variant.SSE) //BMI for windows, SSE for linux
                     .setOption(Option.Hash, 16)
                     .build(), p);
         }
         else if (p.name.contains("Komodo")) {
             setClient(new KomodoClient.Builder()
-                    .setOption(Option.Minimum_Thinking_Time, 500)
                     .setOption(Option.Hash, 16)
                     .build(), p);
         }
