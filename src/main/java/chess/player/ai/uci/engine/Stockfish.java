@@ -19,11 +19,6 @@ public class Stockfish extends UCIEngine {
     }
 
     public String getBestMove(Query query) throws IOException {
-        if (query.getDifficulty() >= 0) {
-            waitForReady();
-            sendCommand("setoption name Skill Level value " + query.getDifficulty());
-        }
-
         waitForReady();
         sendCommand("position fen " + query.getFen());
 

@@ -235,47 +235,17 @@ public class ChessCommand {
                     chessGame.setWhiteSidePlayer(whiteSidePlayer);
                     gameType = GameType.CVC;
                     chessGame.setupStockfishClient();
+                    chessGame.setupComputerClient(gameType);
                     state.getPrevElo().put(whiteSidePlayer.discordId, whiteSidePlayer.elo);
                     state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
                     state.setMatchStartTime(Instant.now().toEpochMilli());
                     decision = COMPUTER_MOVE;
 
-                    if (players[i][1].contains("Cheng")) {
-                        String eloString = players[i][1].split("Cheng ")[1];
-                        chessGame.setupComputerClient(gameType, eloString);
-                    }
-                    else {
-                        chessGame.setupComputerClient(gameType, null);
-                    }
-
                     event.getChannel().sendMessage("Beginning match (" + gamesCompleted + "/" + totalGames + ") : " + whiteSidePlayer.name + " vs " + blackSidePlayer.name).queue();
                     String status;
                     System.gc();
                     do {
-                        int difficulty = -1;
-                        int opponentDifficulty = -1;
-                        if (players[i][1].contains("Cornelius")) {
-                            difficulty = Integer.parseInt(players[i][1].split("Cornelius v")[1]);
-                        }
-                        if (players[j][1].contains("Cornelius")) {
-                            opponentDifficulty = Integer.parseInt(players[j][1].split("Cornelius v")[1]);
-                        }
-                        if (chessGame.board.getCurrentPlayer().getAlliance().isWhite()) {
-                            if (difficulty != -1) {
-                                state = chessGame.ai(difficulty);
-                            }
-                            else {
-                                state = chessGame.ai(20);
-                            }
-                        }
-                        else {
-                            if (opponentDifficulty != -1) {
-                                state = chessGame.ai(opponentDifficulty);
-                            }
-                            else {
-                                state = chessGame.ai(20);
-                            }
-                        }
+                        state = chessGame.ai(null);
                         reply = state.getMessage();
                         status = state.getStatus();
 
@@ -427,13 +397,7 @@ public class ChessCommand {
                     reply = "`Starting Chess Game " + whiteSidePlayer.name + " (" + (int)whiteSidePlayer.elo + ")" + " vs. " + blackSidePlayer.name + " (" + (int)blackSidePlayer.elo + ")`\nMake a move (ex: `c2 c4`)";
                     gameType = GameType.PVC;
                     decision = PLAYER_MOVE;
-                    if (gameidName[2].contains("Cheng")) {
-                        String eloString = gameidName[2].split("Cheng ")[1];
-                        chessGame.setupComputerClient(gameType, eloString);
-                    }
-                    else {
-                        chessGame.setupComputerClient(gameType, null);
-                    }
+                    chessGame.setupComputerClient(gameType);
                     chessGame.setupStockfishClient();
                     state.setMatchStartTime(Instant.now().toEpochMilli());
                 }
@@ -451,13 +415,7 @@ public class ChessCommand {
                     reply = "`Starting Chess Game " + whiteSidePlayer.name + " (" + (int)whiteSidePlayer.elo + ")" + " vs. " + blackSidePlayer.name + " (" + (int)blackSidePlayer.elo + ")`\n" + whiteSidePlayer.name + " will go first...";
                     gameType = GameType.CVP;
                     decision = COMPUTER_MOVE;
-                    if (gameidName[2].contains("Cheng")) {
-                        String eloString = gameidName[2].split("Cheng ")[1];
-                        chessGame.setupComputerClient(gameType, eloString);
-                    }
-                    else {
-                        chessGame.setupComputerClient(gameType, null);
-                    }
+                    chessGame.setupComputerClient(gameType);
                     chessGame.setupStockfishClient();
                     state.setMatchStartTime(Instant.now().toEpochMilli());
                 }

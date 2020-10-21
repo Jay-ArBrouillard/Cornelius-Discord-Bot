@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class ChessGame {
     public Board board;
@@ -51,7 +52,7 @@ public class ChessGame {
         }
     }
 
-    public void setupComputerClient(GameType gameType, String elo) {
+    public void setupComputerClient(GameType gameType) {
         try {
             ChessPlayer [] players;
             if (gameType.isPlayerVsComputer()) {
@@ -70,14 +71,14 @@ public class ChessGame {
                 return;
             }
             for (ChessPlayer p : players) {
-                setClient(p, elo);
+                setClient(p);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void setClient(ChessPlayer p, String elo) throws IOException {
+    private void setClient(ChessPlayer p) throws IOException {
         if (p.name.contains("Cornelius")) { //Cornelius will default to use stockfish client
             setClient(new StockFishClient.Builder()
                     .setOption(Option.Skill_Level, 20)
@@ -110,7 +111,7 @@ public class ChessGame {
             setClient(new ChengClient.Builder()
                     .setOption(Option.Hash, 16)
                     .setOption(Option.Limit_Strength, Boolean.TRUE)
-                    .setOption(Option.Elo, elo)
+                    .setOption(Option.Elo, p.name.split("Cheng ")[1]) //Elo Skill level is in their name
                     .build(), p);
         }
         else if (p.name.contains("Amoeba")) {
@@ -598,73 +599,8 @@ public class ChessGame {
         return intValue;
     }
 
-    public ChessGameState ai(int difficulty) {
-        long thinkTime = 500;
-        String bestMoveString = null;
-        do {
-            try {
-                if (isWhitePlayerTurn()) {
-                    bestMoveString = client1.submit(new Query.Builder(QueryType.Best_Move)
-                            .setMovetime(thinkTime)
-                            .setDifficulty(difficulty)
-                            .setFen(FenUtils.parseFEN(this.board)).build());
-                }
-                else if (isBlackPlayerTurn()) {
-                    bestMoveString = client2.submit(new Query.Builder(QueryType.Best_Move)
-                            .setDifficulty(difficulty)
-                            .setMovetime(thinkTime)
-                            .setFen(FenUtils.parseFEN(this.board)).build());
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                try {
-                    System.out.println("client1 was using " + client1 + ", client 2 was using " + client2);
-                    if (isWhitePlayerTurn()) {
-                        if (client1 != null) {
-                            client1.close();
-                            System.out.println("Shutdown client1");
-                        }
-                    }
-                    else if (isBlackPlayerTurn()) {
-                        if (client2 != null) {
-                            client2.close();
-                            System.out.println("Shutdown client2");
-                        }
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-                finally { //If ai breaks then rely on simple ai for rest of the game
-                    System.out.println("Using iterative deepening");
-                    if (id == null) id = new IterativeDeepening(6);
-                    final Move bestMove = id.execute(this.board);
-                    bestMoveString = BoardUtils.getPositionAtCoordinate(bestMove.getCurrentCoordinate()) + BoardUtils.getPositionAtCoordinate(bestMove.getDestinationCoordinate());
-                    return handleMove(bestMove.getCurrentCoordinate(), bestMove.getDestinationCoordinate(), bestMoveString, true);
-                }
-            } finally {
-                thinkTime *= 2;
-            }
-        } while (bestMoveString == null);
-
-        //Is castling notation?
-        if (bestMoveString.equalsIgnoreCase("o-o") || bestMoveString.equalsIgnoreCase("o-o-o")) {
-            return convertCastlingMove(bestMoveString, -1,-1, true);
-        }
-
-        String x1Str = Character.toString(bestMoveString.charAt(0));
-        String y1Str = Character.toString(bestMoveString.charAt(1));
-        String x2Str = Character.toString(bestMoveString.charAt(2));
-        String y2Str = Character.toString(bestMoveString.charAt(3));
-
-        ///////////////////////// Get board coordinates from input ////////////////////////////////
-        int startCoordinate = convertInputToInteger(x1Str, y1Str);
-        int destinationCoordinate = convertInputToInteger(x2Str, y2Str);
-
-        return handleMove(startCoordinate, destinationCoordinate, bestMoveString, true);
-    }
-
     public ChessGameState ai(MessageChannel mc) {
-        int randomThinkTime = 5000;//ThreadLocalRandom.current().nextInt(5000, 10000 + 1); //Between 5-10 seconds
+        int randomThinkTime = mc == null ? 500 : ThreadLocalRandom.current().nextInt(5000, 10000 + 1); //Between 5-10 seconds against human
         String bestMoveString = null;
         do {
             try {

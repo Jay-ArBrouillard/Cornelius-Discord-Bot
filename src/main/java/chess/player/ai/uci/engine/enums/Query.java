@@ -3,14 +3,13 @@ package chess.player.ai.uci.engine.enums;
 public class Query {
     private QueryType type;
     private String fen, move;
-    private int difficulty, depth;
+    private int depth;
     private long movetime;
 
-    public Query(QueryType type, String fen, String move, int difficulty, int depth, long movetime) {
+    public Query(QueryType type, String fen, String move, int depth, long movetime) {
         this.type = type;
         this.fen = fen;
         this.move = move;
-        this.difficulty = difficulty;
         this.depth = depth;
         this.movetime = movetime;
     }
@@ -27,10 +26,6 @@ public class Query {
         return move;
     }
 
-    public int getDifficulty() {
-        return difficulty;
-    }
-
     public int getDepth() {
         return depth;
     }
@@ -42,7 +37,7 @@ public class Query {
     public static class Builder {
         private QueryType type;
         private String fen, move;
-        private int difficulty = -1, depth = -1;
+        private int depth = -1;
         private long movetime = -1;
 
         public Builder(QueryType type) {
@@ -56,11 +51,6 @@ public class Query {
 
         public Builder setMove(String move) {
             this.move = move;
-            return this;
-        }
-
-        public Builder setDifficulty(int difficulty) {
-            this.difficulty = difficulty;
             return this;
         }
 
@@ -81,7 +71,7 @@ public class Query {
             if (fen == null)
                 throw new IllegalStateException("Query is missing FEN.");
 
-            return new Query(type, fen, move, difficulty, depth, movetime);
+            return new Query(type, fen, move, depth, movetime);
         }
     }
 }
