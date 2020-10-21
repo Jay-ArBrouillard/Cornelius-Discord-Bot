@@ -403,7 +403,7 @@ public class ChessGame {
             //Should computer resign?
             if (isComputer && state.getBoardEvaluationMessage() != null) {
                 double evaluationScore = Double.parseDouble(state.getBoardEvaluationMessage().replace("(white side)", "").trim());
-                if (didWhiteJustMove() && evaluationScore <= -10) {
+                if (didWhiteJustMove() && evaluationScore <= -12) {
                     state.setMessage(whiteSidePlayer.name + " has RESIGNED!");
                     state.setStateComputerResign();
                     state.setWinnerId(blackSidePlayer.discordId);
@@ -411,7 +411,7 @@ public class ChessGame {
                     updateDatabaseBlackSideWin(true);
                     return state;
                 }
-                if (didBlackJustMove() && evaluationScore >= 10) {
+                if (didBlackJustMove() && evaluationScore >= 12) {
                     state.setMessage(blackSidePlayer.name + " has RESIGNED!");
                     state.setStateComputerResign();
                     state.setWinnerId(whiteSidePlayer.discordId);
@@ -709,7 +709,7 @@ public class ChessGame {
             }
         } while (bestMoveString == null);
         mc.sendTyping().queue();
-
+        bestMoveString = bestMoveString.trim(); //In some cases returned string has extra spaces
         //Is castling notation?
         if (bestMoveString.equalsIgnoreCase("o-o") || bestMoveString.equalsIgnoreCase("o-o-o")) {
             return convertCastlingMove(bestMoveString, -1,-1, true);

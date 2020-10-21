@@ -424,7 +424,7 @@ public class ChessCommand {
                     blackSidePlayer = chessGame.addUser(gameidName[1], gameidName[2]);  //Note: Difficulty value is appended to id and name
                     state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
                     chessGame.setBlackSidePlayer(blackSidePlayer);
-                    reply = "`Starting Chess Game " + whiteSidePlayer.name + " (" + whiteSidePlayer.elo + ")" + " vs. " + blackSidePlayer.name + " (" + blackSidePlayer.elo + ")`\nMake a move (ex: `c2 c4`)";
+                    reply = "`Starting Chess Game " + whiteSidePlayer.name + " (" + (int)whiteSidePlayer.elo + ")" + " vs. " + blackSidePlayer.name + " (" + (int)blackSidePlayer.elo + ")`\nMake a move (ex: `c2 c4`)";
                     gameType = GameType.PVC;
                     decision = PLAYER_MOVE;
                     if (gameidName[2].contains("Cheng")) {
@@ -448,7 +448,7 @@ public class ChessCommand {
                     blackSidePlayer = humanPlayer;
                     chessGame.setBlackSidePlayer(blackSidePlayer);
                     state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
-                    reply = "`Starting Chess Game " + whiteSidePlayer.name + " (" + whiteSidePlayer.elo + ")" + " vs. " + blackSidePlayer.name + " (" + blackSidePlayer.elo + ")`\n" + whiteSidePlayer.name + " will go first...";
+                    reply = "`Starting Chess Game " + whiteSidePlayer.name + " (" + (int)whiteSidePlayer.elo + ")" + " vs. " + blackSidePlayer.name + " (" + (int)blackSidePlayer.elo + ")`\n" + whiteSidePlayer.name + " will go first...";
                     gameType = GameType.CVP;
                     decision = COMPUTER_MOVE;
                     if (gameidName[2].contains("Cheng")) {
@@ -493,7 +493,7 @@ public class ChessCommand {
             case OPPONENT_ACCEPT_DECLINE:
                 if (event.getAuthor().getId().equals(blackSidePlayer.discordId)) {
                     if (message.equalsIgnoreCase("y")) {
-                        reply = "<@" + whiteSidePlayer.discordId + "> ("+whiteSidePlayer.elo+") vs <@" + blackSidePlayer.discordId + "> ("+blackSidePlayer.elo+") Chess Game";
+                        reply = "<@" + whiteSidePlayer.discordId + "> ("+(int)whiteSidePlayer.elo+") vs <@" + blackSidePlayer.discordId + "> ("+(int)blackSidePlayer.elo+") Chess Game";
                         boardImageFile = new File(GAME_BOARD_IMAGE_LOCATION);
                         belowMessage = "`"+ whiteSidePlayer.name + "` goes first. Make a move (ex: `c2 c4`)";
                         decision = Decision.PLAYER_MOVE;
