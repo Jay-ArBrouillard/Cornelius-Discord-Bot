@@ -81,9 +81,10 @@ public class ChessGame {
     private void setClient(ChessPlayer p) throws IOException {
         if (p.name.contains("Cornelius")) { //Cornelius will default to use stockfish client
             setClient(new StockFishClient.Builder()
-                    .setOption(Option.Skill_Level, 20)
                     .setOption(Option.Hash, 16)
                     .setVariant(Variant.MODERN) // BMI for windows, Modern for linux
+                    .setOption(Option.Limit_Strength, Boolean.TRUE)
+                    .setOption(Option.Elo, p.name.split("Cornelius ")[1]) //Elo Skill level is in their name
                     .build(), p);
         }
         else if (p.name.contains("Xiphos")) {
@@ -127,6 +128,8 @@ public class ChessGame {
         else if (p.name.contains("Fishnet")) {
             setClient(new FishnetClient.Builder()
                     .setOption(Option.Hash, 16)
+                    .setOption(Option.Limit_Strength, Boolean.TRUE)
+                    .setOption(Option.Elo, p.name.split("Fishnet ")[1]) //Elo Skill level is in their name
                     .build(), p);
         }
         else if (p.name.contains("Asymptote")) {
@@ -404,7 +407,7 @@ public class ChessGame {
             //Should computer resign?
             if (isComputer && state.getBoardEvaluationMessage() != null) {
                 double evaluationScore = Double.parseDouble(state.getBoardEvaluationMessage().replace("(white side)", "").trim());
-                if (didWhiteJustMove() && evaluationScore <= -12) {
+                if (didWhiteJustMove() && evaluationScore <= -10) {
                     state.setMessage(whiteSidePlayer.name + " has RESIGNED!");
                     state.setStateComputerResign();
                     state.setWinnerId(blackSidePlayer.discordId);
@@ -412,7 +415,7 @@ public class ChessGame {
                     updateDatabaseBlackSideWin(true);
                     return state;
                 }
-                if (didBlackJustMove() && evaluationScore >= 12) {
+                if (didBlackJustMove() && evaluationScore >= 10) {
                     state.setMessage(blackSidePlayer.name + " has RESIGNED!");
                     state.setStateComputerResign();
                     state.setWinnerId(whiteSidePlayer.discordId);
@@ -644,7 +647,7 @@ public class ChessGame {
                 randomThinkTime *= 2;
             }
         } while (bestMoveString == null);
-        mc.sendTyping().queue();
+        if (mc != null) mc.sendTyping().queue();
         bestMoveString = bestMoveString.trim(); //In some cases returned string has extra spaces
         //Is castling notation?
         if (bestMoveString.equalsIgnoreCase("o-o") || bestMoveString.equalsIgnoreCase("o-o-o")) {

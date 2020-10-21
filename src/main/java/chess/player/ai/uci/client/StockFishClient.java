@@ -59,7 +59,7 @@ public class StockFishClient extends BaseAiClient {
             return this;
         }
 
-        public final Builder setOption(Option o, long value) {
+        public final Builder setOption(Option o, Object value) {
             options.add(o.setValue(value));
             return this;
         }

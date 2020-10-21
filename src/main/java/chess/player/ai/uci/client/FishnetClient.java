@@ -50,7 +50,7 @@ public class FishnetClient extends BaseAiClient{
             return this;
         }
 
-        public final FishnetClient.Builder setOption(Option o, long value) {
+        public final FishnetClient.Builder setOption(Option o, Object value) {
             options.add(o.setValue(value));
             return this;
         }
