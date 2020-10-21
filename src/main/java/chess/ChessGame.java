@@ -21,11 +21,11 @@ import java.util.*;
 
 public class ChessGame {
     public Board board;
-    private ChessMessageHandler messageHandler;
-    private GoogleSheets db;
-    private ChessGameState state;
-    private ChessPlayer whiteSidePlayer;
-    private ChessPlayer blackSidePlayer;
+    public ChessMessageHandler messageHandler;
+    public GoogleSheets db;
+    public ChessGameState state;
+    public ChessPlayer whiteSidePlayer;
+    public ChessPlayer blackSidePlayer;
     public IterativeDeepening id;
     public boolean threadRunning = false;
     public StockFishClient stockFishClient;
@@ -182,7 +182,7 @@ public class ChessGame {
         return this.board.getCurrentPlayer().getAlliance().isBlack();
     }
 
-    public String setupPlayers(String message, int elo, String id) {
+    public String setupPlayers(String message, double elo, String id) {
         String option = message.contains(" ") ? message.substring(0, message.indexOf(" ")).trim() : message;
         String opponent = message.contains(" ") ? message.substring(message.indexOf(" ")).trim() : null;
 
@@ -413,7 +413,7 @@ public class ChessGame {
         }
     }
 
-    public synchronized ChessPlayer findUserByElo(int elo, String id) {
+    public synchronized ChessPlayer findUserByElo(double elo, String id) {
         return db.findUserClosestElo(elo, id);
     }
 

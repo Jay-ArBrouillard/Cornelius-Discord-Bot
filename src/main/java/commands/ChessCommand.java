@@ -143,26 +143,26 @@ public class ChessCommand {
                     {"693282099167494225C2.3", "Cinnamon v2.3"},
                     {"693282099167494225X0.6", "Xiphos v0.6"},
                     {"693282099167494225K11", "Komodo v11"},
-                    {"6932820991674942250", "Cornelius v0"},
-                    {"6932820991674942251", "Cornelius v1"},
-                    {"6932820991674942252", "Cornelius v2"},
-                    {"6932820991674942253", "Cornelius v3"},
-                    {"6932820991674942254", "Cornelius v4"},
-                    {"6932820991674942255", "Cornelius v5"},
-                    {"6932820991674942256", "Cornelius v6"},
-                    {"6932820991674942257", "Cornelius v7"},
-                    {"6932820991674942258", "Cornelius v8"},
-                    {"6932820991674942259", "Cornelius v9"},
+//                    {"6932820991674942250", "Cornelius v0"},
+//                    {"6932820991674942251", "Cornelius v1"},
+//                    {"6932820991674942252", "Cornelius v2"},
+//                    {"6932820991674942253", "Cornelius v3"},
+//                    {"6932820991674942254", "Cornelius v4"},
+//                    {"6932820991674942255", "Cornelius v5"},
+//                    {"6932820991674942256", "Cornelius v6"},
+//                    {"6932820991674942257", "Cornelius v7"},
+//                    {"6932820991674942258", "Cornelius v8"},
+//                    {"6932820991674942259", "Cornelius v9"},
                     {"69328209916749422510", "Cornelius v10"},
-                    {"69328209916749422511", "Cornelius v11"},
-                    {"69328209916749422512", "Cornelius v12"},
-                    {"69328209916749422513", "Cornelius v13"},
-                    {"69328209916749422514", "Cornelius v14"},
-                    {"69328209916749422515", "Cornelius v15"},
-                    {"69328209916749422516", "Cornelius v16"},
-                    {"69328209916749422517", "Cornelius v17"},
-                    {"69328209916749422518", "Cornelius v18"},
-                    {"69328209916749422519", "Cornelius v19"},
+//                    {"69328209916749422511", "Cornelius v11"},
+//                    {"69328209916749422512", "Cornelius v12"},
+//                    {"69328209916749422513", "Cornelius v13"},
+//                    {"69328209916749422514", "Cornelius v14"},
+//                    {"69328209916749422515", "Cornelius v15"},
+//                    {"69328209916749422516", "Cornelius v16"},
+//                    {"69328209916749422517", "Cornelius v17"},
+//                    {"69328209916749422518", "Cornelius v18"},
+//                    {"69328209916749422519", "Cornelius v19"},
                     {"69328209916749422520", "Cornelius v20"}};
 
             //Randomize list
@@ -236,15 +236,21 @@ public class ChessCommand {
                                 chessGame.stockFishClient = null;
                                 chessGame.client1 = null;
                                 chessGame.client2 = null;
+                                chessGame.board = null;
+                                chessGame.blackSidePlayer = null;
+                                chessGame.whiteSidePlayer = null;
+                                chessGame.state = null;
+                                chessGame.messageHandler = null;
+                                chessGame.db = null;
+                                chessGame.id = null;
                                 Thread.sleep(5000); //Wait to ensure clients are closed
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
-                            chessGame = null;
+                            state = null;
                             chessGame = null;
                             whiteSidePlayer = null;
                             blackSidePlayer = null;
-                            state = null;
                             System.gc(); //Attempt to call garbage collector to clear memory
                             event.getChannel().sendMessage(reply).queue();
                             gamesCompleted++;

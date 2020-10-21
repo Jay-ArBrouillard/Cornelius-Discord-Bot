@@ -5,7 +5,7 @@ import Utils.EloRanking;
 public class ChessPlayer {
     public final String discordId;
     public final String name;
-    public int elo;
+    public double elo;
     public boolean provisional;
     public String title;
     public int wins;
@@ -17,7 +17,7 @@ public class ChessPlayer {
     public final String createdOn;
     public String updatedOn;
 
-    public ChessPlayer(String discordId, String name, int elo, boolean provisional, String title, int wins, int losses, int draws, double ratio, int totalGames, String totalGameTimeStr, String createdOn, String updatedOn) {
+    public ChessPlayer(String discordId, String name, double elo, boolean provisional, String title, int wins, int losses, int draws, double ratio, int totalGames, String totalGameTimeStr, String createdOn, String updatedOn) {
         this.discordId = discordId;
         this.name = name;
         this.elo = elo;
@@ -64,43 +64,45 @@ public class ChessPlayer {
                 this.elo = EloRanking.calculateEstablishedVsProvisional(this.elo, o.elo, o.totalGames,0.5);
             }
             else if (this.provisional && !o.provisional) {
-                this.elo = EloRanking.calculateProvisionalVsEstablished(this.elo, this.totalGames, o.elo, 0);
+                this.elo = EloRanking.calculateProvisionalVsEstablished(this.elo, this.totalGames, o.elo, 0.0);
             }
             else {
-                this.elo = EloRanking.calculateProvisionalVsProvisional(this.elo, this.totalGames, o.elo, 0);
+                this.elo = EloRanking.calculateProvisionalVsProvisional(this.elo, this.totalGames, o.elo, 0.0);
             }
         }
         else {
             if (isWin) {
+                // Never let their elo decrease after a win
                 if (!this.provisional && !o.provisional) {
-                    this.elo = EloRanking.calculateEstablishedVsEstablished(this.elo, o.elo, 1);
+                    this.elo = Math.max(this.elo, EloRanking.calculateEstablishedVsEstablished(this.elo, o.elo, 1.0));
                 }
                 else if (!this.provisional && o.provisional) {
-                    this.elo = EloRanking.calculateEstablishedVsProvisional(this.elo, o.elo, o.totalGames,1);
+                    this.elo = Math.max(this.elo, EloRanking.calculateEstablishedVsProvisional(this.elo, o.elo, o.totalGames,1.0));
                 }
                 else if (this.provisional && !o.provisional) {
-                    this.elo = EloRanking.calculateProvisionalVsEstablished(this.elo, this.totalGames, o.elo, 1);
+                    this.elo = Math.max(this.elo, EloRanking.calculateProvisionalVsEstablished(this.elo, this.totalGames, o.elo, 1.0));
                 }
                 else {
-                    this.elo = EloRanking.calculateProvisionalVsProvisional(this.elo, this.totalGames, o.elo, 1);
+                    this.elo = Math.max(this.elo, EloRanking.calculateProvisionalVsProvisional(this.elo, this.totalGames, o.elo, 1.0));
                 }
             }
             else { //Loss
                 if (!this.provisional && !o.provisional) {
-                    this.elo = EloRanking.calculateEstablishedVsEstablished(this.elo, o.elo, 0);
+                    this.elo = EloRanking.calculateEstablishedVsEstablished(this.elo, o.elo, 0.0);
                 }
                 else if (!this.provisional && o.provisional) {
-                    this.elo = EloRanking.calculateEstablishedVsProvisional(this.elo, o.elo, o.totalGames,0);
+                    this.elo = EloRanking.calculateEstablishedVsProvisional(this.elo, o.elo, o.totalGames,0.0);
                 }
                 else if (this.provisional && !o.provisional) {
-                    this.elo = EloRanking.calculateProvisionalVsEstablished(this.elo, this.totalGames, o.elo, -1);
+                    this.elo = EloRanking.calculateProvisionalVsEstablished(this.elo, this.totalGames, o.elo, -1.0);
                 }
                 else {
-                    this.elo = EloRanking.calculateProvisionalVsProvisional(this.elo, this.totalGames, o.elo, -1);
+                    this.elo = EloRanking.calculateProvisionalVsProvisional(this.elo, this.totalGames, o.elo, -1.0);
                 }
             }
         }
-        if (this.provisional && this.totalGames >= 20) this.provisional = false;
+        this.elo = Math.round(this.elo); // Round double to nearest integer
+        if (this.provisional && this.totalGames > 20) this.provisional = false;
         determineTitle();
     }
 

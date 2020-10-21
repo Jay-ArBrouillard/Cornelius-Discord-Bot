@@ -8,24 +8,64 @@ package Utils;
  * s2 = 1 if A wins, 0 if A loses, and 0.5 for a stalemate
  */
 public class EloRanking {
-    public static double calculateProbabilityOfWin(int rA, int rB) {
-        return 1.0 / (1.0 + Math.pow(10.0, ((rB - rA) / 400.0) ));
+    public static double calculateProbabilityOfWin(double rA, double rB) {
+        double exponent = (rB - rA) / 400.0;
+        double probabilityDenominator = 1.0 + Math.pow(10.0, exponent);
+        return 1.0 / probabilityDenominator;
     }
 
-    public static int calculateProvisionalVsProvisional(int rA, int nA, int rB, int s1) {
-        return (int)( (rA * nA + (rA + rB)/2.0 + 100 * s1) / (nA + 1.0));
+    /**
+     * r'A = (rA * nA + ((rA + rB) / 2) + 100 * s1) / (nA + 1)
+     * @param rA
+     * @param nA
+     * @param rB
+     * @param s1
+     * @return
+     */
+    public static double calculateProvisionalVsProvisional(double rA, double nA, double rB, double s1) {
+        double subNumerator = (rA + rB) / 2.0;
+        double numerator = (rA * nA) + subNumerator + (100.0 * s1);
+        double denominator = nA + 1.0;
+        return numerator / denominator;
     }
 
-    public static int calculateProvisionalVsEstablished(int rA, int nA, int rB, int s1) {
-        return (int)( (rA * nA + rB + 200.0 * s1) / (nA + 1.0));
+    /**
+     * r'A = (rA * nA + rB + 200 * s1) / (nA + 1)
+     * @param rA
+     * @param nA
+     * @param rB
+     * @param s1
+     * @return
+     */
+    public static double calculateProvisionalVsEstablished(double rA, double nA, double rB, double s1) {
+        double numerator = (rA * nA) + rB + (200.0 * s1);
+        double denominator = nA + 1.0;
+        return numerator / denominator;
     }
 
-    public static int calculateEstablishedVsProvisional(int rA, int rB, int nB, double s2) {
-        return (int)(rA + determineK(rA) * (nB / 20.0) * (s2 - (1.0 / (1.0 + Math.pow(10.0,((rB - rA) / 400.0)) ) )));
+    /**
+     * r'A = rA + K * (nB / 20) * (s2 - (1 / (1 + 10^((rB - rA) / 400) )))
+     * @param rA
+     * @param rB
+     * @param nB
+     * @param s2
+     * @return
+     */
+    public static double calculateEstablishedVsProvisional(double rA, double rB, double nB, double s2) {
+        double probability = s2 - calculateProbabilityOfWin(rA, rB);
+        return rA + determineK(rA) * (nB / 20.0) * probability;
     }
 
-    public static int calculateEstablishedVsEstablished(int rA, int rB, double s2) {
-        return (int) (rA + determineK(rA) * (s2 - (1.0 / (1.0 + Math.pow(10.0, ((rB - rA) / 400.0))))));
+    /**
+     * r'A = rA + K * (s2 - (1 / (1 + 10^((rB - rA) / 400) )))
+     * @param rA
+     * @param rB
+     * @param s2
+     * @return
+     */
+    public static double calculateEstablishedVsEstablished(double rA, double rB, double s2) {
+        double probability = s2 - calculateProbabilityOfWin(rA, rB);
+        return rA + determineK(rA) * probability;
     }
 
     /**
@@ -33,7 +73,7 @@ public class EloRanking {
      * @param rating
      * @return
      */
-    public static int determineK(int rating) {
+    public static double determineK(double rating) {
         int K;
         if (rating < 2100) { // 0-2099
             K = 40;

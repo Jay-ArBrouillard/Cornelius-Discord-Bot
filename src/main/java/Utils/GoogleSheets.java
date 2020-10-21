@@ -102,7 +102,7 @@ public class GoogleSheets {
 
             List row = isRanked(id);
             if (row != null) { // Player exists in ranked table
-                user = new ChessPlayer((String)row.get(0), (String)row.get(1), Integer.parseInt((String)row.get(2)),
+                user = new ChessPlayer((String)row.get(0), (String)row.get(1), Double.parseDouble((String)row.get(2)),
                                 Boolean.valueOf((String)row.get(3)), (String)row.get(4), Integer.parseInt((String)row.get(5)),
                                 Integer.parseInt((String)row.get(6)), Integer.parseInt((String)row.get(7)),
                                 Double.parseDouble((String)row.get(8)), Integer.parseInt((String)row.get(9)), (String)row.get(10),
@@ -123,7 +123,7 @@ public class GoogleSheets {
                         .setInsertDataOption("INSERT_ROWS")
                         .execute();
 
-                // Update ranked sheet by elo rating
+                // Update ranked sheet by elo rating and format that elo rating since it is stored as a double
                 BatchUpdateSpreadsheetRequest busReq = new BatchUpdateSpreadsheetRequest();
                 SortSpec sortSpec = new SortSpec();
                 sortSpec.setDimensionIndex(2);
@@ -138,7 +138,7 @@ public class GoogleSheets {
                 busReq.setRequests(Arrays.asList(request));
                 service.spreadsheets().batchUpdate(SPREAD_SHEET_ID, busReq).execute();
 
-                return new ChessPlayer(id, name, 1200, true, "Class D", 0, 0, 0, 0.0, 0, "0 days 0 hours 0 minutes 0 seconds", now, now);
+                return new ChessPlayer(id, name, 1200.0, true, "Class D", 0, 0, 0, 0.0, 0, "0 days 0 hours 0 minutes 0 seconds", now, now);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -170,14 +170,14 @@ public class GoogleSheets {
         }
     }
 
-    public static ChessPlayer findUserClosestElo(int elo, String id) {
+    public static ChessPlayer findUserClosestElo(double elo, String id) {
         try {
             if (service == null) getSheetsService();
 
             ValueRange response = service.spreadsheets().values().get(SPREAD_SHEET_ID, RANKED_TAB).execute();
 
             List closest;
-            int closestDiff = Integer.MAX_VALUE;
+            double closestDiff = Double.MAX_VALUE;
             Random rand = new Random();
             boolean isFirstRow = true;
             List<List> candidates = new ArrayList<>();
@@ -189,8 +189,8 @@ public class GoogleSheets {
                 if (id.equalsIgnoreCase((String)row.get(0))) { // User can't be itself
                     continue;
                 }
-                int currElo = Integer.parseInt((String)row.get(2));
-                int currDiff = Math.abs(elo - currElo);
+                double currElo = Double.parseDouble((String)row.get(2));
+                double currDiff = Math.abs(elo - currElo);
                 if (currDiff < closestDiff) {
                     closestDiff = currDiff;
                     candidates.clear();
@@ -204,7 +204,7 @@ public class GoogleSheets {
 
             //Choose a random opponent from candidate list
             closest = candidates.get(rand.nextInt(candidates.size()));
-            return new ChessPlayer((String)closest.get(0), (String)closest.get(1), Integer.parseInt((String)closest.get(2)),
+            return new ChessPlayer((String)closest.get(0), (String)closest.get(1), Double.parseDouble((String)closest.get(2)),
                     Boolean.valueOf((String)closest.get(3)), (String)closest.get(4), Integer.parseInt((String)closest.get(5)),
                     Integer.parseInt((String)closest.get(6)), Integer.parseInt((String)closest.get(7)),
                     Double.parseDouble((String)closest.get(8)), Integer.parseInt((String)closest.get(9)), (String)closest.get(10),
@@ -318,9 +318,9 @@ public class GoogleSheets {
             long secs = TimeUnit.SECONDS.toSeconds(seconds) - (TimeUnit.SECONDS.toMinutes(seconds) *60);
 
             String matchLength = "" + days + " days " + hours + " hours " + mins + " minutes " + secs + " seconds";
-            double whiteSidePrevElo = (double) state.getPrevElo().get(whiteSidePlayer.discordId);
-            double blackSidePrevElo = (double) state.getPrevElo().get(blackSidePlayer.discordId);
-            double p1Odds = EloRanking.calculateProbabilityOfWin((int)whiteSidePrevElo, (int)blackSidePrevElo);
+            double whiteSidePrevElo = state.getPrevElo().get(whiteSidePlayer.discordId);
+            double blackSidePrevElo = state.getPrevElo().get(blackSidePlayer.discordId);
+            double p1Odds = EloRanking.calculateProbabilityOfWin(whiteSidePrevElo, blackSidePrevElo);
             double p2Odds = 1.0 - p1Odds;
             String p1EloDiff;
             String p2EloDiff;

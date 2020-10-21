@@ -34,10 +34,15 @@ abstract class UCIEngine {
         readResponse("readyok");
     }
 
-    void sendCommand(String command) throws IOException {
+    void sendCommand(String command) {
 //        System.out.println("sendCommand:"+command); //To remove
-        output.write(command + "\n");
-        output.flush();
+        try {
+            output.write(command + "\n");
+            output.flush();
+        }
+        catch (IOException io) {
+            io.printStackTrace();
+        }
     }
 
     String readLine(String expected) throws IOException {
