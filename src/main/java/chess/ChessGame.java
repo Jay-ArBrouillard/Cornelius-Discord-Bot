@@ -306,24 +306,24 @@ public class ChessGame {
         //Handle if player sends "O-O" or "O-O-O" for castling
         if (moveCmd.equalsIgnoreCase("o-o")) {
             if (this.board.getCurrentPlayer().getAlliance().isWhite()) {
-                moveCmd = "e1g1";
+//                moveCmd = "e1g1";
                 startCoordinate = 60;
                 destinationCoordinate = 62;
             }
             else {
-                moveCmd = "e8g8";
+//                moveCmd = "e8g8";
                 startCoordinate = 4;
                 destinationCoordinate = 6;
             }
         }
         else if (moveCmd.equalsIgnoreCase("o-o-o")) {
             if (this.board.getCurrentPlayer().getAlliance().isWhite()) {
-                moveCmd = "e1c1";
+//                moveCmd = "e1c1";
                 startCoordinate = 60;
                 destinationCoordinate = 58;
             }
             else {
-                moveCmd = "e8c8";
+//                moveCmd = "e8c8";
                 startCoordinate = 4;
                 destinationCoordinate = 2;
             }
@@ -648,7 +648,7 @@ public class ChessGame {
             }
         } while (bestMoveString == null);
         if (mc != null) mc.sendTyping().queue();
-        bestMoveString = bestMoveString.trim(); //In some cases returned string has extra spaces
+        bestMoveString = bestMoveString.toLowerCase().trim(); //In some cases returned string has extra spaces or weird casing
         //Is castling notation?
         if (bestMoveString.equalsIgnoreCase("o-o") || bestMoveString.equalsIgnoreCase("o-o-o")) {
             return convertCastlingMove(bestMoveString, -1,-1, true);
