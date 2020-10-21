@@ -51,7 +51,7 @@ public class ChessGame {
         }
     }
 
-    public void setupComputerClient(GameType gameType) {
+    public void setupComputerClient(GameType gameType, String elo) {
         try {
             ChessPlayer [] players;
             if (gameType.isPlayerVsComputer()) {
@@ -69,16 +69,15 @@ public class ChessGame {
                 client2 = null;
                 return;
             }
-
             for (ChessPlayer p : players) {
-                setClient(p);
+                setClient(p, elo);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void setClient(ChessPlayer p) throws IOException {
+    private void setClient(ChessPlayer p, String elo) throws IOException {
         if (p.name.contains("Cornelius")) { //Cornelius will default to use stockfish client
             setClient(new StockFishClient.Builder()
                     .setOption(Option.Skill_Level, 20)
@@ -107,9 +106,11 @@ public class ChessGame {
                     .setOption(Option.Hash, 16)
                     .build(), p);
         }
-        else if (p.name.contains("Eschesc")) {
-            setClient(new EschescClient.Builder()
+        else if (p.name.contains("Cheng")) {
+            setClient(new ChengClient.Builder()
                     .setOption(Option.Hash, 16)
+                    .setOption(Option.Limit_Strength, Boolean.TRUE)
+                    .setOption(Option.Elo, elo)
                     .build(), p);
         }
         else if (p.name.contains("Amoeba")) {
@@ -210,10 +211,10 @@ public class ChessGame {
         }
 
         if (message.startsWith("2")) { // Option 2
-            return GameType.PVC.toString() + " " + player.discordId + " " + player.name;
+            return GameType.PVC.toString() + "-" + player.discordId + "-" + player.name;
         }
         else { //option 3
-            return GameType.CVP.toString() + " " + player.discordId + " " + player.name;
+            return GameType.CVP.toString() + "-" + player.discordId + "-" + player.name;
         }
     }
 
@@ -586,24 +587,21 @@ public class ChessGame {
                     System.out.println("client1 was using " + client1 + ", client 2 was using " + client2);
                     if (isWhitePlayerTurn()) {
                         if (client1 != null) {
-                            System.out.println("Resetting client1");
                             client1.close();
-                            setClient(whiteSidePlayer);
+                            System.out.println("Shutdown client1");
                         }
                     }
                     else if (isBlackPlayerTurn()) {
                         if (client2 != null) {
-                            System.out.println("Resetting client2");
                             client2.close();
-                            setClient(blackSidePlayer);
+                            System.out.println("Shutdown client2");
                         }
                     }
-                    System.out.println("client2 now using " + client1 + ", client 2 now using " + client2);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
                 finally { //If ai breaks then rely on simple ai for rest of the game
-                    System.out.println("Using iterative deepening for this turn");
+                    System.out.println("Using iterative deepening");
                     if (id == null) id = new IterativeDeepening(6);
                     final Move bestMove = id.execute(this.board);
                     bestMoveString = BoardUtils.getPositionAtCoordinate(bestMove.getCurrentCoordinate()) + BoardUtils.getPositionAtCoordinate(bestMove.getDestinationCoordinate());
@@ -647,24 +645,21 @@ public class ChessGame {
                     System.out.println("client1 was using " + client1 + ", client 2 was using " + client2);
                     if (isWhitePlayerTurn()) {
                         if (client1 != null) {
-                            System.out.println("Resetting client1");
                             client1.close();
-                            setClient(whiteSidePlayer);
+                            System.out.println("Shutdown client1");
                         }
                     }
                     else if (isBlackPlayerTurn()) {
                         if (client2 != null) {
-                            System.out.println("Resetting client2");
                             client2.close();
-                            setClient(blackSidePlayer);
+                            System.out.println("Shutdown client2");
                         }
                     }
-                    System.out.println("client2 now using " + client1 + ", client 2 now using " + client2);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
                 finally {
-                    System.out.println("Using iterative deepening for this turn");
+                    System.out.println("Using iterative deepening");
                     if (id == null) id = new IterativeDeepening(6);
                     final Move bestMove = id.execute(this.board);
                     bestMoveString = BoardUtils.getPositionAtCoordinate(bestMove.getCurrentCoordinate()) + BoardUtils.getPositionAtCoordinate(bestMove.getDestinationCoordinate());

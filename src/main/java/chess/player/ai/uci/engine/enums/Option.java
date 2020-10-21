@@ -12,26 +12,24 @@ public enum Option {
     Move_Overhead("Move Overhead"),
     Minimum_Thinking_Time("Minimum Thinking Time"),
     Slow_Mover("Slow Mover"),
-    Nodestime("nodestime");
+    Nodestime("nodestime"),
+    Limit_Strength("UCI_LimitStrength"),
+    Elo("UCI_Elo");
 
     private String optionString;
-    private Long value;
+    private Object value;
 
     Option(String option) {
         optionString = option;
     }
 
-    public Option setValue(long value) {
+    public Option setValue(Object value) {
         this.value = value;
         return this;
     }
 
-    public Long getValue() {
+    public Object getValue() {
         return value;
-    }
-
-    public void setValue(Long value) {
-        this.value = value;
     }
 
     @Override

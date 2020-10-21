@@ -83,7 +83,7 @@ public class ChessCommand {
 
         if (message.startsWith("!chess") && message.contains("addAll")) {
             event.getChannel().sendMessage("Adding all AI's to Chess Records...").queue();
-            String[][] players = {
+            /*String[][] players = {
                     {"693282099167494225MO2", "Monolith v2"},
                     {"693282099167494225PI1.5", "Pigeon v1.5"},
                     {"693282099167494225DU1.4", "Dumb v1.4"},
@@ -117,6 +117,28 @@ public class ChessCommand {
                     {"69328209916749422518", "Cornelius v18"},
                     {"69328209916749422519", "Cornelius v19"},
                     {"69328209916749422520", "Cornelius v20"}};
+            */
+
+            String[][] players = {
+                    {"693282099167494225CH800", "Cheng 800"},
+                    {"693282099167494225CH900", "Cheng 900"},
+                    {"693282099167494225CH1000", "Cheng 1000"},
+                    {"693282099167494225CH1100", "Cheng 1100"},
+                    {"693282099167494225CH1200", "Cheng 1200"},
+                    {"693282099167494225CH1300", "Cheng 1300"},
+                    {"693282099167494225CH1400", "Cheng 1400"},
+                    {"693282099167494225CH1500", "Cheng 1500"},
+                    {"693282099167494225CH1600", "Cheng 1600"},
+                    {"693282099167494225CH1700", "Cheng 1700"},
+                    {"693282099167494225CH1800", "Cheng 1800"},
+                    {"693282099167494225CH1900", "Cheng 1900"},
+                    {"693282099167494225CH2000", "Cheng 2000"},
+                    {"693282099167494225CH2100", "Cheng 2100"},
+                    {"693282099167494225CH2200", "Cheng 2200"},
+                    {"693282099167494225CH2300", "Cheng 2300"},
+                    {"693282099167494225CH2400", "Cheng 2400"},
+                    {"693282099167494225CH2500", "Cheng 2500"},
+            };
 
             chessGame = new ChessGame(null);
             for (int i = 0; i < players.length; i++) {
@@ -129,7 +151,7 @@ public class ChessCommand {
         }
 
         if (message.startsWith("!chess") && message.contains("train")) {
-
+/*
             String[][] players = {
                     {"693282099167494225MO2", "Monolith v2"},
                     {"693282099167494225PI1.5", "Pigeon v1.5"},
@@ -138,7 +160,7 @@ public class ChessCommand {
                     {"693282099167494225F103", "Fishnet v103"},
                     {"693282099167494225CG3.6", "CounterGo v3.6"},
                     {"693282099167494225A3.2", "Amoeba v3.2"},
-                    {"693282099167494225E5", "Eschesc v5.0.6"},
+                    {"693282099167494225CH4", "Cheng v4.0"},
                     {"693282099167494225L1.7", "Laser v1.7"},
                     {"693282099167494225C2.3", "Cinnamon v2.3"},
                     {"693282099167494225X0.6", "Xiphos v0.6"},
@@ -164,6 +186,28 @@ public class ChessCommand {
 //                    {"69328209916749422518", "Cornelius v18"},
 //                    {"69328209916749422519", "Cornelius v19"},
                     {"69328209916749422520", "Cornelius v20"}};
+            */
+
+            String[][] players = {
+                    {"693282099167494225CH800", "Cheng 800"},
+                    {"693282099167494225CH900", "Cheng 900"},
+                    {"693282099167494225CH1000", "Cheng 1000"},
+                    {"693282099167494225CH1100", "Cheng 1100"},
+                    {"693282099167494225CH1200", "Cheng 1200"},
+                    {"693282099167494225CH1300", "Cheng 1300"},
+                    {"693282099167494225CH1400", "Cheng 1400"},
+                    {"693282099167494225CH1500", "Cheng 1500"},
+                    {"693282099167494225CH1600", "Cheng 1600"},
+                    {"693282099167494225CH1700", "Cheng 1700"},
+                    {"693282099167494225CH1800", "Cheng 1800"},
+                    {"693282099167494225CH1900", "Cheng 1900"},
+                    {"693282099167494225CH2000", "Cheng 2000"},
+                    {"693282099167494225CH2100", "Cheng 2100"},
+                    {"693282099167494225CH2200", "Cheng 2200"},
+                    {"693282099167494225CH2300", "Cheng 2300"},
+                    {"693282099167494225CH2400", "Cheng 2400"},
+                    {"693282099167494225CH2500", "Cheng 2500"},
+            };
 
             //Randomize list
             Random random = new Random();
@@ -191,11 +235,18 @@ public class ChessCommand {
                     chessGame.setWhiteSidePlayer(whiteSidePlayer);
                     gameType = GameType.CVC;
                     chessGame.setupStockfishClient();
-                    chessGame.setupComputerClient(gameType);
                     state.getPrevElo().put(whiteSidePlayer.discordId, whiteSidePlayer.elo);
                     state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
                     state.setMatchStartTime(Instant.now().toEpochMilli());
                     decision = COMPUTER_MOVE;
+
+                    if (players[i][1].contains("Cheng")) {
+                        String eloString = players[i][1].split("Cheng ")[1];
+                        chessGame.setupComputerClient(gameType, eloString);
+                    }
+                    else {
+                        chessGame.setupComputerClient(gameType, null);
+                    }
 
                     event.getChannel().sendMessage("Beginning match (" + gamesCompleted + "/" + totalGames + ") : " + whiteSidePlayer.name + " vs " + blackSidePlayer.name).queue();
                     String status;
@@ -369,14 +420,20 @@ public class ChessCommand {
                     chessGame.setWhiteSidePlayer(whiteSidePlayer);
                     state.getPrevElo().put(whiteSidePlayer.discordId, whiteSidePlayer.elo);
                     //Set up black side
-                    String [] gameidName = reply.split("\\s++");
+                    String [] gameidName = reply.split("-");
                     blackSidePlayer = chessGame.addUser(gameidName[1], gameidName[2]);  //Note: Difficulty value is appended to id and name
                     state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
                     chessGame.setBlackSidePlayer(blackSidePlayer);
                     reply = "`Starting Chess Game " + whiteSidePlayer.name + " (" + whiteSidePlayer.elo + ")" + " vs. " + blackSidePlayer.name + " (" + blackSidePlayer.elo + ")`\nMake a move (ex: `c2 c4`)";
                     gameType = GameType.PVC;
                     decision = PLAYER_MOVE;
-                    chessGame.setupComputerClient(gameType);
+                    if (gameidName[2].contains("Cheng")) {
+                        String eloString = gameidName[2].split("Cheng ")[1];
+                        chessGame.setupComputerClient(gameType, eloString);
+                    }
+                    else {
+                        chessGame.setupComputerClient(gameType, null);
+                    }
                     chessGame.setupStockfishClient();
                     state.setMatchStartTime(Instant.now().toEpochMilli());
                 }
@@ -394,7 +451,13 @@ public class ChessCommand {
                     reply = "`Starting Chess Game " + whiteSidePlayer.name + " (" + whiteSidePlayer.elo + ")" + " vs. " + blackSidePlayer.name + " (" + blackSidePlayer.elo + ")`\n" + whiteSidePlayer.name + " will go first...";
                     gameType = GameType.CVP;
                     decision = COMPUTER_MOVE;
-                    chessGame.setupComputerClient(gameType);
+                    if (gameidName[2].contains("Cheng")) {
+                        String eloString = gameidName[2].split("Cheng ")[1];
+                        chessGame.setupComputerClient(gameType, eloString);
+                    }
+                    else {
+                        chessGame.setupComputerClient(gameType, null);
+                    }
                     chessGame.setupStockfishClient();
                     state.setMatchStartTime(Instant.now().toEpochMilli());
                 }
@@ -434,7 +497,6 @@ public class ChessCommand {
                         boardImageFile = new File(GAME_BOARD_IMAGE_LOCATION);
                         belowMessage = "`"+ whiteSidePlayer.name + "` goes first. Make a move (ex: `c2 c4`)";
                         decision = Decision.PLAYER_MOVE;
-                        chessGame.setupComputerClient(gameType);
                         chessGame.setupStockfishClient();
                         state.setMatchStartTime(Instant.now().toEpochMilli());
                     }

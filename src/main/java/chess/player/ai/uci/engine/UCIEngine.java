@@ -19,8 +19,6 @@ abstract class UCIEngine {
 
             for (Option option : options)
                 passOption(option);
-            waitForReady();
-            sendCommand("uci" + "\n");
         } catch (IOException e) {
             throw new IOException("Unable to start and bind " + super.getClass().getSimpleName() + " process: ", e);
         }
@@ -35,15 +33,10 @@ abstract class UCIEngine {
         readResponse("readyok");
     }
 
-    void sendCommand(String command) {
+    void sendCommand(String command) throws IOException {
         System.out.println("sendCommand:"+command); //To remove
-        try {
-            output.write(command + "\n");
-            output.flush();
-        }
-        catch (IOException io) {
-            io.printStackTrace();
-        }
+        output.write(command + "\n");
+        output.flush();
     }
 
     String readLine(String expected) throws IOException {
