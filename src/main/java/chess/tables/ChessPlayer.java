@@ -6,6 +6,7 @@ public class ChessPlayer {
     public final String discordId;
     public final String name;
     public double elo;
+    public Double highestElo;
     public boolean provisional;
     public String title;
     public int wins;

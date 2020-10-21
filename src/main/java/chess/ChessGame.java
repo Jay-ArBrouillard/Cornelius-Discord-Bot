@@ -87,6 +87,27 @@ public class ChessGame {
                     .setOption(Option.Elo, p.name.split("Cornelius ")[1]) //Elo Skill level is in their name
                     .build(), p);
         }
+        else if (p.name.contains("Cheng")) {
+            setClient(new ChengClient.Builder()
+                    .setOption(Option.Hash, 16)
+                    .setOption(Option.Limit_Strength, Boolean.TRUE)
+                    .setOption(Option.Elo, p.name.split("Cheng ")[1]) //Elo Skill level is in their name
+                    .build(), p);
+        }
+        else if (p.name.contains("Fishnet")) {
+            setClient(new FishnetClient.Builder()
+                    .setOption(Option.Hash, 16)
+                    .setOption(Option.Limit_Strength, Boolean.TRUE)
+                    .setOption(Option.Elo, p.name.split("Fishnet ")[1]) //Elo Skill level is in their name
+                    .build(), p);
+        }
+        else if (p.name.contains("CT800")) {
+            setClient(new CT800Client.Builder()
+                    .setOption(Option.Hash, 16)
+                    .setOption(Option.Limit_Strength, Boolean.TRUE)
+                    .setOption(Option.Elo, p.name.split("CT800 ")[1]) //Elo Skill level is in their name
+                    .build(), p);
+        }
         else if (p.name.contains("Xiphos")) {
             setClient(new XiphosClient.Builder()
                     .setVariant(Variant.SSE) //BMI for windows, SSE for linux
@@ -108,13 +129,6 @@ public class ChessGame {
                     .setOption(Option.Hash, 16)
                     .build(), p);
         }
-        else if (p.name.contains("Cheng")) {
-            setClient(new ChengClient.Builder()
-                    .setOption(Option.Hash, 16)
-                    .setOption(Option.Limit_Strength, Boolean.TRUE)
-                    .setOption(Option.Elo, p.name.split("Cheng ")[1]) //Elo Skill level is in their name
-                    .build(), p);
-        }
         else if (p.name.contains("Amoeba")) {
             setClient(new AmoebaClient.Builder()
                     .setOption(Option.Hash, 16)
@@ -123,13 +137,6 @@ public class ChessGame {
         else if (p.name.contains("CounterGo")) {
             setClient(new CounterGoClient.Builder()
                     .setOption(Option.Hash, 16)
-                    .build(), p);
-        }
-        else if (p.name.contains("Fishnet")) {
-            setClient(new FishnetClient.Builder()
-                    .setOption(Option.Hash, 16)
-                    .setOption(Option.Limit_Strength, Boolean.TRUE)
-                    .setOption(Option.Elo, p.name.split("Fishnet ")[1]) //Elo Skill level is in their name
                     .build(), p);
         }
         else if (p.name.contains("Asymptote")) {
@@ -149,6 +156,11 @@ public class ChessGame {
         }
         else if (p.name.contains("Monolith")) {
             setClient(new MonolithClient.Builder()
+                    .setOption(Option.Hash, 16)
+                    .build(), p);
+        }
+        else if (p.name.contains("Floyd")) {
+            setClient(new FloydClient.Builder()
                     .setOption(Option.Hash, 16)
                     .build(), p);
         }

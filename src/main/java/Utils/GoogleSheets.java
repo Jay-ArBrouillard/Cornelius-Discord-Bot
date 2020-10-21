@@ -103,10 +103,13 @@ public class GoogleSheets {
             List row = isRanked(id);
             if (row != null) { // Player exists in ranked table
                 user = new ChessPlayer((String)row.get(0), (String)row.get(1), Double.parseDouble((String)row.get(2)),
-                                Boolean.valueOf((String)row.get(3)), (String)row.get(4), Integer.parseInt((String)row.get(5)),
-                                Integer.parseInt((String)row.get(6)), Integer.parseInt((String)row.get(7)),
-                                Double.parseDouble((String)row.get(8)), Integer.parseInt((String)row.get(9)), (String)row.get(10),
-                                (String)row.get(11), (String)row.get(12));
+                                Boolean.valueOf((String)row.get(4)), (String)row.get(5), Integer.parseInt((String)row.get(6)),
+                                Integer.parseInt((String)row.get(7)), Integer.parseInt((String)row.get(8)),
+                                Double.parseDouble((String)row.get(9)), Integer.parseInt((String)row.get(10)), (String)row.get(11),
+                                (String)row.get(12), (String)row.get(13));
+                if (!user.provisional) {
+                    user.highestElo = Double.parseDouble((String)row.get(3));
+                }
                 return user;
             } else {
                 // Player doesn't exist. Add them as a provisional player
@@ -114,7 +117,7 @@ public class GoogleSheets {
                 // New users get default elo of 1200 - Class D
                 ValueRange appendBody = new ValueRange()
                         .setValues(Arrays.asList(
-                                Arrays.asList(id, name, 1200, true, "Class D", "0", "0", "0", "0", 0, "0 days 0 hours 0 minutes 0 seconds", now, now)
+                                Arrays.asList(id, name, 1200, "-", true, "Class D", "0", "0", "0", "0", 0, "0 days 0 hours 0 minutes 0 seconds", now, now)
                         ));
                 // Add new user to provisional tab
                 service.spreadsheets().values()
@@ -154,11 +157,14 @@ public class GoogleSheets {
             //Check if player exists
             List row = isRankedByName(name);
             if (row != null) { // Player exists in ranked table
-                user = new ChessPlayer((String)row.get(0), (String)row.get(1), Integer.parseInt((String)row.get(2)),
-                        Boolean.valueOf((String)row.get(3)), (String)row.get(4), Integer.parseInt((String)row.get(5)),
-                        Integer.parseInt((String)row.get(6)), Integer.parseInt((String)row.get(7)),
-                        Double.parseDouble((String)row.get(8)), Integer.parseInt((String)row.get(9)), (String)row.get(10),
-                        (String)row.get(11), (String)row.get(12));
+                user = new ChessPlayer((String)row.get(0), (String)row.get(1), Double.parseDouble((String)row.get(2)),
+                        Boolean.valueOf((String)row.get(4)), (String)row.get(5), Integer.parseInt((String)row.get(6)),
+                        Integer.parseInt((String)row.get(7)), Integer.parseInt((String)row.get(8)),
+                        Double.parseDouble((String)row.get(9)), Integer.parseInt((String)row.get(10)), (String)row.get(11),
+                        (String)row.get(12), (String)row.get(13));
+                if (!user.provisional) {
+                    user.highestElo = Double.parseDouble((String)row.get(3));
+                }
                 return user;
             } else {
                 // Player doesn't exist
@@ -204,11 +210,15 @@ public class GoogleSheets {
 
             //Choose a random opponent from candidate list
             closest = candidates.get(rand.nextInt(candidates.size()));
-            return new ChessPlayer((String)closest.get(0), (String)closest.get(1), Double.parseDouble((String)closest.get(2)),
-                    Boolean.valueOf((String)closest.get(3)), (String)closest.get(4), Integer.parseInt((String)closest.get(5)),
-                    Integer.parseInt((String)closest.get(6)), Integer.parseInt((String)closest.get(7)),
-                    Double.parseDouble((String)closest.get(8)), Integer.parseInt((String)closest.get(9)), (String)closest.get(10),
-                    (String)closest.get(11), (String)closest.get(12));
+            ChessPlayer user = new ChessPlayer((String)closest.get(0), (String)closest.get(1), Double.parseDouble((String)closest.get(2)),
+                    Boolean.valueOf((String)closest.get(4)), (String)closest.get(5), Integer.parseInt((String)closest.get(6)),
+                    Integer.parseInt((String)closest.get(7)), Integer.parseInt((String)closest.get(8)),
+                    Double.parseDouble((String)closest.get(9)), Integer.parseInt((String)closest.get(10)), (String)closest.get(11),
+                    (String)closest.get(12), (String)closest.get(13));
+            if (!user.provisional) {
+                user.highestElo = Double.parseDouble((String)closest.get(3));
+            }
+            return user;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -270,6 +280,12 @@ public class GoogleSheets {
             values.add(user.discordId);
             values.add(user.name);
             values.add(user.elo);
+            if (!user.provisional) {
+                values.add(user.highestElo);
+            }
+            else {
+                values.add("-"); //No highest elo until done with provisionals
+            }
             values.add(user.provisional);
             values.add(user.title);
             values.add(user.wins);
@@ -402,7 +418,7 @@ public class GoogleSheets {
         ValueRange body = new ValueRange().setValues(Arrays.asList(Arrays.asList(matchLength)));
 
         service.spreadsheets().values()
-                .update(SPREAD_SHEET_ID, RANKED_TAB+"!K"+rowNumber, body)
+                .update(SPREAD_SHEET_ID, RANKED_TAB+"!L"+rowNumber, body)
                 .setValueInputOption("RAW")
                 .execute();
         return true;
