@@ -167,15 +167,14 @@ public class ChessCommand {
 
             //Randomize list
             Random random = new Random();
-            for (int i = players.length - 1; i > 0; i--) {
-                for (int j = players[i].length - 1; j > 0; j--) {
-                    int m = random.nextInt(i + 1);
-                    int n = random.nextInt(j + 1);
-
-                    String temp = players[i][j];
-                    players[i][j] = players[m][n];
-                    players[m][n] = temp;
-                }
+            for (int i = 0; i < players.length; i++) {
+                int randomIndexToSwap = random.nextInt(players.length);
+                String temp = players[randomIndexToSwap][0];
+                players[randomIndexToSwap][0] = players[i][0];
+                players[i][0] = temp;
+                temp = players[randomIndexToSwap][1];
+                players[randomIndexToSwap][1] = players[i][1];
+                players[i][1] = temp;
             }
 
             int gamesCompleted = 0;
