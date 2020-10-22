@@ -2,6 +2,9 @@
   <artifact type="jar" name="Cornelius-Discord-Bot.main:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/Cornelius_Discord_Bot_main_jar</output-path>
     <root id="archive" name="Cornelius-Discord-Bot.main.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/src/main/resources/META-INF/MANIFEST.MF" />
+      </element>
       <element id="module-output" name="Cornelius-Discord-Bot.main" />
       <element id="library" level="project" name="Gradle: club.minnced:opus-java:pom:1.0.4" />
       <element id="extracted-dir" path="$USER_HOME$/.gradle/caches/modules-2/files-2.1/club.minnced/opus-java-natives/1.0.4/292d015243833578eda04b1ad0af2dc351b14b1b/opus-java-natives-1.0.4.jar" path-in-jar="/" />
