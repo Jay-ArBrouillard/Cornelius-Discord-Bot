@@ -23,7 +23,6 @@ public class LittleWing extends UCIEngine {
         if (query.getMovetime() >= 0)
             command.append("movetime ").append(query.getMovetime());
 
-        waitForUciOk();
         sendCommand(command.toString());
 
         String result = readLine("bestmove");
