@@ -37,15 +37,6 @@ abstract class UCIEngine {
         readResponse("readyok");
     }
 
-    /**
-     * For UCI Engines that don't support isready use uci
-     * @throws IOException
-     */
-    void waitForUciOk() throws IOException {
-        sendCommand("uci");
-        readResponse("uciok");
-    }
-
     void sendCommand(String command) throws IOException {
         System.out.println("sendCommand:"+command); //To remove
         output.write(command + "\n");

@@ -12,7 +12,6 @@ public class LittleWing extends UCIEngine {
     }
 
     public String getBestMove(Query query) throws IOException {
-        waitForUciOk();
         sendCommand("position fen " + query.getFen());
 
         StringBuilder command = new StringBuilder("go ");

@@ -13,7 +13,6 @@ public class CT800 extends UCIEngine {
 
 
     public String getBestMove(Query query) throws IOException {
-        waitForUciOk();
         sendCommand("position fen " + query.getFen());
 
         StringBuilder command = new StringBuilder("go ");
@@ -24,7 +23,6 @@ public class CT800 extends UCIEngine {
         if (query.getMovetime() >= 0)
             command.append("movetime ").append(query.getMovetime());
 
-        waitForUciOk();
         sendCommand(command.toString());
 
         String result = readLine("bestmove");
