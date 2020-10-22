@@ -14,6 +14,7 @@ public class LittleWingClient extends BaseAiClient{
 
     public LittleWingClient(Variant variant, String filePath, Set<Option> options) throws IOException {
         engine = new LittleWing(variant, filePath, options.toArray(new Option[options.size()]));
+
     }
 
     public String submit(Query query) throws IOException {

@@ -9,9 +9,11 @@ import java.io.IOException;
 public class Fridolin extends UCIEngine {
     public Fridolin(Variant variant, String filePath, Option... options) throws IOException {
         super(variant, filePath, options);
+        readResponse("created by C.Sommerfeld");
     }
 
     public String getBestMove(Query query) throws IOException {
+        waitForReady();
         sendCommand("position fen " + query.getFen());
 
         StringBuilder command = new StringBuilder("go ");
@@ -22,6 +24,7 @@ public class Fridolin extends UCIEngine {
         if (query.getMovetime() >= 0)
             command.append("movetime ").append(query.getMovetime());
 
+        waitForReady();
         sendCommand(command.toString());
 
         String result = readLine("bestmove");

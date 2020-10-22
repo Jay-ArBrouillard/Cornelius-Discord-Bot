@@ -9,10 +9,11 @@ import java.io.IOException;
 public class CT800 extends UCIEngine {
     public CT800(Variant variant, String filePath, Option... options) throws IOException {
         super(variant, filePath, options);
+        readResponse("Free software under GPLv3+");
     }
 
-
     public String getBestMove(Query query) throws IOException {
+        waitForReady();
         sendCommand("position fen " + query.getFen());
 
         StringBuilder command = new StringBuilder("go ");
@@ -23,6 +24,7 @@ public class CT800 extends UCIEngine {
         if (query.getMovetime() >= 0)
             command.append("movetime ").append(query.getMovetime());
 
+        waitForReady();
         sendCommand(command.toString());
 
         String result = readLine("bestmove");
