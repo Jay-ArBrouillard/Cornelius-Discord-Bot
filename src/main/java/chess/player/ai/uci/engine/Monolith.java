@@ -8,7 +8,7 @@ import java.io.IOException;
 
 public class Monolith extends UCIEngine {
     public Monolith(Variant variant, String filePath, Option... options) throws IOException {
-        super(variant, filePath, options);
+        super(variant, filePath, "Monolith 2", options);
     }
 
     public String getBestMove(Query query) throws IOException {

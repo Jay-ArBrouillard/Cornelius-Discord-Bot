@@ -80,232 +80,15 @@ public class ChessCommand {
             return;
         }
 
-        if (message.startsWith("!chess") && message.contains("addAll")) {
-            event.getChannel().sendMessage("Adding all AI's to Chess Records...").queue();
-            String[][] players = {
-                    {"693282099167494225LW0.6", "LittleWing 0.6"},
-                    {"693282099167494225FR3", "Fridolin 3"},
-                    {"693282099167494225FL0.9", "Floyd 0.9"},
-                    {"693282099167494225MO2", "Monolith 2"},
-                    {"693282099167494225PI1.5", "Pigeon 1.5"},
-                    {"693282099167494225DU1.4", "Dumb 1.4"},
-                    {"693282099167494225A0.8", "Asymptote 0.8"},
-                    {"693282099167494225F103", "Fishnet 103"},
-                    {"693282099167494225CG3.6", "CounterGo 3.6"},
-                    {"693282099167494225A3.2", "Amoeba 3.2"},
-                    {"693282099167494225L1.7", "Laser 1.7"},
-                    {"693282099167494225C2.3", "Cinnamon 2.3"},
-                    {"693282099167494225X0.6", "Xiphos 0.6"},
-                    {"693282099167494225K11", "Komodo 11"},
-                    {"693282099167494225CH800", "Cheng 800"},
-                    {"693282099167494225CH900", "Cheng 900"},
-                    {"693282099167494225CH1000", "Cheng 1000"},
-                    {"693282099167494225CH1100", "Cheng 1100"},
-                    {"693282099167494225CH1200", "Cheng 1200"},
-                    {"693282099167494225CH1300", "Cheng 1300"},
-                    {"693282099167494225CH1400", "Cheng 1400"},
-                    {"693282099167494225CH1500", "Cheng 1500"},
-                    {"693282099167494225CH1600", "Cheng 1600"},
-                    {"693282099167494225CH1700", "Cheng 1700"},
-                    {"693282099167494225CH1800", "Cheng 1800"},
-                    {"693282099167494225CH1900", "Cheng 1900"},
-                    {"693282099167494225CH2000", "Cheng 2000"},
-                    {"693282099167494225CH2100", "Cheng 2100"},
-                    {"693282099167494225CH2200", "Cheng 2200"},
-                    {"693282099167494225CH2300", "Cheng 2300"},
-                    {"693282099167494225CH2400", "Cheng 2400"},
-                    {"693282099167494225CH2500", "Cheng 2500"},
-                    {"693282099167494225CO1350", "Cornelius 1350"},
-                    {"693282099167494225CO1450", "Cornelius 1450"},
-                    {"693282099167494225CO1550", "Cornelius 1550"},
-                    {"693282099167494225CO1650", "Cornelius 1650"},
-                    {"693282099167494225CO1750", "Cornelius 1750"},
-                    {"693282099167494225CO1850", "Cornelius 1850"},
-                    {"693282099167494225CO1950", "Cornelius 1950"},
-                    {"693282099167494225CO2050", "Cornelius 2050"},
-                    {"693282099167494225CO2150", "Cornelius 2150"},
-                    {"693282099167494225CO2250", "Cornelius 2250"},
-                    {"693282099167494225CO2350", "Cornelius 2350"},
-                    {"693282099167494225CO2450", "Cornelius 2450"},
-                    {"693282099167494225CO2550", "Cornelius 2550"},
-                    {"693282099167494225CO2650", "Cornelius 2650"},
-                    {"693282099167494225CO2750", "Cornelius 2750"},
-                    {"693282099167494225CO2850", "Cornelius 2850"},
-                    {"693282099167494225FN0", "Fishnet 0"},
-                    {"693282099167494225FN100", "Fishnet 100"},
-                    {"693282099167494225FN200", "Fishnet 200"},
-                    {"693282099167494225FN300", "Fishnet 300"},
-                    {"693282099167494225FN400", "Fishnet 400"},
-                    {"693282099167494225FN500", "Fishnet 500"},
-                    {"693282099167494225FN600", "Fishnet 600"},
-                    {"693282099167494225FN700", "Fishnet 700"},
-                    {"693282099167494225FN800", "Fishnet 800"},
-                    {"693282099167494225FN900", "Fishnet 900"},
-                    {"693282099167494225FN1000", "Fishnet 1000"},
-                    {"693282099167494225FN1100", "Fishnet 1100"},
-                    {"693282099167494225FN1200", "Fishnet 1200"},
-                    {"693282099167494225FN1300", "Fishnet 1300"},
-                    {"693282099167494225FN1400", "Fishnet 1400"},
-                    {"693282099167494225FN1500", "Fishnet 1500"},
-                    {"693282099167494225FN1600", "Fishnet 1600"},
-                    {"693282099167494225FN1700", "Fishnet 1700"},
-                    {"693282099167494225FN1800", "Fishnet 1800"},
-                    {"693282099167494225FN1900", "Fishnet 1900"},
-                    {"693282099167494225FN2000", "Fishnet 2000"},
-                    {"693282099167494225FN2100", "Fishnet 2100"},
-                    {"693282099167494225FN2200", "Fishnet 2200"},
-                    {"693282099167494225FN2300", "Fishnet 2300"},
-                    {"693282099167494225FN2400", "Fishnet 2400"},
-                    {"693282099167494225FN2500", "Fishnet 2500"},
-                    {"693282099167494225FN2600", "Fishnet 2600"},
-                    {"693282099167494225FN2700", "Fishnet 2700"},
-                    {"693282099167494225FN2800", "Fishnet 2800"},
-                    {"693282099167494225FN2900", "Fishnet 2900"},
-                    {"693282099167494225FN3000", "Fishnet 3000"},
-                    {"693282099167494225CT1000", "CT800 1000"},
-                    {"693282099167494225CT1100", "CT800 1100"},
-                    {"693282099167494225CT1200", "CT800 1200"},
-                    {"693282099167494225CT1300", "CT800 1300"},
-                    {"693282099167494225CT1400", "CT800 1400"},
-                    {"693282099167494225CT1500", "CT800 1500"},
-                    {"693282099167494225CT1600", "CT800 1600"},
-                    {"693282099167494225CT1700", "CT800 1700"},
-                    {"693282099167494225CT1800", "CT800 1800"},
-                    {"693282099167494225CT1900", "CT800 1900"},
-                    {"693282099167494225CT2000", "CT800 2000"},
-                    {"693282099167494225CT2100", "CT800 2100"},
-                    {"693282099167494225CT2200", "CT800 2200"},
-                    {"693282099167494225CT2300", "CT800 2300"},
-                    {"693282099167494225CT2400", "CT800 2400"},
-                    {"693282099167494225CT2500", "CT800 2500"},
-                    {"693282099167494225CT2600", "CT800 2600"},
-                    {"693282099167494225CT2700", "CT800 2700"},
-                    {"693282099167494225CT2800", "CT800 2800"},
-                    {"693282099167494225CT2900", "CT800 2900"},
-                    {"693282099167494225CT3000", "CT800 3000"},
-            };
-
-            chessGame = new ChessGame(null);
-            for (int i = 0; i < players.length; i++) {
-                //100 requests per 100 seconds per user or 1 per second
-                chessGame.addUser(players[i][0], players[i][1]); //This execute 3 requests
-                try {
-                    Thread.sleep(3000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+        if (message.contains("!chess train")) { //Ex: !chess train 10 - Every player would play 10 games against random opponents
+            String [] split = message.split("\\s+");
+            if (split.length != 3) {
+                event.getChannel().sendMessage("Incorrect format for `!chess train`. Valid examples include `!chess train 1`, `!chess train 10`, etc...").queue();
+                return;
             }
 
-            event.getChannel().sendMessage("Completed").queue();
-            endGame(event.getChannel());
-            return;
-        }
-
-        if (message.startsWith("!chess") && message.contains("train")) {
-
-            String[][] players = {
-                    {"693282099167494225LW0.6", "LittleWing 0.6"},
-                    {"693282099167494225FR3", "Fridolin 3"},
-                    {"693282099167494225FL0.9", "Floyd 0.9"},
-                    {"693282099167494225MO2", "Monolith 2"},
-                    {"693282099167494225PI1.5", "Pigeon 1.5"},
-                    {"693282099167494225DU1.4", "Dumb 1.4"},
-                    {"693282099167494225A0.8", "Asymptote 0.8"},
-                    {"693282099167494225F103", "Fishnet 103"},
-                    {"693282099167494225CG3.6", "CounterGo 3.6"},
-                    {"693282099167494225A3.2", "Amoeba 3.2"},
-                    {"693282099167494225L1.7", "Laser 1.7"},
-                    {"693282099167494225C2.3", "Cinnamon 2.3"},
-                    {"693282099167494225X0.6", "Xiphos 0.6"},
-                    {"693282099167494225K11", "Komodo 11"},
-                    {"693282099167494225CH800", "Cheng 800"},
-                    {"693282099167494225CH900", "Cheng 900"},
-                    {"693282099167494225CH1000", "Cheng 1000"},
-                    {"693282099167494225CH1100", "Cheng 1100"},
-                    {"693282099167494225CH1200", "Cheng 1200"},
-                    {"693282099167494225CH1300", "Cheng 1300"},
-                    {"693282099167494225CH1400", "Cheng 1400"},
-                    {"693282099167494225CH1500", "Cheng 1500"},
-                    {"693282099167494225CH1600", "Cheng 1600"},
-                    {"693282099167494225CH1700", "Cheng 1700"},
-                    {"693282099167494225CH1800", "Cheng 1800"},
-                    {"693282099167494225CH1900", "Cheng 1900"},
-                    {"693282099167494225CH2000", "Cheng 2000"},
-                    {"693282099167494225CH2100", "Cheng 2100"},
-                    {"693282099167494225CH2200", "Cheng 2200"},
-                    {"693282099167494225CH2300", "Cheng 2300"},
-                    {"693282099167494225CH2400", "Cheng 2400"},
-                    {"693282099167494225CH2500", "Cheng 2500"},
-                    {"693282099167494225CO1350", "Cornelius 1350"},
-                    {"693282099167494225CO1450", "Cornelius 1450"},
-                    {"693282099167494225CO1550", "Cornelius 1550"},
-                    {"693282099167494225CO1650", "Cornelius 1650"},
-                    {"693282099167494225CO1750", "Cornelius 1750"},
-                    {"693282099167494225CO1850", "Cornelius 1850"},
-                    {"693282099167494225CO1950", "Cornelius 1950"},
-                    {"693282099167494225CO2050", "Cornelius 2050"},
-                    {"693282099167494225CO2150", "Cornelius 2150"},
-                    {"693282099167494225CO2250", "Cornelius 2250"},
-                    {"693282099167494225CO2350", "Cornelius 2350"},
-                    {"693282099167494225CO2450", "Cornelius 2450"},
-                    {"693282099167494225CO2550", "Cornelius 2550"},
-                    {"693282099167494225CO2650", "Cornelius 2650"},
-                    {"693282099167494225CO2750", "Cornelius 2750"},
-                    {"693282099167494225CO2850", "Cornelius 2850"},
-                    {"693282099167494225FN0", "Fishnet 0"},
-                    {"693282099167494225FN100", "Fishnet 100"},
-                    {"693282099167494225FN200", "Fishnet 200"},
-                    {"693282099167494225FN300", "Fishnet 300"},
-                    {"693282099167494225FN400", "Fishnet 400"},
-                    {"693282099167494225FN500", "Fishnet 500"},
-                    {"693282099167494225FN600", "Fishnet 600"},
-                    {"693282099167494225FN700", "Fishnet 700"},
-                    {"693282099167494225FN800", "Fishnet 800"},
-                    {"693282099167494225FN900", "Fishnet 900"},
-                    {"693282099167494225FN1000", "Fishnet 1000"},
-                    {"693282099167494225FN1100", "Fishnet 1100"},
-                    {"693282099167494225FN1200", "Fishnet 1200"},
-                    {"693282099167494225FN1300", "Fishnet 1300"},
-                    {"693282099167494225FN1400", "Fishnet 1400"},
-                    {"693282099167494225FN1500", "Fishnet 1500"},
-                    {"693282099167494225FN1600", "Fishnet 1600"},
-                    {"693282099167494225FN1700", "Fishnet 1700"},
-                    {"693282099167494225FN1800", "Fishnet 1800"},
-                    {"693282099167494225FN1900", "Fishnet 1900"},
-                    {"693282099167494225FN2000", "Fishnet 2000"},
-                    {"693282099167494225FN2100", "Fishnet 2100"},
-                    {"693282099167494225FN2200", "Fishnet 2200"},
-                    {"693282099167494225FN2300", "Fishnet 2300"},
-                    {"693282099167494225FN2400", "Fishnet 2400"},
-                    {"693282099167494225FN2500", "Fishnet 2500"},
-                    {"693282099167494225FN2600", "Fishnet 2600"},
-                    {"693282099167494225FN2700", "Fishnet 2700"},
-                    {"693282099167494225FN2800", "Fishnet 2800"},
-                    {"693282099167494225FN2900", "Fishnet 2900"},
-                    {"693282099167494225FN3000", "Fishnet 3000"},
-                      {"693282099167494225CT1000", "CT800 1000"},
-                    {"693282099167494225CT1100", "CT800 1100"},
-                    {"693282099167494225CT1200", "CT800 1200"},
-                    {"693282099167494225CT1300", "CT800 1300"},
-                    {"693282099167494225CT1400", "CT800 1400"},
-                    {"693282099167494225CT1500", "CT800 1500"},
-                    {"693282099167494225CT1600", "CT800 1600"},
-                    {"693282099167494225CT1700", "CT800 1700"},
-                    {"693282099167494225CT1800", "CT800 1800"},
-                    {"693282099167494225CT1900", "CT800 1900"},
-                    {"693282099167494225CT2000", "CT800 2000"},
-                    {"693282099167494225CT2100", "CT800 2100"},
-                    {"693282099167494225CT2200", "CT800 2200"},
-                    {"693282099167494225CT2300", "CT800 2300"},
-                    {"693282099167494225CT2400", "CT800 2400"},
-                    {"693282099167494225CT2500", "CT800 2500"},
-                    {"693282099167494225CT2600", "CT800 2600"},
-                    {"693282099167494225CT2700", "CT800 2700"},
-                    {"693282099167494225CT2800", "CT800 2800"},
-                    {"693282099167494225CT2900", "CT800 2900"},
-                    {"693282099167494225CT3000", "CT800 3000"},
-            };
-
+            event.getChannel().sendMessage("Starting Computer vs Computer matches...").queue();
+            String[][] players = getAIList();
             //Randomize list
             Random random = new Random();
             for (int i = 0; i < players.length; i++) {
@@ -318,6 +101,78 @@ public class ChessCommand {
                 players[i][1] = temp;
             }
 
+            int gamesCompleted = 0;
+            int gamesPerPlayer = Integer.parseInt(split[2]);
+            int totalGames = players.length * gamesPerPlayer;
+
+            while (gamesCompleted < totalGames) {
+                for (int i = 0; i < players.length; i++) {
+                    int randomIndex = i;
+                    do {
+                        randomIndex = random.nextInt(players.length);
+                    } while (randomIndex != i);
+
+                    state = new ChessGameState();
+                    chessGame = new ChessGame(state);
+                    whiteSidePlayer = chessGame.addUser(players[i][0], players[i][1]);
+                    blackSidePlayer = chessGame.addUser(players[randomIndex][0], players[randomIndex][1]);
+                    chessGame.setBlackSidePlayer(blackSidePlayer);
+                    chessGame.setWhiteSidePlayer(whiteSidePlayer);
+                    gameType = GameType.CVC;
+                    chessGame.setupStockfishClient();
+                    chessGame.setupComputerClient(gameType);
+                    state.getPrevElo().put(whiteSidePlayer.discordId, whiteSidePlayer.elo);
+                    state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
+                    state.setMatchStartTime(Instant.now().toEpochMilli());
+                    decision = COMPUTER_MOVE;
+
+                    event.getChannel().sendMessage("Beginning match (" + gamesCompleted + "/" + totalGames + ") : " + whiteSidePlayer.name + " vs " + blackSidePlayer.name).queue();
+                    String status;
+                    do {
+                        state = chessGame.ai(null);
+                        reply = state.getMessage();
+                        status = state.getStatus();
+
+                        if (CHECKMATE.equals(status) || DRAW.equals(status) || COMPUTER_RESIGN.equals(status)) {
+                            try {
+                                if (chessGame.stockFishClient != null) chessGame.stockFishClient.close();
+                                if (chessGame.client1 != null) chessGame.client1.close();
+                                if (chessGame.client2 != null) chessGame.client2.close();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            state = null;
+                            chessGame.stockFishClient = null;
+                            chessGame.client1 = null;
+                            chessGame.client2 = null;
+                            chessGame.board = null;
+                            chessGame.blackSidePlayer = null;
+                            chessGame.whiteSidePlayer = null;
+                            chessGame.state = null;
+                            chessGame.messageHandler = null;
+                            chessGame.db = null;
+                            chessGame.id = null;
+                            chessGame = null;
+                            whiteSidePlayer = null;
+                            blackSidePlayer = null;
+                            System.gc(); //Attempt to call garbage collector to clear memory
+                            event.getChannel().sendMessage(reply).queue();
+                            gamesCompleted++;
+                            break;
+                        }
+
+                    } while (true);
+                }
+            }
+
+
+            event.getChannel().sendMessage("Completed").queue();
+            endGame(event.getChannel());
+            return;
+        }
+
+        if (message.contains("!chess trainAll")) {
+            String[][] players = getAIList();
             int gamesCompleted = 0;
             int totalGames = players.length * players.length;
 
@@ -583,6 +438,112 @@ public class ChessCommand {
                 }
             }).start();
         }
+    }
+
+    private static String[][] getAIList() {
+        return new String[][]{
+            {"693282099167494225MO0.3", "Moustique 0.3"},
+            {"693282099167494225LW0.6", "LittleWing 0.6"},
+            {"693282099167494225FR3", "Fridolin 3"},
+            {"693282099167494225FL0.9", "Floyd 0.9"},
+            {"693282099167494225MO2", "Monolith 2"},
+            {"693282099167494225PI1.5", "Pigeon 1.5"},
+            {"693282099167494225DU1.4", "Dumb 1.4"},
+            {"693282099167494225A0.8", "Asymptote 0.8"},
+            {"693282099167494225F103", "Fishnet 103"},
+            {"693282099167494225CG3.6", "CounterGo 3.6"},
+            {"693282099167494225A3.2", "Amoeba 3.2"},
+            {"693282099167494225L1.7", "Laser 1.7"},
+            {"693282099167494225C2.3", "Cinnamon 2.3"},
+            {"693282099167494225X0.6", "Xiphos 0.6"},
+            {"693282099167494225K11", "Komodo 11"},
+            {"693282099167494225CH800", "Cheng 800"},
+            {"693282099167494225CH900", "Cheng 900"},
+            {"693282099167494225CH1000", "Cheng 1000"},
+            {"693282099167494225CH1100", "Cheng 1100"},
+            {"693282099167494225CH1200", "Cheng 1200"},
+            {"693282099167494225CH1300", "Cheng 1300"},
+            {"693282099167494225CH1400", "Cheng 1400"},
+            {"693282099167494225CH1500", "Cheng 1500"},
+            {"693282099167494225CH1600", "Cheng 1600"},
+            {"693282099167494225CH1700", "Cheng 1700"},
+            {"693282099167494225CH1800", "Cheng 1800"},
+            {"693282099167494225CH1900", "Cheng 1900"},
+            {"693282099167494225CH2000", "Cheng 2000"},
+            {"693282099167494225CH2100", "Cheng 2100"},
+            {"693282099167494225CH2200", "Cheng 2200"},
+            {"693282099167494225CH2300", "Cheng 2300"},
+            {"693282099167494225CH2400", "Cheng 2400"},
+            {"693282099167494225CH2500", "Cheng 2500"},
+            {"693282099167494225CO1350", "Cornelius 1350"},
+            {"693282099167494225CO1450", "Cornelius 1450"},
+            {"693282099167494225CO1550", "Cornelius 1550"},
+            {"693282099167494225CO1650", "Cornelius 1650"},
+            {"693282099167494225CO1750", "Cornelius 1750"},
+            {"693282099167494225CO1850", "Cornelius 1850"},
+            {"693282099167494225CO1950", "Cornelius 1950"},
+            {"693282099167494225CO2050", "Cornelius 2050"},
+            {"693282099167494225CO2150", "Cornelius 2150"},
+            {"693282099167494225CO2250", "Cornelius 2250"},
+            {"693282099167494225CO2350", "Cornelius 2350"},
+            {"693282099167494225CO2450", "Cornelius 2450"},
+            {"693282099167494225CO2550", "Cornelius 2550"},
+            {"693282099167494225CO2650", "Cornelius 2650"},
+            {"693282099167494225CO2750", "Cornelius 2750"},
+            {"693282099167494225CO2850", "Cornelius 2850"},
+            {"693282099167494225FN0", "Fishnet 0"},
+            {"693282099167494225FN100", "Fishnet 100"},
+            {"693282099167494225FN200", "Fishnet 200"},
+            {"693282099167494225FN300", "Fishnet 300"},
+            {"693282099167494225FN400", "Fishnet 400"},
+            {"693282099167494225FN500", "Fishnet 500"},
+            {"693282099167494225FN600", "Fishnet 600"},
+            {"693282099167494225FN700", "Fishnet 700"},
+            {"693282099167494225FN800", "Fishnet 800"},
+            {"693282099167494225FN900", "Fishnet 900"},
+            {"693282099167494225FN1000", "Fishnet 1000"},
+            {"693282099167494225FN1100", "Fishnet 1100"},
+            {"693282099167494225FN1200", "Fishnet 1200"},
+            {"693282099167494225FN1300", "Fishnet 1300"},
+            {"693282099167494225FN1400", "Fishnet 1400"},
+            {"693282099167494225FN1500", "Fishnet 1500"},
+            {"693282099167494225FN1600", "Fishnet 1600"},
+            {"693282099167494225FN1700", "Fishnet 1700"},
+            {"693282099167494225FN1800", "Fishnet 1800"},
+            {"693282099167494225FN1900", "Fishnet 1900"},
+            {"693282099167494225FN2000", "Fishnet 2000"},
+            {"693282099167494225FN2100", "Fishnet 2100"},
+            {"693282099167494225FN2200", "Fishnet 2200"},
+            {"693282099167494225FN2300", "Fishnet 2300"},
+            {"693282099167494225FN2400", "Fishnet 2400"},
+            {"693282099167494225FN2500", "Fishnet 2500"},
+            {"693282099167494225FN2600", "Fishnet 2600"},
+            {"693282099167494225FN2700", "Fishnet 2700"},
+            {"693282099167494225FN2800", "Fishnet 2800"},
+            {"693282099167494225FN2900", "Fishnet 2900"},
+            {"693282099167494225FN3000", "Fishnet 3000"},
+            {"693282099167494225CT1000", "CT800 1000"},
+            {"693282099167494225CT1100", "CT800 1100"},
+            {"693282099167494225CT1200", "CT800 1200"},
+            {"693282099167494225CT1300", "CT800 1300"},
+            {"693282099167494225CT1400", "CT800 1400"},
+            {"693282099167494225CT1500", "CT800 1500"},
+            {"693282099167494225CT1600", "CT800 1600"},
+            {"693282099167494225CT1700", "CT800 1700"},
+            {"693282099167494225CT1800", "CT800 1800"},
+            {"693282099167494225CT1900", "CT800 1900"},
+            {"693282099167494225CT2000", "CT800 2000"},
+            {"693282099167494225CT2100", "CT800 2100"},
+            {"693282099167494225CT2200", "CT800 2200"},
+            {"693282099167494225CT2300", "CT800 2300"},
+            {"693282099167494225CT2400", "CT800 2400"},
+            {"693282099167494225CT2500", "CT800 2500"},
+            {"693282099167494225CT2600", "CT800 2600"},
+            {"693282099167494225CT2700", "CT800 2700"},
+            {"693282099167494225CT2800", "CT800 2800"},
+            {"693282099167494225CT2900", "CT800 2900"},
+            {"693282099167494225CT3000", "CT800 3000"},
+        };
     }
 
     public static void sendMessages(MessageReceivedEvent event, String reply, File file, String belowMessage) {

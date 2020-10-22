@@ -174,6 +174,10 @@ public class ChessGame {
                     .setOption(Option.Hash, 16)
                     .build(), p);
         }
+        else if (p.name.contains("Moustique")) {
+            setClient(new MoustiqueClient.Builder()
+                    .build(), p);
+        }
     }
 
     private void setClient(BaseAiClient client, ChessPlayer p) {
