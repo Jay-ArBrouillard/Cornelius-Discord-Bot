@@ -44,7 +44,7 @@ public class ChessGame {
         try {
             stockFishClient = new StockFishClient.Builder()
                                 .setOption(Option.Minimum_Thinking_Time, 500)
-                                .setOption(Option.Hash, 2)
+                                .setOption(Option.Hash, 8)
                                 .setVariant(Variant.MODERN)  // BMI for windows, Modern for linux
                                 .build();
         } catch (Exception e) {
@@ -424,15 +424,15 @@ public class ChessGame {
                 if (evaluationMessage != null) state.setBoardEvaluationMessage(evaluationMessage.substring(22));
             } catch (Exception e) {
                 e.printStackTrace();
-            } finally {
                 try {
                     stockFishClient.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (IOException ie) {
+                    ie.printStackTrace();
                 }
-                stockFishClient = null;
-                System.gc();
-                setupStockfishClient();
+                finally {
+                    stockFishClient = null;
+                    setupStockfishClient();
+                }
             }
 
             //Should computer resign?

@@ -12,7 +12,7 @@ public class Fridolin extends UCIEngine {
     }
 
     public String getBestMove(Query query) throws IOException {
-        waitForReady();
+        waitForUciOk();
         sendCommand("position fen " + query.getFen());
 
         StringBuilder command = new StringBuilder("go ");
@@ -23,7 +23,7 @@ public class Fridolin extends UCIEngine {
         if (query.getMovetime() >= 0)
             command.append("movetime ").append(query.getMovetime());
 
-        waitForReady();
+        waitForUciOk();
         sendCommand(command.toString());
 
         String result = readLine("bestmove");
