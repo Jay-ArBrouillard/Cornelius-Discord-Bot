@@ -182,9 +182,9 @@ public class ChessCommand {
             chessGame = new ChessGame(null);
             for (int i = 0; i < players.length; i++) {
                 //100 requests per 100 seconds per user or 1 per second
-                chessGame.addUser(players[i][0], players[i][1]);
+                chessGame.addUser(players[i][0], players[i][1]); //This execute 3 requests
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(3000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
