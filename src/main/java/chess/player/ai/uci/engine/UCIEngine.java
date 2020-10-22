@@ -54,10 +54,6 @@ abstract class UCIEngine {
         sendCommand(option.toString());
     }
 
-    /**
-     * For UCI Engines that support isready
-     * @throws IOException
-     */
     void waitForReady() throws IOException {
         sendCommand("isready");
         readResponse("readyok");

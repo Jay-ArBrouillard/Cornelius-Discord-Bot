@@ -499,7 +499,7 @@ public class ChessCommand {
                 else if (reply.startsWith(GameType.CVP.toString())) {
                     boardImageFile = new File(GAME_BOARD_IMAGE_LOCATION);
                     //Set up white side
-                    String [] gameidName = reply.split("\\s++");
+                    String [] gameidName = reply.split("-");
                     whiteSidePlayer = chessGame.addUser(gameidName[1], gameidName[2]);   //Note: Difficulty value is appended to id and name
                     chessGame.setWhiteSidePlayer(whiteSidePlayer);
                     state.getPrevElo().put(whiteSidePlayer.discordId, whiteSidePlayer.elo);
