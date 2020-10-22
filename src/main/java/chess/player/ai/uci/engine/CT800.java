@@ -10,6 +10,7 @@ public class CT800 extends UCIEngine {
     public CT800(Variant variant, String filePath, Option... options) throws IOException {
         super(variant, filePath, options);
         readResponse("Free software under GPLv3+");
+        sendCommand("uci");
     }
 
     public String getBestMove(Query query) throws IOException {

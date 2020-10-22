@@ -10,6 +10,7 @@ public class LittleWing extends UCIEngine {
     public LittleWing(Variant variant, String filePath, Option... options) throws IOException {
         super(variant, filePath, options);
         readResponse("    a   b   c   d   e   f   g   h");
+        sendCommand("uci");
     }
 
     public String getBestMove(Query query) throws IOException {
