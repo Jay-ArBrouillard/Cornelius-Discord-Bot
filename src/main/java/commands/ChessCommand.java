@@ -181,7 +181,13 @@ public class ChessCommand {
 
             chessGame = new ChessGame(null);
             for (int i = 0; i < players.length; i++) {
+                //100 requests per 100 seconds per user
                 chessGame.addUser(players[i][0], players[i][1]);
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
 
             event.getChannel().sendMessage("Completed").queue();
