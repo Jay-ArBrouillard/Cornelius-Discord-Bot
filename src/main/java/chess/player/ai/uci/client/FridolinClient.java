@@ -1,6 +1,6 @@
 package chess.player.ai.uci.client;
 
-import chess.player.ai.uci.engine.Amoeba;
+import chess.player.ai.uci.engine.Fridolin;
 import chess.player.ai.uci.engine.enums.Option;
 import chess.player.ai.uci.engine.enums.Query;
 import chess.player.ai.uci.engine.enums.Variant;
@@ -10,10 +10,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class FridolinClient extends BaseAiClient{
-    private Amoeba engine;
+    private Fridolin engine;
 
     public FridolinClient(Variant variant, String filePath, Set<Option> options) throws IOException {
-        engine = new Amoeba(variant, filePath, options.toArray(new Option[options.size()]));
+        engine = new Fridolin(variant, filePath, options.toArray(new Option[options.size()]));
     }
 
     public String submit(Query query) throws IOException {

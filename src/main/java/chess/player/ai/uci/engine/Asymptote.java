@@ -32,13 +32,7 @@ public class Asymptote extends UCIEngine {
     }
 
     public void close() throws IOException {
-        try {
-            sendCommand("quit");
-        } finally {
-            process.destroy();
-            input.close();
-            output.close();
-        }
+        super.close();
     }
 
     private String getFen() throws IOException {

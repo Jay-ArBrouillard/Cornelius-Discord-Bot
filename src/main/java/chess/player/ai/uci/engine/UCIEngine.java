@@ -66,6 +66,17 @@ abstract class UCIEngine {
         return lines;
     }
 
+    void close() throws IOException {
+        try {
+            sendCommand("quit");
+        } finally {
+            process.destroyForcibly();
+            input.close();
+            output.close();
+            System.gc();
+        }
+    }
+
     String getPath(Variant variant, String filePath) {
         StringBuilder path = new StringBuilder(filePath);
 
