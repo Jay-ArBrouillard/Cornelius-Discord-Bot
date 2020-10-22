@@ -423,9 +423,16 @@ public class ChessGame {
                 String evaluationMessage = stockFishClient.submit(new Query.Builder(QueryType.EVAL).setFen(FenUtils.parseFEN(this.board)).build());
                 if (evaluationMessage != null) state.setBoardEvaluationMessage(evaluationMessage.substring(22));
             } catch (Exception e) {
-                stockFishClient = null;
-                setupStockfishClient();
                 e.printStackTrace();
+            } finally {
+                try {
+                    stockFishClient.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                stockFishClient = null;
+                System.gc();
+                setupStockfishClient();
             }
 
             //Should computer resign?

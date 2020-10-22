@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.io.File;
-import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
 
@@ -352,21 +351,20 @@ public class ChessCommand {
                                 if (chessGame.stockFishClient != null) chessGame.stockFishClient.close();
                                 if (chessGame.client1 != null) chessGame.client1.close();
                                 if (chessGame.client2 != null) chessGame.client2.close();
-                                chessGame.stockFishClient = null;
-                                chessGame.client1 = null;
-                                chessGame.client2 = null;
-                                chessGame.board = null;
-                                chessGame.blackSidePlayer = null;
-                                chessGame.whiteSidePlayer = null;
-                                chessGame.state = null;
-                                chessGame.messageHandler = null;
-                                chessGame.db = null;
-                                chessGame.id = null;
-                                Thread.sleep(5000); //Wait to ensure clients are closed
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
                             state = null;
+                            chessGame.stockFishClient = null;
+                            chessGame.client1 = null;
+                            chessGame.client2 = null;
+                            chessGame.board = null;
+                            chessGame.blackSidePlayer = null;
+                            chessGame.whiteSidePlayer = null;
+                            chessGame.state = null;
+                            chessGame.messageHandler = null;
+                            chessGame.db = null;
+                            chessGame.id = null;
                             chessGame = null;
                             whiteSidePlayer = null;
                             blackSidePlayer = null;
