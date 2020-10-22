@@ -340,7 +340,6 @@ public class ChessCommand {
 
                     event.getChannel().sendMessage("Beginning match (" + gamesCompleted + "/" + totalGames + ") : " + whiteSidePlayer.name + " vs " + blackSidePlayer.name).queue();
                     String status;
-                    System.gc();
                     do {
                         state = chessGame.ai(null);
                         reply = state.getMessage();
