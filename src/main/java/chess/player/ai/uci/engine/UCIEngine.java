@@ -63,7 +63,7 @@ abstract class UCIEngine {
             System.out.println("readResponse:"+line); //To remove
             lines.add(line);
 
-            if (line.contains(expected) || line.startsWith("Protocol not found")) //In some UCI isReady is not needed
+            if (line.startsWith(expected) || line.startsWith("Protocol not found")) //In some UCI isReady is not needed
                 break;
         }
 
