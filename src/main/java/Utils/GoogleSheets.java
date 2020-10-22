@@ -145,6 +145,14 @@ public class GoogleSheets {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            if (e.getMessage().contains("Quota exeeded")) {
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
+                addUser(id, name);
+            }
             return null;
         }
     }

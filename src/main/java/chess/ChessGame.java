@@ -44,7 +44,7 @@ public class ChessGame {
         try {
             stockFishClient = new StockFishClient.Builder()
                                 .setOption(Option.Minimum_Thinking_Time, 500)
-                                .setOption(Option.Hash, 8)
+                                .setOption(Option.Hash, 2)
                                 .setVariant(Variant.MODERN)  // BMI for windows, Modern for linux
                                 .build();
         } catch (Exception e) {
@@ -204,7 +204,7 @@ public class ChessGame {
         return this.board.getCurrentPlayer().getAlliance().isBlack();
     }
 
-    public String setupPlayers(String message, double elo, String id) {
+    public String setupPlayers(MessageChannel mc, String message, double elo, String id) {
         String option = message.contains(" ") ? message.substring(0, message.indexOf(" ")).trim() : message;
         String opponent = message.contains(" ") ? message.substring(message.indexOf(" ")).trim() : null;
 
@@ -218,9 +218,11 @@ public class ChessGame {
 
         ChessPlayer player = null;
         if (opponent == null || (opponent != null && opponent.isEmpty())) { //Find a random opponent with a similar elo if possible
+            mc.sendTyping().queue();
             player = findUserByElo(elo, id); //Should never be null
         }
         else if (option.equals("2") || option.equals("3")){
+            mc.sendTyping().queue();
             player = findUserByName(opponent);
             if (player == null) {
                 return new StringBuilder("Opponent by the name of `").append(opponent).append("` does not exist in the database. Try again and/or check the chess record spreadsheets for exact name").toString();

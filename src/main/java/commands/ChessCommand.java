@@ -451,7 +451,7 @@ public class ChessCommand {
                 break;
             case SETUP_RESPONSE:
                 ChessPlayer humanPlayer = chessGame.addUser(event.getAuthor().getId(), event.getAuthor().getName());
-                reply = chessGame.setupPlayers(message, humanPlayer.elo, humanPlayer.discordId);
+                reply = chessGame.setupPlayers(event.getChannel(), message, humanPlayer.elo, humanPlayer.discordId);
                 System.gc();
                 if (reply.startsWith(GameType.PVP.toString())) {
                     reply = "`Player vs Player Chess Game`\nPlease challenge another player by entering their `userId` (Click on user and Copy ID)";
