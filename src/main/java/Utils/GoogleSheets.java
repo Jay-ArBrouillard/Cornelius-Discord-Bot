@@ -126,16 +126,19 @@ public class GoogleSheets {
                         .setInsertDataOption("INSERT_ROWS")
                         .execute();
 
-                // Update ranked sheet by elo rating and format that elo rating since it is stored as a double
+                // Update ranked sheet by elo rating and then name
                 BatchUpdateSpreadsheetRequest busReq = new BatchUpdateSpreadsheetRequest();
-                SortSpec sortSpec = new SortSpec();
-                sortSpec.setDimensionIndex(2);
-                sortSpec.setSortOrder("DESCENDING");
+                SortSpec eloSortSpec = new SortSpec();
+                eloSortSpec.setDimensionIndex(2);
+                eloSortSpec.setSortOrder("DESCENDING");
+                SortSpec nameSortSpec = new SortSpec();
+                nameSortSpec.setDimensionIndex(1);
+                nameSortSpec.setSortOrder("ASCENDING");
                 SortRangeRequest sortRangeRequest = new SortRangeRequest();
                 GridRange gridRange = new GridRange();
                 gridRange.setSheetId(1906592208);
                 sortRangeRequest.setRange(gridRange);
-                sortRangeRequest.setSortSpecs(Arrays.asList(sortSpec));
+                sortRangeRequest.setSortSpecs(Arrays.asList(eloSortSpec, nameSortSpec));
                 Request request = new Request();
                 request.setSortRange(sortRangeRequest);
                 busReq.setRequests(Arrays.asList(request));
@@ -306,16 +309,19 @@ public class GoogleSheets {
                     .setValueInputOption("RAW")
                     .execute();
 
-            // Update ranked sheet by elo rating
+            // Update ranked sheet by elo rating and then name
             BatchUpdateSpreadsheetRequest busReq = new BatchUpdateSpreadsheetRequest();
-            SortSpec sortSpec = new SortSpec();
-            sortSpec.setDimensionIndex(2);
-            sortSpec.setSortOrder("DESCENDING");
+            SortSpec eloSortSpec = new SortSpec();
+            eloSortSpec.setDimensionIndex(2);
+            eloSortSpec.setSortOrder("DESCENDING");
+            SortSpec nameSortSpec = new SortSpec();
+            nameSortSpec.setDimensionIndex(1);
+            nameSortSpec.setSortOrder("ASCENDING");
             SortRangeRequest sortRangeRequest = new SortRangeRequest();
             GridRange gridRange = new GridRange();
             gridRange.setSheetId(1906592208);
             sortRangeRequest.setRange(gridRange);
-            sortRangeRequest.setSortSpecs(Arrays.asList(sortSpec));
+            sortRangeRequest.setSortSpecs(Arrays.asList(eloSortSpec, nameSortSpec));
             Request request = new Request();
             request.setSortRange(sortRangeRequest);
             busReq.setRequests(Arrays.asList(request));

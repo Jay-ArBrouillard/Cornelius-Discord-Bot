@@ -57,67 +57,6 @@ public class ChessPlayer {
         this.ratio = this.losses != 0 ? (this.wins + this.draws) / (double) this.losses : (this.wins + this.draws) / 1.0 ;
     }
 
-    public void calculateElo(boolean isDraw, boolean isWin, ChessPlayer o) {
-        if (isDraw) {
-            if (!this.provisional && !o.provisional) {
-                this.elo = EloRanking.calculateEstablishedVsEstablished(this.elo, o.elo, 0.5);
-            }
-            else if (!this.provisional && o.provisional) {
-                this.elo = EloRanking.calculateEstablishedVsProvisional(this.elo, o.elo, o.totalGames,0.5);
-            }
-            else if (this.provisional && !o.provisional) {
-                this.elo = EloRanking.calculateProvisionalVsEstablished(this.elo, this.totalGames, o.elo, 0.0);
-            }
-            else {
-                this.elo = EloRanking.calculateProvisionalVsProvisional(this.elo, this.totalGames, o.elo, 0.0);
-            }
-        }
-        else {
-            if (isWin) {
-                // Never let their elo decrease after a win
-                if (!this.provisional && !o.provisional) {
-                    this.elo = Math.max(this.elo, EloRanking.calculateEstablishedVsEstablished(this.elo, o.elo, 1.0));
-                }
-                else if (!this.provisional && o.provisional) {
-                    this.elo = Math.max(this.elo, EloRanking.calculateEstablishedVsProvisional(this.elo, o.elo, o.totalGames,1.0));
-                }
-                else if (this.provisional && !o.provisional) {
-                    this.elo = Math.max(this.elo, EloRanking.calculateProvisionalVsEstablished(this.elo, this.totalGames, o.elo, 1.0));
-                }
-                else {
-                    this.elo = Math.max(this.elo, EloRanking.calculateProvisionalVsProvisional(this.elo, this.totalGames, o.elo, 1.0));
-                }
-            }
-            else { //Loss
-                // Never let their elo decrease lower than 100
-                if (!this.provisional && !o.provisional) {
-                    this.elo = Math.max(100, EloRanking.calculateEstablishedVsEstablished(this.elo, o.elo, 0.0));
-                }
-                else if (!this.provisional && o.provisional) {
-                    this.elo = Math.max(100, EloRanking.calculateEstablishedVsProvisional(this.elo, o.elo, o.totalGames,0.0));
-                }
-                else if (this.provisional && !o.provisional) {
-                    this.elo = Math.max(100, EloRanking.calculateProvisionalVsEstablished(this.elo, this.totalGames, o.elo, -1.0));
-                }
-                else {
-                    this.elo = Math.max(100, EloRanking.calculateProvisionalVsProvisional(this.elo, this.totalGames, o.elo, -1.0));
-                }
-            }
-        }
-        this.elo = Math.round(this.elo); // Round double to nearest integer
-        if (this.provisional && this.totalGames > 20) this.provisional = false;
-        if (this.totalGames <= 20) {
-            this.highestElo = null;
-        }
-        else if (this.totalGames == 21) {
-            this.highestElo = this.elo;
-        }
-        else if (this.elo > this.highestElo) {
-            this.highestElo = this.elo;
-        }
-        determineTitle();
-    }
-
     public void determineTitle() {
         if (this.elo >= 2500) {
             this.title = "Grandmaster (GM)";

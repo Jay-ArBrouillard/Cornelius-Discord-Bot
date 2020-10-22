@@ -1,6 +1,9 @@
 package Utils;
 
 
+import chess.ChessGameState;
+import chess.tables.ChessPlayer;
+
 /**
  * https://www.daysofwonder.com/online/en/play/ranking/
  * Let's call rA the starting score of player A, and nA his number of games. Same thing with rB and nB.
@@ -89,5 +92,85 @@ public class EloRanking {
         }
 
         return K;
+    }
+
+    public static void calculateChessElo(ChessGameState state, ChessPlayer whiteSidePlayer, ChessPlayer blackSidePlayer) {
+        String winnerId = state.getWinnerId();
+        if (winnerId == null) { //Draw
+            calculateChessEloSingle(true, false, whiteSidePlayer, state.getPrevElo().get(blackSidePlayer.discordId), blackSidePlayer);
+            calculateChessEloSingle(true, false, blackSidePlayer, state.getPrevElo().get(whiteSidePlayer.discordId), whiteSidePlayer);
+        }
+        else if (winnerId.equals(whiteSidePlayer.discordId)) { //White side white
+            calculateChessEloSingle(false, true, whiteSidePlayer, state.getPrevElo().get(blackSidePlayer.discordId), blackSidePlayer);
+            calculateChessEloSingle(false, false, blackSidePlayer, state.getPrevElo().get(whiteSidePlayer.discordId), whiteSidePlayer);
+        }
+        else if (winnerId.equals(blackSidePlayer.discordId)) { //Black side white
+            calculateChessEloSingle(false, false, whiteSidePlayer, state.getPrevElo().get(blackSidePlayer.discordId), blackSidePlayer);
+            calculateChessEloSingle(false, true, blackSidePlayer, state.getPrevElo().get(whiteSidePlayer.discordId), whiteSidePlayer);
+        }
+        else {
+            new RuntimeException("Error calculating chess elo");
+        }
+    }
+
+    public static void calculateChessEloSingle(boolean isDraw, boolean isWin, ChessPlayer c, double oPrevElo, ChessPlayer o) {
+        if (isDraw) {
+            if (!c.provisional && !o.provisional) {
+                c.elo = EloRanking.calculateEstablishedVsEstablished(o.elo, oPrevElo, 0.5);
+            }
+            else if (!c.provisional && o.provisional) {
+                c.elo = EloRanking.calculateEstablishedVsProvisional(c.elo, oPrevElo, o.totalGames,0.5);
+            }
+            else if (c.provisional && !o.provisional) {
+                c.elo = EloRanking.calculateProvisionalVsEstablished(c.elo, c.totalGames, oPrevElo, 0.0);
+            }
+            else {
+                c.elo = EloRanking.calculateProvisionalVsProvisional(c.elo, c.totalGames, oPrevElo, 0.0);
+            }
+        }
+        else {
+            if (isWin) {
+                // Never let their elo decrease after a win
+                if (!c.provisional && !o.provisional) {
+                    c.elo = Math.max(c.elo, EloRanking.calculateEstablishedVsEstablished(c.elo, oPrevElo, 1.0));
+                }
+                else if (!c.provisional && o.provisional) {
+                    c.elo = Math.max(c.elo, EloRanking.calculateEstablishedVsProvisional(c.elo, oPrevElo, o.totalGames,1.0));
+                }
+                else if (c.provisional && !o.provisional) {
+                    c.elo = Math.max(c.elo, EloRanking.calculateProvisionalVsEstablished(c.elo, c.totalGames, oPrevElo, 1.0));
+                }
+                else {
+                    c.elo = Math.max(c.elo, EloRanking.calculateProvisionalVsProvisional(c.elo, c.totalGames, oPrevElo, 1.0));
+                }
+            }
+            else { //Loss
+                // Never let their elo decrease lower than 100
+                if (!c.provisional && !o.provisional) {
+                    c.elo = Math.max(100, EloRanking.calculateEstablishedVsEstablished(c.elo, oPrevElo, 0.0));
+                }
+                else if (!c.provisional && o.provisional) {
+                    c.elo = Math.max(100, EloRanking.calculateEstablishedVsProvisional(c.elo, oPrevElo, o.totalGames,0.0));
+                }
+                else if (c.provisional && !o.provisional) {
+                    c.elo = Math.max(100, EloRanking.calculateProvisionalVsEstablished(c.elo, c.totalGames, oPrevElo, -1.0));
+                }
+                else {
+                    c.elo = Math.max(100, EloRanking.calculateProvisionalVsProvisional(c.elo, c.totalGames, oPrevElo, -1.0));
+                }
+            }
+        }
+        c.elo = Math.round(c.elo); // Round double to nearest integer
+        if (c.provisional && c.totalGames > 20) c.provisional = false;
+        if (c.totalGames <= 20) {
+            c.highestElo = null;
+        }
+        else if (c.totalGames == 21) {
+            c.highestElo = c.elo;
+        }
+        else if (c.elo > c.highestElo) {
+            c.highestElo = c.elo;
+        }
+        c.determineTitle();
     }
 }

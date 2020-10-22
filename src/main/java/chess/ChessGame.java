@@ -1,5 +1,6 @@
 package chess;
 
+import Utils.EloRanking;
 import Utils.GoogleSheets;
 import chess.board.Board;
 import chess.board.BoardUtils;
@@ -497,13 +498,10 @@ public class ChessGame {
 
     private synchronized void updateDatabaseDraw() {
         whiteSidePlayer.incrementDraws();
-        whiteSidePlayer.calculateElo(true, false, blackSidePlayer);
-        db.updateUser(whiteSidePlayer);
-
         blackSidePlayer.incrementDraws();
-        blackSidePlayer.calculateElo(true, false, whiteSidePlayer);
+        EloRanking.calculateChessElo(state, whiteSidePlayer, blackSidePlayer);
+        db.updateUser(whiteSidePlayer);
         db.updateUser(blackSidePlayer);
-
         db.addMatch(whiteSidePlayer, blackSidePlayer, state);
     }
 
@@ -517,13 +515,10 @@ public class ChessGame {
     public synchronized void updateDatabaseWhiteSideWin(boolean isForfeit) {
         if (isForfeit || state.getTotalMoves() > 0) {
             whiteSidePlayer.incrementWins();
-            whiteSidePlayer.calculateElo(false, true, blackSidePlayer);
-            db.updateUser(whiteSidePlayer);
-
             blackSidePlayer.incrementLosses();
-            blackSidePlayer.calculateElo(false, false, whiteSidePlayer);
+            EloRanking.calculateChessElo(state, whiteSidePlayer, blackSidePlayer);
+            db.updateUser(whiteSidePlayer);
             db.updateUser(blackSidePlayer);
-
             db.addMatch(whiteSidePlayer, blackSidePlayer, state);
         }
         else {
@@ -543,13 +538,10 @@ public class ChessGame {
     public synchronized void updateDatabaseBlackSideWin(boolean isForfeit) {
         if (isForfeit || state.getTotalMoves() > 0) {
             whiteSidePlayer.incrementLosses();
-            whiteSidePlayer.calculateElo(false, false, blackSidePlayer);
-            db.updateUser(whiteSidePlayer);
-
             blackSidePlayer.incrementWins();
-            blackSidePlayer.calculateElo(false, true, whiteSidePlayer);
+            EloRanking.calculateChessElo(state, whiteSidePlayer, blackSidePlayer);
+            db.updateUser(whiteSidePlayer);
             db.updateUser(blackSidePlayer);
-
             db.addMatch(whiteSidePlayer, blackSidePlayer, state);
         }
         else {
