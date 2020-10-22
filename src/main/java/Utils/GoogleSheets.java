@@ -241,11 +241,13 @@ public class GoogleSheets {
         ValueRange response = service.spreadsheets().values().get(SPREAD_SHEET_ID, RANKED_TAB).execute();
         rowNumber = 1;
         totalRows = response.getValues().size();
-        for (List row : response.getValues()) {
-            if (id.equalsIgnoreCase((String)row.get(0))) {
-                return row;
+        if (totalRows > 0) {
+            for (List row : response.getValues()) {
+                if (id.equalsIgnoreCase((String)row.get(0))) {
+                    return row;
+                }
+                rowNumber++;
             }
-            rowNumber++;
         }
         return null;
     }
@@ -260,11 +262,13 @@ public class GoogleSheets {
         ValueRange response = service.spreadsheets().values().get(SPREAD_SHEET_ID, RANKED_TAB).execute();
         rowNumber = 1;
         totalRows = response.getValues().size();
-        for (List row : response.getValues()) {
-            if (name.equalsIgnoreCase((String)row.get(1))) {
-                return row;
+        if (totalRows > 0) {
+            for (List row : response.getValues()) {
+                if (name.equalsIgnoreCase((String)row.get(1))) {
+                    return row;
+                }
+                rowNumber++;
             }
-            rowNumber++;
         }
         return null;
     }
