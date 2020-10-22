@@ -80,7 +80,7 @@ public class ChessCommand {
             return;
         }
 
-        if (message.contains("!chess train")) { //Ex: !chess train 10 - Every player would play 10 games against random opponents
+        if (message.startsWith("!chess train")) { //Ex: !chess train 10 - Every player would play 10 games against random opponents
             String [] split = message.split("\\s+");
             if (split.length != 3) {
                 event.getChannel().sendMessage("Incorrect format for `!chess train`. Valid examples include `!chess train 1`, `!chess train 10`, etc...").queue();
@@ -107,11 +107,10 @@ public class ChessCommand {
 
             while (gamesCompleted < totalGames) {
                 for (int i = 0; i < players.length; i++) {
-                    int randomIndex = i;
-                    do {
+                    int randomIndex = random.nextInt(players.length);
+                    while (randomIndex == i) {
                         randomIndex = random.nextInt(players.length);
-                    } while (randomIndex != i);
-
+                    }
                     state = new ChessGameState();
                     chessGame = new ChessGame(state);
                     whiteSidePlayer = chessGame.addUser(players[i][0], players[i][1]);
@@ -171,7 +170,7 @@ public class ChessCommand {
             return;
         }
 
-        if (message.contains("!chess trainAll")) {
+        if (message.startsWith("!chess trainAll")) {
             String[][] players = getAIList();
             int gamesCompleted = 0;
             int totalGames = players.length * players.length;
