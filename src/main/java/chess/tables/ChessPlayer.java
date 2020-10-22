@@ -18,10 +18,11 @@ public class ChessPlayer {
     public final String createdOn;
     public String updatedOn;
 
-    public ChessPlayer(String discordId, String name, double elo, boolean provisional, String title, int wins, int losses, int draws, double ratio, int totalGames, String totalGameTimeStr, String createdOn, String updatedOn) {
+    public ChessPlayer(String discordId, String name, double elo, Double highestElo, boolean provisional, String title, int wins, int losses, int draws, double ratio, int totalGames, String totalGameTimeStr, String createdOn, String updatedOn) {
         this.discordId = discordId;
         this.name = name;
         this.elo = elo;
+        this.highestElo = highestElo;
         this.provisional = provisional;
         this.title = title;
         this.wins = wins;
@@ -105,6 +106,15 @@ public class ChessPlayer {
         }
         this.elo = Math.round(this.elo); // Round double to nearest integer
         if (this.provisional && this.totalGames > 20) this.provisional = false;
+        if (this.totalGames <= 20) {
+            this.highestElo = null;
+        }
+        else if (this.totalGames == 21) {
+            this.highestElo = this.elo;
+        }
+        else if (this.elo > this.highestElo) {
+            this.highestElo = this.elo;
+        }
         determineTitle();
     }
 

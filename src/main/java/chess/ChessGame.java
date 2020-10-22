@@ -164,6 +164,11 @@ public class ChessGame {
                     .setOption(Option.Hash, 16)
                     .build(), p);
         }
+        else if (p.name.contains("Fridolin")) {
+            setClient(new FridolinClient.Builder()
+                    .setOption(Option.Hash, 16)
+                    .build(), p);
+        }
     }
 
     private void setClient(BaseAiClient client, ChessPlayer p) {

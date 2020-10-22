@@ -102,7 +102,7 @@ public class GoogleSheets {
 
             List row = isRanked(id);
             if (row != null) { // Player exists in ranked table
-                user = new ChessPlayer((String)row.get(0), (String)row.get(1), Double.parseDouble((String)row.get(2)),
+                user = new ChessPlayer((String)row.get(0), (String)row.get(1), Double.parseDouble((String)row.get(2)), null,
                                 Boolean.valueOf((String)row.get(4)), (String)row.get(5), Integer.parseInt((String)row.get(6)),
                                 Integer.parseInt((String)row.get(7)), Integer.parseInt((String)row.get(8)),
                                 Double.parseDouble((String)row.get(9)), Integer.parseInt((String)row.get(10)), (String)row.get(11),
@@ -141,7 +141,7 @@ public class GoogleSheets {
                 busReq.setRequests(Arrays.asList(request));
                 service.spreadsheets().batchUpdate(SPREAD_SHEET_ID, busReq).execute();
 
-                return new ChessPlayer(id, name, 1200, true, "Class D", 0, 0, 0, 0.0, 0, "0 days 0 hours 0 minutes 0 seconds", now, now);
+                return new ChessPlayer(id, name, 1200, null, true, "Class D", 0, 0, 0, 0.0, 0, "0 days 0 hours 0 minutes 0 seconds", now, now);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -157,7 +157,7 @@ public class GoogleSheets {
             //Check if player exists
             List row = isRankedByName(name);
             if (row != null) { // Player exists in ranked table
-                user = new ChessPlayer((String)row.get(0), (String)row.get(1), Double.parseDouble((String)row.get(2)),
+                user = new ChessPlayer((String)row.get(0), (String)row.get(1), Double.parseDouble((String)row.get(2)), null,
                         Boolean.valueOf((String)row.get(4)), (String)row.get(5), Integer.parseInt((String)row.get(6)),
                         Integer.parseInt((String)row.get(7)), Integer.parseInt((String)row.get(8)),
                         Double.parseDouble((String)row.get(9)), Integer.parseInt((String)row.get(10)), (String)row.get(11),
@@ -210,7 +210,7 @@ public class GoogleSheets {
 
             //Choose a random opponent from candidate list
             closest = candidates.get(rand.nextInt(candidates.size()));
-            ChessPlayer user = new ChessPlayer((String)closest.get(0), (String)closest.get(1), Double.parseDouble((String)closest.get(2)),
+            ChessPlayer user = new ChessPlayer((String)closest.get(0), (String)closest.get(1), Double.parseDouble((String)closest.get(2)), null,
                     Boolean.valueOf((String)closest.get(4)), (String)closest.get(5), Integer.parseInt((String)closest.get(6)),
                     Integer.parseInt((String)closest.get(7)), Integer.parseInt((String)closest.get(8)),
                     Double.parseDouble((String)closest.get(9)), Integer.parseInt((String)closest.get(10)), (String)closest.get(11),
@@ -280,7 +280,7 @@ public class GoogleSheets {
             values.add(user.discordId);
             values.add(user.name);
             values.add(user.elo);
-            if (!user.provisional) {
+            if (user.highestElo != null) {
                 values.add(user.highestElo);
             }
             else {
