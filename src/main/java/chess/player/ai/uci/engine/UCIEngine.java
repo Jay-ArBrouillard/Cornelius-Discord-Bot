@@ -17,8 +17,13 @@ abstract class UCIEngine {
             input = new BufferedReader(new InputStreamReader(process.getInputStream()));
             output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
-            for (Option option : options)
-                passOption(option);
+            boolean hashSet = false;
+            for (Option option : options) {
+                if (!hashSet) passOption(option);
+                if (option.getOptionString().equals("Hash")) {
+                    hashSet = true;
+                }
+            }
         } catch (IOException e) {
             throw new IOException("Unable to start and bind " + super.getClass().getSimpleName() + " process: ", e);
         }
@@ -43,8 +48,13 @@ abstract class UCIEngine {
             sendCommand("uci");
             readResponse("uciok");
 
-            for (Option option : options)
-                passOption(option);
+            boolean hashSet = false;
+            for (Option option : options) {
+                if (!hashSet) passOption(option);
+                if (option.getOptionString().equals("Hash")) {
+                    hashSet = true;
+                }
+            }
         } catch (IOException e) {
             throw new IOException("Unable to start and bind " + super.getClass().getSimpleName() + " process: ", e);
         }

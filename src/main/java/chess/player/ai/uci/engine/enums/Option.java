@@ -23,6 +23,10 @@ public enum Option {
         optionString = option;
     }
 
+    public String getOptionString() {
+        return optionString;
+    }
+
     public Option setValue(Object value) {
         this.value = value;
         return this;

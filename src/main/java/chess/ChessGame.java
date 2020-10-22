@@ -43,8 +43,7 @@ public class ChessGame {
 
     public void setupStockfishClient() {
         try {
-            stockFishClient = new StockFishClient.Builder()
-                                .setOption(Option.Hash, 8)
+            stockFishClient = new StockFishClient.Builder()  //Stockfish defaults to hash of 16mb
                                 .setVariant(Variant.MODERN)  // BMI for windows, Modern for linux
                                 .build();
         } catch (Exception e) {
