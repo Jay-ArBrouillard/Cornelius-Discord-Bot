@@ -181,7 +181,7 @@ public class ChessCommand {
 
             chessGame = new ChessGame(null);
             for (int i = 0; i < players.length; i++) {
-                //100 requests per 100 seconds per user
+                //100 requests per 100 seconds per user or 1 per second
                 chessGame.addUser(players[i][0], players[i][1]);
                 try {
                     Thread.sleep(500);
