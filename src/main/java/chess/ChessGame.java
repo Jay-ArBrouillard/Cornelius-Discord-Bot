@@ -169,6 +169,11 @@ public class ChessGame {
                     .setOption(Option.Hash, 16)
                     .build(), p);
         }
+        else if (p.name.contains("LittleWing")) {
+            setClient(new LittleWingClient.Builder()
+                    .setOption(Option.Hash, 16)
+                    .build(), p);
+        }
     }
 
     private void setClient(BaseAiClient client, ChessPlayer p) {
