@@ -27,17 +27,8 @@ apply plugin: 'java'
 jar {
     manifest {
         attributes(
+                "Manifest-Version": "1.0",
                 'Main-Class': 'Main'
         )
     }
 }
-
-//task stage(dependsOn: ['build', 'clean'])
-//build.mustRunAfter clean
-//
-//task copyToLib(type: Copy) {
-//    into "build/libs"
-//    from(configurations.compile)
-//}
-//
-//stage.dependsOn(copyToLib)
