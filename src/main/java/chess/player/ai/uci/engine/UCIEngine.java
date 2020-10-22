@@ -24,6 +24,32 @@ abstract class UCIEngine {
         }
     }
 
+
+    /**
+     * Case when UCI doesn't immediately initiate
+     * @param variant
+     * @param filePath
+     * @param startUpReadCommand
+     * @param options
+     * @throws IOException
+     */
+    UCIEngine(Variant variant, String filePath, String startUpReadCommand, Option... options) throws IOException {
+        try {
+            process = Runtime.getRuntime().exec(getPath(variant, filePath));
+            input = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+
+            readResponse(startUpReadCommand);
+            sendCommand("uci");
+            readResponse("uciok");
+
+            for (Option option : options)
+                passOption(option);
+        } catch (IOException e) {
+            throw new IOException("Unable to start and bind " + super.getClass().getSimpleName() + " process: ", e);
+        }
+    }
+
     void passOption(Option option) throws IOException {
         sendCommand(option.toString());
     }

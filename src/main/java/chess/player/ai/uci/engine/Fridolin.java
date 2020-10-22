@@ -8,9 +8,7 @@ import java.io.IOException;
 
 public class Fridolin extends UCIEngine {
     public Fridolin(Variant variant, String filePath, Option... options) throws IOException {
-        super(variant, filePath, options);
-        readResponse("created by C.Sommerfeld");
-        sendCommand("uci");
+        super(variant, filePath, "created by C.Sommerfeld", options);
     }
 
     public String getBestMove(Query query) throws IOException {

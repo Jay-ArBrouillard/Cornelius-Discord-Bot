@@ -7,10 +7,9 @@ import chess.player.ai.uci.engine.enums.Variant;
 import java.io.IOException;
 
 public class CT800 extends UCIEngine {
+
     public CT800(Variant variant, String filePath, Option... options) throws IOException {
-        super(variant, filePath, options);
-        readResponse("Free software under GPLv3+");
-        sendCommand("uci");
+        super(variant, filePath, "Free software under GPLv3+", options);
     }
 
     public String getBestMove(Query query) throws IOException {
