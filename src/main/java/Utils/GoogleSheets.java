@@ -138,6 +138,7 @@ public class GoogleSheets {
                 nameSortSpec.setSortOrder("ASCENDING");
                 SortRangeRequest sortRangeRequest = new SortRangeRequest();
                 GridRange gridRange = new GridRange();
+                gridRange.setStartRowIndex(1); //If we don't set this then header column is sorted
                 gridRange.setSheetId(1906592208);
                 sortRangeRequest.setRange(gridRange);
                 sortRangeRequest.setSortSpecs(Arrays.asList(eloSortSpec, nameSortSpec));
@@ -378,6 +379,7 @@ public class GoogleSheets {
             nameSortSpec.setSortOrder("ASCENDING");
             SortRangeRequest sortRangeRequest = new SortRangeRequest();
             GridRange gridRange = new GridRange();
+            gridRange.setStartRowIndex(1); //If we don't set this then header column is sorted
             gridRange.setSheetId(1906592208);
             sortRangeRequest.setRange(gridRange);
             sortRangeRequest.setSortSpecs(Arrays.asList(eloSortSpec, nameSortSpec));
