@@ -34,6 +34,8 @@ public class GoogleSheets {
     private static final String MATCHES_TAB = "matches";
     private static int rowNumber;
     private static int totalRows;
+    private static final String pattern = "MMM dd yyyy hh:mm a";
+
 
     public GoogleSheets() {
         getSheetsService();
@@ -430,7 +432,7 @@ public class GoogleSheets {
             }
 
             service.spreadsheets().values()
-                    .append(SPREAD_SHEET_ID, "matches", appendBody)
+                    .append(SPREAD_SHEET_ID, MATCHES_TAB, appendBody)
                     .setValueInputOption("RAW")
                     .setInsertDataOption("INSERT_ROWS")
                     .execute();
@@ -502,6 +504,7 @@ public class GoogleSheets {
     }
 
     public static String getDate(Long pCurrentTimeMs) {
-        return DateTimeFormatter.ofPattern("MMM-dd-yyyy hh:mm a").format(Instant.ofEpochMilli(pCurrentTimeMs));
+        ZonedDateTime zonedTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(pCurrentTimeMs), ZoneId.systemDefault());
+        return zonedTime.format(DateTimeFormatter.ofPattern(pattern));
     }
 }
