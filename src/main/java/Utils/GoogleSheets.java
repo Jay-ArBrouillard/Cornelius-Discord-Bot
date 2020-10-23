@@ -503,6 +503,6 @@ public class GoogleSheets {
 
     public static String getDate(Long pCurrentTimeMs) {
         Instant i = Instant.ofEpochMilli(pCurrentTimeMs);
-        return DateTimeFormatter.ofPattern("MM-dd-yyyy hh:mm:ss a").format(ZonedDateTime.ofInstant(i, ZoneId.of("America/Chicago")));
+        return DateTimeFormatter.ofPattern("MM-dd-yyyy hh:mm:ss a").format(i);
     }
 }
