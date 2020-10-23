@@ -450,8 +450,15 @@ public class GoogleSheets {
             gridRange.setSheetId(2021381704);
             sortRangeRequest.setRange(gridRange);
             sortRangeRequest.setSortSpecs(Arrays.asList(sortSpec));
+            DeleteDimensionRequest deleteDimensionRequest = new DeleteDimensionRequest();
+            //Only keep the last 10000 matches
+            DimensionRange dimensionRange = new DimensionRange();
+            dimensionRange.setStartIndex(10001); //Delete rows after 10000
+            dimensionRange.setSheetId(2021381704);
+            deleteDimensionRequest.setRange(dimensionRange);
             Request request = new Request();
             request.setSortRange(sortRangeRequest);
+            request.setDeleteDimension(deleteDimensionRequest);
             busReq.setRequests(Arrays.asList(request));
             service.spreadsheets().batchUpdate(SPREAD_SHEET_ID, busReq).execute();
 
