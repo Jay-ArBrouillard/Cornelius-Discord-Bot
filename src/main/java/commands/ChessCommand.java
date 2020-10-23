@@ -559,7 +559,7 @@ public class ChessCommand {
         int totalGames = Integer.parseInt(split[3]);
         int playerIndex = 0;
         for (int i = 0; i < players.length; i++) {
-            if (players[i].equals(discordId)) {
+            if (players[i][0].equals(discordId)) {
                 playerIndex = i;
                 break;
             }
