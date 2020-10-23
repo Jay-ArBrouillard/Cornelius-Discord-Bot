@@ -672,28 +672,28 @@ public class ChessGame {
             } catch (Exception e) {
                 e.printStackTrace();
                 try {
-                    System.out.println("client1 was using " + client1 + ", client 2 was using " + client2);
+                    System.out.println("-----------------client1 was using " + client1 + ", client 2 was using " + client2);
                     if (isWhitePlayerTurn()) {
                         if (client1 != null) {
                             client1.close();
-                            System.out.println("Shutdown client1");
+                            System.out.println("-----------------Shutdown client1");
                             setClient(whiteSidePlayer);
-                            System.out.println("Restarted " + client1);
+                            System.out.println("-----------------Restarted " + client1);
                         }
                     }
                     else if (isBlackPlayerTurn()) {
                         if (client2 != null) {
                             client2.close();
-                            System.out.println("Shutdown client2");
-                            setClient(whiteSidePlayer);
-                            System.out.println("Restarted " + client2);
+                            System.out.println("-----------------Shutdown client2");
+                            setClient(blackSidePlayer);
+                            System.out.println("-----------------Restarted " + client2);
                         }
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
                 finally {
-                    System.out.println("Using iterative deepening");
+                    System.out.println("-----------------Using iterative deepening");
                     if (id == null) id = new IterativeDeepening(6);
                     final Move bestMove = id.execute(this.board);
                     bestMoveString = BoardUtils.getPositionAtCoordinate(bestMove.getCurrentCoordinate()) + BoardUtils.getPositionAtCoordinate(bestMove.getDestinationCoordinate());
