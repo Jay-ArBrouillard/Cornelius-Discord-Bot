@@ -50,7 +50,7 @@ public class LaserClient extends BaseAiClient{
             return this;
         }
 
-        public final LaserClient.Builder setOption(Option o, long value) {
+        public final LaserClient.Builder setOption(Option o, Object value) {
             options.add(o.setValue(value));
             return this;
         }

@@ -178,6 +178,21 @@ public class ChessGame {
             setClient(new MoustiqueClient.Builder()
                     .build(), p);
         }
+        else if (p.name.contains("Hakkapeliitta")) {
+            setClient(new HakkapeliittaClient.Builder()
+                    .setOption(Option.Hash, 16)
+                    .build(), p);
+        }
+        else if (p.name.contains("Ethereal")) {
+            setClient(new EtherealClient.Builder()
+                    .setOption(Option.Hash, 16)
+                    .build(), p);
+        }
+        else if (p.name.contains("Demolito")) {
+            setClient(new DemolitoClient.Builder()
+                    .setOption(Option.Hash, 16)
+                    .build(), p);
+        }
     }
 
     private void setClient(BaseAiClient client, ChessPlayer p) {

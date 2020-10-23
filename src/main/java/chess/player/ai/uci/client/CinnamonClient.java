@@ -50,7 +50,7 @@ public class CinnamonClient extends BaseAiClient{
             return this;
         }
 
-        public final CinnamonClient.Builder setOption(Option o, long value) {
+        public final CinnamonClient.Builder setOption(Option o, Object value) {
             options.add(o.setValue(value));
             return this;
         }

@@ -50,7 +50,7 @@ public class MonolithClient extends BaseAiClient{
             return this;
         }
 
-        public final MonolithClient.Builder setOption(Option o, long value) {
+        public final MonolithClient.Builder setOption(Option o, Object value) {
             options.add(o.setValue(value));
             return this;
         }

@@ -80,6 +80,7 @@ public class ChessCommand {
             return;
         }
 
+        if (message.startsWith("!chess addAll")) { handleAddAll(event); return; }
         if (message.startsWith("!chess trainFair")) { handleTrainFairly(event, message); return; }
         if (message.startsWith("!chess trainRandom")) { handleTrainRandom(event, message); return; }
         if (message.startsWith("!chess trainAll")) { handleTrainAll(event); return; }
@@ -287,6 +288,24 @@ public class ChessCommand {
                 }
             }).start();
         }
+    }
+
+    private static void handleAddAll(MessageReceivedEvent event) {
+        event.getChannel().sendMessage("Starting adding all computer players...").queue();
+        String[][] players = getAIList();
+        chessGame = new ChessGame(null);
+        for (int i = 0; i < players.length; i++) {
+            //google api limit is 1 per second
+            chessGame.addUser(players[i][0], players[i][1]); //This executes 3 requests
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        chessGame = null;
+        event.getChannel().sendMessage("Completed").queue();
     }
 
     private static void handleTrainAll(MessageReceivedEvent event) {
@@ -637,6 +656,9 @@ public class ChessCommand {
 
     private static String[][] getAIList() {
         return new String[][]{
+                {"693282099167494225DE1", "Demolito 1"},
+                {"693282099167494225ET12", "Ethereal 12"},
+                {"693282099167494225HA", "Hakkapeliitta 3"},
             {"693282099167494225MO0.3", "Moustique 0.3"},
             {"693282099167494225LW0.6", "LittleWing 0.6"},
             {"693282099167494225FR3", "Fridolin 3"},

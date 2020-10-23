@@ -50,7 +50,7 @@ public class DumbClient extends BaseAiClient{
             return this;
         }
 
-        public final DumbClient.Builder setOption(Option o, long value) {
+        public final DumbClient.Builder setOption(Option o, Object value) {
             options.add(o.setValue(value));
             return this;
         }

@@ -50,7 +50,7 @@ public class AmoebaClient extends BaseAiClient{
             return this;
         }
 
-        public final AmoebaClient.Builder setOption(Option o, long value) {
+        public final AmoebaClient.Builder setOption(Option o, Object value) {
             options.add(o.setValue(value));
             return this;
         }

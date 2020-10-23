@@ -50,7 +50,7 @@ public class CounterGoClient extends BaseAiClient{
             return this;
         }
 
-        public final CounterGoClient.Builder setOption(Option o, long value) {
+        public final CounterGoClient.Builder setOption(Option o, Object value) {
             options.add(o.setValue(value));
             return this;
         }
