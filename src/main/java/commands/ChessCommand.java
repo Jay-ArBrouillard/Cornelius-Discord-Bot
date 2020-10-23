@@ -345,24 +345,32 @@ public class ChessCommand {
                 state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
                 state.setMatchStartTime(Instant.now().toEpochMilli());
 
-                threads[threadCount] = new TrainThread(chessGame, whiteSidePlayer, blackSidePlayer, state, event.getChannel());
-                event.getChannel().sendMessage("Beginning match on Thread " + threadCount + ": " + whiteSidePlayer.name + " vs " + blackSidePlayer.name).queue();
-                threads[threadCount].start();
-                threadCount++;
-
-                if (threads.length == threadCount) {
-                    for (TrainThread thread : threads) {
-                        if (thread.isAlive()) {
+                if (threadCount < threads.length-1) {
+                    threads[threadCount] = new TrainThread(chessGame, whiteSidePlayer, blackSidePlayer, state, event.getChannel());
+                    event.getChannel().sendMessage("Beginning match on Thread " + threadCount + ": " + whiteSidePlayer.name + " vs " + blackSidePlayer.name).queue();
+                    threads[threadCount].start();
+                    threadCount++;
+                }
+                else {
+                    for (int k = 0; k < threads.length; k++) {
+                        TrainThread currentThread = threads[k];
+                        if (currentThread.isAlive()) {
                             try {
-                                thread.join();
+                                currentThread.join(); //Wait for this thread to complete
+                                currentThread =  new TrainThread(chessGame, whiteSidePlayer, blackSidePlayer, state, event.getChannel());
+                                event.getChannel().sendMessage("Beginning match on Thread " + k + ": " + whiteSidePlayer.name + " vs " + blackSidePlayer.name).queue();
+                                threads[k].start();
+                                threadCount++;
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
+                            break;
+                        }
+                        else {
+                            threadCount--;
+                            System.gc();
                         }
                     }
-                    threads = new TrainThread[8];
-                    threadCount = 0;
-                    System.gc();
                 }
             }
         }
