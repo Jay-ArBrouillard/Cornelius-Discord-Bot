@@ -677,12 +677,16 @@ public class ChessGame {
                         if (client1 != null) {
                             client1.close();
                             System.out.println("Shutdown client1");
+                            setClient(whiteSidePlayer);
+                            System.out.println("Restarted " + client1);
                         }
                     }
                     else if (isBlackPlayerTurn()) {
                         if (client2 != null) {
                             client2.close();
                             System.out.println("Shutdown client2");
+                            setClient(whiteSidePlayer);
+                            System.out.println("Restarted " + client2);
                         }
                     }
                 } catch (Exception ex) {
