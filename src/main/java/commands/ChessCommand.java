@@ -290,6 +290,17 @@ public class ChessCommand {
 
     private static void handleTrainAll(MessageReceivedEvent event, String message) {
         String[][] players = getAIList();
+        //Randomize list
+        Random random = new Random();
+        for (int i = 0; i < players.length; i++) {
+            int randomIndexToSwap = random.nextInt(players.length);
+            String temp = players[randomIndexToSwap][0];
+            players[randomIndexToSwap][0] = players[i][0];
+            players[i][0] = temp;
+            temp = players[randomIndexToSwap][1];
+            players[randomIndexToSwap][1] = players[i][1];
+            players[i][1] = temp;
+        }
         int gamesCompleted = 0;
         int totalGames = players.length * players.length;
 
@@ -363,6 +374,17 @@ public class ChessCommand {
 
         event.getChannel().sendMessage("Starting Computer vs Computer matches...").queue();
         String[][] players = getAIList();
+        //Randomize list
+        Random random = new Random();
+        for (int i = 0; i < players.length; i++) {
+            int randomIndexToSwap = random.nextInt(players.length);
+            String temp = players[randomIndexToSwap][0];
+            players[randomIndexToSwap][0] = players[i][0];
+            players[i][0] = temp;
+            temp = players[randomIndexToSwap][1];
+            players[randomIndexToSwap][1] = players[i][1];
+            players[i][1] = temp;
+        }
 
         int gamesCompleted = 0;
         int gamesPerPlayer = Integer.parseInt(split[2]);
