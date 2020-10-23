@@ -464,8 +464,8 @@ public class GoogleSheets {
                             .setRange(new DimensionRange()
                                     .setSheetId(2021381704)
                                     .setDimension("ROWS")
-                                    .setStartIndex(10001)
-                                    .setEndIndex(10002)
+                                    .setStartIndex(10000)
+                                    .setEndIndex(10001)
                             )
                     );
             deleteBatch.setRequests(Arrays.asList(deleteRequest));

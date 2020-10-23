@@ -621,9 +621,11 @@ public class ChessCommand {
 
                 if (CHECKMATE.equals(status) || DRAW.equals(status) || COMPUTER_RESIGN.equals(status)) {
                     try {
-                        if (chessGame.stockFishClient != null) chessGame.stockFishClient.close();
-                        if (chessGame.client1 != null) chessGame.client1.close();
-                        if (chessGame.client2 != null) chessGame.client2.close();
+                        if (chessGame != null) {
+                            if (chessGame.stockFishClient != null) chessGame.stockFishClient.close();
+                            if (chessGame.client1 != null) chessGame.client1.close();
+                            if (chessGame.client2 != null) chessGame.client2.close();
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
