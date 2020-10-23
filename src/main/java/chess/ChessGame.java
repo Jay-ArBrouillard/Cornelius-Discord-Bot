@@ -687,6 +687,7 @@ public class ChessGame {
         if (mc != null) mc.sendTyping().queue();
         System.out.println("bestMoveString:"+bestMoveString);
         //Is castling notation?
+        bestMoveString = bestMoveString.toLowerCase(); //Always convert best move to lowercase
         if (bestMoveString.contains("o-o")) {
             return convertCastlingMove("o-o", -1,-1, true);
         }
