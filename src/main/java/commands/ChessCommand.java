@@ -83,7 +83,7 @@ public class ChessCommand {
         if (message.startsWith("!chess trainFair")) { handleTrainFairly(event, message); return; }
         if (message.startsWith("!chess trainRandom")) { handleTrainRandom(event, message); return; }
         if (message.startsWith("!chess trainAll")) { handleTrainAll(event); return; }
-        if (message.startsWith("!chess trainUser")) { handleTrainUser(event, message); }
+        if (message.startsWith("!chess trainUser")) { handleTrainUser(event, message); return; }
 
         // Don't allow a new game to be started until the previous game has saved
         if (decision.equals(DATABASE_SAVING)) {
@@ -367,14 +367,14 @@ public class ChessCommand {
     }
 
     private static void handleTrainFairly(MessageReceivedEvent event, String message) {
-        //Ex: !chess train 10 - Every player would play 10 games against random opponents
+        //Ex: !chess train 10 - Every player would play 10 games against fair opponents
         String [] split = message.split("\\s+");
         if (split.length != 3) {
-            event.getChannel().sendMessage("Incorrect format for `!chess train`. Valid examples include `!chess trainFair 1`, `!chess trainFair 10`, etc...").queue();
+            event.getChannel().sendMessage("Incorrect format for `!chess trainFair`. Valid examples include `!chess trainFair 1`, `!chess trainFair 10`, etc...").queue();
             return;
         }
 
-        event.getChannel().sendMessage("Starting training fair matches...").queue();
+        event.getChannel().sendMessage("Train all computer players vs fair opponents...").queue();
         String[][] players = getAIList();
         //Randomize list
         Random random = new Random();
@@ -397,7 +397,12 @@ public class ChessCommand {
                 state = new ChessGameState();
                 chessGame = new ChessGame(state);
                 whiteSidePlayer = chessGame.addUser(players[i][0], players[i][1]);
-                blackSidePlayer = chessGame.findOpponentSimilarElo(whiteSidePlayer.elo, whiteSidePlayer.discordId, 50); //Finds opponent of similar elo
+                if (whiteSidePlayer.provisional) { //Increased range
+                    blackSidePlayer = chessGame.findOpponentSimilarElo(whiteSidePlayer.elo, whiteSidePlayer.discordId, 100);
+                }
+                else {
+                    blackSidePlayer = chessGame.findOpponentSimilarElo(whiteSidePlayer.elo, whiteSidePlayer.discordId, 50);
+                }
                 if (blackSidePlayer == null) { //If we don't find an opponent in a range of 50 elo above/below
                     blackSidePlayer = chessGame.findUserByClosestElo(whiteSidePlayer.elo, whiteSidePlayer.discordId); //Then settle for the closest elo
                 }
@@ -458,11 +463,11 @@ public class ChessCommand {
         //Ex: !chess train 10 - Every player would play 10 games against random opponents
         String [] split = message.split("\\s+");
         if (split.length != 3) {
-            event.getChannel().sendMessage("Incorrect format for `!chess train`. Valid examples include `!chess trainRandom 1`, `!chess trainRandom 10`, etc...").queue();
+            event.getChannel().sendMessage("Incorrect format for `!chess trainRandom`. Valid examples include `!chess trainRandom 1`, `!chess trainRandom 10`, etc...").queue();
             return;
         }
 
-        event.getChannel().sendMessage("Starting train random matches...").queue();
+        event.getChannel().sendMessage("Train all computer players vs random opponents...").queue();
         String[][] players = getAIList();
         //Randomize list
         Random random = new Random();
@@ -551,7 +556,7 @@ public class ChessCommand {
             return;
         }
 
-        event.getChannel().sendMessage("Starting training user vs similar elo players...").queue();
+        event.getChannel().sendMessage("Train user vs similar elo players...").queue();
         String[][] players = getAIList();
 
         int gamesCompleted = 0;
@@ -569,7 +574,12 @@ public class ChessCommand {
             state = new ChessGameState();
             chessGame = new ChessGame(state);
             whiteSidePlayer = chessGame.addUser(players[playerIndex][0], players[playerIndex][1]);
-            blackSidePlayer = chessGame.findOpponentSimilarElo(whiteSidePlayer.elo, whiteSidePlayer.discordId, 50); //Finds opponent of similar elo
+            if (whiteSidePlayer.provisional) { //Increased range
+                blackSidePlayer = chessGame.findOpponentSimilarElo(whiteSidePlayer.elo, whiteSidePlayer.discordId, 100);
+            }
+            else {
+                blackSidePlayer = chessGame.findOpponentSimilarElo(whiteSidePlayer.elo, whiteSidePlayer.discordId, 50);
+            }
             if (blackSidePlayer == null) { //If we don't find an opponent in a range of 50 elo above/below
                 blackSidePlayer = chessGame.findUserByClosestElo(whiteSidePlayer.elo, whiteSidePlayer.discordId); //Then settle for the closest elo
             }
@@ -635,7 +645,6 @@ public class ChessCommand {
             {"693282099167494225PI1.5", "Pigeon 1.5"},
             {"693282099167494225DU1.4", "Dumb 1.4"},
             {"693282099167494225A0.8", "Asymptote 0.8"},
-            {"693282099167494225F103", "Fishnet 103"},
             {"693282099167494225CG3.6", "CounterGo 3.6"},
             {"693282099167494225A3.2", "Amoeba 3.2"},
             {"693282099167494225L1.7", "Laser 1.7"},
