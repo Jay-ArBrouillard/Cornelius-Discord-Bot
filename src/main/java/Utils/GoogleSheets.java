@@ -440,20 +440,6 @@ public class GoogleSheets {
                     .setInsertDataOption("INSERT_ROWS")
                     .execute();
 
-            //Delete the 10001 row. Only saving 10000 matches maximum
-            BatchUpdateSpreadsheetRequest deleteBatch = new BatchUpdateSpreadsheetRequest();
-            Request deleteRequest = new Request()
-                    .setDeleteDimension(new DeleteDimensionRequest()
-                            .setRange(new DimensionRange()
-                                    .setSheetId(2021381704)
-                                    .setDimension("ROWS")
-                                    .setStartIndex(10001)
-                                    .setEndIndex(10002)
-                            )
-                    );
-            deleteBatch.setRequests(Arrays.asList(deleteRequest));
-            service.spreadsheets().batchUpdate(SPREAD_SHEET_ID, deleteBatch).execute();
-
             //Sort Matches by updated on column
             BatchUpdateSpreadsheetRequest busReq = new BatchUpdateSpreadsheetRequest();
             SortSpec sortSpec = new SortSpec();
@@ -469,6 +455,21 @@ public class GoogleSheets {
             sortRequest.setSortRange(sortRangeRequest);
             busReq.setRequests(Arrays.asList(sortRequest));
             service.spreadsheets().batchUpdate(SPREAD_SHEET_ID, busReq).execute();
+            //Oldest match will now be the last row
+
+            //Delete the 10001 row. Only saving 10000 matches maximum
+            BatchUpdateSpreadsheetRequest deleteBatch = new BatchUpdateSpreadsheetRequest();
+            Request deleteRequest = new Request()
+                    .setDeleteDimension(new DeleteDimensionRequest()
+                            .setRange(new DimensionRange()
+                                    .setSheetId(2021381704)
+                                    .setDimension("ROWS")
+                                    .setStartIndex(10001)
+                                    .setEndIndex(10002)
+                            )
+                    );
+            deleteBatch.setRequests(Arrays.asList(deleteRequest));
+            service.spreadsheets().batchUpdate(SPREAD_SHEET_ID, deleteBatch).execute();
 
             //Update total game time
             updateTotalGameTime(whiteSidePlayer, days, hours, mins, secs);
