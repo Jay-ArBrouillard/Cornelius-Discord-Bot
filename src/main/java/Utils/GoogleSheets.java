@@ -444,6 +444,7 @@ public class GoogleSheets {
             sortSpec.setSortOrder("DESCENDING");
             SortRangeRequest sortRangeRequest = new SortRangeRequest();
             GridRange gridRange = new GridRange();
+            gridRange.setStartRowIndex(1); //If we don't set this then header column is sorted
             gridRange.setSheetId(2021381704);
             sortRangeRequest.setRange(gridRange);
             sortRangeRequest.setSortSpecs(Arrays.asList(sortSpec));
