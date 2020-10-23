@@ -452,14 +452,21 @@ public class GoogleSheets {
             sortRangeRequest.setSortSpecs(Arrays.asList(sortSpec));
             DeleteDimensionRequest deleteDimensionRequest = new DeleteDimensionRequest();
             //Only keep the last 10000 matches
-            DimensionRange dimensionRange = new DimensionRange();
-            dimensionRange.setStartIndex(10001); //Delete rows after 10000
-            dimensionRange.setSheetId(2021381704);
-            deleteDimensionRequest.setRange(dimensionRange);
-            Request request = new Request();
-            request.setSortRange(sortRangeRequest);
-            request.setDeleteDimension(deleteDimensionRequest);
-            busReq.setRequests(Arrays.asList(request));
+            Request deleteRequest = new Request()
+                    .setDeleteDimension(new DeleteDimensionRequest()
+                            .setRange(new DimensionRange()
+                                    .setSheetId(2021381704)
+                                    .setDimension("ROWS")
+                                    .setStartIndex(10001)
+                            )
+                    );
+            List<Request> requestList = new ArrayList<>();
+            Request sortRequest = new Request();
+            sortRequest.setSortRange(sortRangeRequest);
+            sortRequest.setDeleteDimension(deleteDimensionRequest);
+            requestList.add(deleteRequest);
+            requestList.add(sortRequest);
+            busReq.setRequests(requestList);
             service.spreadsheets().batchUpdate(SPREAD_SHEET_ID, busReq).execute();
 
             //Update total game time
