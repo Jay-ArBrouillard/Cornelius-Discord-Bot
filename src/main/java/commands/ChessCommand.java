@@ -544,14 +544,14 @@ public class ChessCommand {
     }
 
     private static void handleTrainUser(MessageReceivedEvent event, String message) {
-        //Ex: !chess train discordId 10 - Player with this id would play 10 games against random opponents
+        //Ex: !chess train discordId 10 - Player with this id would play 10 games against similar elo opponents
         String [] split = message.split("\\s+");
         if (split.length != 4) {
             event.getChannel().sendMessage("Incorrect format for `!chess trainUser discordId number`. Valid example `!chess trainUser 693282099167494225FN3000 10`").queue();
             return;
         }
 
-        event.getChannel().sendMessage("Starting training user vs random players...").queue();
+        event.getChannel().sendMessage("Starting training user vs similar elo players...").queue();
         String[][] players = getAIList();
 
         int gamesCompleted = 0;
@@ -565,16 +565,14 @@ public class ChessCommand {
             }
         }
 
-        Random random = new Random();
         while (gamesCompleted < totalGames) {
-            int randomIndex = random.nextInt(players.length);
-            while (randomIndex == playerIndex) {
-                randomIndex = random.nextInt(players.length);
-            }
             state = new ChessGameState();
             chessGame = new ChessGame(state);
             whiteSidePlayer = chessGame.addUser(players[playerIndex][0], players[playerIndex][1]);
-            blackSidePlayer = chessGame.addUser(players[randomIndex][0], players[randomIndex][1]);
+            blackSidePlayer = chessGame.findOpponentSimilarElo(whiteSidePlayer.elo, whiteSidePlayer.discordId, 50); //Finds opponent of similar elo
+            if (blackSidePlayer == null) { //If we don't find an opponent in a range of 50 elo above/below
+                blackSidePlayer = chessGame.findUserByClosestElo(whiteSidePlayer.elo, whiteSidePlayer.discordId); //Then settle for the closest elo
+            }
             chessGame.setBlackSidePlayer(blackSidePlayer);
             chessGame.setWhiteSidePlayer(whiteSidePlayer);
             gameType = GameType.CVC;
