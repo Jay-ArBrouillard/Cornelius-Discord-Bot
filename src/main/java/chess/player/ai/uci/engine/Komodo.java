@@ -27,7 +27,7 @@ public class Komodo extends UCIEngine {
         sendCommand(command.toString());
 
         String result = readLine("bestmove");
-        if (result != null) return result.substring(9).split("\\s+")[0];
+        if (result != null) return result.split("\\s+")[1].trim();
         return null;
     }
 

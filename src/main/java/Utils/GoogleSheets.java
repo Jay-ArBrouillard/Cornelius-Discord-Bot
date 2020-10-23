@@ -232,6 +232,59 @@ public class GoogleSheets {
     }
 
     /**
+     * Finds a player of similar elo. Opponent must be +- the range of the passed elo.
+     * EX: Given an elo of 1000 and a range of 50, then opponent can be anywhere from 950 - 1050
+     * @param elo
+     * @param id
+     * @param range
+     * @return
+     */
+    public static ChessPlayer findUserSimilarElo(double elo, String id, double range) {
+        try {
+            if (service == null) getSheetsService();
+
+            ValueRange response = service.spreadsheets().values().get(SPREAD_SHEET_ID, RANKED_TAB).execute();
+
+            Random rand = new Random();
+            boolean isFirstRow = true;
+            List<List> candidates = new ArrayList<>();
+            double lowerBound = elo - range;
+            double upperBound = elo + range;
+            for (List row : response.getValues()) {
+                if (isFirstRow) {
+                    isFirstRow = false;
+                    continue;
+                };
+                if (id.equalsIgnoreCase((String)row.get(0))) { // User can't be itself
+                    continue;
+                }
+                if (!((String)row.get(0)).contains(System.getenv("OWNER_ID"))) { // Ensure opponent found is a computer
+                    continue;
+                }
+                double currElo = Double.parseDouble((String)row.get(2));
+                if (currElo >= lowerBound && currElo <= upperBound) {
+                    candidates.add(row);
+                }
+            }
+
+            //Choose a random opponent from candidate list
+            List player = candidates.get(rand.nextInt(candidates.size()));
+            ChessPlayer user = new ChessPlayer((String)player.get(0), (String)player.get(1), Double.parseDouble((String)player.get(2)), null,
+                    Boolean.valueOf((String)player.get(4)), (String)player.get(5), Integer.parseInt((String)player.get(6)),
+                    Integer.parseInt((String)player.get(7)), Integer.parseInt((String)player.get(8)),
+                    Double.parseDouble((String)player.get(9)), Integer.parseInt((String)player.get(10)), (String)player.get(11),
+                    (String)player.get(12), (String)player.get(13));
+            if (!user.provisional) {
+                user.highestElo = Double.parseDouble((String)player.get(3));
+            }
+            return user;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
      * Find player in ranked tab by id
      * @param id
      * @return

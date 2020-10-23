@@ -228,7 +228,7 @@ public class ChessGame {
         ChessPlayer player = null;
         if (opponent == null || (opponent != null && opponent.isEmpty())) { //Find a random opponent with a similar elo if possible
             mc.sendTyping().queue();
-            player = findUserByElo(elo, id); //Should never be null
+            player = findUserByClosestElo(elo, id); //Should never be null
         }
         else if (option.equals("2") || option.equals("3")){
             mc.sendTyping().queue();
@@ -248,6 +248,10 @@ public class ChessGame {
         else { //option 3
             return GameType.CVP.toString() + "-" + player.discordId + "-" + player.name;
         }
+    }
+
+    public ChessPlayer findOpponentSimilarElo(double elo, String id, double range) {
+        return findUserBySimilarElo(elo, id, range);
     }
 
     public ChessGameState processMove(String input)
@@ -355,6 +359,9 @@ public class ChessGame {
                 startCoordinate = 4;
                 destinationCoordinate = 2;
             }
+        }
+        else {
+            throw new RuntimeException("Not a castle move");
         }
         return handleMove(startCoordinate, destinationCoordinate, moveCmd, isComputer);
     }
@@ -487,8 +494,12 @@ public class ChessGame {
         }
     }
 
-    public synchronized ChessPlayer findUserByElo(double elo, String id) {
+    public synchronized ChessPlayer findUserByClosestElo(double elo, String id) {
         return db.findUserClosestElo(elo, id);
+    }
+
+    public synchronized ChessPlayer findUserBySimilarElo(double elo, String id, double range) {
+        return db.findUserSimilarElo(elo, id, range);
     }
 
     public synchronized ChessPlayer findUserByName(String name) {
@@ -674,10 +685,13 @@ public class ChessGame {
             }
         } while (bestMoveString == null);
         if (mc != null) mc.sendTyping().queue();
-        bestMoveString = bestMoveString.toLowerCase().trim(); //In some cases returned string has extra spaces or weird casing
+        System.out.println("bestMoveString:"+bestMoveString);
         //Is castling notation?
-        if (bestMoveString.equalsIgnoreCase("o-o") || bestMoveString.equalsIgnoreCase("o-o-o")) {
-            return convertCastlingMove(bestMoveString, -1,-1, true);
+        if (bestMoveString.contains("o-o")) {
+            return convertCastlingMove("o-o", -1,-1, true);
+        }
+        if (bestMoveString.contains("o-o-o")) {
+            return convertCastlingMove("o-o-o", -1,-1, true);
         }
 
         String x1Str = Character.toString(bestMoveString.charAt(0));

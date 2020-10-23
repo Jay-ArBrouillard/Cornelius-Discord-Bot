@@ -80,160 +80,9 @@ public class ChessCommand {
             return;
         }
 
-        if (message.startsWith("!chess train")) { //Ex: !chess train 10 - Every player would play 10 games against random opponents
-            String [] split = message.split("\\s+");
-            if (split.length != 3) {
-                event.getChannel().sendMessage("Incorrect format for `!chess train`. Valid examples include `!chess train 1`, `!chess train 10`, etc...").queue();
-                return;
-            }
-
-            event.getChannel().sendMessage("Starting Computer vs Computer matches...").queue();
-            String[][] players = getAIList();
-            //Randomize list
-            Random random = new Random();
-            for (int i = 0; i < players.length; i++) {
-                int randomIndexToSwap = random.nextInt(players.length);
-                String temp = players[randomIndexToSwap][0];
-                players[randomIndexToSwap][0] = players[i][0];
-                players[i][0] = temp;
-                temp = players[randomIndexToSwap][1];
-                players[randomIndexToSwap][1] = players[i][1];
-                players[i][1] = temp;
-            }
-
-            int gamesCompleted = 0;
-            int gamesPerPlayer = Integer.parseInt(split[2]);
-            int totalGames = players.length * gamesPerPlayer;
-
-            while (gamesCompleted < totalGames) {
-                for (int i = 0; i < players.length; i++) {
-                    int randomIndex = random.nextInt(players.length);
-                    while (randomIndex == i) {
-                        randomIndex = random.nextInt(players.length);
-                    }
-                    state = new ChessGameState();
-                    chessGame = new ChessGame(state);
-                    whiteSidePlayer = chessGame.addUser(players[i][0], players[i][1]);
-                    blackSidePlayer = chessGame.addUser(players[randomIndex][0], players[randomIndex][1]);
-                    chessGame.setBlackSidePlayer(blackSidePlayer);
-                    chessGame.setWhiteSidePlayer(whiteSidePlayer);
-                    gameType = GameType.CVC;
-                    chessGame.setupStockfishClient();
-                    chessGame.setupComputerClient(gameType);
-                    state.getPrevElo().put(whiteSidePlayer.discordId, whiteSidePlayer.elo);
-                    state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
-                    state.setMatchStartTime(Instant.now().toEpochMilli());
-                    decision = COMPUTER_MOVE;
-
-                    event.getChannel().sendMessage("Beginning match (" + gamesCompleted + "/" + totalGames + ") : " + whiteSidePlayer.name + " vs " + blackSidePlayer.name).queue();
-                    String status;
-                    do {
-                        state = chessGame.ai(null);
-                        reply = state.getMessage();
-                        status = state.getStatus();
-
-                        if (CHECKMATE.equals(status) || DRAW.equals(status) || COMPUTER_RESIGN.equals(status)) {
-                            try {
-                                if (chessGame.stockFishClient != null) chessGame.stockFishClient.close();
-                                if (chessGame.client1 != null) chessGame.client1.close();
-                                if (chessGame.client2 != null) chessGame.client2.close();
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                            state = null;
-                            chessGame.stockFishClient = null;
-                            chessGame.client1 = null;
-                            chessGame.client2 = null;
-                            chessGame.board = null;
-                            chessGame.blackSidePlayer = null;
-                            chessGame.whiteSidePlayer = null;
-                            chessGame.state = null;
-                            chessGame.messageHandler = null;
-                            chessGame.db = null;
-                            chessGame.id = null;
-                            chessGame = null;
-                            whiteSidePlayer = null;
-                            blackSidePlayer = null;
-                            System.gc(); //Attempt to call garbage collector to clear memory
-                            event.getChannel().sendMessage(reply).queue();
-                            gamesCompleted++;
-                            break;
-                        }
-
-                    } while (true);
-                }
-            }
-
-
-            event.getChannel().sendMessage("Completed").queue();
-            endGame(event.getChannel());
-            return;
-        }
-
-        if (message.startsWith("!chess trainAll")) {
-            String[][] players = getAIList();
-            int gamesCompleted = 0;
-            int totalGames = players.length * players.length;
-
-            for (int i = 0; i < players.length; i++) {
-                for (int j = 0; j < players.length; j++) {
-                    if (i == j) continue; //Don't play itself
-                    state = new ChessGameState();
-                    chessGame = new ChessGame(state);
-                    whiteSidePlayer = chessGame.addUser(players[i][0], players[i][1]);
-                    blackSidePlayer = chessGame.addUser(players[j][0], players[j][1]);
-                    chessGame.setBlackSidePlayer(blackSidePlayer);
-                    chessGame.setWhiteSidePlayer(whiteSidePlayer);
-                    gameType = GameType.CVC;
-                    chessGame.setupStockfishClient();
-                    chessGame.setupComputerClient(gameType);
-                    state.getPrevElo().put(whiteSidePlayer.discordId, whiteSidePlayer.elo);
-                    state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
-                    state.setMatchStartTime(Instant.now().toEpochMilli());
-                    decision = COMPUTER_MOVE;
-
-                    event.getChannel().sendMessage("Beginning match (" + gamesCompleted + "/" + totalGames + ") : " + whiteSidePlayer.name + " vs " + blackSidePlayer.name).queue();
-                    String status;
-                    do {
-                        state = chessGame.ai(null);
-                        reply = state.getMessage();
-                        status = state.getStatus();
-
-                        if (CHECKMATE.equals(status) || DRAW.equals(status) || COMPUTER_RESIGN.equals(status)) {
-                            try {
-                                if (chessGame.stockFishClient != null) chessGame.stockFishClient.close();
-                                if (chessGame.client1 != null) chessGame.client1.close();
-                                if (chessGame.client2 != null) chessGame.client2.close();
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                            state = null;
-                            chessGame.stockFishClient = null;
-                            chessGame.client1 = null;
-                            chessGame.client2 = null;
-                            chessGame.board = null;
-                            chessGame.blackSidePlayer = null;
-                            chessGame.whiteSidePlayer = null;
-                            chessGame.state = null;
-                            chessGame.messageHandler = null;
-                            chessGame.db = null;
-                            chessGame.id = null;
-                            chessGame = null;
-                            whiteSidePlayer = null;
-                            blackSidePlayer = null;
-                            System.gc(); //Attempt to call garbage collector to clear memory
-                            event.getChannel().sendMessage(reply).queue();
-                            gamesCompleted++;
-                            break;
-                        }
-
-                    } while (true);
-                }
-            }
-
-            endGame(event.getChannel());
-            return;
-        }
+        if (message.startsWith("!chess trainFair")) { handleTrainFairly(event, message); return; }
+        if (message.startsWith("!chess trainRandom")) { handleTrainRandom(event, message); return; }
+        if (message.startsWith("!chess trainAll")) { handleTrainAll(event, message); return; }
 
         // Don't allow a new game to be started until the previous game has saved
         if (decision.equals(DATABASE_SAVING)) {
@@ -437,6 +286,237 @@ public class ChessCommand {
                 }
             }).start();
         }
+    }
+
+    private static void handleTrainAll(MessageReceivedEvent event, String message) {
+        String[][] players = getAIList();
+        int gamesCompleted = 0;
+        int totalGames = players.length * players.length;
+
+        for (int i = 0; i < players.length; i++) {
+            for (int j = 0; j < players.length; j++) {
+                if (i == j) continue; //Don't play itself
+                state = new ChessGameState();
+                chessGame = new ChessGame(state);
+                whiteSidePlayer = chessGame.addUser(players[i][0], players[i][1]);
+                blackSidePlayer = chessGame.addUser(players[j][0], players[j][1]);
+                chessGame.setBlackSidePlayer(blackSidePlayer);
+                chessGame.setWhiteSidePlayer(whiteSidePlayer);
+                gameType = GameType.CVC;
+                chessGame.setupStockfishClient();
+                chessGame.setupComputerClient(gameType);
+                state.getPrevElo().put(whiteSidePlayer.discordId, whiteSidePlayer.elo);
+                state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
+                state.setMatchStartTime(Instant.now().toEpochMilli());
+                decision = COMPUTER_MOVE;
+
+                event.getChannel().sendMessage("Beginning match (" + gamesCompleted + "/" + totalGames + ") : " + whiteSidePlayer.name + " vs " + blackSidePlayer.name).queue();
+                String status;
+                do {
+                    state = chessGame.ai(null);
+                    reply = state.getMessage();
+                    status = state.getStatus();
+
+                    if (CHECKMATE.equals(status) || DRAW.equals(status) || COMPUTER_RESIGN.equals(status)) {
+                        try {
+                            if (chessGame.stockFishClient != null) chessGame.stockFishClient.close();
+                            if (chessGame.client1 != null) chessGame.client1.close();
+                            if (chessGame.client2 != null) chessGame.client2.close();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        state = null;
+                        chessGame.stockFishClient = null;
+                        chessGame.client1 = null;
+                        chessGame.client2 = null;
+                        chessGame.board = null;
+                        chessGame.blackSidePlayer = null;
+                        chessGame.whiteSidePlayer = null;
+                        chessGame.state = null;
+                        chessGame.messageHandler = null;
+                        chessGame.db = null;
+                        chessGame.id = null;
+                        chessGame = null;
+                        whiteSidePlayer = null;
+                        blackSidePlayer = null;
+                        System.gc(); //Attempt to call garbage collector to clear memory
+                        event.getChannel().sendMessage(reply).queue();
+                        gamesCompleted++;
+                        break;
+                    }
+
+                } while (true);
+            }
+        }
+
+        event.getChannel().sendMessage("Completed").queue();
+        endGame(event.getChannel());
+    }
+
+    private static void handleTrainFairly(MessageReceivedEvent event, String message) {
+        //Ex: !chess train 10 - Every player would play 10 games against random opponents
+        String [] split = message.split("\\s+");
+        if (split.length != 3) {
+            event.getChannel().sendMessage("Incorrect format for `!chess train`. Valid examples include `!chess trainFair 1`, `!chess trainFair 10`, etc...").queue();
+            return;
+        }
+
+        event.getChannel().sendMessage("Starting Computer vs Computer matches...").queue();
+        String[][] players = getAIList();
+
+        int gamesCompleted = 0;
+        int gamesPerPlayer = Integer.parseInt(split[2]);
+        int totalGames = players.length * gamesPerPlayer;
+
+        while (gamesCompleted < totalGames) {
+            for (int i = 0; i < players.length; i++) {
+                state = new ChessGameState();
+                chessGame = new ChessGame(state);
+                whiteSidePlayer = chessGame.addUser(players[i][0], players[i][1]);
+                blackSidePlayer = chessGame.findOpponentSimilarElo(whiteSidePlayer.elo, whiteSidePlayer.discordId, 100); //Finds opponent of similar elo
+                if (blackSidePlayer == null) { //If we don't find an opponent in a range of 100 elo above/below
+                    blackSidePlayer = chessGame.findUserByClosestElo(whiteSidePlayer.elo, whiteSidePlayer.discordId); //Then settle for the closest elo
+                }
+                chessGame.setBlackSidePlayer(blackSidePlayer);
+                chessGame.setWhiteSidePlayer(whiteSidePlayer);
+                gameType = GameType.CVC;
+                chessGame.setupStockfishClient();
+                chessGame.setupComputerClient(gameType);
+                state.getPrevElo().put(whiteSidePlayer.discordId, whiteSidePlayer.elo);
+                state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
+                state.setMatchStartTime(Instant.now().toEpochMilli());
+                decision = COMPUTER_MOVE;
+
+                event.getChannel().sendMessage("Beginning match (" + gamesCompleted + "/" + totalGames + ") : " + whiteSidePlayer.name + " vs " + blackSidePlayer.name).queue();
+                String status;
+                do {
+                    state = chessGame.ai(null);
+                    reply = state.getMessage();
+                    status = state.getStatus();
+
+                    if (CHECKMATE.equals(status) || DRAW.equals(status) || COMPUTER_RESIGN.equals(status)) {
+                        try {
+                            if (chessGame.stockFishClient != null) chessGame.stockFishClient.close();
+                            if (chessGame.client1 != null) chessGame.client1.close();
+                            if (chessGame.client2 != null) chessGame.client2.close();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        state = null;
+                        chessGame.stockFishClient = null;
+                        chessGame.client1 = null;
+                        chessGame.client2 = null;
+                        chessGame.board = null;
+                        chessGame.blackSidePlayer = null;
+                        chessGame.whiteSidePlayer = null;
+                        chessGame.state = null;
+                        chessGame.messageHandler = null;
+                        chessGame.db = null;
+                        chessGame.id = null;
+                        chessGame = null;
+                        whiteSidePlayer = null;
+                        blackSidePlayer = null;
+                        System.gc(); //Attempt to call garbage collector to clear memory
+                        event.getChannel().sendMessage(reply).queue();
+                        gamesCompleted++;
+                        break;
+                    }
+
+                } while (true);
+            }
+        }
+
+        event.getChannel().sendMessage("Completed").queue();
+        endGame(event.getChannel());
+    }
+
+    private static void handleTrainRandom(MessageReceivedEvent event, String message) {
+        //Ex: !chess train 10 - Every player would play 10 games against random opponents
+        String [] split = message.split("\\s+");
+        if (split.length != 3) {
+            event.getChannel().sendMessage("Incorrect format for `!chess train`. Valid examples include `!chess trainRandom 1`, `!chess trainRandom 10`, etc...").queue();
+            return;
+        }
+
+        event.getChannel().sendMessage("Starting Computer vs Computer matches...").queue();
+        String[][] players = getAIList();
+        //Randomize list
+        Random random = new Random();
+        for (int i = 0; i < players.length; i++) {
+            int randomIndexToSwap = random.nextInt(players.length);
+            String temp = players[randomIndexToSwap][0];
+            players[randomIndexToSwap][0] = players[i][0];
+            players[i][0] = temp;
+            temp = players[randomIndexToSwap][1];
+            players[randomIndexToSwap][1] = players[i][1];
+            players[i][1] = temp;
+        }
+
+        int gamesCompleted = 0;
+        int gamesPerPlayer = Integer.parseInt(split[2]);
+        int totalGames = players.length * gamesPerPlayer;
+
+        while (gamesCompleted < totalGames) {
+            for (int i = 0; i < players.length; i++) {
+                int randomIndex = random.nextInt(players.length);
+                while (randomIndex == i) {
+                    randomIndex = random.nextInt(players.length);
+                }
+                state = new ChessGameState();
+                chessGame = new ChessGame(state);
+                whiteSidePlayer = chessGame.addUser(players[i][0], players[i][1]);
+                blackSidePlayer = chessGame.addUser(players[randomIndex][0], players[randomIndex][1]);
+                chessGame.setBlackSidePlayer(blackSidePlayer);
+                chessGame.setWhiteSidePlayer(whiteSidePlayer);
+                gameType = GameType.CVC;
+                chessGame.setupStockfishClient();
+                chessGame.setupComputerClient(gameType);
+                state.getPrevElo().put(whiteSidePlayer.discordId, whiteSidePlayer.elo);
+                state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
+                state.setMatchStartTime(Instant.now().toEpochMilli());
+                decision = COMPUTER_MOVE;
+
+                event.getChannel().sendMessage("Beginning match (" + gamesCompleted + "/" + totalGames + ") : " + whiteSidePlayer.name + " vs " + blackSidePlayer.name).queue();
+                String status;
+                do {
+                    state = chessGame.ai(null);
+                    reply = state.getMessage();
+                    status = state.getStatus();
+
+                    if (CHECKMATE.equals(status) || DRAW.equals(status) || COMPUTER_RESIGN.equals(status)) {
+                        try {
+                            if (chessGame.stockFishClient != null) chessGame.stockFishClient.close();
+                            if (chessGame.client1 != null) chessGame.client1.close();
+                            if (chessGame.client2 != null) chessGame.client2.close();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        state = null;
+                        chessGame.stockFishClient = null;
+                        chessGame.client1 = null;
+                        chessGame.client2 = null;
+                        chessGame.board = null;
+                        chessGame.blackSidePlayer = null;
+                        chessGame.whiteSidePlayer = null;
+                        chessGame.state = null;
+                        chessGame.messageHandler = null;
+                        chessGame.db = null;
+                        chessGame.id = null;
+                        chessGame = null;
+                        whiteSidePlayer = null;
+                        blackSidePlayer = null;
+                        System.gc(); //Attempt to call garbage collector to clear memory
+                        event.getChannel().sendMessage(reply).queue();
+                        gamesCompleted++;
+                        break;
+                    }
+
+                } while (true);
+            }
+        }
+
+        event.getChannel().sendMessage("Completed").queue();
+        endGame(event.getChannel());
     }
 
     private static String[][] getAIList() {
