@@ -373,8 +373,8 @@ public class ChessCommand {
                 state = new ChessGameState();
                 chessGame = new ChessGame(state);
                 whiteSidePlayer = chessGame.addUser(players[i][0], players[i][1]);
-                blackSidePlayer = chessGame.findOpponentSimilarElo(whiteSidePlayer.elo, whiteSidePlayer.discordId, 100); //Finds opponent of similar elo
-                if (blackSidePlayer == null) { //If we don't find an opponent in a range of 100 elo above/below
+                blackSidePlayer = chessGame.findOpponentSimilarElo(whiteSidePlayer.elo, whiteSidePlayer.discordId, 50); //Finds opponent of similar elo
+                if (blackSidePlayer == null) { //If we don't find an opponent in a range of 50 elo above/below
                     blackSidePlayer = chessGame.findUserByClosestElo(whiteSidePlayer.elo, whiteSidePlayer.discordId); //Then settle for the closest elo
                 }
                 chessGame.setBlackSidePlayer(blackSidePlayer);
