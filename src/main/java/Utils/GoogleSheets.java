@@ -34,7 +34,7 @@ public class GoogleSheets {
     private static final String MATCHES_TAB = "matches";
     private static int rowNumber;
     private static int totalRows;
-    private static final String pattern = "MMM dd yyyy hh:mm a";
+    private static final String pattern = "MM-dd-yyyy hh:mm a";
 
 
     public GoogleSheets() {
