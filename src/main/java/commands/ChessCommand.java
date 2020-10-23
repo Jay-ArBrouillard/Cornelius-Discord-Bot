@@ -350,7 +350,7 @@ public class ChessCommand {
                 threads[threadCount].start();
                 threadCount++;
 
-                if (threads.length == threads.length) {
+                if (threads.length == threadCount) {
                     for (TrainThread thread : threads) {
                         if (thread.isAlive()) {
                             try {
