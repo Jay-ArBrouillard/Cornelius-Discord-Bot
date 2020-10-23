@@ -440,9 +440,19 @@ public class GoogleSheets {
                     .setInsertDataOption("INSERT_ROWS")
                     .execute();
 
-            //Clear the 10001 row. Only saving 10000 matches maximum
-            ClearValuesRequest requestBody = new ClearValuesRequest();
-            service.spreadsheets().values().clear(SPREAD_SHEET_ID, MATCHES_TAB+"!10001:10001", requestBody).execute();
+            //Delete the 10001 row. Only saving 10000 matches maximum
+            BatchUpdateSpreadsheetRequest deleteBatch = new BatchUpdateSpreadsheetRequest();
+            Request deleteRequest = new Request()
+                    .setDeleteDimension(new DeleteDimensionRequest()
+                            .setRange(new DimensionRange()
+                                    .setSheetId(2021381704)
+                                    .setDimension("ROWS")
+                                    .setStartIndex(10001)
+                                    .setEndIndex(10002)
+                            )
+                    );
+            deleteBatch.setRequests(Arrays.asList(deleteRequest));
+            service.spreadsheets().batchUpdate(SPREAD_SHEET_ID, deleteBatch).execute();
 
             //Sort Matches by updated on column
             BatchUpdateSpreadsheetRequest busReq = new BatchUpdateSpreadsheetRequest();
