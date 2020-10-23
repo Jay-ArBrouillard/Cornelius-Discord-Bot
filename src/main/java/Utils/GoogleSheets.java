@@ -450,7 +450,6 @@ public class GoogleSheets {
             gridRange.setSheetId(2021381704);
             sortRangeRequest.setRange(gridRange);
             sortRangeRequest.setSortSpecs(Arrays.asList(sortSpec));
-            DeleteDimensionRequest deleteDimensionRequest = new DeleteDimensionRequest();
             //Only keep the last 10000 matches
             Request deleteRequest = new Request()
                     .setDeleteDimension(new DeleteDimensionRequest()
@@ -463,7 +462,6 @@ public class GoogleSheets {
             List<Request> requestList = new ArrayList<>();
             Request sortRequest = new Request();
             sortRequest.setSortRange(sortRangeRequest);
-            sortRequest.setDeleteDimension(deleteDimensionRequest);
             requestList.add(deleteRequest);
             requestList.add(sortRequest);
             busReq.setRequests(requestList);
