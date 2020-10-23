@@ -502,7 +502,6 @@ public class GoogleSheets {
     }
 
     public static String getDate(Long pCurrentTimeMs) {
-        Instant i = Instant.ofEpochMilli(pCurrentTimeMs);
-        return DateTimeFormatter.ofPattern("MM-dd-yyyy hh:mm:ss a").format(i);
+        return DateTimeFormatter.ofPattern("MM-dd-yyyy hh:mm:ss aa").format(Instant.ofEpochMilli(pCurrentTimeMs));
     }
 }
