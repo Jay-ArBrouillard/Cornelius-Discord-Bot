@@ -433,12 +433,16 @@ public class GoogleSheets {
                                                                                     blackSidePlayer.name, whiteSidePlayer.name, DRAW.equals(status), state.isPlayerForfeited(), state.getTotalMoves(), matchLength, getDate(millis))));
             }
 
-            AppendValuesResponse appendValuesResponse = service.spreadsheets().values()
+            //Append the new match
+            service.spreadsheets().values()
                     .append(SPREAD_SHEET_ID, MATCHES_TAB, appendBody)
                     .setValueInputOption("RAW")
                     .setInsertDataOption("INSERT_ROWS")
-                    .setIncludeValuesInResponse(true)
                     .execute();
+
+            //Clear the 10001 row. Only saving 10000 matches maximum
+            ClearValuesRequest requestBody = new ClearValuesRequest();
+            service.spreadsheets().values().clear(SPREAD_SHEET_ID, MATCHES_TAB+"!10001:10001", requestBody).execute();
 
             //Sort Matches by updated on column
             BatchUpdateSpreadsheetRequest busReq = new BatchUpdateSpreadsheetRequest();
@@ -455,14 +459,6 @@ public class GoogleSheets {
             sortRequest.setSortRange(sortRangeRequest);
             busReq.setRequests(Arrays.asList(sortRequest));
             service.spreadsheets().batchUpdate(SPREAD_SHEET_ID, busReq).execute();
-
-            int size = appendValuesResponse.size();
-            System.out.println("size:"+size);
-            if (size >= 10001) {
-                String range = MATCHES_TAB+"!10001:10001";
-                ClearValuesRequest requestBody = new ClearValuesRequest();
-                service.spreadsheets().values().clear(SPREAD_SHEET_ID, range, requestBody).execute();
-            }
 
             //Update total game time
             updateTotalGameTime(whiteSidePlayer, days, hours, mins, secs);
