@@ -656,9 +656,9 @@ public class ChessCommand {
 
     private static String[][] getAIList() {
         return new String[][]{
-                {"693282099167494225DE1", "Demolito 1"},
+                {"693282099167494225DO1", "Demolito 1"},
                 {"693282099167494225ET12", "Ethereal 12"},
-                {"693282099167494225HA", "Hakkapeliitta 3"},
+                {"693282099167494225HA3", "Hakkapeliitta 3"},
             {"693282099167494225MO0.3", "Moustique 0.3"},
             {"693282099167494225LW0.6", "LittleWing 0.6"},
             {"693282099167494225FR3", "Fridolin 3"},
