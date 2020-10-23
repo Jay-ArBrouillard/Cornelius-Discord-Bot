@@ -451,17 +451,15 @@ public class GoogleSheets {
             gridRange.setSheetId(2021381704);
             sortRangeRequest.setRange(gridRange);
             sortRangeRequest.setSortSpecs(Arrays.asList(sortSpec));
-            List<Request> requestList = new ArrayList<>();
             Request sortRequest = new Request();
             sortRequest.setSortRange(sortRangeRequest);
-            requestList.add(sortRequest);
-            busReq.setRequests(requestList);
+            busReq.setRequests(Arrays.asList(sortRequest));
             service.spreadsheets().batchUpdate(SPREAD_SHEET_ID, busReq).execute();
 
-            String tableRange = appendValuesResponse.getTableRange(); //https://developers.google.com/sheets/api/guides/concepts#a1_notation
-            System.out.println("tableRange:"+tableRange);
-            if (tableRange.contains(":O10001")) {
-                String range = MATCHES_TAB+"!10001";
+            int size = appendValuesResponse.size();
+            System.out.println("size:"+size);
+            if (size >= 10001) {
+                String range = MATCHES_TAB+"!10001:10001";
                 ClearValuesRequest requestBody = new ClearValuesRequest();
                 service.spreadsheets().values().clear(SPREAD_SHEET_ID, range, requestBody).execute();
             }
