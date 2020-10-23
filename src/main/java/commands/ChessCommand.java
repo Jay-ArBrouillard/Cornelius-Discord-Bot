@@ -345,33 +345,25 @@ public class ChessCommand {
                 state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
                 state.setMatchStartTime(Instant.now().toEpochMilli());
 
-                if (threadCount < threads.length-1) {
-                    threads[threadCount] = new TrainThread(chessGame, whiteSidePlayer, blackSidePlayer, state, event.getChannel());
-                    event.getChannel().sendMessage("Beginning match on Thread " + threadCount + ": " + whiteSidePlayer.name + " vs " + blackSidePlayer.name).queue();
-                    threads[threadCount].start();
-                    threadCount++;
-                }
-                else {
-                    for (int k = 0; k < threads.length; k++) {
-                        TrainThread currentThread = threads[k];
-                        if (currentThread.isAlive()) {
-                            try {
-                                currentThread.join(); //Wait for this thread to complete
-                                currentThread =  new TrainThread(chessGame, whiteSidePlayer, blackSidePlayer, state, event.getChannel());
-                                event.getChannel().sendMessage("Beginning match on Thread " + k + ": " + whiteSidePlayer.name + " vs " + blackSidePlayer.name).queue();
-                                threads[k].start();
-                                threadCount++;
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                            break;
+                while (threadCount >= threads.length-1) {
+                    for (TrainThread t : threads) {
+                        if (t.isAlive()) {
+                            threadCount++;
                         }
                         else {
                             threadCount--;
-                            System.gc();
                         }
                     }
+                    try {
+                        if (threadCount >= threads.length-1) Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
+
+                threads[threadCount] = new TrainThread(chessGame, whiteSidePlayer, blackSidePlayer, state, event.getChannel());
+                event.getChannel().sendMessage("Beginning match on Thread " + threadCount + ": " + whiteSidePlayer.name + " vs " + blackSidePlayer.name).queue();
+                threads[threadCount].start();
             }
         }
 
