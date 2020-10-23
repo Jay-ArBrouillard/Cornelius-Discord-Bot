@@ -456,7 +456,7 @@ public class GoogleSheets {
                             .setRange(new DimensionRange()
                                     .setSheetId(2021381704)
                                     .setDimension("ROWS")
-                                    .setStartIndex(10001)
+                                    .setStartIndex(10000)
                             )
                     );
             List<Request> requestList = new ArrayList<>();
