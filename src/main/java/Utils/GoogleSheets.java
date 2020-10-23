@@ -433,10 +433,11 @@ public class GoogleSheets {
                                                                                     blackSidePlayer.name, whiteSidePlayer.name, DRAW.equals(status), state.isPlayerForfeited(), state.getTotalMoves(), matchLength, getDate(millis))));
             }
 
-            service.spreadsheets().values()
+            AppendValuesResponse appendValuesResponse = service.spreadsheets().values()
                     .append(SPREAD_SHEET_ID, MATCHES_TAB, appendBody)
                     .setValueInputOption("RAW")
                     .setInsertDataOption("INSERT_ROWS")
+                    .setIncludeValuesInResponse(true)
                     .execute();
 
             //Sort Matches by updated on column
@@ -450,22 +451,20 @@ public class GoogleSheets {
             gridRange.setSheetId(2021381704);
             sortRangeRequest.setRange(gridRange);
             sortRangeRequest.setSortSpecs(Arrays.asList(sortSpec));
-            //Only keep the last 10000 matches
-            Request deleteRequest = new Request()
-                    .setDeleteDimension(new DeleteDimensionRequest()
-                            .setRange(new DimensionRange()
-                                    .setSheetId(2021381704)
-                                    .setDimension("ROWS")
-                                    .setStartIndex(10000)
-                            )
-                    );
             List<Request> requestList = new ArrayList<>();
             Request sortRequest = new Request();
             sortRequest.setSortRange(sortRangeRequest);
-            requestList.add(deleteRequest);
             requestList.add(sortRequest);
             busReq.setRequests(requestList);
             service.spreadsheets().batchUpdate(SPREAD_SHEET_ID, busReq).execute();
+
+            String tableRange = appendValuesResponse.getTableRange(); //https://developers.google.com/sheets/api/guides/concepts#a1_notation
+            System.out.println("tableRange:"+tableRange);
+            if (tableRange.contains(":O10001")) {
+                String range = MATCHES_TAB+"!10001";
+                ClearValuesRequest requestBody = new ClearValuesRequest();
+                service.spreadsheets().values().clear(SPREAD_SHEET_ID, range, requestBody).execute();
+            }
 
             //Update total game time
             updateTotalGameTime(whiteSidePlayer, days, hours, mins, secs);
