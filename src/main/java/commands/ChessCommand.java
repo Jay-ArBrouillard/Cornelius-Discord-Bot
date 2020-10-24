@@ -324,7 +324,6 @@ public class ChessCommand {
             }
         }
 
-        System.out.println("Size of Matchups: " + allMatchups.size());
         List<String> playersInGame = new ArrayList<>();
         while (allMatchups.size() > 0) {
             boolean isThreadOpen = false;
@@ -340,11 +339,6 @@ public class ChessCommand {
                         break;
                     }
                 }
-                try {
-                    if (!isThreadOpen) Thread.sleep(5000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
             }
             List<String> matchup = null;
 
@@ -359,6 +353,7 @@ public class ChessCommand {
             }
 
             if (matchup != null) {
+                //matchup - id1, name1, id2, name2
                 playersInGame.add(matchup.get(0)); // Add id1
                 playersInGame.add(matchup.get(2)); // Add id2
                 threads[threadIndex] = new TrainThread(matchup.get(0), matchup.get(1), matchup.get(2), matchup.get(3), threadIndex, event.getChannel(), playersInGame);

@@ -28,11 +28,11 @@ public class TrainThread extends Thread {
         game = new ChessGame(state);
         ChessPlayer whiteSidePlayer = game.addUser(id1, name1);
         ChessPlayer blackSidePlayer = game.addUser(id2, name2);
-        game.setBlackSidePlayer(blackSidePlayer);
         game.setWhiteSidePlayer(whiteSidePlayer);
+        game.setBlackSidePlayer(blackSidePlayer);
         game.setupStockfishClient();
         game.setupComputerClient(GameType.CVC);
-        game.gameType = GameType.CVP;
+        game.gameType = GameType.CVC;
         state.getPrevElo().put(whiteSidePlayer.discordId, whiteSidePlayer.elo);
         state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
         state.setMatchStartTime(Instant.now().toEpochMilli());
