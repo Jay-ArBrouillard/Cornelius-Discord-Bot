@@ -514,6 +514,13 @@ public class ChessGame {
 
     private synchronized void updateDatabaseDraw() {
         threadRunning = true;
+        if (gameType.isComputerVsComputer()) {
+            try {
+                Thread.sleep(11000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         whiteSidePlayer.incrementDraws();
         blackSidePlayer.incrementDraws();
         EloRanking.calculateChessElo(state, whiteSidePlayer, blackSidePlayer);
@@ -532,15 +539,22 @@ public class ChessGame {
      */
     public synchronized void updateDatabaseWhiteSideWin(boolean isForfeit) {
         threadRunning = true;
+        if (gameType.isComputerVsComputer()) {
+            try {
+                Thread.sleep(11000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         if (isForfeit || state.getTotalMoves() > 0) {
             whiteSidePlayer.incrementWins();
             blackSidePlayer.incrementLosses();
             EloRanking.calculateChessElo(state, whiteSidePlayer, blackSidePlayer);
-            db.updateUser(whiteSidePlayer);
-            db.updateUser(blackSidePlayer);
-            db.addMatch(whiteSidePlayer, blackSidePlayer, state);
+            db.updateUser(whiteSidePlayer); // Executes 3 requests
+            db.updateUser(blackSidePlayer); // Executes 3 requests
+            db.addMatch(whiteSidePlayer, blackSidePlayer, state); //Executes 5 requests
         }
-        else {
+        else { // This is should never happen when computer vs computer
             state.setStateDraw();
             updateDatabaseDraw();
         }
@@ -556,6 +570,13 @@ public class ChessGame {
      */
     public synchronized void updateDatabaseBlackSideWin(boolean isForfeit) {
         threadRunning = true;
+        if (gameType.isComputerVsComputer()) {
+            try {
+                Thread.sleep(11000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         if (isForfeit || state.getTotalMoves() > 0) {
             whiteSidePlayer.incrementLosses();
             blackSidePlayer.incrementWins();
@@ -564,7 +585,7 @@ public class ChessGame {
             db.updateUser(blackSidePlayer);
             db.addMatch(whiteSidePlayer, blackSidePlayer, state);
         }
-        else {
+        else { // This is should never happen when computer vs computer
             state.setStateDraw();
             updateDatabaseDraw();
         }
