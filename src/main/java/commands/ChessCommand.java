@@ -298,9 +298,10 @@ public class ChessCommand {
             String temp = list[randomIndexToSwap][0];
             list[randomIndexToSwap][0] = list[i][0];
             list[i][0] = temp;
-            temp = list[randomIndexToSwap][1];
+
+            String temp2 = list[randomIndexToSwap][1];
             list[randomIndexToSwap][1] = list[i][1];
-            list[i][1] = temp;
+            list[i][1] = temp2;
         }
     }
 
@@ -325,7 +326,7 @@ public class ChessCommand {
     private static void handleTrainAll(MessageReceivedEvent event) {
         event.getChannel().sendMessage("Starting training all matches...").queue();
         String[][] players = getAIList();
-        randomizeAIList(players);
+//        randomizeAIList(players);
 
         TrainThread[] threads = new TrainThread[3];
         for (int i = 0; i < players.length; i++) {

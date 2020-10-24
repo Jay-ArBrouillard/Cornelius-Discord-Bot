@@ -43,8 +43,17 @@ abstract class UCIEngine {
             sendCommand("uci");
             readResponse("uciok");
 
+            boolean hashIsSet = false;
             for (Option option : options)
-                passOption(option);
+                if (option.getOptionString().contains("Hash")) {
+                    if (!hashIsSet) {
+                        passOption(option);
+                        hashIsSet = true;
+                    }
+                }
+                else {
+                    passOption(option);
+                }
         } catch (IOException e) {
             throw new IOException("Unable to start and bind " + super.getClass().getSimpleName() + " process: ", e);
         }
