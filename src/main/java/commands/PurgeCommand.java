@@ -51,7 +51,7 @@ public class PurgeCommand {
                 int messagesDeleted = 0;
                 for (int i = messageList.size() - 1; i >= 0; i--) {
                     Message curr = messageList.get(i);
-                    System.out.println("Deleted: " + curr);
+                    channel.deleteMessageById(curr.getId()).queue();
                     messagesDeleted++;
                     if (messagesDeleted == amount) {
                         break;
