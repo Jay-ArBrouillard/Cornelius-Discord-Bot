@@ -22,7 +22,8 @@ public class PurgeCommand {
             event.getChannel().sendMessage("Invalid format for purge. Ex: `!purge 100`").queue();
             return;
         }
-        if (i < 1 || i > 100) {
+        if (i < 1) {
+            event.getChannel().sendMessage("Must purge atleast 1 message").queue();
             return;
         }
 
@@ -44,17 +45,22 @@ public class PurgeCommand {
         new Thread(() ->
         {
             MessageHistory history = new MessageHistory(channel);
-            List<Message> msgs = history.getRetrievedHistory();
-
-            System.out.println(msgs.size());
-            System.out.println(msgs);
 
             int messagesDeleted = 0;
-            for (Message m : msgs) {
-                System.out.println("Deleting:" + m.getContentRaw());
-                m.delete().queue();
-                messagesDeleted++;
-                if (messagesDeleted == amount) {
+            while (true) {
+                List<Message> msgs;
+                if (amount - messagesDeleted > 100) {
+                    msgs = history.retrievePast(100).complete();
+                }
+                else {
+                    msgs = history.retrievePast(amount).complete();
+                }
+                System.out.println(msgs.size());
+                System.out.println(msgs);
+
+                channel.deleteMessages(msgs).queue();
+                messagesDeleted += msgs.size();
+                if (messagesDeleted >= amount) {
                     break;
                 }
             }
