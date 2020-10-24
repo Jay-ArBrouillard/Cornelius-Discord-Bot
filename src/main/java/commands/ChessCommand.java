@@ -364,18 +364,14 @@ public class ChessCommand {
                 }
             }
             List<String> matchup = null;
-            //Find a matchup to start
-            if (playersInGame.isEmpty()) {
-                matchup = allMatchups.remove(0);
-            }
-            else { // Find a match that is not running. Same player can't be in two games at the same time
-                for (int i = 0; i < allMatchups.size(); i++) {
-                    List currMatchup = allMatchups.get(i);
-                    if (!playersInGame.contains(currMatchup.get(0)) && !playersInGame.contains(currMatchup.get(2))) {
-                        //found a free matchup
-                        matchup = allMatchups.remove(i);
-                        break;
-                    }
+
+            // Find a match that is not running. Same player can't be in two games at the same time
+            for (int i = 0; i < allMatchups.size(); i++) {
+                List currMatchup = allMatchups.get(i);
+                if (!playersInGame.contains(currMatchup.get(0)) && !playersInGame.contains(currMatchup.get(2))) {
+                    //found a free matchup
+                    matchup = allMatchups.remove(i);
+                    break;
                 }
             }
             if (matchup != null) {
