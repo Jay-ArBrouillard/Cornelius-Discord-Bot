@@ -293,20 +293,6 @@ public class ChessCommand {
         }
     }
 
-    private static void randomizeAIList(String[][] list) {
-        Random random = new Random();
-        for (int i = 0; i < list.length; i++) {
-            int randomIndexToSwap = random.nextInt(list.length);
-            String temp = list[randomIndexToSwap][0];
-            list[randomIndexToSwap][0] = list[i][0];
-            list[i][0] = temp;
-
-            String temp2 = list[randomIndexToSwap][1];
-            list[randomIndexToSwap][1] = list[i][1];
-            list[i][1] = temp2;
-        }
-    }
-
     private static void handleAddAll(MessageReceivedEvent event) {
         event.getChannel().sendMessage("Starting adding all computer players...").queue();
         String[][] players = getAIList();
@@ -328,7 +314,6 @@ public class ChessCommand {
     private static void handleTrainAll(MessageReceivedEvent event) {
         event.getChannel().sendMessage("Starting training all matches...").queue();
         String[][] players = getAIList();
-//        randomizeAIList(players);
 
         TrainThread[] threads = new TrainThread[3];
         ArrayList<ArrayList<String>> allMatchups = new ArrayList<>();
@@ -341,7 +326,6 @@ public class ChessCommand {
 
         System.out.println("Size of Matchups: " + allMatchups.size());
         List<String> playersInGame = new ArrayList<>();
-        int lastMatchupSize = allMatchups.size();
         while (allMatchups.size() > 0) {
             boolean isThreadOpen = false;
             int threadIndex = 0;
@@ -379,7 +363,7 @@ public class ChessCommand {
                 playersInGame.add(matchup.get(2)); // Add id2
                 threads[threadIndex] = new TrainThread(matchup.get(0), matchup.get(1), matchup.get(2), matchup.get(3), threadIndex, event.getChannel(), playersInGame);
                 threads[threadIndex].start();
-                event.getChannel().sendMessage("Matches left to start: " + allMatchups.size());
+                event.getChannel().sendMessage("Matches left to start: " + allMatchups.size()).queue();
             }
         }
 
