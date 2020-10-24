@@ -351,18 +351,18 @@ public class ChessCommand {
                         TrainThread currThread = threads[k];
                         if (currThread == null || !currThread.isAlive()) {
                             threadIndex = k;
+                            threads[k] = null;
                             isThreadOpen = true;
+                            System.gc();
                             break;
                         }
                     }
                     try {
                         if (!isThreadOpen) Thread.sleep(5000);
-                        else System.gc();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
-
                 threads[threadIndex] = new TrainThread(chessGame, whiteSidePlayer, blackSidePlayer, state, event.getChannel());
                 event.getChannel().sendMessage("Beginning match on Thread " + threadIndex + ": " + whiteSidePlayer.name + " vs " + blackSidePlayer.name).queue();
                 threads[threadIndex].start();
