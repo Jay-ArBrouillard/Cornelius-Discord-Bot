@@ -69,7 +69,7 @@ public class TrainThread extends Thread {
                 game.id = null;
                 game = null;
                 System.gc(); //Attempt to call garbage collector to clear memory
-                mc.sendMessage("Completed match - " + reply).queue();
+                mc.sendMessage("Completed match on Thread " + threadNum + " - " + reply).queue();
                 break;
             }
 
