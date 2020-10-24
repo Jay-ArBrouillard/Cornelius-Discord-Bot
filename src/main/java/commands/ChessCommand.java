@@ -366,26 +366,34 @@ public class ChessCommand {
             List<String> matchup = null;
 
             // Find a match that is not running. Same player can't be in two games at the same time
-            // Iterate from the end since same user is often grouped together
-            for (int i = allMatchups.size() - 1; i >= 0; i--) {
-                List currMatchup = allMatchups.get(i);
-                if (!playersInGame.contains(currMatchup.get(0)) && !playersInGame.contains(currMatchup.get(2))) {
-                    //found a free matchup
-                    matchup = allMatchups.remove(i);
-                    break;
+            // Iterate swap iterating from the start or end since
+            if (allMatchups.size() % 2 == 0) { //Even
+                for (int i = 0; i < allMatchups.size(); i++) {
+                    List currMatchup = allMatchups.get(i);
+                    if (!playersInGame.contains(currMatchup.get(0)) && !playersInGame.contains(currMatchup.get(2))) {
+                        //found a free matchup
+                        matchup = allMatchups.remove(i);
+                        break;
+                    }
                 }
             }
+            else {
+                for (int i = allMatchups.size() - 1; i >= 0; i--) {
+                    List currMatchup = allMatchups.get(i);
+                    if (!playersInGame.contains(currMatchup.get(0)) && !playersInGame.contains(currMatchup.get(2))) {
+                        //found a free matchup
+                        matchup = allMatchups.remove(i);
+                        break;
+                    }
+                }
+            }
+
             if (matchup != null) {
                 playersInGame.add(matchup.get(0)); // Add id1
                 playersInGame.add(matchup.get(2)); // Add id2
                 threads[threadIndex] = new TrainThread(matchup.get(0), matchup.get(1), matchup.get(2), matchup.get(3), threadIndex, event.getChannel(), playersInGame);
                 threads[threadIndex].start();
-                System.out.println("matches left: " + allMatchups.size());
-            }
-            int matchesLeft = allMatchups.size();
-            if (lastMatchupSize != matchesLeft) {
-                event.getChannel().sendMessage("Matches left - " + matchesLeft);
-                lastMatchupSize = matchesLeft;
+                event.getChannel().sendMessage("Matches left to start: " + allMatchups.size());
             }
         }
 
