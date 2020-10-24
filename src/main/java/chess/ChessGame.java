@@ -672,23 +672,38 @@ public class ChessGame {
                         if (client1 != null) {
                             client1.close();
                             System.out.println("-----------------Shutdown client1");
-                            setClient(whiteSidePlayer);
-                            System.out.println("-----------------Restarted " + client1);
                         }
                     }
-                    else if (isBlackPlayerTurn()) {
+                    else {
                         if (client2 != null) {
                             client2.close();
                             System.out.println("-----------------Shutdown client2");
-                            setClient(blackSidePlayer);
-                            System.out.println("-----------------Restarted " + client2);
                         }
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
                 finally {
-                    System.out.println("-----------------Using iterative deepening");
+                    if (isWhitePlayerTurn()) {
+                        try {
+                            setClient(whiteSidePlayer);
+                            System.out.println("-----------------Restarted " + client1);
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                            System.out.println("-----------------Restart Failed " + client1);
+                        }
+                    }
+                    else {
+                        try {
+                            setClient(blackSidePlayer);
+                            System.out.println("-----------------Restarted " + client2);
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                            System.out.println("-----------------Restart Failed " + client2);
+                        }
+                    }
+
+                    System.out.println("-----------------Using iterative deepening for this turn-------------");
                     if (id == null) id = new IterativeDeepening(6);
                     final Move bestMove = id.execute(this.board);
                     bestMoveString = BoardUtils.getPositionAtCoordinate(bestMove.getCurrentCoordinate()) + BoardUtils.getPositionAtCoordinate(bestMove.getDestinationCoordinate());
