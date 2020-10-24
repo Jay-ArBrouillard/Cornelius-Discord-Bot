@@ -41,7 +41,7 @@ public class ServerInfoCommand {
 
     public static class Help {
         static String name = "!server";
-        static String description = "returns data about the server such as owner and member info";
+        static String description = "returns data about the server such as owner and member info. Notice this command won't work correctly with caching off";
         static String arguments = "";
         static boolean guildOnly = false;
 
