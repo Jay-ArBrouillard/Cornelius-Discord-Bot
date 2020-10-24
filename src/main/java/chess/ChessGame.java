@@ -714,14 +714,8 @@ public class ChessGame {
         if (mc != null) mc.sendTyping().queue();
         //Is castling notation?
         bestMoveString = bestMoveString.toLowerCase().trim(); //Always convert best move to lowercase
-        System.out.println("bestMoveString:"+bestMoveString);
-        if (bestMoveString.equalsIgnoreCase("o-o")) {
-            throw new RuntimeException("GOT INTO KING SIDE CASTLE MOVE");
-//            return convertCastlingMove("o-o", -1,-1, true);
-        }
-        else if (bestMoveString.equalsIgnoreCase("o-o-o")) {
-            throw new RuntimeException("GOT INTO QUEEN SIDE CASTLE MOVE");
-            //return convertCastlingMove("o-o-o", -1,-1, true);
+        if (bestMoveString.equalsIgnoreCase("o-o") || bestMoveString.equalsIgnoreCase("o-o-o")) {
+            return convertCastlingMove(bestMoveString, -1,-1, true);
         }
 
         String x1Str = Character.toString(bestMoveString.charAt(0));
