@@ -327,15 +327,15 @@ public class ChessCommand {
         String[][] players = getAIList();
         randomizeAIList(players);
 
-        TrainThread[] threads = new TrainThread[4];
+        TrainThread[] threads = new TrainThread[3];
         for (int i = 0; i < players.length; i++) {
             for (int j = 0; j < players.length; j++) {
                 if (i == j) continue;
 
-                ChessGameState state = new ChessGameState();
-                ChessGame chessGame = new ChessGame(state);
-                ChessPlayer whiteSidePlayer = chessGame.addUser(players[i][0], players[i][1]);
-                ChessPlayer blackSidePlayer = chessGame.addUser(players[j][0], players[j][1]);
+                state = new ChessGameState();
+                chessGame = new ChessGame(state);
+                whiteSidePlayer = chessGame.addUser(players[i][0], players[i][1]);
+                blackSidePlayer = chessGame.addUser(players[j][0], players[j][1]);
                 chessGame.setBlackSidePlayer(blackSidePlayer);
                 chessGame.setWhiteSidePlayer(whiteSidePlayer);
                 chessGame.setupStockfishClient();
