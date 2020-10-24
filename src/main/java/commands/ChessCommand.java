@@ -327,23 +327,10 @@ public class ChessCommand {
         String[][] players = getAIList();
         randomizeAIList(players);
 
-        TrainThread[] threads = new TrainThread[3];
+        TrainThread[] threads = new TrainThread[2];
         for (int i = 0; i < players.length; i++) {
             for (int j = 0; j < players.length; j++) {
                 if (i == j) continue;
-
-                state = new ChessGameState();
-                chessGame = new ChessGame(state);
-                whiteSidePlayer = chessGame.addUser(players[i][0], players[i][1]);
-                blackSidePlayer = chessGame.addUser(players[j][0], players[j][1]);
-                chessGame.setBlackSidePlayer(blackSidePlayer);
-                chessGame.setWhiteSidePlayer(whiteSidePlayer);
-                chessGame.setupStockfishClient();
-                chessGame.setupComputerClient(GameType.CVC);
-                state.getPrevElo().put(whiteSidePlayer.discordId, whiteSidePlayer.elo);
-                state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
-                state.setMatchStartTime(Instant.now().toEpochMilli());
-
                 boolean isThreadOpen = false;
                 int threadIndex = 0;
                 while (!isThreadOpen) {
@@ -363,7 +350,7 @@ public class ChessCommand {
                         e.printStackTrace();
                     }
                 }
-                threads[threadIndex] = new TrainThread(chessGame, whiteSidePlayer, blackSidePlayer, state, event.getChannel());
+                threads[threadIndex] = new TrainThread(players[i][0], players[i][1], players[j][0], players[j][1], event.getChannel());
                 event.getChannel().sendMessage("Beginning match on Thread " + threadIndex + ": " + whiteSidePlayer.name + " vs " + blackSidePlayer.name).queue();
                 threads[threadIndex].start();
             }

@@ -2,23 +2,31 @@ package chess.multithread;
 
 import chess.ChessGame;
 import chess.ChessGameState;
+import chess.GameType;
 import chess.tables.ChessPlayer;
 import net.dv8tion.jda.api.entities.MessageChannel;
+
+import java.time.Instant;
 
 import static chess.ChessConstants.*;
 
 public class TrainThread extends Thread {
     private ChessGame game;
-    private ChessPlayer whiteSidePlayer;
-    private ChessPlayer blackSidePlayer;
     private ChessGameState state;
     private MessageChannel mc;
 
-    public TrainThread(ChessGame game, ChessPlayer whiteSidePlayer, ChessPlayer blackSidePlayer, ChessGameState state, MessageChannel mc) {
-        this.game = game;
-        this.whiteSidePlayer = whiteSidePlayer;
-        this.blackSidePlayer = blackSidePlayer;
-        this.state = state;
+    public TrainThread(String id1, String name1, String id2, String name2, MessageChannel mc) {
+        state = new ChessGameState();
+        game = new ChessGame(state);
+        ChessPlayer whiteSidePlayer = game.addUser(id1, name1);
+        ChessPlayer blackSidePlayer = game.addUser(id2, name2);
+        game.setBlackSidePlayer(blackSidePlayer);
+        game.setWhiteSidePlayer(whiteSidePlayer);
+        game.setupStockfishClient();
+        game.setupComputerClient(GameType.CVC);
+        state.getPrevElo().put(whiteSidePlayer.discordId, whiteSidePlayer.elo);
+        state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
+        state.setMatchStartTime(Instant.now().toEpochMilli());
         this.mc = mc;
     }
 
@@ -52,8 +60,6 @@ public class TrainThread extends Thread {
                 game.db = null;
                 game.id = null;
                 game = null;
-                whiteSidePlayer = null;
-                blackSidePlayer = null;
                 System.gc(); //Attempt to call garbage collector to clear memory
                 mc.sendMessage(reply).queue();
                 break;
