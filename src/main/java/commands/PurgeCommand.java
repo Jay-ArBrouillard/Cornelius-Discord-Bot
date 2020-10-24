@@ -22,8 +22,8 @@ public class PurgeCommand {
             event.getChannel().sendMessage("Invalid format for purge. Ex: `!purge 100`").queue();
             return;
         }
-        if (i < 1) {
-            event.getChannel().sendMessage("Must purge atleast 1 message").queue();
+        if (i < 2) {
+            event.getChannel().sendMessage("Must purge atleast 2 messages").queue();
             return;
         }
 
@@ -53,16 +53,16 @@ public class PurgeCommand {
                     msgs = history.retrievePast(100).complete();
                 }
                 else {
-                    msgs = history.retrievePast(amount).complete();
+                    msgs = history.retrievePast(amount - messagesDeleted).complete();
                 }
                 channel.deleteMessages(msgs).complete();
                 messagesDeleted += msgs.size();
-                System.out.println("msgSize:" + msgs.size());
-                System.out.println("messagesDeleted:" + messagesDeleted);
                 if (messagesDeleted >= amount) {
                     break;
                 }
             }
+
+            System.out.println("Deleted " + messagesDeleted + " messages");
         }).run();
 
     }
