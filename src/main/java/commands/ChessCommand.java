@@ -327,7 +327,7 @@ public class ChessCommand {
         String[][] players = getAIList();
         randomizeAIList(players);
 
-        TrainThread[] threads = new TrainThread[2];
+        TrainThread[] threads = new TrainThread[4];
         for (int i = 0; i < players.length; i++) {
             for (int j = 0; j < players.length; j++) {
                 if (i == j) continue;
@@ -350,7 +350,7 @@ public class ChessCommand {
                         e.printStackTrace();
                     }
                 }
-                threads[threadIndex] = new TrainThread(players[i][0], players[i][1], players[j][0], players[j][1], threadIndex, event.getChannel());
+                threads[threadIndex] = new TrainThread(players, i, j, threadIndex, event.getChannel());
                 threads[threadIndex].start();
             }
         }

@@ -17,12 +17,15 @@ public class TrainThread extends Thread {
     private int threadNum;
     private String whiteSidePlayerName;
     private String blackSidePlayerName;
+    private int p1Index;
+    private int p2Index;
+    private int size;
 
-    public TrainThread(String id1, String name1, String id2, String name2, int threadNum, MessageChannel mc) {
+    public TrainThread(String[][] players, int i, int j, int threadNum, MessageChannel mc) {
         state = new ChessGameState();
         game = new ChessGame(state);
-        ChessPlayer whiteSidePlayer = game.addUser(id1, name1);
-        ChessPlayer blackSidePlayer = game.addUser(id2, name2);
+        ChessPlayer whiteSidePlayer = game.addUser(players[i][0], players[i][1]);
+        ChessPlayer blackSidePlayer = game.addUser(players[j][0], players[j][1]);
         game.setBlackSidePlayer(blackSidePlayer);
         game.setWhiteSidePlayer(whiteSidePlayer);
         game.setupStockfishClient();
@@ -30,9 +33,12 @@ public class TrainThread extends Thread {
         state.getPrevElo().put(whiteSidePlayer.discordId, whiteSidePlayer.elo);
         state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
         state.setMatchStartTime(Instant.now().toEpochMilli());
+        this.p1Index = i;
+        this.p2Index = j;
+        this.size = players.length;
         this.threadNum = threadNum;
-        this.whiteSidePlayerName = name1;
-        this.blackSidePlayerName = name2;
+        this.whiteSidePlayerName = players[i][1];
+        this.blackSidePlayerName = players[j][1];
         this.mc = mc;
     }
 
@@ -68,7 +74,9 @@ public class TrainThread extends Thread {
                 game.id = null;
                 game = null;
                 System.gc(); //Attempt to call garbage collector to clear memory
-                mc.sendMessage(reply).queue();
+                int gameNumber = p1Index * size + p2Index + 1;
+                int totalGames = size * size;
+                mc.sendMessage("Completed match ("+gameNumber + "/" + totalGames +") " + reply).queue();
                 break;
             }
 
