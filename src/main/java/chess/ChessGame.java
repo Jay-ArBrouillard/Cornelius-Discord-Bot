@@ -15,6 +15,7 @@ import chess.player.ai.uci.engine.enums.Query;
 import chess.player.ai.uci.engine.enums.QueryType;
 import chess.player.ai.uci.engine.enums.Variant;
 import chess.tables.ChessPlayer;
+import com.sun.deploy.security.ruleset.RunRule;
 import net.dv8tion.jda.api.entities.MessageChannel;
 
 import java.io.IOException;
@@ -28,7 +29,6 @@ public class ChessGame {
     public ChessGameState state;
     public ChessPlayer whiteSidePlayer;
     public ChessPlayer blackSidePlayer;
-//    public IterativeDeepening id;
     public boolean threadRunning = false;
     public StockFishClient stockFishClient;
     public BaseAiClient client1;
@@ -735,7 +735,10 @@ public class ChessGame {
         if (mc != null) mc.sendTyping().queue();
         //Is castling notation?
         bestMoveString = bestMoveString.toLowerCase().trim(); //Always convert best move to lowercase
+        System.out.println("bestMoveString:"+bestMoveString);
         if (bestMoveString.equalsIgnoreCase("o-o") || bestMoveString.equalsIgnoreCase("o-o-o")) {
+            System.out.println("HHHHHHHHHHHHHHHHHHHHHHHHHHHHEEEEEEEEEEEEEEEEEEEEEEEELLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLOOOOOOOOOOOOOOOOOOO");
+            System.out.println("---------------------fen:"+FenUtils.parseFEN(this.board));
             return convertCastlingMove(bestMoveString, -1,-1, true);
         }
 
