@@ -381,7 +381,7 @@ public class ChessCommand {
             if (matchup != null) {
                 playersInGame.add(matchup.get(0));
                 playersInGame.add(matchup.get(2));
-                threads[threadIndex] = new TrainThread(matchup.get(0), matchup.get(1), matchup.get(2), matchup.get(3), threadIndex, event.getChannel());
+                threads[threadIndex] = new TrainThread(matchup.get(0), matchup.get(1), matchup.get(2), matchup.get(3), threadIndex, event.getChannel(), playersInGame);
                 threads[threadIndex].start();
             }
             int matchesLeft = allMatchups.size();

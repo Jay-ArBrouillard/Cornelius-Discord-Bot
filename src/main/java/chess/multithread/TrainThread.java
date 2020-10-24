@@ -4,8 +4,10 @@ import chess.ChessGame;
 import chess.ChessGameState;
 import chess.GameType;
 import chess.tables.ChessPlayer;
+import commands.ChessCommand;
 import net.dv8tion.jda.api.entities.MessageChannel;
 
+import java.util.*;
 import java.time.Instant;
 
 import static chess.ChessConstants.*;
@@ -17,8 +19,9 @@ public class TrainThread extends Thread {
     private int threadNum;
     public String whiteSidePlayerName;
     public String blackSidePlayerName;
+    public List<String> playersInGame;
 
-    public TrainThread(String id1, String name1, String id2, String name2, int threadNum, MessageChannel mc) {
+    public TrainThread(String id1, String name1, String id2, String name2, int threadNum, MessageChannel mc, List<String> playersInGame) {
         state = new ChessGameState();
         game = new ChessGame(state);
         ChessPlayer whiteSidePlayer = game.addUser(id1, name1);
@@ -35,6 +38,7 @@ public class TrainThread extends Thread {
         this.blackSidePlayerName = name2;
         this.threadNum = threadNum;
         this.mc = mc;
+        this.playersInGame = playersInGame;
     }
 
     public void run() {
@@ -70,6 +74,8 @@ public class TrainThread extends Thread {
                 game = null;
                 System.gc(); //Attempt to call garbage collector to clear memory
                 mc.sendMessage("Completed match on Thread " + threadNum + " - " + reply).queue();
+                playersInGame.remove(whiteSidePlayerName);
+                playersInGame.remove(blackSidePlayerName);
                 break;
             }
 
