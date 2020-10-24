@@ -349,7 +349,7 @@ public class ChessCommand {
                 while (!isThreadOpen) {
                     for (int k = 0; k < threads.length; k++) {
                         TrainThread currThread = threads[k];
-                        if (currThread != null && currThread.isAlive()) {
+                        if (currThread == null || !currThread.isAlive()) {
                             threadIndex = k;
                             isThreadOpen = true;
                             break;
