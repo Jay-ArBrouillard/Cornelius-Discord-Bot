@@ -686,6 +686,7 @@ public class ChessGame {
                 finally {
                     if (isWhitePlayerTurn()) {
                         try {
+                            client1 = null;
                             setClient(whiteSidePlayer);
                             System.out.println("-----------------Restarted " + client1);
                         } catch (IOException ex) {
@@ -695,6 +696,7 @@ public class ChessGame {
                     }
                     else {
                         try {
+                            client2 = null;
                             setClient(blackSidePlayer);
                             System.out.println("-----------------Restarted " + client2);
                         } catch (IOException ex) {
@@ -702,7 +704,7 @@ public class ChessGame {
                             System.out.println("-----------------Restart Failed " + client2);
                         }
                     }
-
+                    System.gc();
                     System.out.println("-----------------Using iterative deepening for this turn-------------");
                     if (id == null) id = new IterativeDeepening(6);
                     final Move bestMove = id.execute(this.board);

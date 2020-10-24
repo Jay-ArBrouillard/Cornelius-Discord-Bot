@@ -105,10 +105,12 @@ abstract class UCIEngine {
         try {
             sendCommand("quit");
         } finally {
-            process.destroyForcibly();
+            process.destroy();
+            if (process.isAlive()) {
+                process.destroyForcibly();
+            }
             input.close();
             output.close();
-            System.gc();
         }
     }
 
