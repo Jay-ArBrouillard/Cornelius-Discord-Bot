@@ -31,6 +31,8 @@ public class TrainThread extends Thread {
         state.getPrevElo().put(whiteSidePlayer.discordId, whiteSidePlayer.elo);
         state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
         state.setMatchStartTime(Instant.now().toEpochMilli());
+        this.whiteSidePlayerName = name1;
+        this.blackSidePlayerName = name2;
         this.threadNum = threadNum;
         this.mc = mc;
     }
