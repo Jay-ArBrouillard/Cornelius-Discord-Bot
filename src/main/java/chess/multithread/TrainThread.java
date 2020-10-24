@@ -19,6 +19,8 @@ public class TrainThread extends Thread {
     private int threadNum;
     public String whiteSidePlayerName;
     public String blackSidePlayerName;
+    public String whiteSideId;
+    public String blackSideId;
     public List<String> playersInGame;
 
     public TrainThread(String id1, String name1, String id2, String name2, int threadNum, MessageChannel mc, List<String> playersInGame) {
@@ -36,6 +38,8 @@ public class TrainThread extends Thread {
         state.setMatchStartTime(Instant.now().toEpochMilli());
         this.whiteSidePlayerName = name1;
         this.blackSidePlayerName = name2;
+        this.whiteSideId = id1;
+        this.blackSideId = id2;
         this.threadNum = threadNum;
         this.mc = mc;
         this.playersInGame = playersInGame;
@@ -74,8 +78,8 @@ public class TrainThread extends Thread {
                 game = null;
                 System.gc(); //Attempt to call garbage collector to clear memory
                 mc.sendMessage("Completed match on Thread " + threadNum + " - " + reply).queue();
-                playersInGame.remove(whiteSidePlayerName);
-                playersInGame.remove(blackSidePlayerName);
+                playersInGame.remove(whiteSideId);
+                playersInGame.remove(blackSideId);
                 break;
             }
 

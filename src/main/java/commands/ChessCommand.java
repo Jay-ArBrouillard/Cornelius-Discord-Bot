@@ -379,8 +379,8 @@ public class ChessCommand {
                 }
             }
             if (matchup != null) {
-                playersInGame.add(matchup.get(1)); // Add names
-                playersInGame.add(matchup.get(3)); // Add names
+                playersInGame.add(matchup.get(0)); // Add id1
+                playersInGame.add(matchup.get(2)); // Add id2
                 threads[threadIndex] = new TrainThread(matchup.get(0), matchup.get(1), matchup.get(2), matchup.get(3), threadIndex, event.getChannel(), playersInGame);
                 threads[threadIndex].start();
             }
