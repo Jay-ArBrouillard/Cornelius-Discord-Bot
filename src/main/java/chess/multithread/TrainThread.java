@@ -83,7 +83,7 @@ public class TrainThread extends Thread {
                     try {
                         Thread.sleep(10000);
                         //In the rare case that the same player plays in a matchup consecutively
-                        //Wait 10 seconds to ensures that the new elo is saved in the database before the same player plays again
+                        //Wait 10 seconds to ensure that the new elo is saved in the database before the same player plays again
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

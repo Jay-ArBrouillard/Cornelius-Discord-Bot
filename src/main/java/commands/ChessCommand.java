@@ -366,7 +366,8 @@ public class ChessCommand {
             List<String> matchup = null;
 
             // Find a match that is not running. Same player can't be in two games at the same time
-            for (int i = 0; i < allMatchups.size(); i++) {
+            // Iterate from the end since same user is often grouped together
+            for (int i = allMatchups.size() - 1; i >= 0; i--) {
                 List currMatchup = allMatchups.get(i);
                 if (!playersInGame.contains(currMatchup.get(0)) && !playersInGame.contains(currMatchup.get(2))) {
                     //found a free matchup
