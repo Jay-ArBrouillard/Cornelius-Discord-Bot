@@ -344,24 +344,20 @@ public class ChessGame {
         //Handle if player sends "O-O" or "O-O-O" for castling
         if (moveCmd.equalsIgnoreCase("o-o")) {
             if (this.board.getCurrentPlayer().getAlliance().isWhite()) {
-//                moveCmd = "e1g1";
                 startCoordinate = 60;
                 destinationCoordinate = 62;
             }
             else {
-//                moveCmd = "e8g8";
                 startCoordinate = 4;
                 destinationCoordinate = 6;
             }
         }
         else if (moveCmd.equalsIgnoreCase("o-o-o")) {
             if (this.board.getCurrentPlayer().getAlliance().isWhite()) {
-//                moveCmd = "e1c1";
                 startCoordinate = 60;
                 destinationCoordinate = 58;
             }
             else {
-//                moveCmd = "e8c8";
                 startCoordinate = 4;
                 destinationCoordinate = 2;
             }
@@ -716,14 +712,16 @@ public class ChessGame {
             }
         } while (bestMoveString == null);
         if (mc != null) mc.sendTyping().queue();
-//        System.out.println("bestMoveString:"+bestMoveString);
         //Is castling notation?
-        bestMoveString = bestMoveString.toLowerCase(); //Always convert best move to lowercase
-        if (bestMoveString.contains("o-o")) {
-            return convertCastlingMove("o-o", -1,-1, true);
+        bestMoveString = bestMoveString.toLowerCase().trim(); //Always convert best move to lowercase
+        System.out.println("bestMoveString:"+bestMoveString);
+        if (bestMoveString.equalsIgnoreCase("o-o")) {
+            throw new RuntimeException("GOT INTO KING SIDE CASTLE MOVE");
+//            return convertCastlingMove("o-o", -1,-1, true);
         }
-        if (bestMoveString.contains("o-o-o")) {
-            return convertCastlingMove("o-o-o", -1,-1, true);
+        else if (bestMoveString.equalsIgnoreCase("o-o-o")) {
+            throw new RuntimeException("GOT INTO QUEEN SIDE CASTLE MOVE");
+            //return convertCastlingMove("o-o-o", -1,-1, true);
         }
 
         String x1Str = Character.toString(bestMoveString.charAt(0));

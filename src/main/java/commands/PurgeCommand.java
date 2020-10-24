@@ -43,15 +43,20 @@ public class PurgeCommand {
 
         new Thread(() ->
         {
-                List<Message> messages = channel.getHistory().retrievePast(amount).complete();
-                //messages.removeIf(m -> m.getCreationTime().isBefore(twoWeeksAgo));
-                messages.remove(messages);
-                if (messages.isEmpty())
+                List<Message> messageList = channel.getHistory().getRetrievedHistory();
+                if (messageList.isEmpty())
                 {
                     return;
                 }
-//                messages.forEach(m -> System.out.println("Deleting: " + m));
-                channel.deleteMessages(messages).complete();
+                int messagesDeleted = 0;
+                for (int i = messageList.size() - 1; i >= 0; i--) {
+                    Message curr = messageList.get(i);
+                    System.out.println("Deleted: " + curr);
+                    messagesDeleted++;
+                    if (messagesDeleted == amount) {
+                        break;
+                    }
+                }
         }).run();
 
     }
