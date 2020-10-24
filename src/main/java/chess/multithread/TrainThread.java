@@ -78,6 +78,14 @@ public class TrainThread extends Thread {
                 game = null;
                 System.gc(); //Attempt to call garbage collector to clear memory
                 mc.sendMessage("Completed match on Thread " + threadNum + " - " + reply).queue();
+                try {
+                    Thread.sleep(30000);
+                    //In the rare case that the same player plays in a matchup consecutively
+                    //Ensures that the new elo is saved in the database before the same player plays again
+                    //And grabs the old elo
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 playersInGame.remove(whiteSideId);
                 playersInGame.remove(blackSideId);
                 break;
