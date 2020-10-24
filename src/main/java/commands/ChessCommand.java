@@ -340,32 +340,6 @@ public class ChessCommand {
             }
         }
 
-        System.out.println(allMatchups);
-
-        //Try to order the list such that people in the same matchup aren't next to each other
-        /*for (int i = 0; i < allMatchups.size() - 1; i++) {
-            List<String> curr = allMatchups.get(i);
-            List<String> next = allMatchups.get(i+1);
-            boolean found = false;
-            //Check if first id is in next
-            if (curr.get(0).equals(next.get(0)) || curr.get(0).equals(next.get(2))) found = true;
-            //Check if second id is in next
-            if (curr.get(2).equals(next.get(0)) || curr.get(2).equals(next.get(2))) found = true;
-
-            if (found) { // Swap the next match with a matchup that doesn't contain ids from current match
-                for (int j = 0; j < allMatchups.size(); j++) {
-                    String id3 = allMatchups.get(j).get(0);
-                    String id4 = allMatchups.get(j).get(2);
-
-                    if (!id3.equals(next.get(0)) && !id4.equals(next.get(2))) {
-                        Collections.swap(allMatchups, i+1, j);
-                        break;
-                    }
-                }
-            }
-
-        }*/
-
         System.out.println("Size of Matchups: " + allMatchups.size());
         List<String> playersInGame = new ArrayList<>();
         int lastMatchupSize = allMatchups.size();
@@ -405,6 +379,7 @@ public class ChessCommand {
                 playersInGame.add(matchup.get(2)); // Add id2
                 threads[threadIndex] = new TrainThread(matchup.get(0), matchup.get(1), matchup.get(2), matchup.get(3), threadIndex, event.getChannel(), playersInGame);
                 threads[threadIndex].start();
+                System.out.println("matches left: " + allMatchups.size());
             }
             int matchesLeft = allMatchups.size();
             if (lastMatchupSize != matchesLeft) {
