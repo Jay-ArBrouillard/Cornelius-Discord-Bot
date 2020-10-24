@@ -33,6 +33,7 @@ public class ChessGame {
     public StockFishClient stockFishClient;
     public BaseAiClient client1;
     public BaseAiClient client2;
+    public GameType gameType;
 
     public ChessGame(ChessGameState state) {
         db = new GoogleSheets();
@@ -378,7 +379,7 @@ public class ChessGame {
             state.setTotalMoves(state.getTotalMoves() + 0.5);
             this.board = null;
             this.board = transition.getTransitionBoard();
-            this.board.buildImage();
+            if (!gameType.isComputerVsComputer()) this.board.buildImage(); //Only build board image when human player is playing
 
             // Is someone in check mate?
             if (this.board.getCurrentPlayer().isInCheckMate()) {
@@ -441,7 +442,7 @@ public class ChessGame {
             } catch (Exception e) {
                 e.printStackTrace();
                 try {
-                    stockFishClient.close();
+                    if (stockFishClient != null) stockFishClient.close();
                 } catch (IOException ie) {
                     ie.printStackTrace();
                 }

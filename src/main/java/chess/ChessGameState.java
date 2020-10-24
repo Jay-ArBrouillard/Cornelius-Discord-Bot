@@ -7,7 +7,6 @@ public class ChessGameState {
     private String message;
     private String status;
     private Map<String, Double> prevElo; //PlayerId -> Elo
-
     private long matchStartTime;
     private String boardEvaluationMessage;
     private double totalMoves = 0; //Half moves that's why we need a double
@@ -15,7 +14,7 @@ public class ChessGameState {
     private boolean playerForfeited = false;
 
     public ChessGameState() {
-        prevElo = new HashMap<String, Double>();
+        prevElo = new HashMap<>();
     }
 
     public void setMessage(String message) {
