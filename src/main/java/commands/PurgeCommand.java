@@ -21,13 +21,8 @@ public class PurgeCommand {
         } catch (Exception nfe) {
             return;
         }
-        if (i < 1 || i > 100) {
-            event.getChannel().sendMessage("You can only purge between 1 and 100 messages").queue();
-            return;
-        }
 
         TextChannel channel = event.getTextChannel();
-
         boolean isAdmin = event.getMember().getPermissions(channel).contains(Permission.ADMINISTRATOR);
 
         if (isAdmin) {
@@ -51,7 +46,7 @@ public class PurgeCommand {
                 int messagesDeleted = 0;
                 for (int i = messageList.size() - 1; i >= 0; i--) {
                     Message curr = messageList.get(i);
-                    channel.deleteMessageById(curr.getId()).queue();
+                    curr.delete().complete();
                     messagesDeleted++;
                     if (messagesDeleted == amount) {
                         break;
@@ -63,7 +58,7 @@ public class PurgeCommand {
 
     public static class Help {
         static String name = "!purge";
-        static String description = "deletes up to 100 messages in the given text channel";
+        static String description = "deletes up to x amount of messages in the given text channel. Notice only admins can use this command.";
         static String arguments = "<number>";
         static boolean guildOnly = false;
 
