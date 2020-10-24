@@ -81,7 +81,7 @@ public class ChessGame {
     private void setClient(ChessPlayer p) throws IOException {
         if (p.name.contains("Cornelius")) { //Cornelius will default to use stockfish client
             setClient(new StockFishClient.Builder()
-                    .setOption(Option.Hash, 8)
+                    .setOption(Option.Hash, 16)
                     .setVariant(Variant.MODERN) // BMI for windows, Modern for linux
                     .setOption(Option.Limit_Strength, Boolean.TRUE)
                     .setOption(Option.Elo, p.name.split("Cornelius ")[1]) //Elo Skill level is in their name
@@ -89,21 +89,21 @@ public class ChessGame {
         }
         else if (p.name.contains("Cheng")) {
             setClient(new ChengClient.Builder()
-                    .setOption(Option.Hash, 8)
+                    .setOption(Option.Hash, 16)
                     .setOption(Option.Limit_Strength, Boolean.TRUE)
                     .setOption(Option.Elo, p.name.split("Cheng ")[1]) //Elo Skill level is in their name
                     .build(), p);
         }
         else if (p.name.contains("Fishnet")) {
             setClient(new FishnetClient.Builder()
-                    .setOption(Option.Hash, 8)
+                    .setOption(Option.Hash, 16)
                     .setOption(Option.Limit_Strength, Boolean.TRUE)
                     .setOption(Option.Elo, p.name.split("Fishnet ")[1]) //Elo Skill level is in their name
                     .build(), p);
         }
         else if (p.name.contains("CT800")) {
             setClient(new CT800Client.Builder()
-                    .setOption(Option.Hash, 8)
+                    .setOption(Option.Hash, 16)
                     .setOption(Option.Limit_Strength, Boolean.TRUE)
                     .setOption(Option.Elo, p.name.split("CT800 ")[1]) //Elo Skill level is in their name
                     .build(), p);
@@ -111,67 +111,67 @@ public class ChessGame {
         else if (p.name.contains("Xiphos")) {
             setClient(new XiphosClient.Builder()
                     .setVariant(Variant.SSE) //BMI for windows, SSE for linux
-                    .setOption(Option.Hash, 8)
+                    .setOption(Option.Hash, 16)
                     .build(), p);
         }
         else if (p.name.contains("Komodo")) {
             setClient(new KomodoClient.Builder()
-                    .setOption(Option.Hash, 8)
+                    .setOption(Option.Hash, 16)
                     .build(), p);
         }
         else if (p.name.contains("Cinnamon")) {
             setClient(new CinnamonClient.Builder()
-                    .setOption(Option.Hash, 8)
+                    .setOption(Option.Hash, 16)
                     .build(), p);
         }
         else if (p.name.contains("Laser")) {
             setClient(new LaserClient.Builder()
-                    .setOption(Option.Hash, 8)
+                    .setOption(Option.Hash, 16)
                     .build(), p);
         }
         else if (p.name.contains("Amoeba")) {
             setClient(new AmoebaClient.Builder()
-                    .setOption(Option.Hash, 8)
+                    .setOption(Option.Hash, 16)
                     .build(), p);
         }
         else if (p.name.contains("CounterGo")) {
             setClient(new CounterGoClient.Builder()
-                    .setOption(Option.Hash, 8)
+                    .setOption(Option.Hash, 16)
                     .build(), p);
         }
         else if (p.name.contains("Asymptote")) {
             setClient(new AsymptoteClient.Builder()
-                    .setOption(Option.Hash, 8)
+                    .setOption(Option.Hash, 16)
                     .build(), p);
         }
         else if (p.name.contains("Dumb")) {
             setClient(new DumbClient.Builder()
-                    .setOption(Option.Hash, 8)
+                    .setOption(Option.Hash, 16)
                     .build(), p);
         }
         else if (p.name.contains("Pigeon")) {
             setClient(new PigeonClient.Builder()
-                    .setOption(Option.Hash, 8)
+                    .setOption(Option.Hash, 16)
                     .build(), p);
         }
         else if (p.name.contains("Monolith")) {
             setClient(new MonolithClient.Builder()
-                    .setOption(Option.Hash, 8)
+                    .setOption(Option.Hash, 16)
                     .build(), p);
         }
         else if (p.name.contains("Floyd")) {
             setClient(new FloydClient.Builder()
-                    .setOption(Option.Hash, 8)
+                    .setOption(Option.Hash, 16)
                     .build(), p);
         }
         else if (p.name.contains("Fridolin")) {
             setClient(new FridolinClient.Builder()
-                    .setOption(Option.Hash, 8)
+                    .setOption(Option.Hash, 16)
                     .build(), p);
         }
         else if (p.name.contains("LittleWing")) {
             setClient(new LittleWingClient.Builder()
-                    .setOption(Option.Hash, 8)
+                    .setOption(Option.Hash, 16)
                     .build(), p);
         }
         else if (p.name.contains("Moustique")) {
@@ -180,12 +180,12 @@ public class ChessGame {
         }
         else if (p.name.contains("Ethereal")) {
             setClient(new EtherealClient.Builder()
-                    .setOption(Option.Hash, 8)
+                    .setOption(Option.Hash, 16)
                     .build(), p);
         }
         else if (p.name.contains("Demolito")) {
             setClient(new DemolitoClient.Builder()
-                    .setOption(Option.Hash, 8)
+                    .setOption(Option.Hash, 16)
                     .build(), p);
         }
     }
