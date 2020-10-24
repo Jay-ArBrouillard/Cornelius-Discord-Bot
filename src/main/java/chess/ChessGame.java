@@ -517,12 +517,14 @@ public class ChessGame {
     }
 
     private synchronized void updateDatabaseDraw() {
+        threadRunning = true;
         whiteSidePlayer.incrementDraws();
         blackSidePlayer.incrementDraws();
         EloRanking.calculateChessElo(state, whiteSidePlayer, blackSidePlayer);
         db.updateUser(whiteSidePlayer);
         db.updateUser(blackSidePlayer);
         db.addMatch(whiteSidePlayer, blackSidePlayer, state);
+        threadRunning = false;
     }
 
     public synchronized void updateDatabaseWhiteSideWin() {
@@ -533,6 +535,7 @@ public class ChessGame {
      * If no moves are made treat this as a draw as long as someone didn't forfeit
      */
     public synchronized void updateDatabaseWhiteSideWin(boolean isForfeit) {
+        threadRunning = true;
         if (isForfeit || state.getTotalMoves() > 0) {
             whiteSidePlayer.incrementWins();
             blackSidePlayer.incrementLosses();
@@ -556,6 +559,7 @@ public class ChessGame {
      * If no moves are made treat this as a draw as long as someone didn't forfeit
      */
     public synchronized void updateDatabaseBlackSideWin(boolean isForfeit) {
+        threadRunning = false;
         if (isForfeit || state.getTotalMoves() > 0) {
             whiteSidePlayer.incrementLosses();
             blackSidePlayer.incrementWins();

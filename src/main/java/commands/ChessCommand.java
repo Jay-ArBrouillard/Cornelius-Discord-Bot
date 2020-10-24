@@ -53,7 +53,6 @@ public class ChessCommand {
             if (isMessageFromPlayer(event.getAuthor().getId())) {
                 state.setPlayerForfeit();
                 if (gameType != null && gameType.isPlayerVsComputer() && (decision == Decision.PLAYER_MOVE || decision == COMPUTER_MOVE)) { //Player vs Computer game
-                    chessGame.threadRunning = true;
                     if (event.getAuthor().getId().equals(blackSidePlayer.discordId)) { // Black quit
                         state.setWinnerId(whiteSidePlayer.discordId);
                         new Thread(() -> chessGame.updateDatabaseWhiteSideWin(true)).start();
@@ -818,6 +817,7 @@ public class ChessCommand {
                     messageChannel.sendMessage("Error saving Chess Stats to GoogleSheets: " + e).queue();
                 }
             }
+            chessGame = null;
             gameType = null;
             decision = INACTIVE;
 

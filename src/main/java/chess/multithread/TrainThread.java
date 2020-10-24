@@ -56,37 +56,35 @@ public class TrainThread extends Thread {
 
             if (CHECKMATE.equals(status) || DRAW.equals(status) || COMPUTER_RESIGN.equals(status)) {
                 String finalReply = reply;
-                new Thread(() -> {
-                    while (game != null && game.threadRunning) {
-                        try {
-                            Thread.sleep(1000);
-                            //In the rare case that the same player plays in a matchup consecutively
-                            //Wait to ensure that the new elo is saved in the database before the same player plays again
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
+                while (game.threadRunning) {
                     try {
-                        if (game.stockFishClient != null) game.stockFishClient.close();
-                        if (game.client1 != null) game.client1.close();
-                        if (game.client2 != null) game.client2.close();
-                    } catch (Exception e) {
+                        Thread.sleep(1000);
+                        //In the rare case that the same player plays in a matchup consecutively
+                        //Wait to ensure that the new elo is saved in the database before the same player plays again
+                    } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    finally {
-                        playersInGame.remove(whiteSideId);
-                        playersInGame.remove(blackSideId);
-                        state = null;
-                        game = null;
-                        whiteSidePlayerName = null;
-                        blackSidePlayerName = null;
-                        whiteSideId = null;
-                        blackSideId = null;
-                        System.gc(); //Attempt to call garbage collector to clear memory
-                        mc.sendMessage("Completed match on Thread " + threadNum + " - " + finalReply).queue();
-                        mc = null;
-                    }
-                }).start();
+                }
+                try {
+                    if (game.stockFishClient != null) game.stockFishClient.close();
+                    if (game.client1 != null) game.client1.close();
+                    if (game.client2 != null) game.client2.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                finally {
+                    playersInGame.remove(whiteSideId);
+                    playersInGame.remove(blackSideId);
+                    state = null;
+                    game = null;
+                    whiteSidePlayerName = null;
+                    blackSidePlayerName = null;
+                    whiteSideId = null;
+                    blackSideId = null;
+                    mc.sendMessage("Completed match on Thread " + threadNum + " - " + finalReply).queue();
+                    mc = null;
+                    System.gc(); //Attempt to call garbage collector to clear memory
+                }
                 break;
             }
 
