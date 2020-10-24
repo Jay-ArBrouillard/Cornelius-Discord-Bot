@@ -55,11 +55,10 @@ public class PurgeCommand {
                 else {
                     msgs = history.retrievePast(amount).complete();
                 }
-                System.out.println(msgs.size());
-                System.out.println(msgs);
-
-                channel.deleteMessages(msgs).queue();
+                channel.deleteMessages(msgs).complete();
                 messagesDeleted += msgs.size();
+                System.out.println("msgSize:" + msgs.size());
+                System.out.println("messagesDeleted:" + messagesDeleted);
                 if (messagesDeleted >= amount) {
                     break;
                 }
