@@ -28,7 +28,7 @@ public class ChessGame {
     public ChessGameState state;
     public ChessPlayer whiteSidePlayer;
     public ChessPlayer blackSidePlayer;
-    public IterativeDeepening id;
+//    public IterativeDeepening id;
     public boolean threadRunning = false;
     public StockFishClient stockFishClient;
     public BaseAiClient client1;
@@ -687,7 +687,10 @@ public class ChessGame {
                             System.out.println("-----------------Restarted " + client1);
                         } catch (IOException ex) {
                             ex.printStackTrace();
-                            System.out.println("-----------------Restart Failed " + client1);
+                            state.setMessage("Error forcing draw. " + client1 + " was not able initialize external process");
+                            state.setStateDraw();
+                            updateDatabaseDraw();
+                            return state;
                         }
                     }
                     else {
@@ -697,18 +700,15 @@ public class ChessGame {
                             System.out.println("-----------------Restarted " + client2);
                         } catch (IOException ex) {
                             ex.printStackTrace();
-                            System.out.println("-----------------Restart Failed " + client2);
+                            state.setMessage("Error forcing draw. " + client2 + " was not able initialize external process");
+                            state.setStateDraw();
+                            updateDatabaseDraw();
+                            return state;
                         }
                     }
-                    System.gc();
-                    System.out.println("-----------------Using iterative deepening for this turn-------------");
-                    if (id == null) id = new IterativeDeepening(6);
-                    final Move bestMove = id.execute(this.board);
-                    bestMoveString = BoardUtils.getPositionAtCoordinate(bestMove.getCurrentCoordinate()) + BoardUtils.getPositionAtCoordinate(bestMove.getDestinationCoordinate());
-                    return handleMove(bestMove.getCurrentCoordinate(), bestMove.getDestinationCoordinate(), bestMoveString, true);
                 }
             } finally {
-                randomThinkTime *= 2;
+                randomThinkTime += 500;
             }
         } while (bestMoveString == null);
         if (mc != null) mc.sendTyping().queue();

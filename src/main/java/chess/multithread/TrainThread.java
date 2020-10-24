@@ -11,7 +11,6 @@ import java.util.*;
 import java.time.Instant;
 
 import static chess.ChessConstants.*;
-import static commands.ChessCommand.Decision.INACTIVE;
 
 public class TrainThread extends Thread {
     private ChessGame game;
@@ -56,40 +55,36 @@ public class TrainThread extends Thread {
             status = state.getStatus();
 
             if (CHECKMATE.equals(status) || DRAW.equals(status) || COMPUTER_RESIGN.equals(status)) {
-                try {
-                    if (game != null) {
+                String finalReply = reply;
+                new Thread(() -> {
+                    while (game != null && game.threadRunning) {
+                        try {
+                            Thread.sleep(1000);
+                            //In the rare case that the same player plays in a matchup consecutively
+                            //Wait to ensure that the new elo is saved in the database before the same player plays again
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    try {
                         if (game.stockFishClient != null) game.stockFishClient.close();
                         if (game.client1 != null) game.client1.close();
                         if (game.client2 != null) game.client2.close();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                state = null;
-                game.stockFishClient = null;
-                game.client1 = null;
-                game.client2 = null;
-                game.board = null;
-                game.blackSidePlayer = null;
-                game.whiteSidePlayer = null;
-                game.state = null;
-                game.messageHandler = null;
-                game.db = null;
-                game.id = null;
-                game = null;
-                System.gc(); //Attempt to call garbage collector to clear memory
-                mc.sendMessage("Completed match on Thread " + threadNum + " - " + reply).queue();
-                new Thread(() -> {
-                    try {
-                        Thread.sleep(10000);
-                        //In the rare case that the same player plays in a matchup consecutively
-                        //Wait 10 seconds to ensure that the new elo is saved in the database before the same player plays again
-                    } catch (InterruptedException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                     finally {
                         playersInGame.remove(whiteSideId);
                         playersInGame.remove(blackSideId);
+                        state = null;
+                        game = null;
+                        whiteSidePlayerName = null;
+                        blackSidePlayerName = null;
+                        whiteSideId = null;
+                        blackSideId = null;
+                        System.gc(); //Attempt to call garbage collector to clear memory
+                        mc.sendMessage("Completed match on Thread " + threadNum + " - " + finalReply).queue();
+                        mc = null;
                     }
                 }).start();
                 break;
