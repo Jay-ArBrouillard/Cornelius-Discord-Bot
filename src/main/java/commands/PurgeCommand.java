@@ -19,10 +19,15 @@ public class PurgeCommand {
         try {
             i = Integer.parseInt(args[1]);
         } catch (Exception nfe) {
+            event.getChannel().sendMessage("Invalid format for purge. Ex: `!purge 100`").queue();
+            return;
+        }
+        if (i < 1 || i > 100) {
             return;
         }
 
         TextChannel channel = event.getTextChannel();
+
         boolean isAdmin = event.getMember().getPermissions(channel).contains(Permission.ADMINISTRATOR);
 
         if (isAdmin) {
@@ -38,27 +43,28 @@ public class PurgeCommand {
 
         new Thread(() ->
         {
-                List<Message> messageList = channel.getHistory().getRetrievedHistory();
-                if (messageList.isEmpty())
-                {
-                    return;
+            MessageHistory history = new MessageHistory(channel);
+            List<Message> msgs = history.getRetrievedHistory();
+
+            System.out.println(msgs.size());
+            System.out.println(msgs);
+
+            int messagesDeleted = 0;
+            for (Message m : msgs) {
+                System.out.println("Deleting:" + m.getContentRaw());
+                m.delete().queue();
+                messagesDeleted++;
+                if (messagesDeleted == amount) {
+                    break;
                 }
-                int messagesDeleted = 0;
-                for (int i = messageList.size() - 1; i >= 0; i--) {
-                    Message curr = messageList.get(i);
-                    curr.delete().queue();
-                    messagesDeleted++;
-                    if (messagesDeleted == amount) {
-                        break;
-                    }
-                }
+            }
         }).run();
 
     }
 
     public static class Help {
         static String name = "!purge";
-        static String description = "deletes up to x amount of messages in the given text channel. Notice only admins can use this command.";
+        static String description = "deletes up to 100 messages in the given text channel";
         static String arguments = "<number>";
         static boolean guildOnly = false;
 
