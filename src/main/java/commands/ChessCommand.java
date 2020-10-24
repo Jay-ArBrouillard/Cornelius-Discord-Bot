@@ -327,8 +327,7 @@ public class ChessCommand {
         String[][] players = getAIList();
         randomizeAIList(players);
 
-        TrainThread[] threads = new TrainThread[8];
-        int threadCount = 0;
+        TrainThread[] threads = new TrainThread[4];
         for (int i = 0; i < players.length; i++) {
             for (int j = 0; j < players.length; j++) {
                 if (i == j) continue;
@@ -345,25 +344,28 @@ public class ChessCommand {
                 state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
                 state.setMatchStartTime(Instant.now().toEpochMilli());
 
-                while (threadCount >= threads.length-1) {
-                    for (TrainThread t : threads) {
-                        if (t.isAlive()) {
-                            threadCount++;
-                        }
-                        else {
-                            threadCount--;
+                boolean isThreadOpen = false;
+                int threadIndex = 0;
+                while (!isThreadOpen) {
+                    for (int k = 0; k < threads.length; k++) {
+                        TrainThread currThread = threads[k];
+                        if (currThread.isAlive()) {
+                            threadIndex = k;
+                            isThreadOpen = true;
+                            break;
                         }
                     }
                     try {
-                        if (threadCount >= threads.length-1) Thread.sleep(5000);
+                        if (!isThreadOpen) Thread.sleep(5000);
+                        else System.gc();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
 
-                threads[threadCount] = new TrainThread(chessGame, whiteSidePlayer, blackSidePlayer, state, event.getChannel());
-                event.getChannel().sendMessage("Beginning match on Thread " + threadCount + ": " + whiteSidePlayer.name + " vs " + blackSidePlayer.name).queue();
-                threads[threadCount].start();
+                threads[threadIndex] = new TrainThread(chessGame, whiteSidePlayer, blackSidePlayer, state, event.getChannel());
+                event.getChannel().sendMessage("Beginning match on Thread " + threadIndex + ": " + whiteSidePlayer.name + " vs " + blackSidePlayer.name).queue();
+                threads[threadIndex].start();
             }
         }
 
