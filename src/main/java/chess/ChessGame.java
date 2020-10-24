@@ -559,7 +559,7 @@ public class ChessGame {
      * If no moves are made treat this as a draw as long as someone didn't forfeit
      */
     public synchronized void updateDatabaseBlackSideWin(boolean isForfeit) {
-        threadRunning = false;
+        threadRunning = true;
         if (isForfeit || state.getTotalMoves() > 0) {
             whiteSidePlayer.incrementLosses();
             blackSidePlayer.incrementWins();
