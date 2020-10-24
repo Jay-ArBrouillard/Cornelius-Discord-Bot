@@ -74,7 +74,7 @@ public class TrainThread extends Thread {
                 game.id = null;
                 game = null;
                 System.gc(); //Attempt to call garbage collector to clear memory
-                int gameNumber = p1Index * size + p2Index + 1;
+                int gameNumber = p1Index * size + p2Index;
                 int totalGames = size * size;
                 mc.sendMessage("Completed match ("+gameNumber + "/" + totalGames +") " + reply).queue();
                 break;

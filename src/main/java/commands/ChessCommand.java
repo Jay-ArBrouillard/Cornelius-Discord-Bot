@@ -327,7 +327,7 @@ public class ChessCommand {
         String[][] players = getAIList();
         randomizeAIList(players);
 
-        TrainThread[] threads = new TrainThread[4];
+        TrainThread[] threads = new TrainThread[3];
         for (int i = 0; i < players.length; i++) {
             for (int j = 0; j < players.length; j++) {
                 if (i == j) continue;
@@ -696,7 +696,6 @@ public class ChessCommand {
         return new String[][]{
                 {"693282099167494225DO1", "Demolito 1"},
                 {"693282099167494225ET12", "Ethereal 12"},
-                {"693282099167494225HA3", "Hakkapeliitta 3"},
             {"693282099167494225MO0.3", "Moustique 0.3"},
             {"693282099167494225LW0.6", "LittleWing 0.6"},
             {"693282099167494225FR3", "Fridolin 3"},

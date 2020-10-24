@@ -95,7 +95,7 @@ public class GoogleSheets {
      * @param name
      * @return
      */
-    public static ChessPlayer addUser(String id, String name) {
+    public static synchronized ChessPlayer addUser(String id, String name) {
         try {
             if (service == null) getSheetsService();
 
@@ -155,7 +155,7 @@ public class GoogleSheets {
         }
     }
 
-    public static ChessPlayer findUserByName(String name) {
+    public static synchronized ChessPlayer findUserByName(String name) {
         try {
             if (service == null) getSheetsService();
 
@@ -182,7 +182,7 @@ public class GoogleSheets {
         }
     }
 
-    public static ChessPlayer findUserClosestElo(double elo, String id) {
+    public static synchronized ChessPlayer findUserClosestElo(double elo, String id) {
         try {
             if (service == null) getSheetsService();
 
@@ -242,7 +242,7 @@ public class GoogleSheets {
      * @param range
      * @return
      */
-    public static ChessPlayer findUserSimilarElo(double elo, String id, double range) {
+    public static synchronized ChessPlayer findUserSimilarElo(double elo, String id, double range) {
         try {
             if (service == null) getSheetsService();
 
@@ -293,7 +293,7 @@ public class GoogleSheets {
      * @return
      * @throws IOException
      */
-    private static List isRanked(String id) throws IOException {
+    private static synchronized List isRanked(String id) throws IOException {
         ValueRange response = service.spreadsheets().values().get(SPREAD_SHEET_ID, RANKED_TAB).execute();
         rowNumber = 1;
         totalRows = response.getValues().size();
@@ -314,7 +314,7 @@ public class GoogleSheets {
      * @return
      * @throws IOException
      */
-    private static List isRankedByName(String name) throws IOException {
+    private static synchronized List isRankedByName(String name) throws IOException {
         ValueRange response = service.spreadsheets().values().get(SPREAD_SHEET_ID, RANKED_TAB).execute();
         rowNumber = 1;
         totalRows = response.getValues().size();
@@ -335,7 +335,7 @@ public class GoogleSheets {
      * Behaves like POST or full update
      * Returns EloStatus object
      */
-    public static void updateUser(ChessPlayer user) {
+    public static synchronized void updateUser(ChessPlayer user) {
         try {
             if (service == null) getSheetsService();
             List row = isRanked(user.discordId);
@@ -392,7 +392,7 @@ public class GoogleSheets {
         }
     }
 
-    public static boolean addMatch(ChessPlayer whiteSidePlayer, ChessPlayer blackSidePlayer, ChessGameState state) {
+    public static synchronized boolean addMatch(ChessPlayer whiteSidePlayer, ChessPlayer blackSidePlayer, ChessGameState state) {
         try {
             if (service == null) getSheetsService();
 
@@ -482,7 +482,7 @@ public class GoogleSheets {
         }
     }
 
-    public static boolean updateTotalGameTime(ChessPlayer p, long days, long hours, long mins, long secs) throws IOException {
+    public static synchronized boolean updateTotalGameTime(ChessPlayer p, long days, long hours, long mins, long secs) throws IOException {
         String timePlayedSoFar = p.totalGameTimeStr;
         String[] split = timePlayedSoFar.split("\\s+"); //Example: 0 days 0 hours 0 minutes 7 seconds
         days += Integer.parseInt(split[0].trim());
