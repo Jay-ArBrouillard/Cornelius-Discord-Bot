@@ -350,8 +350,7 @@ public class ChessCommand {
                         e.printStackTrace();
                     }
                 }
-                threads[threadIndex] = new TrainThread(players[i][0], players[i][1], players[j][0], players[j][1], event.getChannel());
-                event.getChannel().sendMessage("Beginning match on Thread " + threadIndex + ": " + whiteSidePlayer.name + " vs " + blackSidePlayer.name).queue();
+                threads[threadIndex] = new TrainThread(players[i][0], players[i][1], players[j][0], players[j][1], threadIndex, event.getChannel());
                 threads[threadIndex].start();
             }
         }

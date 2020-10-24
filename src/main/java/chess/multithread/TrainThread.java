@@ -14,8 +14,11 @@ public class TrainThread extends Thread {
     private ChessGame game;
     private ChessGameState state;
     private MessageChannel mc;
+    private int threadNum;
+    private String whiteSidePlayerName;
+    private String blackSidePlayerName;
 
-    public TrainThread(String id1, String name1, String id2, String name2, MessageChannel mc) {
+    public TrainThread(String id1, String name1, String id2, String name2, int threadNum, MessageChannel mc) {
         state = new ChessGameState();
         game = new ChessGame(state);
         ChessPlayer whiteSidePlayer = game.addUser(id1, name1);
@@ -27,12 +30,16 @@ public class TrainThread extends Thread {
         state.getPrevElo().put(whiteSidePlayer.discordId, whiteSidePlayer.elo);
         state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
         state.setMatchStartTime(Instant.now().toEpochMilli());
+        this.threadNum = threadNum;
+        this.whiteSidePlayerName = name1;
+        this.blackSidePlayerName = name2;
         this.mc = mc;
     }
 
     public void run() {
         String status;
         String reply;
+        mc.sendMessage("Beginning match on Thread " + threadNum + ": " + whiteSidePlayerName + " vs " + blackSidePlayerName).queue();
         do {
             state = game.ai(null);
             reply = state.getMessage();
