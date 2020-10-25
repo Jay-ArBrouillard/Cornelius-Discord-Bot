@@ -325,7 +325,6 @@ public class ChessCommand {
         }
 
         List<String> playersInGame = new ArrayList<>();
-        int [] threadRunningTally = new int[threads.length];
         while (allMatchups.size() > 0) {
             boolean isThreadOpen = false;
             int threadIndex = 0;
@@ -336,19 +335,9 @@ public class ChessCommand {
                         threadIndex = k;
                         threads[k] = null;
                         isThreadOpen = true;
-                        threadRunningTally[k] = 0;
                         System.gc();
                         break;
                     }
-                    else {
-                        threadRunningTally[k] += 1;
-                    }
-                }
-
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
                 }
             }
             List<String> matchup = null;
@@ -371,21 +360,9 @@ public class ChessCommand {
                 threads[threadIndex].start();
                 event.getChannel().sendMessage("Matches left to start: " + allMatchups.size()).queue();
             }
-
-            for (int i = 0; i < threadRunningTally.length; i++) {
-                if (threadRunningTally[i] >= 200) { //2.5 minutes
-                    threads[i].setPriority(Thread.MAX_PRIORITY);
-                    for (int j = 0; j < threads.length; j++) { //Set rest other threads to normal
-                        if (j != i) {
-                            threads[j].setPriority(Thread.NORM_PRIORITY);
-                        }
-                    }
-                    break;
-                }
-            }
         }
 
-        event.getChannel().sendMessage("Completed").queue();
+        event.getChannel().sendMessage("Completed Train All").queue();
     }
 
     private static void handleTrainFairly(MessageReceivedEvent event, String message) {

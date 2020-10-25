@@ -545,18 +545,13 @@ public class ChessGame {
 
     private synchronized void updateDatabaseDraw() {
         threadRunning = true;
-        if (gameType.isComputerVsComputer()) {
-            try {
-                Thread.sleep(11000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
         whiteSidePlayer.incrementDraws();
         blackSidePlayer.incrementDraws();
         EloRanking.calculateChessElo(state, whiteSidePlayer, blackSidePlayer);
         db.updateUser(whiteSidePlayer);
+        if (gameType.isComputerVsComputer()) sleep(3000);
         db.updateUser(blackSidePlayer);
+        if (gameType.isComputerVsComputer()) sleep(3000);
         db.addMatch(whiteSidePlayer, blackSidePlayer, state);
         threadRunning = false;
     }
@@ -570,19 +565,14 @@ public class ChessGame {
      */
     public synchronized void updateDatabaseWhiteSideWin(boolean isForfeit) {
         threadRunning = true;
-        if (gameType.isComputerVsComputer()) {
-            try {
-                Thread.sleep(11000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
         if (isForfeit || state.getTotalMoves() > 0) {
             whiteSidePlayer.incrementWins();
             blackSidePlayer.incrementLosses();
             EloRanking.calculateChessElo(state, whiteSidePlayer, blackSidePlayer);
             db.updateUser(whiteSidePlayer); // Executes 3 requests
+            if (gameType.isComputerVsComputer()) sleep(3000);
             db.updateUser(blackSidePlayer); // Executes 3 requests
+            if (gameType.isComputerVsComputer()) sleep(3000);
             db.addMatch(whiteSidePlayer, blackSidePlayer, state); //Executes 5 requests
         }
         else { // This is should never happen when computer vs computer
@@ -601,19 +591,14 @@ public class ChessGame {
      */
     public synchronized void updateDatabaseBlackSideWin(boolean isForfeit) {
         threadRunning = true;
-        if (gameType.isComputerVsComputer()) {
-            try {
-                Thread.sleep(11000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
         if (isForfeit || state.getTotalMoves() > 0) {
             whiteSidePlayer.incrementLosses();
             blackSidePlayer.incrementWins();
             EloRanking.calculateChessElo(state, whiteSidePlayer, blackSidePlayer);
             db.updateUser(whiteSidePlayer);
+            if (gameType.isComputerVsComputer()) sleep(3000);
             db.updateUser(blackSidePlayer);
+            if (gameType.isComputerVsComputer()) sleep(3000);
             db.addMatch(whiteSidePlayer, blackSidePlayer, state);
         }
         else { // This is should never happen when computer vs computer
@@ -621,6 +606,13 @@ public class ChessGame {
             updateDatabaseDraw();
         }
         threadRunning = false;
+    }
+
+    public void sleep(int millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+        }
     }
 
     public int convertInputToInteger(String column, String row) {
@@ -769,11 +761,13 @@ public class ChessGame {
         } while (bestMoveString == null);
         if (mc != null) mc.sendTyping().queue();
         //Is castling notation?
-        bestMoveString = bestMoveString.toLowerCase().trim(); //Always convert best move to lowercase
+        bestMoveString = bestMoveString.trim().toLowerCase(); //Always convert best move to lowercase
         System.out.println("bestMoveString:"+bestMoveString);
         if (bestMoveString.equalsIgnoreCase("o-o") || bestMoveString.equalsIgnoreCase("o-o-o")) {
+            System.out.println("--------------------castle fen:"+FenUtils.parseFEN(this.board));
             return convertCastlingMove(bestMoveString, true);
         }
+        System.out.println("fen:"+FenUtils.parseFEN(this.board));
 
         String x1Str = Character.toString(bestMoveString.charAt(0));
         String y1Str = Character.toString(bestMoveString.charAt(1));
