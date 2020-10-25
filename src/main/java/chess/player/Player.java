@@ -127,13 +127,14 @@ public abstract class Player {
             //Update is castle capable in the case that Rook is moved
             this.setKingSideCastleCapable(false); //Default these to false unless found
             this.setQueenSideCastleCapable(false);
-            Collection<Move> castleMoveAvailable = calculateKingCastles(transitionBoard.getCurrentPlayer().getOpponent().getLegalMoves(),
-                                                                        transitionBoard.getCurrentPlayer().getLegalMoves());
-            for (Move m : castleMoveAvailable) {
-                if (m.toString().contains("o-o")) { //This is hard coded in KingSideCastleMove class
+            Collection<Move> castleMovesAvailable = calculateKingCastles(transitionBoard.getCurrentPlayer().getLegalMoves(),
+                                                                        transitionBoard.getCurrentPlayer().getOpponent().getLegalMoves());
+            for (Move m : castleMovesAvailable) {
+                System.out.println(m.toString());
+                if (m.toString().equals("King Side Castle `o-o`")) { //This is hard coded in KingSideCastleMove class
                     this.setKingSideCastleCapable(true);
                 }
-                if (m.toString().contains("o-o-o")) { //This is hard coded in QueenSideCastleMove class
+                if (m.toString().equals("Queen Side Castle `o-o-o`")) { //This is hard coded in QueenSideCastleMove class
                     this.setQueenSideCastleCapable(true);
                 }
             }
