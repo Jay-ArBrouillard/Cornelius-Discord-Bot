@@ -124,19 +124,36 @@ public abstract class Player {
             return new MoveTransition(this.board, move, MoveStatus.LEAVES_PLAYER_CHECK);
         }
         if (!isDummyMove) {
-            //Update is castle capable in the case that Rook is moved
-            this.setKingSideCastleCapable(false); //Default these to false unless found
-            this.setQueenSideCastleCapable(false);
-            Collection<Move> castleMovesAvailable = calculateKingCastles(transitionBoard.getCurrentPlayer().getLegalMoves(),
-                                                                        transitionBoard.getCurrentPlayer().getOpponent().getLegalMoves());
-            for (Move m : castleMovesAvailable) {
-                System.out.println(m.toString());
-                if (m.toString().equals("King Side Castle `o-o`")) { //This is hard coded in KingSideCastleMove class
-                    this.setKingSideCastleCapable(true);
+            //Update is castle capable
+            if (move.isCastlingMove()) {
+                if (move.toString().equals("King Side Castle `o-o`")) { //This is hard coded in KingSideCastleMove class
+                    this.setKingSideCastleCapable(false);
                 }
-                if (m.toString().equals("Queen Side Castle `o-o-o`")) { //This is hard coded in QueenSideCastleMove class
-                    this.setQueenSideCastleCapable(true);
+                if (move.toString().equals("Queen Side Castle `o-o-o`")) { //This is hard coded in QueenSideCastleMove class
+                    this.setQueenSideCastleCapable(false);
                 }
+            }
+            else if (move.getMovedPiece() instanceof Rook) {
+                if (this.board.getCurrentPlayer().getAlliance().isWhite()) {
+                    if (move.getCurrentCoordinate() == 0) {
+                        this.setQueenSideCastleCapable(false);
+                    }
+                    else if (move.getCurrentCoordinate() == 7) {
+                        this.setKingSideCastleCapable(false);
+                    }
+                }
+                else {
+                    if (move.getCurrentCoordinate() == 57) {
+                        this.setQueenSideCastleCapable(false);
+                    }
+                    else if (move.getCurrentCoordinate() == 63) {
+                        this.setKingSideCastleCapable(false);
+                    }
+                }
+            }
+            else if (move.getMovedPiece() instanceof King) {
+                this.setKingSideCastleCapable(false);
+                this.setQueenSideCastleCapable(false);
             }
 
             //Add to moves played
