@@ -432,7 +432,7 @@ public abstract class Move {
                 builder.setPiece(piece);
             }
             builder.setPiece(this.movedPiece.movePiece(this));
-            builder.setPiece(new Rook(this.castleRookDestination, this.castleRook.getPieceAlliance()));
+            builder.setPiece(new Rook(this.castleRookDestination, this.castleRook.getPieceAlliance(), false));
             builder.setMoveMaker(this.board.getCurrentPlayer().getOpponent().getAlliance());
             int numFullMoves = this.board.getCurrentPlayer().getAlliance().isBlack() ? this.board.getNumFullMoves() + 1 : this.board.getNumFullMoves();
             return builder.build(this.board.getMovesPlayed(), numFullMoves); //Return a new board

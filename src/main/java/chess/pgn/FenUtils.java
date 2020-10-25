@@ -21,12 +21,12 @@ public class FenUtils {
                 calculateCurrentPlayerText(board) + " " +
                 calculateCastleText(board) + " " +
                 calculateEnPassantSquare(board) + " " +
-                calculateMoves(board);
+                calculateHalfMoveClockAndFullMoveNumber(board);
     }
 
-    private static String calculateMoves(Board board) {
-        int halfMove = 0;
-        int fullMoves = board.getNumFullMoves();
+    private static String calculateHalfMoveClockAndFullMoveNumber(Board board) {
+        int halfMove = 0; //This is the number of halfmoves since the last capture or pawn advance.
+        int fullMoves = board.getNumFullMoves(); //The number of the full move. It starts at 1, and is incremented after Black's move.
         List<Boolean> moveHistory = board.getMovesPlayed();
         for (int i = moveHistory.size() - 1; i >= 0; i--) {
             if (moveHistory.get(i) == true) {

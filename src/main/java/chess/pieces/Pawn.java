@@ -153,8 +153,8 @@ public class Pawn extends Piece {
         else if (promotionType.isBishop()) {
             return new Bishop(this.piecePosition, this.pieceAlliance, false);
         }
-        else if (promotionType.isRook()) {
-            return new Rook(this.piecePosition, this.pieceAlliance, false);
+        else if (promotionType.isKnight()) {
+            return new Knight(this.piecePosition, this.pieceAlliance, false);
         }
         else {
             throw new RuntimeException("Cannot promote pawn to " + promotionType.getFullPieceName());
