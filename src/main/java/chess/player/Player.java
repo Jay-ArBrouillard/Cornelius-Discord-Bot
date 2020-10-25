@@ -125,29 +125,16 @@ public abstract class Player {
         }
         if (!isDummyMove) {
             //Update is castle capable in the case that Rook is moved
-            //Case where King is moved is already taken care of
-            if (move.getMovedPiece() instanceof Rook) {
-                boolean isWhite = transitionBoard.getCurrentPlayer().getOpponent().getAlliance().isWhite();
-
-                if (isWhite) {
-                    Piece pieceAt0 = transitionBoard.getTile(0).getPiece();
-                    Piece pieceAt7 = transitionBoard.getTile(7).getPiece();
-                    if (pieceAt0 == null || !(pieceAt0 instanceof Rook) || !pieceAt0.isFirstMove()) {
-                        this.setQueenSideCastleCapable(false);
-                    }
-                    if (pieceAt7 == null || !(pieceAt7 instanceof Rook) || !pieceAt7.isFirstMove()) {
-                        this.setKingSideCastleCapable(false);
-                    }
+            this.setKingSideCastleCapable(false); //Default these to false unless found
+            this.setQueenSideCastleCapable(false);
+            Collection<Move> castleMoveAvailable = calculateKingCastles(transitionBoard.getCurrentPlayer().getOpponent().getLegalMoves(),
+                                                                        transitionBoard.getCurrentPlayer().getLegalMoves());
+            for (Move m : castleMoveAvailable) {
+                if (m.toString().contains("o-o")) { //This is hard coded in KingSideCastleMove class
+                    this.setKingSideCastleCapable(true);
                 }
-                else {
-                    Piece pieceAt56 = transitionBoard.getTile(56).getPiece();
-                    Piece pieceAt63 = transitionBoard.getTile(63).getPiece();
-                    if (pieceAt56 == null || !(pieceAt56 instanceof Rook) || !pieceAt56.isFirstMove()) {
-                        this.setQueenSideCastleCapable(false);
-                    }
-                    if (pieceAt63 == null || !(pieceAt63 instanceof Rook) || !pieceAt63.isFirstMove()) {
-                        this.setKingSideCastleCapable(false);
-                    }
+                if (m.toString().contains("o-o-o")) { //This is hard coded in QueenSideCastleMove class
+                    this.setQueenSideCastleCapable(true);
                 }
             }
 

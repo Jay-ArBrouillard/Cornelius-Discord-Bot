@@ -762,7 +762,12 @@ public class ChessGame {
         if (mc != null) mc.sendTyping().queue();
         //Is castling notation?
         bestMoveString = bestMoveString.trim().toLowerCase(); //Always convert best move to lowercase
-        System.out.println("bestMoveString:"+bestMoveString);
+        if (isWhitePlayerTurn()) {
+            System.out.println("client: " + client1 + ", bestMoveString:"+bestMoveString);
+        }
+        else {
+            System.out.println("client: " + client2 + ", bestMoveString:"+bestMoveString);
+        }
         if (bestMoveString.equalsIgnoreCase("o-o") || bestMoveString.equalsIgnoreCase("o-o-o")) {
             System.out.println("--------------------castle fen:"+FenUtils.parseFEN(this.board));
             return convertCastlingMove(bestMoveString, true);
