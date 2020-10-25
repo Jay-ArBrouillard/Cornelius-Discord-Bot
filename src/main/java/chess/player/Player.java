@@ -125,13 +125,9 @@ public abstract class Player {
         }
         if (!isDummyMove) {
             //Update is castle capable
-            if (move.isCastlingMove()) {
-                if (move.toString().equals("King Side Castle `o-o`")) { //This is hard coded in KingSideCastleMove class
-                    this.setKingSideCastleCapable(false);
-                }
-                if (move.toString().equals("Queen Side Castle `o-o-o`")) { //This is hard coded in QueenSideCastleMove class
-                    this.setQueenSideCastleCapable(false);
-                }
+            if (move.isCastlingMove() || move.getMovedPiece() instanceof King) {
+                this.setKingSideCastleCapable(false);
+                this.setQueenSideCastleCapable(false);
             }
             else if (move.getMovedPiece() instanceof Rook) {
                 if (this.board.getCurrentPlayer().getAlliance().isWhite()) {
@@ -150,10 +146,6 @@ public abstract class Player {
                         this.setKingSideCastleCapable(false);
                     }
                 }
-            }
-            else if (move.getMovedPiece() instanceof King) {
-                this.setKingSideCastleCapable(false);
-                this.setQueenSideCastleCapable(false);
             }
 
             //Add to moves played
