@@ -492,6 +492,16 @@ public class ChessGame {
             transition = null;
             return state;
         }
+        else if (isComputer) { //If computer sends an incorrect move then we should throw exception and also remove this computer from AI List
+            System.out.println(String.format("Start coordinate: %d, Destination coordinate: %d, Move command: %s, Promotion Type: %s", startCoordinate, destinationCoordinate, moveCmd, promotionType));
+            System.out.println(String.format("Current fen:%s", FenUtils.parseFEN(this.board)));
+            if (didWhiteJustMove()) {
+                throw new RuntimeException(client1 + " sent invalid move");
+            }
+            else {
+                throw new RuntimeException(client2 + " sent invalid move");
+            }
+        }
         else {
             if (transition.getMoveStatus().leavesPlayerInCheck()) {
                 state.setMessage("`"+moveCmd + "` leaves " + this.board.getCurrentPlayer().getAlliance() + " player in check");
