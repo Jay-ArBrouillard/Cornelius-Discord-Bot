@@ -131,18 +131,18 @@ public abstract class Player {
             }
             else if (move.getMovedPiece() instanceof Rook) {
                 if (this.board.getCurrentPlayer().getAlliance().isWhite()) {
-                    if (move.getCurrentCoordinate() == 0) {
-                        this.setQueenSideCastleCapable(false);
-                    }
-                    else if (move.getCurrentCoordinate() == 7) {
-                        this.setKingSideCastleCapable(false);
-                    }
-                }
-                else {
                     if (move.getCurrentCoordinate() == 57) {
                         this.setQueenSideCastleCapable(false);
                     }
                     else if (move.getCurrentCoordinate() == 63) {
+                        this.setKingSideCastleCapable(false);
+                    }
+                }
+                else { //Blackside
+                    if (move.getCurrentCoordinate() == 0) {
+                        this.setQueenSideCastleCapable(false);
+                    }
+                    else if (move.getCurrentCoordinate() == 7) {
                         this.setKingSideCastleCapable(false);
                     }
                 }
