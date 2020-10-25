@@ -14,7 +14,8 @@ public enum Option {
     Slow_Mover("Slow Mover"),
     Nodestime("nodestime"),
     Limit_Strength("UCI_LimitStrength"),
-    Elo("UCI_Elo");
+    Elo("UCI_Elo"),
+    Opponent("UCI_Opponent"); //format of the string has to be [GM|IM|FM|WGM|WIM|none] [<elo>|none] [computer|human] <name>
 
     private String optionString;
     private Object value;

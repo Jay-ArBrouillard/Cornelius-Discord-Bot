@@ -1,9 +1,9 @@
 package chess.pgn;
 
-import chess.Alliance;
 import chess.board.Board;
 import chess.board.BoardUtils;
 import chess.pieces.*;
+import java.util.*;
 
 public class FenUtils {
 
@@ -21,7 +21,20 @@ public class FenUtils {
                 calculateCurrentPlayerText(board) + " " +
                 calculateCastleText(board) + " " +
                 calculateEnPassantSquare(board) + " " +
-                "0 1";
+                calculateMoves(board);
+    }
+
+    private static String calculateMoves(Board board) {
+        int halfMove = 0;
+        int fullMoves = board.getNumFullMoves();
+        List<Boolean> moveHistory = board.getMovesPlayed();
+        for (int i = moveHistory.size() - 1; i >= 0; i--) {
+            if (moveHistory.get(i) == true) {
+                break;
+            }
+            halfMove++;
+        }
+        return String.format("%d %d", halfMove, fullMoves);
     }
 
 //    private static Board parseFEN(final String fenString) {
@@ -104,37 +117,12 @@ public class FenUtils {
 //        return builder.build();
 //    }
 
-    private static Alliance moveMaker(final String moveMakerString) {
-        if(moveMakerString.equals("w")) {
-            return Alliance.WHITE;
-        } else if(moveMakerString.equals("b")) {
-            return Alliance.BLACK;
-        }
-        throw new RuntimeException("Invalid FEN String " +moveMakerString);
-    }
-
-    private static boolean whiteKingSideCastle(final String fenCastleString) {
-        return fenCastleString.contains("K");
-    }
-
-    private static boolean whiteQueenSideCastle(final String fenCastleString) {
-        return fenCastleString.contains("Q");
-    }
-
-    private static boolean blackKingSideCastle(final String fenCastleString) {
-        return fenCastleString.contains("k");
-    }
-
-    private static boolean blackQueenSideCastle(final String fenCastleString) {
-        return fenCastleString.contains("q");
-    }
-
     private static String calculateBoardText(final Board board) {
         final StringBuilder builder = new StringBuilder();
         for (int i = 0; i < BoardUtils.NUM_TILES; i++) {
             final String tileText = board.getTile(i).getPiece() == null ? "-" :
-                    board.getTile(i).getPiece().getPieceAlliance().isWhite() ? board.getTile(i).getPiece().toString() :
-                            board.getTile(i).getPiece().toString().toLowerCase();
+                    board.getTile(i).getPiece().getPieceAlliance().isWhite() ? board.getTile(i).getPiece().getPieceType().getShortPieceName().toUpperCase() :
+                            board.getTile(i).getPiece().getPieceType().getShortPieceName().toLowerCase();
             builder.append(tileText);
         }
         builder.insert(8, "/");

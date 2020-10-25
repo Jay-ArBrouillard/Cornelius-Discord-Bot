@@ -20,14 +20,22 @@ public class King extends Piece {
     private final boolean kingSideCastleCapable;
     private final boolean queenSideCastleCapable;
 
-    public King(final int piecePosition, final Alliance alliance, final boolean kingSideCastleCapable, final boolean queenSideCastleCapable) {
+    public King(final int piecePosition,
+                final Alliance alliance,
+                final boolean kingSideCastleCapable,
+                final boolean queenSideCastleCapable) {
         super(PieceType.KING, piecePosition, alliance, true);
         this.isCastled = false;
         this.kingSideCastleCapable = kingSideCastleCapable;
         this.queenSideCastleCapable = queenSideCastleCapable;
     }
 
-    public King(final int piecePosition, final Alliance alliance, final boolean isFirstMove, final boolean isCastled, final boolean kingSideCastleCapable, final boolean queenSideCastleCapable) {
+    public King(final int piecePosition,
+                final Alliance alliance,
+                final boolean isFirstMove,
+                final boolean isCastled,
+                final boolean kingSideCastleCapable,
+                final boolean queenSideCastleCapable) {
         super(PieceType.KING, piecePosition, alliance, isFirstMove);
         this.isCastled = isCastled;
         this.kingSideCastleCapable = kingSideCastleCapable;
@@ -74,7 +82,7 @@ public class King extends Piece {
 
     @Override
     public King movePiece(Move move) {
-        return new King(move.getDestinationCoordinate(), move.getMovedPiece().getPieceAlliance(), false, move.isCastlingMove(),false, false);
+        return new King(move.getDestinationCoordinate(), this.pieceAlliance,false, move.isCastlingMove(), false, false);
     }
 
     @Override

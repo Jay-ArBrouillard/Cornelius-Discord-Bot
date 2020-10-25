@@ -384,7 +384,7 @@ public class ChessGame {
         }
         MoveTransition transition = this.board.getCurrentPlayer().makeMove(move);
         if (transition.getMoveStatus().isDone()) {
-            state.setTotalMoves(state.getTotalMoves() + 0.5);
+            state.setFullMoves(this.board.getNumFullMoves());
             this.board = null;
             this.board = transition.getTransitionBoard();
             if (!gameType.isComputerVsComputer()) this.board.buildImage(); //Only build board image when human player is playing
@@ -565,7 +565,7 @@ public class ChessGame {
      */
     public synchronized void updateDatabaseWhiteSideWin(boolean isForfeit) {
         threadRunning = true;
-        if (isForfeit || state.getTotalMoves() > 0) {
+        if (isForfeit || state.getFullMoves() > 1) {
             whiteSidePlayer.incrementWins();
             blackSidePlayer.incrementLosses();
             EloRanking.calculateChessElo(state, whiteSidePlayer, blackSidePlayer);
@@ -591,7 +591,7 @@ public class ChessGame {
      */
     public synchronized void updateDatabaseBlackSideWin(boolean isForfeit) {
         threadRunning = true;
-        if (isForfeit || state.getTotalMoves() > 0) {
+        if (isForfeit || state.getFullMoves() > 1) {
             whiteSidePlayer.incrementLosses();
             blackSidePlayer.incrementWins();
             EloRanking.calculateChessElo(state, whiteSidePlayer, blackSidePlayer);
@@ -767,6 +767,7 @@ public class ChessGame {
             System.out.println("--------------------castle fen:"+FenUtils.parseFEN(this.board));
             return convertCastlingMove(bestMoveString, true);
         }
+
         System.out.println("fen:"+FenUtils.parseFEN(this.board));
 
         String x1Str = Character.toString(bestMoveString.charAt(0));

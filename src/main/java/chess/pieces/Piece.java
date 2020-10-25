@@ -277,6 +277,10 @@ public abstract class Piece {
             return this.value;
         }
 
+        public String getShortPieceName() {
+            return this.pieceName;
+        }
+
         public String getFullPieceName() {
             return this.fullPieceName;
         }

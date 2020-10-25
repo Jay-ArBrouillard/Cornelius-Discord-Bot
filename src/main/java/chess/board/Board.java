@@ -1,7 +1,6 @@
 package chess.board;
 
 import chess.*;
-import chess.board.Move.*;
 import chess.pieces.*;
 import chess.player.BlackPlayer;
 import chess.player.Player;
@@ -26,14 +25,16 @@ public class Board {
 
     private final Pawn enPassantPawn;
     private final List<Boolean> movesPlayed; //If a move captures a piece or moves a pawn value is true else false
+    private final int numFullMoves; //The number of the full move. It starts at 1, and is incremented after Black's move.
 
     private static final int START_X_COORDINATE = 70;
     private static final int START_Y_COORDINATE = 43;
     private static final int X_OFFSET = 162;
     private static final int Y_OFFSET = 162;
 
-    public Board(Builder builder, List<Boolean> movesPlayed) {
+    public Board(Builder builder, List<Boolean> movesPlayed, int numFullMoves) {
         this.gameBoard = createGameBoard(builder);
+        this.numFullMoves = numFullMoves;
         this.whitePieces = calculateActivePieces(this.gameBoard, Alliance.WHITE);
         this.blackPieces = calculateActivePieces(this.gameBoard, Alliance.BLACK);
         this.enPassantPawn = builder.enPassantPawn;
@@ -74,6 +75,10 @@ public class Board {
 
     public List<Boolean> getMovesPlayed() {
         return movesPlayed;
+    }
+
+    public int getNumFullMoves() {
+        return numFullMoves;
     }
 
     public boolean isDraw50MoveRule() {
@@ -280,7 +285,7 @@ public class Board {
         //white to move
         builder.setMoveMaker(Alliance.WHITE);
         //build the board
-        return builder.build(new LinkedList<>());
+        return builder.build(new LinkedList<>(), 1);
     }
 
     public static class Builder {
@@ -303,11 +308,11 @@ public class Board {
             return this;
         }
 
-        public Board build(List<Boolean> movesPlayed) {
+        public Board build(List<Boolean> movesPlayed, int numFullMoves) {
             if (movesPlayed.size() >= 51) {
                 movesPlayed.remove(0); //IMPORTANT: never let the size exceed 50 moves. Remove the first move in the list
             }
-            return new Board(this, movesPlayed);
+            return new Board(this, movesPlayed, numFullMoves);
         }
 
         public void setEnPassantPawn(Pawn movedPawn) {

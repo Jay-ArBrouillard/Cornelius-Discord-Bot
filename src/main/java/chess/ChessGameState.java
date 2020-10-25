@@ -9,7 +9,7 @@ public class ChessGameState {
     private Map<String, Double> prevElo; //PlayerId -> Elo
     private long matchStartTime;
     private String boardEvaluationMessage;
-    private double totalMoves = 0; //Half moves that's why we need a double
+    private int fullMoves = 1; //The number of the full move. It starts at 1, and is incremented after Black's move.
     private String winnerId;
     private boolean playerForfeited = false;
 
@@ -61,12 +61,12 @@ public class ChessGameState {
         this.winnerId = winnerId;
     }
 
-    public double getTotalMoves() {
-        return totalMoves;
+    public int getFullMoves() {
+        return fullMoves;
     }
 
-    public void setTotalMoves(double totalMoves) {
-        this.totalMoves = totalMoves;
+    public void setFullMoves(int fullMoves) {
+        this.fullMoves = fullMoves;
     }
 
     public boolean isPlayerForfeited() {

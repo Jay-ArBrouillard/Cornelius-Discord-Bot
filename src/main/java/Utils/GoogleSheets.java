@@ -421,20 +421,20 @@ public class GoogleSheets {
                 p2EloDiff = generateEloDiffString(blackSidePrevElo, blackSidePlayer.elo);
                 appendBody = new ValueRange().setValues(Arrays.asList(Arrays.asList(whiteSidePlayer.name, whiteSidePlayer.discordId, Math.round(whiteSidePlayer.elo)+" ("+p1EloDiff+")", formatPercent.format(p1Odds*100)+"%",
                                                                                     blackSidePlayer.name,  blackSidePlayer.discordId,  Math.round(blackSidePlayer.elo)+" ("+p2EloDiff+")", formatPercent.format(p2Odds*100)+"%",
-                                                                                    "-", "-", DRAW.equals(status), state.isPlayerForfeited(), state.getTotalMoves(), matchLength, updatedOn)));
+                                                                                    "-", "-", DRAW.equals(status), state.isPlayerForfeited(), state.getFullMoves(), matchLength, updatedOn)));
             } else if (state.getWinnerId().equals(whiteSidePlayer.discordId)) {
                 p1EloDiff = generateEloDiffString(whiteSidePrevElo, whiteSidePlayer.elo);
                 p2EloDiff = generateEloDiffString(blackSidePrevElo, blackSidePlayer.elo);
                 appendBody = new ValueRange().setValues(Arrays.asList(Arrays.asList(whiteSidePlayer.name, whiteSidePlayer.discordId, Math.round(whiteSidePlayer.elo)+" ("+p1EloDiff+")", formatPercent.format(p1Odds*100)+"%",
                                                                                     blackSidePlayer.name,  blackSidePlayer.discordId, Math.round(blackSidePlayer.elo)+" ("+p2EloDiff+")", formatPercent.format(p2Odds*100)+"%",
-                                                                                    whiteSidePlayer.name, blackSidePlayer.name, DRAW.equals(status), state.isPlayerForfeited(), state.getTotalMoves(), matchLength, updatedOn)));
+                                                                                    whiteSidePlayer.name, blackSidePlayer.name, DRAW.equals(status), state.isPlayerForfeited(), state.getFullMoves(), matchLength, updatedOn)));
             }
             else if (state.getWinnerId().equals(blackSidePlayer.discordId)) {
                 p1EloDiff = generateEloDiffString(whiteSidePrevElo, whiteSidePlayer.elo);
                 p2EloDiff = generateEloDiffString(blackSidePrevElo, blackSidePlayer.elo);
                 appendBody = new ValueRange().setValues(Arrays.asList(Arrays.asList(whiteSidePlayer.name, whiteSidePlayer.discordId, Math.round(whiteSidePlayer.elo)+" ("+p1EloDiff+")", formatPercent.format(p1Odds *100)+"%",
                                                                                     blackSidePlayer.name,  blackSidePlayer.discordId, Math.round(blackSidePlayer.elo)+" ("+p2EloDiff+")", formatPercent.format(p2Odds*100)+"%",
-                                                                                    blackSidePlayer.name, whiteSidePlayer.name, DRAW.equals(status), state.isPlayerForfeited(), state.getTotalMoves(), matchLength, updatedOn)));
+                                                                                    blackSidePlayer.name, whiteSidePlayer.name, DRAW.equals(status), state.isPlayerForfeited(), state.getFullMoves(), matchLength, updatedOn)));
             }
 
             //Append the new match
