@@ -21,7 +21,7 @@ public abstract class Move {
         this.board = board;
         this.movedPiece = movedPiece;
         this.destinationCoordinate = destinationCoordinate;
-        this.isFirstMove = false;
+        this.isFirstMove = movedPiece.isFirstMove();;
     }
 
     @Override
