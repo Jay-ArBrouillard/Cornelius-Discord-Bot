@@ -10,6 +10,7 @@ public class ChessMessageHandler {
     public final String NO_ERROR = "NO_ERROR";
     public final String ERROR = "ERROR";
     public final String PVP = "PVP";
+    public String [] promotionTypes = {"q", "r", "b", "k"};
 
 
     public ChessMessageHandler() {
@@ -57,12 +58,26 @@ public class ChessMessageHandler {
         }
     }
 
-    public void validateInputLengthFour(String input) {
+    public void validateInput(String input) {
         if (input.equalsIgnoreCase("o-o") || input.equalsIgnoreCase("o-o-o")) {
             return;
         }
-        if (input.replaceAll("\\s+", "").length() != 4) {
-            lastErrorMessage = new StringBuilder("Invalid move input format. Use format such as `c2 c4` or `c2c4` or castling notation");
+        if (input.length() == 5) {
+            String promotionType = Character.toString(input.charAt(4));
+            boolean success = false;
+            for (String e : promotionTypes) {
+                if (e.equals(promotionType)) {
+                    success = true;
+                    break;
+                }
+            }
+            if (!success) {
+                lastErrorMessage = new StringBuilder("Invalid move input format for promotion. Promotion type must be one of " + promotionTypes.toString() + " Ex: `e7e8q`");
+                return;
+            }
+        }
+        if (input.length() != 4) {
+            lastErrorMessage = new StringBuilder("Invalid move input format. Use format such as `c2 c4` or `c2c4` or `e7e8q` for promotion or castling notation");
         }
     }
 

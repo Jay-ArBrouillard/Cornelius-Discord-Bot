@@ -121,6 +121,8 @@ public class ChessGameState {
         this.status = ChessConstants.CHALLENGEE_DECLINE;
     }
 
+    public void setStateInvalidPawnPromotionType() { this.status = ChessConstants.INVALID_PAWN_PROMOTION_TYPE; }
+
     public void setPlayerForfeit() {
         this.playerForfeited = true;
     }

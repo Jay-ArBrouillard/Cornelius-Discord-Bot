@@ -3,6 +3,8 @@ package chess.board;
 import chess.board.Board.Builder;
 import chess.pieces.Pawn;
 import chess.pieces.Piece;
+import chess.pieces.Piece.PieceType;
+import chess.pieces.Queen;
 import chess.pieces.Rook;
 
 public abstract class Move {
@@ -11,6 +13,7 @@ public abstract class Move {
     protected final Piece movedPiece;
     protected final int destinationCoordinate;
     protected final boolean isFirstMove;
+    protected PieceType promotionType = PieceType.QUEEN; //Default to queen
 
     public static final Move NULL_MOVE = new NullMove();
 
@@ -42,6 +45,10 @@ public abstract class Move {
         final Move otherMove = (Move) other;
         return getDestinationCoordinate() == otherMove.getDestinationCoordinate() &&
                 getMovedPiece().equals(otherMove.getMovedPiece());
+    }
+
+    public void setPromotionType(PieceType promotionType) {
+        this.promotionType = promotionType;
     }
 
     public int getDestinationCoordinate() {
@@ -343,7 +350,7 @@ public abstract class Move {
             for (final Piece piece : pawnMovedBoard.getCurrentPlayer().getOpponent().getActivePieces()) {
                 builder.setPiece(piece);
             }
-            builder.setPiece(this.promotedPawn.getPromotionPiece().movePiece(this));
+            builder.setPiece(this.promotedPawn.getPromotionPiece(promotionType).movePiece(this));
             builder.setMoveMaker(this.board.getCurrentPlayer().getOpponent().getAlliance());
             return builder.build(this.board.getMovesPlayed()); //Return a new board
         }

@@ -143,7 +143,21 @@ public class Pawn extends Piece {
         return this.pieceAlliance.pawnBonus(this.piecePosition);
     }
 
-    public Piece getPromotionPiece() {
-        return new Queen(this.piecePosition, this.pieceAlliance, false); //TODO currently always promotes to Queen no choice
+    public Piece getPromotionPiece(PieceType promotionType) {
+        if (promotionType.isQueen()) {
+            return new Queen(this.piecePosition, this.pieceAlliance, false);
+        }
+        else if (promotionType.isRook()) {
+            return new Rook(this.piecePosition, this.pieceAlliance, false);
+        }
+        else if (promotionType.isBishop()) {
+            return new Bishop(this.piecePosition, this.pieceAlliance, false);
+        }
+        else if (promotionType.isRook()) {
+            return new Rook(this.piecePosition, this.pieceAlliance, false);
+        }
+        else {
+            throw new RuntimeException("Cannot promote pawn to " + promotionType.getFullPieceName());
+        }
     }
 }

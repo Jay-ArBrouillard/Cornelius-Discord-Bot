@@ -6,6 +6,7 @@ import chess.board.Board;
 import chess.board.Move;
 import chess.board.Tile;
 import chess.pgn.FenUtils;
+import chess.pieces.Piece.PieceType;
 import chess.player.MoveTransition;
 import chess.player.ai.uci.client.*;
 import chess.player.ai.uci.engine.enums.Option;
@@ -299,10 +300,10 @@ public class ChessGame {
         String inputNoSpaces = input.replaceAll("\\s+", "");
         //Is castling notation?
         if (inputNoSpaces.equalsIgnoreCase("o-o") || inputNoSpaces.equalsIgnoreCase("o-o-o")) {
-            return convertCastlingMove(inputNoSpaces, -1,-1, false);
+            return convertCastlingMove(inputNoSpaces, false);
         }
 
-        messageHandler.validateInputLengthFour(input);
+        messageHandler.validateInput(input);
         if (messageHandler.handleErrorMessage().equals(messageHandler.ERROR)) {
             state.setMessage(messageHandler.getLastErrorMessage());
             state.setStateError();
@@ -313,6 +314,10 @@ public class ChessGame {
         String y1Str = Character.toString(inputNoSpaces.charAt(1)).toLowerCase();
         String x2Str = Character.toString(inputNoSpaces.charAt(2)).toLowerCase();
         String y2Str = Character.toString(inputNoSpaces.charAt(3)).toLowerCase();
+        String promotionType = null;
+        if (inputNoSpaces.length() == 5) { //Example: e7e8q
+            promotionType = Character.toString(inputNoSpaces.charAt(4)).toLowerCase();
+        }
 
         messageHandler.validateRowAndColumn(x1Str+y1Str, x2Str+y2Str);
         if (messageHandler.handleErrorMessage().equals(messageHandler.ERROR)) {
@@ -334,11 +339,13 @@ public class ChessGame {
             return state;
         }
 
-        return handleMove(startCoordinate, destinationCoordinate, inputNoSpaces, false);
+        return handleMove(startCoordinate, destinationCoordinate, inputNoSpaces, promotionType, false);
     }
 
-    private ChessGameState convertCastlingMove(String moveCmd, int startCoordinate, int destinationCoordinate, boolean isComputer) {
+    private ChessGameState convertCastlingMove(String moveCmd, boolean isComputer) {
         //Handle if player sends "O-O" or "O-O-O" for castling
+        int startCoordinate;
+        int destinationCoordinate;
         if (moveCmd.equalsIgnoreCase("o-o")) {
             if (this.board.getCurrentPlayer().getAlliance().isWhite()) {
                 startCoordinate = 60;
@@ -362,11 +369,19 @@ public class ChessGame {
         else {
             throw new RuntimeException("Not a castle move");
         }
-        return handleMove(startCoordinate, destinationCoordinate, moveCmd, isComputer);
+        return handleMove(startCoordinate, destinationCoordinate, moveCmd, null, isComputer);
     }
 
-    private ChessGameState handleMove(int startCoordinate, int destinationCoordinate, String moveCmd, boolean isComputer) {
-        final Move move = Move.MoveFactory.createMove(this.board, startCoordinate, destinationCoordinate);
+    private ChessGameState handleMove(int startCoordinate, int destinationCoordinate, String moveCmd, String promotionType, boolean isComputer) {
+        Move move = Move.MoveFactory.createMove(this.board, startCoordinate, destinationCoordinate);
+        if (promotionType != null)  {
+            boolean success = setPromotionType(promotionType, move);
+            if (!success) {
+                state.setStateInvalidPawnPromotionType();
+                state.setMessage("Invalid promotion type `" + promotionType + "`. Valid types include q (Queen), r (Rook), k (Knight), or b (Bishop).");
+                return state;
+            }
+        }
         MoveTransition transition = this.board.getCurrentPlayer().makeMove(move);
         if (transition.getMoveStatus().isDone()) {
             state.setTotalMoves(state.getTotalMoves() + 0.5);
@@ -491,6 +506,25 @@ public class ChessGame {
                 return state;
             }
         }
+    }
+
+    private boolean setPromotionType(String promotionType, Move move) {
+        if (promotionType.equals("q")) {
+            move.setPromotionType(PieceType.QUEEN);
+        }
+        else if (promotionType.equals("r")) {
+            move.setPromotionType(PieceType.ROOK);
+        }
+        else if (promotionType.equals("k")) {
+            move.setPromotionType(PieceType.KNIGHT);
+        }
+        else if (promotionType.equals("b")) {
+            move.setPromotionType(PieceType.BISHOP);
+        }
+        else {
+            return false;
+        }
+        return true;
     }
 
     public synchronized ChessPlayer findUserByClosestElo(double elo, String id) {
@@ -679,7 +713,6 @@ public class ChessGame {
                             .setFen(FenUtils.parseFEN(this.board)).build());
                 }
             } catch (Exception e) {
-                e.printStackTrace();
                 try {
                     System.out.println("-----------------client1 was using " + client1 + ", client 2 was using " + client2);
                     if (isWhitePlayerTurn()) {
@@ -695,7 +728,6 @@ public class ChessGame {
                         }
                     }
                 } catch (Exception ex) {
-                    ex.printStackTrace();
                 }
                 finally {
                     if (isWhitePlayerTurn()) {
@@ -734,20 +766,22 @@ public class ChessGame {
         bestMoveString = bestMoveString.toLowerCase().trim(); //Always convert best move to lowercase
         System.out.println("bestMoveString:"+bestMoveString);
         if (bestMoveString.equalsIgnoreCase("o-o") || bestMoveString.equalsIgnoreCase("o-o-o")) {
-            System.out.println("HHHHHHHHHHHHHHHHHHHHHHHHHHHHEEEEEEEEEEEEEEEEEEEEEEEELLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLOOOOOOOOOOOOOOOOOOO");
-            System.out.println("---------------------fen:"+FenUtils.parseFEN(this.board));
-            return convertCastlingMove(bestMoveString, -1,-1, true);
+            return convertCastlingMove(bestMoveString, true);
         }
 
         String x1Str = Character.toString(bestMoveString.charAt(0));
         String y1Str = Character.toString(bestMoveString.charAt(1));
         String x2Str = Character.toString(bestMoveString.charAt(2));
         String y2Str = Character.toString(bestMoveString.charAt(3));
+        String promotionType = null;
+        if (bestMoveString.length() == 5) { //Example: e7e8q
+            promotionType = Character.toString(bestMoveString.charAt(4)).toLowerCase();
+        }
 
         ///////////////////////// Get board coordinates from input ////////////////////////////////
         int startCoordinate = convertInputToInteger(x1Str, y1Str);
         int destinationCoordinate = convertInputToInteger(x2Str, y2Str);
 
-        return handleMove(startCoordinate, destinationCoordinate, bestMoveString, true);
+        return handleMove(startCoordinate, destinationCoordinate, bestMoveString, promotionType, true);
     }
 }
