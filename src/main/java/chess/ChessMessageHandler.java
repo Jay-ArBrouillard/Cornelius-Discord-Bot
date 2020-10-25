@@ -10,7 +10,7 @@ public class ChessMessageHandler {
     public final String NO_ERROR = "NO_ERROR";
     public final String ERROR = "ERROR";
     public final String PVP = "PVP";
-    public String [] promotionTypes = {"q", "r", "b", "k"};
+    public String [] promotionTypes = {"q", "r", "b", "n"};
 
 
     public ChessMessageHandler() {

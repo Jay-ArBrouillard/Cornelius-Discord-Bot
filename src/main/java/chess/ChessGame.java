@@ -379,7 +379,7 @@ public class ChessGame {
             boolean success = setPromotionType(promotionType, move);
             if (!success) {
                 state.setStateInvalidPawnPromotionType();
-                state.setMessage("Invalid promotion type `" + promotionType + "`. Valid types include q (Queen), r (Rook), k (Knight), or b (Bishop).");
+                state.setMessage("Invalid promotion type `" + promotionType + "`. Valid types include q (Queen), r (Rook), n (Knight), or b (Bishop).");
                 return state;
             }
         }
@@ -526,7 +526,7 @@ public class ChessGame {
         else if (promotionType.equals("r")) {
             move.setPromotionType(PieceType.ROOK);
         }
-        else if (promotionType.equals("k")) {
+        else if (promotionType.equals("n")) {
             move.setPromotionType(PieceType.KNIGHT);
         }
         else if (promotionType.equals("b")) {
