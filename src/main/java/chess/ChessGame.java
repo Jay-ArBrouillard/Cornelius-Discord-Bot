@@ -728,13 +728,18 @@ public class ChessGame {
                         }
                     }
                 } catch (Exception ex) {
+                    //Do nothing is client close fails
                 }
                 finally {
+                    randomThinkTime = 1000;
                     if (isWhitePlayerTurn()) {
                         try {
                             client1 = null;
                             setClient(whiteSidePlayer);
                             System.out.println("-----------------Restarted " + client1);
+                            bestMoveString = client1.submit(new Query.Builder(QueryType.Best_Move)
+                                    .setMovetime(randomThinkTime)
+                                    .setFen(FenUtils.parseFEN(this.board)).build());
                         } catch (IOException ex) {
                             ex.printStackTrace();
                             state.setMessage("Error forcing draw. " + client1 + " was not able initialize external process");
@@ -748,6 +753,9 @@ public class ChessGame {
                             client2 = null;
                             setClient(blackSidePlayer);
                             System.out.println("-----------------Restarted " + client2);
+                            bestMoveString = client2.submit(new Query.Builder(QueryType.Best_Move)
+                                    .setMovetime(randomThinkTime)
+                                    .setFen(FenUtils.parseFEN(this.board)).build());
                         } catch (IOException ex) {
                             ex.printStackTrace();
                             state.setMessage("Error forcing draw. " + client2 + " was not able initialize external process");
@@ -757,8 +765,6 @@ public class ChessGame {
                         }
                     }
                 }
-            } finally {
-                randomThinkTime += 500;
             }
         } while (bestMoveString == null);
         if (mc != null) mc.sendTyping().queue();
