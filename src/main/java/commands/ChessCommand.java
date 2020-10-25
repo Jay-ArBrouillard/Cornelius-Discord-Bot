@@ -320,7 +320,6 @@ public class ChessCommand {
         for (int i = 0; i < players.length; i++) {
             for (int j = 0; j < players.length; j++) {
                 if (i == j) continue;
-                if (i < 2 || (i > 2 && i < 14)) continue; //TODO REMOVE
                 allMatchups.add(new ArrayList<>(Arrays.asList(players[i][0], players[i][1], players[j][0], players[j][1])));
             }
         }
