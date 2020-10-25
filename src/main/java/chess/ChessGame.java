@@ -44,7 +44,7 @@ public class ChessGame {
     public void setupStockfishClient() {
         try {
             stockFishClient = new StockFishClient.Builder()
-                                .setOption(Option.Hash, 1) //This is just used for evaluation
+                                .setOption(Option.Hash, 16)
                                 .setVariant(Variant.MODERN)  // BMI for windows, Modern for linux
                                 .build();
         } catch (Exception e) {
@@ -453,7 +453,7 @@ public class ChessGame {
                 try {
                     if (stockFishClient != null) stockFishClient.close();
                 } catch (IOException ie) {
-                    ie.printStackTrace();
+                    //Do nothing close fails
                 }
                 finally {
                     stockFishClient = null;
@@ -703,73 +703,75 @@ public class ChessGame {
     public ChessGameState ai(MessageChannel mc) {
         int randomThinkTime = mc == null ? 500 : ThreadLocalRandom.current().nextInt(5000, 10000 + 1); //Between 5-10 seconds against human
         String bestMoveString = null;
-        do {
+        try {
+            if (isWhitePlayerTurn()) {
+                bestMoveString = client1.submit(new Query.Builder(QueryType.Best_Move)
+                        .setMovetime(randomThinkTime)
+                        .setFen(FenUtils.parseFEN(this.board)).build());
+            }
+            else if (isBlackPlayerTurn()) {
+                bestMoveString = client2.submit(new Query.Builder(QueryType.Best_Move)
+                        .setMovetime(randomThinkTime)
+                        .setFen(FenUtils.parseFEN(this.board)).build());
+            }
+        } catch (Exception e) {
             try {
+                System.out.println("-----------------client1 was using " + client1 + ", client 2 was using " + client2);
                 if (isWhitePlayerTurn()) {
-                    bestMoveString = client1.submit(new Query.Builder(QueryType.Best_Move)
-                            .setMovetime(randomThinkTime)
-                            .setFen(FenUtils.parseFEN(this.board)).build());
-                }
-                else if (isBlackPlayerTurn()) {
-                    bestMoveString = client2.submit(new Query.Builder(QueryType.Best_Move)
-                            .setMovetime(randomThinkTime)
-                            .setFen(FenUtils.parseFEN(this.board)).build());
-                }
-            } catch (Exception e) {
-                try {
-                    System.out.println("-----------------client1 was using " + client1 + ", client 2 was using " + client2);
-                    if (isWhitePlayerTurn()) {
-                        if (client1 != null) {
-                            client1.close();
-                            System.out.println("-----------------Shutdown client1");
-                        }
+                    if (client1 != null) {
+                        client1.close();
+                        System.out.println("-----------------Shutdown client1");
                     }
-                    else {
-                        if (client2 != null) {
-                            client2.close();
-                            System.out.println("-----------------Shutdown client2");
-                        }
-                    }
-                } catch (Exception ex) {
-                    //Do nothing is client close fails
                 }
-                finally {
-                    randomThinkTime = 1000;
-                    if (isWhitePlayerTurn()) {
-                        try {
-                            client1 = null;
-                            setClient(whiteSidePlayer);
-                            System.out.println("-----------------Restarted " + client1);
-                            bestMoveString = client1.submit(new Query.Builder(QueryType.Best_Move)
-                                    .setMovetime(randomThinkTime)
-                                    .setFen(FenUtils.parseFEN(this.board)).build());
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
-                            state.setMessage("Error forcing draw. " + client1 + " was not able initialize external process");
-                            state.setStateDraw();
-                            updateDatabaseDraw();
-                            return state;
-                        }
+                else {
+                    if (client2 != null) {
+                        client2.close();
+                        System.out.println("-----------------Shutdown client2");
                     }
-                    else {
-                        try {
-                            client2 = null;
-                            setClient(blackSidePlayer);
-                            System.out.println("-----------------Restarted " + client2);
-                            bestMoveString = client2.submit(new Query.Builder(QueryType.Best_Move)
-                                    .setMovetime(randomThinkTime)
-                                    .setFen(FenUtils.parseFEN(this.board)).build());
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
-                            state.setMessage("Error forcing draw. " + client2 + " was not able initialize external process");
-                            state.setStateDraw();
-                            updateDatabaseDraw();
-                            return state;
-                        }
+                }
+            } catch (Exception ex) {
+                //Do nothing is client close fails
+            }
+            finally {
+                randomThinkTime = 1000;
+                if (isWhitePlayerTurn()) {
+                    try {
+                        client1 = null;
+                        setClient(whiteSidePlayer);
+                        System.out.println("-----------------Restarted " + client1);
+                        bestMoveString = client1.submit(new Query.Builder(QueryType.Best_Move)
+                                .setMovetime(randomThinkTime)
+                                .setFen(FenUtils.parseFEN(this.board)).build());
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                    if (bestMoveString == null) {
+                        state.setMessage("Error forcing draw. " + client1 + " was not able initialize external process");
+                        state.setStateDraw();
+                        updateDatabaseDraw();
+                        return state;
+                    }
+                }
+                else {
+                    try {
+                        client2 = null;
+                        setClient(blackSidePlayer);
+                        System.out.println("-----------------Restarted " + client2);
+                        bestMoveString = client2.submit(new Query.Builder(QueryType.Best_Move)
+                                .setMovetime(randomThinkTime)
+                                .setFen(FenUtils.parseFEN(this.board)).build());
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                    if (bestMoveString == null) {
+                        state.setMessage("Error forcing draw. " + client2 + " was not able initialize external process");
+                        state.setStateDraw();
+                        updateDatabaseDraw();
+                        return state;
                     }
                 }
             }
-        } while (bestMoveString == null);
+        }
         if (mc != null) mc.sendTyping().queue();
         //Is castling notation?
         bestMoveString = bestMoveString.trim().toLowerCase(); //Always convert best move to lowercase
