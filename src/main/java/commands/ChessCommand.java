@@ -325,6 +325,7 @@ public class ChessCommand {
         }
 
         List<String> playersInGame = new ArrayList<>();
+        int [] threadRunningTally = new int[threads.length];
         while (allMatchups.size() > 0) {
             boolean isThreadOpen = false;
             int threadIndex = 0;
@@ -335,9 +336,19 @@ public class ChessCommand {
                         threadIndex = k;
                         threads[k] = null;
                         isThreadOpen = true;
+                        threadRunningTally[k] = 0;
                         System.gc();
                         break;
                     }
+                    else {
+                        threadRunningTally[k] += 1;
+                    }
+                }
+
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
             List<String> matchup = null;
@@ -359,6 +370,18 @@ public class ChessCommand {
                 threads[threadIndex] = new TrainThread(matchup.get(0), matchup.get(1), matchup.get(2), matchup.get(3), threadIndex, event.getChannel(), playersInGame);
                 threads[threadIndex].start();
                 event.getChannel().sendMessage("Matches left to start: " + allMatchups.size()).queue();
+            }
+
+            for (int i = 0; i < threadRunningTally.length; i++) {
+                if (threadRunningTally[i] >= 200) { //2.5 minutes
+                    threads[i].setPriority(Thread.MAX_PRIORITY);
+                    for (int j = 0; j < threads.length; j++) { //Set rest other threads to normal
+                        if (j != i) {
+                            threads[j].setPriority(Thread.NORM_PRIORITY);
+                        }
+                    }
+                    break;
+                }
             }
         }
 
