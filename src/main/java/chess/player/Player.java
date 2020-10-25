@@ -124,13 +124,15 @@ public abstract class Player {
             return new MoveTransition(this.board, move, MoveStatus.LEAVES_PLAYER_CHECK);
         }
         if (!isDummyMove) {
-            //Update is castle capable
+            //Update is castle capable. Used in FenUtils
             if (move.isCastlingMove() || move.getMovedPiece() instanceof King) {
                 this.setKingSideCastleCapable(false);
                 this.setQueenSideCastleCapable(false);
             }
             else if (move.getMovedPiece() instanceof Rook) {
-                if (this.board.getCurrentPlayer().getAlliance().isWhite()) {
+                System.out.println(move.getCurrentCoordinate());
+                if (this.board.getCurrentPlayer().getOpponent().getAlliance().isWhite()) {
+                    System.out.println("isWhite");
                     if (move.getCurrentCoordinate() == 57) {
                         this.setQueenSideCastleCapable(false);
                     }
@@ -139,6 +141,7 @@ public abstract class Player {
                     }
                 }
                 else { //Blackside
+                    System.out.println("isBlack");
                     if (move.getCurrentCoordinate() == 0) {
                         this.setQueenSideCastleCapable(false);
                     }
