@@ -130,10 +130,8 @@ public abstract class Player {
                 this.setQueenSideCastleCapable(false);
             }
             else if (move.getMovedPiece() instanceof Rook) {
-                System.out.println(move.getCurrentCoordinate());
-                if (this.board.getCurrentPlayer().getOpponent().getAlliance().isWhite()) {
-                    System.out.println("isWhite");
-                    if (move.getCurrentCoordinate() == 57) {
+                if (this.board.getCurrentPlayer().getAlliance().isWhite()) {
+                    if (move.getCurrentCoordinate() == 56) {
                         this.setQueenSideCastleCapable(false);
                     }
                     else if (move.getCurrentCoordinate() == 63) {
@@ -141,7 +139,6 @@ public abstract class Player {
                     }
                 }
                 else { //Blackside
-                    System.out.println("isBlack");
                     if (move.getCurrentCoordinate() == 0) {
                         this.setQueenSideCastleCapable(false);
                     }
