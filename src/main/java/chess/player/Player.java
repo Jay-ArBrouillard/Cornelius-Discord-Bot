@@ -4,8 +4,10 @@ import chess.Alliance;
 import chess.board.Board;
 import chess.board.Move;
 import chess.board.Move.*;
+import chess.board.Tile;
 import chess.pieces.King;
 import chess.pieces.Piece;
+import chess.pieces.Rook;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -57,12 +59,21 @@ public abstract class Player {
         return this.playerKing.isCastled();
     }
 
+
     public boolean isKingSideCastleCapable() {
         return this.playerKing.isKingSideCastleCapable();
     }
 
+    public void setKingSideCastleCapable(boolean kingSideCastleCapable) {
+        this.playerKing.kingSideCastleCapable = kingSideCastleCapable;
+    }
+
     public boolean isQueenSideCastleCapable() {
         return this.playerKing.isQueenSideCastleCapable();
+    }
+
+    public void setQueenSideCastleCapable(boolean queenSideCastleCapable) {
+        this.playerKing.queenSideCastleCapable = queenSideCastleCapable;
     }
 
     public List<Move> getLegalMoves() {
@@ -112,8 +123,35 @@ public abstract class Player {
         if (!kingAttacks.isEmpty()) {
             return new MoveTransition(this.board, move, MoveStatus.LEAVES_PLAYER_CHECK);
         }
-        //Add to moves played
         if (!isDummyMove) {
+            //Update is castle capable in the case that Rook is moved
+            //Case where King is moved is already taken care of
+            if (move.getMovedPiece() instanceof Rook) {
+                boolean isWhite = transitionBoard.getCurrentPlayer().getOpponent().getAlliance().isWhite();
+
+                if (isWhite) {
+                    Piece pieceAt0 = transitionBoard.getTile(0).getPiece();
+                    Piece pieceAt7 = transitionBoard.getTile(7).getPiece();
+                    if (pieceAt0 == null || !(pieceAt0 instanceof Rook) || !pieceAt0.isFirstMove()) {
+                        this.setQueenSideCastleCapable(false);
+                    }
+                    if (pieceAt7 == null || !(pieceAt7 instanceof Rook) || !pieceAt7.isFirstMove()) {
+                        this.setKingSideCastleCapable(false);
+                    }
+                }
+                else {
+                    Piece pieceAt56 = transitionBoard.getTile(56).getPiece();
+                    Piece pieceAt63 = transitionBoard.getTile(63).getPiece();
+                    if (pieceAt56 == null || !(pieceAt56 instanceof Rook) || !pieceAt56.isFirstMove()) {
+                        this.setQueenSideCastleCapable(false);
+                    }
+                    if (pieceAt63 == null || !(pieceAt63 instanceof Rook) || !pieceAt63.isFirstMove()) {
+                        this.setKingSideCastleCapable(false);
+                    }
+                }
+            }
+
+            //Add to moves played
             if (move instanceof PawnEnPassantAttackMove ||
                     move instanceof PawnMove ||
                     move instanceof PawnJump ||
