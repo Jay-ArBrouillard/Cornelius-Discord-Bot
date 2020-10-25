@@ -21,7 +21,7 @@ public abstract class Move {
         this.board = board;
         this.movedPiece = movedPiece;
         this.destinationCoordinate = destinationCoordinate;
-        this.isFirstMove = movedPiece.isFirstMove();;
+        this.isFirstMove = movedPiece == null ? false : movedPiece.isFirstMove();
     }
 
     @Override
@@ -199,7 +199,7 @@ public abstract class Move {
     /*
      * Pawn Move 1 tile
      */
-    public static final class PawnMove extends Move {
+    public static class PawnMove extends Move {
 
         public PawnMove(final Board board, final Piece movedPiece, final int destinationCoordinate) {
             super(board, movedPiece, destinationCoordinate);
@@ -219,7 +219,7 @@ public abstract class Move {
     /*
      * Pawn Move 2 tiles on first move
      */
-    public static final class PawnJump extends Move {
+    public static class PawnJump extends Move {
 
         public PawnJump(final Board board, final Piece movedPiece, final int destinationCoordinate) {
             super(board, movedPiece, destinationCoordinate);
@@ -279,7 +279,7 @@ public abstract class Move {
     /*
      * Pawn Captures Piece in passing
      */
-    public static final class PawnEnPassantAttackMove extends PawnAttackMove {
+    public static class PawnEnPassantAttackMove extends PawnAttackMove {
 
         public PawnEnPassantAttackMove(final Board board, final Piece movedPiece, final int destinationCoordinate, final Piece attackedPiece) {
             super(board, movedPiece, destinationCoordinate, attackedPiece);
@@ -448,7 +448,7 @@ public abstract class Move {
 
     }
 
-    public static final class KingSideCastleMove extends CastleMove {
+    public static class KingSideCastleMove extends CastleMove {
 
         public KingSideCastleMove(final Board board, final Piece movedPiece, final int destinationCoordinate,
                                   final Rook castleRook, final int castleRookStart, final int castleRookDestination) {
@@ -473,7 +473,7 @@ public abstract class Move {
         }
     }
 
-    public static final class QueenSideCastleMove extends CastleMove {
+    public static class QueenSideCastleMove extends CastleMove {
 
         public QueenSideCastleMove(final Board board, final Piece movedPiece, final int destinationCoordinate,
                                    final Rook castleRook, final int castleRookStart, final int castleRookDestination) {
@@ -501,7 +501,7 @@ public abstract class Move {
     /*
      * Invalid move
      */
-    public static final class NullMove extends Move {
+    public static class NullMove extends Move {
 
         public NullMove() {
             super(null,null, -1);
