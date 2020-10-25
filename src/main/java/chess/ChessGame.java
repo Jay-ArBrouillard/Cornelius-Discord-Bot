@@ -32,6 +32,7 @@ public class ChessGame {
     public BaseAiClient client1;
     public BaseAiClient client2;
     public GameType gameType;
+    private boolean DEBUG = true;
 
     public ChessGame(ChessGameState state) {
         db = new GoogleSheets();
@@ -492,7 +493,7 @@ public class ChessGame {
             transition = null;
             return state;
         }
-        else if (isComputer) { //If computer sends an incorrect move then we should throw exception and also remove this computer from AI List
+        else if (isComputer) { //If computer sends an incorrect move then we should throw exception and likely remove this computer from AI List
             System.out.println(String.format("Start coordinate: %d, Destination coordinate: %d, Move command: %s, Promotion Type: %s", startCoordinate, destinationCoordinate, moveCmd, promotionType));
             System.out.println(String.format("Current fen:%s", FenUtils.parseFEN(this.board)));
             if (didWhiteJustMove()) {
@@ -772,18 +773,18 @@ public class ChessGame {
         if (mc != null) mc.sendTyping().queue();
         //Is castling notation?
         bestMoveString = bestMoveString.trim().toLowerCase(); //Always convert best move to lowercase
-        if (isWhitePlayerTurn()) {
-            System.out.println("client: " + client1 + ", bestMoveString:"+bestMoveString);
-        }
-        else {
-            System.out.println("client: " + client2 + ", bestMoveString:"+bestMoveString);
-        }
-        if (bestMoveString.equalsIgnoreCase("o-o") || bestMoveString.equalsIgnoreCase("o-o-o")) {
-            System.out.println("--------------------castle fen:"+FenUtils.parseFEN(this.board));
-            return convertCastlingMove(bestMoveString, true);
+        if (DEBUG) {
+            if (isWhitePlayerTurn()) {
+                System.out.println(String.format("client:%s, bestMoveString:%s, fen:%s", client1, bestMoveString, FenUtils.parseFEN(this.board)));
+            }
+            else {
+                System.out.println(String.format("client:%s, bestMoveString:%s, fen:%s", client2, bestMoveString, FenUtils.parseFEN(this.board)));
+            }
         }
 
-        System.out.println("fen:"+FenUtils.parseFEN(this.board));
+        if (bestMoveString.equalsIgnoreCase("o-o") || bestMoveString.equalsIgnoreCase("o-o-o")) {
+            return convertCastlingMove(bestMoveString, true);
+        }
 
         String x1Str = Character.toString(bestMoveString.charAt(0));
         String y1Str = Character.toString(bestMoveString.charAt(1));

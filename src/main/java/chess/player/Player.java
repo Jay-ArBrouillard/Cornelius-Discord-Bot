@@ -65,7 +65,7 @@ public abstract class Player {
     }
 
     public void setKingSideCastleCapable(boolean kingSideCastleCapable) {
-        this.playerKing.kingSideCastleCapable = kingSideCastleCapable;
+        this.playerKing.setKingSideCastleCapable(kingSideCastleCapable);
     }
 
     public boolean isQueenSideCastleCapable() {
@@ -73,7 +73,7 @@ public abstract class Player {
     }
 
     public void setQueenSideCastleCapable(boolean queenSideCastleCapable) {
-        this.playerKing.queenSideCastleCapable = queenSideCastleCapable;
+        this.playerKing.setQueenSideCastleCapable(queenSideCastleCapable);
     }
 
     public List<Move> getLegalMoves() {

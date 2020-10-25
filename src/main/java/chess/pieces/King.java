@@ -17,8 +17,8 @@ import java.util.List;
 public class King extends Piece {
     private final static int[] CANDIDATE_MOVE_COORDINATES = { -9, -8, -7, -1, 1, 7, 8, 9 };
     private final boolean isCastled;
-    public boolean kingSideCastleCapable;
-    public boolean queenSideCastleCapable;
+    private boolean kingSideCastleCapable;
+    private boolean queenSideCastleCapable;
 
     public King(final int piecePosition,
                 final Alliance alliance,
