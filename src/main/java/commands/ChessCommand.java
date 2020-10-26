@@ -399,7 +399,7 @@ public class ChessCommand {
         List<List<Object>> userObjects = new ChessGame(null).getAllUsers();
         Map<String, Integer> gamesForPlayer = new HashMap<>();
         userObjects.remove(0); // Remove header row
-        event.getChannel().sendMessage(String.format("Attempting to find %d opponents in a +/-%d range for each player...", gamesForPlayer, range)).queue();
+        event.getChannel().sendMessage(String.format("Attempting to find %d opponents in a +/-%d range for each player...", gamesPerPlayer, range)).queue();
         for (List row : userObjects) {
             String id1 = (String) row.get(0);
             if (id1.contains(System.getenv("OWNER_ID"))) continue; //Ensure player is a bot
@@ -441,7 +441,7 @@ public class ChessCommand {
         userObjects = null;
         gamesForPlayer = null;
         System.gc();
-        event.getChannel().sendMessage(String.format("Found %d matches", allMatchups.size())).queue();
+        event.getChannel().sendMessage(String.format("Found %d matches out of %d possible matches", allMatchups.size(), players.length * gamesPerPlayer)).queue();
 
         List<String> playersInGame = new ArrayList<>();
         while (allMatchups.size() > 0) {
