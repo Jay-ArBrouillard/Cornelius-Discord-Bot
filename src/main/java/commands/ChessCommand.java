@@ -404,6 +404,7 @@ public class ChessCommand {
         while (allMatchups.size() < totalGames) {
             for (List row : userObjects) {
                 String id1 = (String) row.get(0);
+                if (id1.contains(System.getenv("OWNER_ID"))) continue; //Ensure player is a bot
                 String name1 = (String) row.get(1);
                 int elo1 = Integer.parseInt((String) row.get(2));
                 int lowerBound = elo1 - range;
@@ -420,6 +421,7 @@ public class ChessCommand {
                     for (List row2 : userObjects) {
                         String id2 = (String) row2.get(0);
                         if (id1.equals(id2)) continue;
+                        if (id2.contains(System.getenv("OWNER_ID"))) continue; //Ensure player is a bot
                         String name2 = (String) row2.get(1);
                         int elo2 = Integer.parseInt((String) row2.get(2));
                         if (elo2 >= lowerBound && elo2 <= upperBound) {
