@@ -1,7 +1,5 @@
 package chess.tables;
 
-import Utils.EloRanking;
-
 public class ChessPlayer {
     public final String discordId;
     public final String name;

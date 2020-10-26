@@ -1,1 +1,1 @@
-worker: java -Dserver.port=$PORT $JAVA_OPTS -javaagent:/app/newrelic/newrelic.jar -jar out/artifacts/Cornelius_Discord_Bot_jar/Cornelius-Discord-Bot.jar Main
+web: java -Dserver.port=$PORT $JAVA_OPTS -javaagent:/app/newrelic/newrelic.jar -jar out/artifacts/Cornelius_Discord_Bot_jar/Cornelius-Discord-Bot.jar Main

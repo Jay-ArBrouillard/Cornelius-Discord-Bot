@@ -1,7 +1,7 @@
 package chess;
 
-import Utils.EloRanking;
-import Utils.GoogleSheets;
+import utils.EloRanking;
+import utils.GoogleSheets;
 import chess.board.Board;
 import chess.board.Move;
 import chess.board.Tile;

@@ -1,12 +1,12 @@
 package commands;
 
-import Wumpus.Game;
-import Wumpus.Board;
-import Wumpus.Human;
-import Wumpus.Wumpus;
-import Wumpus.State;
-import Wumpus.WumpusUtils;
-import Wumpus.Map;
+import wumpus.Game;
+import wumpus.Board;
+import wumpus.Human;
+import wumpus.Wumpus;
+import wumpus.State;
+import wumpus.WumpusUtils;
+import wumpus.Map;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.*;
