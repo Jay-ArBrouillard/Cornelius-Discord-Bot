@@ -402,7 +402,7 @@ public class ChessCommand {
         event.getChannel().sendMessage(String.format("Attempting to find %d opponents in a +/-%d range for each player...", gamesPerPlayer, range)).queue();
         for (List row : userObjects) {
             String id1 = (String) row.get(0);
-            if (id1.contains(System.getenv("OWNER_ID"))) continue; //Ensure player is a bot
+            if (!id1.contains(System.getenv("OWNER_ID"))) continue; //Ensure player is a bot
             String name1 = (String) row.get(1);
             int elo1 = Integer.parseInt((String) row.get(2));
             int lowerBound = elo1 - range;
@@ -419,7 +419,7 @@ public class ChessCommand {
                 for (List row2 : userObjects) {
                     String id2 = (String) row2.get(0);
                     if (id1.equals(id2)) continue;
-                    if (id2.contains(System.getenv("OWNER_ID"))) continue; //Ensure player is a bot
+                    if (!id2.contains(System.getenv("OWNER_ID"))) continue; //Ensure player is a bot
                     String name2 = (String) row2.get(1);
                     int elo2 = Integer.parseInt((String) row2.get(2));
                     if (elo2 >= lowerBound && elo2 <= upperBound) {
@@ -441,7 +441,7 @@ public class ChessCommand {
         userObjects = null;
         gamesForPlayer = null;
         System.gc();
-        event.getChannel().sendMessage(String.format("Found %d matches out of %d possible matches", allMatchups.size(), players.length * gamesPerPlayer)).queue();
+        event.getChannel().sendMessage(String.format("Found %d matches out of %d maximum matches", allMatchups.size(), players.length * gamesPerPlayer)).queue();
 
         List<String> playersInGame = new ArrayList<>();
         while (allMatchups.size() > 0) {
