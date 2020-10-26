@@ -426,6 +426,11 @@ public class ChessCommand {
                             allMatchups.add(new ArrayList<>(Arrays.asList(id1, name1, id2, name2)));
                             gamesFoundForPlayer++;
                         }
+                        if (elo2 < lowerBound) {
+                            //Since users are ordered by elo. If we find an elo that is lower than the lowerbound
+                            //Then the rest of the users in this loop will also be lower than the lowerbound
+                            break;
+                        }
                         if (gamesFoundForPlayer == gamesPerPlayer) {
                             break;
                         }
@@ -438,6 +443,7 @@ public class ChessCommand {
         userObjects = null;
         gamesForPlayer = null;
         System.gc();
+        System.out.println("All matchups size: " + allMatchups.size());
 
         List<String> playersInGame = new ArrayList<>();
         while (allMatchups.size() > 0) {
