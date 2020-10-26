@@ -317,10 +317,9 @@ public class ChessCommand {
 
         TrainThread[] threads = new TrainThread[3];
         ArrayList<ArrayList<String>> allMatchups = new ArrayList<>();
-        for (int i = 0; i < players.length; i++) {
-            for (int j = 0; j < players.length; j++) {
+        for (int i = players.length-1; i >= 0; i--) {
+            for (int j = players.length-1; j >= 0; j--) {
                 if (i == j) continue;
-                if (i == 0 || i == 1 || i == 2) continue; //TODO REMOVE LATER
                 allMatchups.add(new ArrayList<>(Arrays.asList(players[i][0], players[i][1], players[j][0], players[j][1])));
             }
         }

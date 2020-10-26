@@ -16,6 +16,7 @@ import java.io.*;
 import java.text.DecimalFormat;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -116,9 +117,9 @@ public class GoogleSheets {
                 return user;
             } else {
                 // Player doesn't exist. Add them as a provisional player
-                long nowMillis = Instant.now().toEpochMilli();
-                String createdOn = getDate(nowMillis, RANKED_TAB, false);
-                String updatedOn = getDate(nowMillis, RANKED_TAB, true);
+                ZonedDateTime utc = ZonedDateTime.now(ZoneOffset.UTC);
+                String createdOn = getDate(utc, RANKED_TAB, false);
+                String updatedOn = getDate(utc, RANKED_TAB, true);
                 // New users get default elo of 1200 - Class D
                 ValueRange appendBody = new ValueRange()
                         .setValues(Arrays.asList(
@@ -364,7 +365,7 @@ public class GoogleSheets {
             values.add(user.totalGames);
             values.add(user.totalGameTimeStr);
             values.add(user.createdOn);
-            values.add(getDate(Instant.now().toEpochMilli(), RANKED_TAB, true));
+            values.add(getDate(ZonedDateTime.now(ZoneOffset.UTC), RANKED_TAB, true));
 
             ValueRange body = new ValueRange().setValues(Arrays.asList(values));
             service.spreadsheets().values()
@@ -415,7 +416,7 @@ public class GoogleSheets {
             String p2EloDiff;
             ValueRange appendBody = null;
             String status = state.getStatus();
-            String updatedOn = getDate(nowMillis, MATCHES_TAB, true);
+            String updatedOn = getDate(ZonedDateTime.now(ZoneOffset.UTC), MATCHES_TAB, true);
             if (DRAW.equals(status)) {
                 p1EloDiff = generateEloDiffString(whiteSidePrevElo, whiteSidePlayer.elo);
                 p2EloDiff = generateEloDiffString(blackSidePrevElo, blackSidePlayer.elo);
@@ -526,17 +527,16 @@ public class GoogleSheets {
         return eloDiff;
     }
 
-    public static String getDate(Long pCurrentTimeMs, String sheetName, boolean isUpdatedOn) {
-        ZonedDateTime zonedTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(pCurrentTimeMs), ZoneId.systemDefault());
+    public static String getDate(ZonedDateTime utc, String sheetName, boolean isUpdatedOn) {
         if (sheetName.equals(MATCHES_TAB)) {
-            return zonedTime.format(DateTimeFormatter.ofPattern(MM_DD_YYYY_HH_MM_SS_A));
+            return utc.format(DateTimeFormatter.ofPattern(MM_DD_YYYY_HH_MM_SS_A).withZone(ZoneId.of("America/Chicago")));
         }
         else { //RANKED Tab
             if (isUpdatedOn) { // Updated On
-                return zonedTime.format(DateTimeFormatter.ofPattern(MMM_DD_YYYY_HH_MM_A));
+                return utc.format(DateTimeFormatter.ofPattern(MMM_DD_YYYY_HH_MM_A).withZone(ZoneId.of("America/Chicago")));
             }
             else { //Created On
-                return zonedTime.format(DateTimeFormatter.ofPattern(MMM_DD_YYYY));
+                return utc.format(DateTimeFormatter.ofPattern(MMM_DD_YYYY).withZone(ZoneId.of("America/Chicago")));
             }
         }
     }
