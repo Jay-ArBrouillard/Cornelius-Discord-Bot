@@ -55,7 +55,7 @@ public class PurgeCommand {
                 else {
                     msgs = history.retrievePast(amount - messagesDeleted).complete();
                 }
-                channel.deleteMessages(msgs).complete();
+                if (msgs.size() != 0) channel.deleteMessages(msgs).complete();
                 messagesDeleted += msgs.size();
                 if (messagesDeleted >= amount) {
                     break;

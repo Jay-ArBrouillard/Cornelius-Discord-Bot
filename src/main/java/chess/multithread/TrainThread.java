@@ -3,6 +3,7 @@ package chess.multithread;
 import chess.ChessGame;
 import chess.ChessGameState;
 import chess.GameType;
+import chess.pgn.FenUtils;
 import chess.tables.ChessPlayer;
 import commands.ChessCommand;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -50,9 +51,30 @@ public class TrainThread extends Thread {
         String reply;
         mc.sendMessage("Beginning match on Thread " + threadNum + ": " + whiteSidePlayerName + " vs " + blackSidePlayerName).queue();
         do {
-            state = game.ai(null);
             reply = state.getMessage();
             status = state.getStatus();
+
+            state = game.ai(null);
+            long minutesElapsed = (Instant.now().toEpochMilli() - state.getMatchStartTime()) / 1000 / 60;
+            if (minutesElapsed >= 2) { //2 minutes
+                if (game.didWhiteJustMove()) {
+                    System.out.println(String.format("client:%s, reply:%s, status:%s, fen:%s", game.client1, reply, status, FenUtils.parseFEN(game.board)));
+                }
+                else {
+                    System.out.println(String.format("client:%s, reply:%s, status:%s, fen:%s", game.client2, reply, status, FenUtils.parseFEN(game.board)));
+                }
+            }
+            if (minutesElapsed >= 10) {
+                if (game.didWhiteJustMove()) {
+                    System.out.println(String.format("client:%s, reply:%s, status:%s, fen:%s", game.client1, reply, status, FenUtils.parseFEN(game.board)));
+                }
+                else {
+                    System.out.println(String.format("client:%s, reply:%s, status:%s, fen:%s", game.client2, reply, status, FenUtils.parseFEN(game.board)));
+                }
+                System.out.println(String.format("Ending match for %s vs %s because match is taking longer than 10 minutes to completed", whiteSidePlayerName, blackSidePlayerName));
+                break;
+            }
+
 
             if (ERROR.equals(status) || MOVE_LEAVES_PLAYER_IN_CHECK.equals(status) || ILLEGAL_MOVE.equals(status)) {
                 String finalReply = reply;

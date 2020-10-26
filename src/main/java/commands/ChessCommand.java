@@ -391,6 +391,7 @@ public class ChessCommand {
 
         event.getChannel().sendMessage("Train all computer players vs fair opponents...").queue();
         String[][] players = getAIList();
+        randomizeList(players);
 
         int range = Integer.parseInt(split[2]);
         int gamesPerPlayer = Integer.parseInt(split[3]);
