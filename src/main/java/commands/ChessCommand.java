@@ -436,6 +436,7 @@ public class ChessCommand {
         }
         chessGame = null;
         userObjects = null;
+        gamesForPlayer = null;
         System.gc();
 
         List<String> playersInGame = new ArrayList<>();
