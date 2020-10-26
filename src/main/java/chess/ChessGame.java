@@ -701,7 +701,7 @@ public class ChessGame {
     }
 
     public ChessGameState ai(MessageChannel mc) {
-        int randomThinkTime = mc == null ? 500 : ThreadLocalRandom.current().nextInt(5000, 10000 + 1); //Between 5-10 seconds against human
+        int randomThinkTime = mc == null ? 1000 : ThreadLocalRandom.current().nextInt(5000, 10000 + 1); //Between 5-10 seconds against human
         String bestMoveString = null;
         try {
             if (isWhitePlayerTurn()) {
@@ -733,7 +733,7 @@ public class ChessGame {
                 //Do nothing is client close fails
             }
             finally {
-                randomThinkTime = 1000;
+                randomThinkTime = 5000;
                 if (isWhitePlayerTurn()) {
                     try {
                         client1 = null;
@@ -744,12 +744,6 @@ public class ChessGame {
                                 .setFen(FenUtils.parseFEN(this.board)).build());
                     } catch (IOException ex) {
                         ex.printStackTrace();
-                    }
-                    if (bestMoveString == null) {
-                        state.setMessage("Error forcing draw. " + client1 + " was not able initialize external process");
-                        state.setStateDraw();
-                        updateDatabaseDraw();
-                        return state;
                     }
                 }
                 else {
@@ -763,15 +757,17 @@ public class ChessGame {
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
-                    if (bestMoveString == null) {
-                        state.setMessage("Error forcing draw. " + client2 + " was not able initialize external process");
-                        state.setStateDraw();
-                        updateDatabaseDraw();
-                        return state;
-                    }
                 }
             }
         }
+
+        if (bestMoveString == null || bestMoveString.isEmpty()) {
+            state.setMessage("Error forcing draw. Computer was not able initialize external process");
+            state.setStateDraw();
+            updateDatabaseDraw();
+            return state;
+        }
+
         if (mc != null) mc.sendTyping().queue();
         //Is castling notation?
         bestMoveString = bestMoveString.trim().toLowerCase(); //Always convert best move to lowercase
@@ -793,7 +789,7 @@ public class ChessGame {
         String x2Str = Character.toString(bestMoveString.charAt(2));
         String y2Str = Character.toString(bestMoveString.charAt(3));
         String promotionType = null;
-        if (bestMoveString.length() == 5) { //Example: e7e8q
+        if (bestMoveString.length() == 5) { //Example: e7e8q for queen promotion
             promotionType = Character.toString(bestMoveString.charAt(4)).toLowerCase();
         }
 

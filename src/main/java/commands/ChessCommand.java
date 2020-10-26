@@ -314,6 +314,7 @@ public class ChessCommand {
     private static void handleTrainAll(MessageReceivedEvent event) {
         event.getChannel().sendMessage("Starting training all matches...").queue();
         String[][] players = getAIList();
+        randomizeList(players);
 
         TrainThread[] threads = new TrainThread[3];
         ArrayList<ArrayList<String>> allMatchups = new ArrayList<>();
@@ -364,6 +365,13 @@ public class ChessCommand {
         }
 
         event.getChannel().sendMessage("Completed Train All").queue();
+    }
+
+    private static void randomizeList(String[][] players) {
+        Random rand = new Random();
+        for (int i = 0; i < players.length; i++) {
+            Collections.swap(Collections.singletonList(players), i, rand.nextInt(players.length));
+        }
     }
 
     private static void handleTrainFairly(MessageReceivedEvent event, String message) {
