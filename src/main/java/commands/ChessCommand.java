@@ -382,70 +382,66 @@ public class ChessCommand {
     }
 
     private static void handleTrainFairly(MessageReceivedEvent event, String message) {
-        //Ex: !chess trainFair 10 - Every player would play 10 games against fair opponents
+        //Ex: !chess trainFair range 50 10 - Every player would play 10 games against opponents in a +- 50 range
         String [] split = message.split("\\s+");
-        if (split.length != 3) {
-            event.getChannel().sendMessage("Incorrect format for `!chess trainFair`. Valid examples include `!chess trainFair 1`, `!chess trainFair 10`, etc...").queue();
+        if (split.length != 4) {
+            event.getChannel().sendMessage("Incorrect format for `!chess trainFair`. Valid examples include `!chess trainFair 50 1`, `!chess trainFair 100 10`, etc...").queue();
             return;
         }
 
         event.getChannel().sendMessage("Train all computer players vs fair opponents...").queue();
         String[][] players = getAIList();
 
-        int gamesPerPlayer = Integer.parseInt(split[2]);
+        int range = Integer.parseInt(split[2]);
+        int gamesPerPlayer = Integer.parseInt(split[3]);
         TrainThread[] threads = new TrainThread[3];
         ArrayList<ArrayList<String>> allMatchups = new ArrayList<>();
-        int totalGames = players.length * gamesPerPlayer;
-        chessGame = new ChessGame(null);
-        List<List<Object>> userObjects = chessGame.getAllUsers();
+        List<List<Object>> userObjects = new ChessGame(null).getAllUsers();
         Map<String, Integer> gamesForPlayer = new HashMap<>();
         userObjects.remove(0); // Remove header row
-        int range = 50;
-        while (allMatchups.size() < totalGames) {
-            for (List row : userObjects) {
-                String id1 = (String) row.get(0);
-                if (id1.contains(System.getenv("OWNER_ID"))) continue; //Ensure player is a bot
-                String name1 = (String) row.get(1);
-                int elo1 = Integer.parseInt((String) row.get(2));
-                int lowerBound = elo1 - range;
-                int upperBound = elo1 + range;
-                int gamesFoundForPlayer;
-                if (gamesForPlayer.get(id1) == null) {
-                    gamesForPlayer.put(id1, 0);
-                    gamesFoundForPlayer = 0;
-                }
-                else {
-                    gamesFoundForPlayer = gamesForPlayer.get(id1);
-                }
-                if (gamesFoundForPlayer != gamesPerPlayer) {
-                    for (List row2 : userObjects) {
-                        String id2 = (String) row2.get(0);
-                        if (id1.equals(id2)) continue;
-                        if (id2.contains(System.getenv("OWNER_ID"))) continue; //Ensure player is a bot
-                        String name2 = (String) row2.get(1);
-                        int elo2 = Integer.parseInt((String) row2.get(2));
-                        if (elo2 >= lowerBound && elo2 <= upperBound) {
-                            allMatchups.add(new ArrayList<>(Arrays.asList(id1, name1, id2, name2)));
-                            gamesFoundForPlayer++;
-                        }
-                        if (elo2 < lowerBound) {
-                            //Since users are ordered by elo. If we find an elo that is lower than the lowerbound
-                            //Then the rest of the users in this loop will also be lower than the lowerbound
-                            break;
-                        }
-                        if (gamesFoundForPlayer == gamesPerPlayer) {
-                            break;
-                        }
+        event.getChannel().sendMessage(String.format("Attempting to find %d opponents in a +/-%d range for each player...", gamesForPlayer, range)).queue();
+        for (List row : userObjects) {
+            String id1 = (String) row.get(0);
+            if (id1.contains(System.getenv("OWNER_ID"))) continue; //Ensure player is a bot
+            String name1 = (String) row.get(1);
+            int elo1 = Integer.parseInt((String) row.get(2));
+            int lowerBound = elo1 - range;
+            int upperBound = elo1 + range;
+            int gamesFoundForPlayer;
+            if (gamesForPlayer.get(id1) == null) {
+                gamesForPlayer.put(id1, 0);
+                gamesFoundForPlayer = 0;
+            }
+            else {
+                gamesFoundForPlayer = gamesForPlayer.get(id1);
+            }
+            if (gamesFoundForPlayer != gamesPerPlayer) {
+                for (List row2 : userObjects) {
+                    String id2 = (String) row2.get(0);
+                    if (id1.equals(id2)) continue;
+                    if (id2.contains(System.getenv("OWNER_ID"))) continue; //Ensure player is a bot
+                    String name2 = (String) row2.get(1);
+                    int elo2 = Integer.parseInt((String) row2.get(2));
+                    if (elo2 >= lowerBound && elo2 <= upperBound) {
+                        allMatchups.add(new ArrayList<>(Arrays.asList(id1, name1, id2, name2)));
+                        gamesFoundForPlayer++;
                     }
-                    gamesForPlayer.put(id1, gamesForPlayer.get(id1) + gamesFoundForPlayer);
+                    if (elo2 < lowerBound) {
+                        //Since users are ordered by elo. If we find an elo that is lower than the lowerbound
+                        //Then the rest of the users in this loop will also be lower than the lowerbound
+                        break;
+                    }
+                    if (gamesFoundForPlayer == gamesPerPlayer) {
+                        break;
+                    }
                 }
+                gamesForPlayer.put(id1, gamesForPlayer.get(id1) + gamesFoundForPlayer);
             }
         }
-        chessGame = null;
         userObjects = null;
         gamesForPlayer = null;
         System.gc();
-        System.out.println("All matchups size: " + allMatchups.size());
+        event.getChannel().sendMessage(String.format("Found %d matches", allMatchups.size())).queue();
 
         List<String> playersInGame = new ArrayList<>();
         while (allMatchups.size() > 0) {
