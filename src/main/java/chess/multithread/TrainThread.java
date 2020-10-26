@@ -51,10 +51,10 @@ public class TrainThread extends Thread {
         String reply;
         mc.sendMessage("Beginning match on Thread " + threadNum + ": " + whiteSidePlayerName + " vs " + blackSidePlayerName).queue();
         do {
+            state = game.ai(null);
             reply = state.getMessage();
             status = state.getStatus();
 
-            state = game.ai(null);
             long minutesElapsed = (Instant.now().toEpochMilli() - state.getMatchStartTime()) / 1000 / 60;
             if (minutesElapsed >= 2) { //2 minutes
                 if (game.didWhiteJustMove()) {
