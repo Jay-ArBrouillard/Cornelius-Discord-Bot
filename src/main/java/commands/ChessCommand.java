@@ -455,7 +455,6 @@ public class ChessCommand {
                         threadIndex = k;
                         threads[k] = null;
                         isThreadOpen = true;
-                        System.gc();
                         break;
                     }
                 }
@@ -468,6 +467,7 @@ public class ChessCommand {
                 if (!playersInGame.contains(currMatchup.get(0)) && !playersInGame.contains(currMatchup.get(2))) {
                     //found a free matchup
                     matchup = allMatchups.remove(i);
+                    System.gc();
                     break;
                 }
             }

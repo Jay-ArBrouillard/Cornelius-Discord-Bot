@@ -54,57 +54,22 @@ public class TrainThread extends Thread {
             state = game.ai(null);
             reply = state.getMessage();
             status = state.getStatus();
-
+            boolean isGameOver = CHECKMATE.equals(status) || DRAW.equals(status) || COMPUTER_RESIGN.equals(status) || ERROR.equals(status);
             long minutesElapsed = (Instant.now().toEpochMilli() - state.getMatchStartTime()) / 1000 / 60;
             if (minutesElapsed >= 2) { //2 minutes
                 if (game.didWhiteJustMove()) {
-                    System.out.println(String.format("client:%s, reply:%s, status:%s, fen:%s", game.client1, reply, status, FenUtils.parseFEN(game.board)));
+                    System.out.println(String.format("thread:%d, client:%s, reply:%s, status:%s, fen:%s", threadNum, game.client1, reply, status, FenUtils.parseFEN(game.board)));
                 }
                 else {
-                    System.out.println(String.format("client:%s, reply:%s, status:%s, fen:%s", game.client2, reply, status, FenUtils.parseFEN(game.board)));
+                    System.out.println(String.format("thread:%d, client:%s, reply:%s, status:%s, fen:%s", threadNum, game.client2, reply, status, FenUtils.parseFEN(game.board)));
+                }
+                if (minutesElapsed >= 10 && !isGameOver) {
+                    mc.sendMessage((String.format("Ending match for %s vs %s because match is taking longer than 10 minutes to complete", whiteSidePlayerName, blackSidePlayerName))).queue();
+                    break;
                 }
             }
-            if (minutesElapsed >= 10) {
-                if (game.didWhiteJustMove()) {
-                    System.out.println(String.format("client:%s, reply:%s, status:%s, fen:%s", game.client1, reply, status, FenUtils.parseFEN(game.board)));
-                }
-                else {
-                    System.out.println(String.format("client:%s, reply:%s, status:%s, fen:%s", game.client2, reply, status, FenUtils.parseFEN(game.board)));
-                }
-                System.out.println(String.format("Ending match for %s vs %s because match is taking longer than 10 minutes to completed", whiteSidePlayerName, blackSidePlayerName));
-                break;
-            }
 
-
-            if (ERROR.equals(status) || MOVE_LEAVES_PLAYER_IN_CHECK.equals(status) || ILLEGAL_MOVE.equals(status)) {
-                String finalReply = reply;
-                try {
-                    if (game.stockFishClient != null) game.stockFishClient.close();
-                    if (game.client1 != null) game.client1.close();
-                    if (game.client2 != null) game.client2.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                finally {
-                    playersInGame.remove(whiteSideId);
-                    playersInGame.remove(blackSideId);
-                    state = null;
-                    game.stockFishClient = null;
-                    game.client1 = null;
-                    game.client2 = null;
-                    game = null;
-                    whiteSidePlayerName = null;
-                    blackSidePlayerName = null;
-                    whiteSideId = null;
-                    blackSideId = null;
-                    mc.sendMessage("-------------------Error on Thread " + threadNum + " - " + finalReply).queue();
-                    mc = null;
-                    System.gc(); //Attempt to call garbage collector to clear memory
-                }
-                break;
-            }
-
-            if (CHECKMATE.equals(status) || DRAW.equals(status) || COMPUTER_RESIGN.equals(status)) {
+            if (isGameOver) {
                 String finalReply = reply;
                 while (game.threadRunning) {
                     try {
@@ -136,11 +101,12 @@ public class TrainThread extends Thread {
                     blackSideId = null;
                     mc.sendMessage("Completed match on Thread " + threadNum + " - " + finalReply).queue();
                     mc = null;
-                    System.gc(); //Attempt to call garbage collector to clear memory
                 }
                 break;
             }
 
         } while (true);
+
+        System.gc(); //Attempt to call garbage collector to clear memory
     }
 }

@@ -766,7 +766,7 @@ public class ChessGame {
             }
         }
 
-        if (DEBUG && (bestMoveString == null || bestMoveString.isEmpty())) {
+        if (bestMoveString == null || bestMoveString.isEmpty()) {
             if (isWhitePlayerTurn()) {
                 System.out.println(String.format("client:%s, bestMoveString:%s, fen:%s", client1, bestMoveString, FenUtils.parseFEN(this.board)));
                 state.setMessage("Error forcing game to end. " + client1 + " was not able initialize external process.");
@@ -775,6 +775,8 @@ public class ChessGame {
                 System.out.println(String.format("client:%s, bestMoveString:%s, fen:%s", client2, bestMoveString, FenUtils.parseFEN(this.board)));
                 state.setMessage("Error forcing game to end. " + client2 + " was not able initialize external process.");
             }
+            client1 = null;
+            client2 = null;
             state.setStateError();
             return state;
         }
