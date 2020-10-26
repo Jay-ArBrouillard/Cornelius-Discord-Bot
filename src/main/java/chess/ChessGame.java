@@ -493,17 +493,18 @@ public class ChessGame {
             transition = null;
             return state;
         }
-        else if (isComputer) { //If computer sends an incorrect move then we should throw exception and likely remove this computer from AI List
-            System.out.println(String.format("Start coordinate: %d, Destination coordinate: %d, Move command: %s, Promotion Type: %s", startCoordinate, destinationCoordinate, moveCmd, promotionType));
-            System.out.println(String.format("Current fen:%s", FenUtils.parseFEN(this.board)));
-            if (didWhiteJustMove()) {
-                throw new RuntimeException(client1 + " sent invalid move");
-            }
-            else {
-                throw new RuntimeException(client2 + " sent invalid move");
-            }
-        }
         else {
+            if (DEBUG && isComputer) {
+                System.out.println(String.format("Start coordinate: %d, Destination coordinate: %d, Move command: %s, Promotion Type: %s", startCoordinate, destinationCoordinate, moveCmd, promotionType));
+                System.out.println(String.format("Current fen:%s", FenUtils.parseFEN(this.board)));
+                if (didWhiteJustMove()) {
+                    System.out.println(client1 + " just sent an move that leaves player in check or an illegal move");
+                }
+                else {
+                    System.out.println(client2 + " just sent an move that leaves player in check or an illegal move");
+                }
+            }
+
             if (transition.getMoveStatus().leavesPlayerInCheck()) {
                 state.setMessage("`"+moveCmd + "` leaves " + this.board.getCurrentPlayer().getAlliance() + " player in check");
                 state.setStateLeavesPlayerInCheck();
@@ -761,24 +762,22 @@ public class ChessGame {
             }
         }
 
-        if (bestMoveString == null || bestMoveString.isEmpty()) {
-            state.setMessage("Error forcing draw. Computer was not able initialize external process");
-            state.setStateDraw();
-            updateDatabaseDraw();
+        if (DEBUG && (bestMoveString == null || bestMoveString.isEmpty())) {
+            if (isWhitePlayerTurn()) {
+                System.out.println(String.format("client:%s, bestMoveString:%s, fen:%s", client1, bestMoveString, FenUtils.parseFEN(this.board)));
+                state.setMessage("Error forcing game to end. " + client1 + " was not able initialize external process.");
+            }
+            else {
+                System.out.println(String.format("client:%s, bestMoveString:%s, fen:%s", client2, bestMoveString, FenUtils.parseFEN(this.board)));
+                state.setMessage("Error forcing game to end. " + client2 + " was not able initialize external process.");
+            }
+            state.setStateError();
             return state;
         }
 
         if (mc != null) mc.sendTyping().queue();
         //Is castling notation?
         bestMoveString = bestMoveString.trim().toLowerCase(); //Always convert best move to lowercase
-        if (DEBUG) {
-            if (isWhitePlayerTurn()) {
-                System.out.println(String.format("client:%s, bestMoveString:%s, fen:%s", client1, bestMoveString, FenUtils.parseFEN(this.board)));
-            }
-            else {
-                System.out.println(String.format("client:%s, bestMoveString:%s, fen:%s", client2, bestMoveString, FenUtils.parseFEN(this.board)));
-            }
-        }
 
         if (bestMoveString.equalsIgnoreCase("o-o") || bestMoveString.equalsIgnoreCase("o-o-o")) {
             return convertCastlingMove(bestMoveString, true);

@@ -369,7 +369,14 @@ public class ChessCommand {
     private static void randomizeList(String[][] players) {
         Random rand = new Random();
         for (int i = 0; i < players.length; i++) {
-            Collections.swap(Collections.singletonList(players), i, rand.nextInt(players.length));
+            int randomIndex = rand.nextInt(players.length);
+            String temp = players[i][0];
+            players[i][0] = players[randomIndex][0];
+            players[randomIndex][0] = temp;
+
+            String temp2 = players[i][1];
+            players[i][1] = players[randomIndex][1];
+            players[randomIndex][1] = temp2;
         }
     }
 

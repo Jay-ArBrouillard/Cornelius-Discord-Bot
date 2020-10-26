@@ -54,6 +54,34 @@ public class TrainThread extends Thread {
             reply = state.getMessage();
             status = state.getStatus();
 
+            if (ERROR.equals(status) || MOVE_LEAVES_PLAYER_IN_CHECK.equals(status) || ILLEGAL_MOVE.equals(status)) {
+                String finalReply = reply;
+                try {
+                    if (game.stockFishClient != null) game.stockFishClient.close();
+                    if (game.client1 != null) game.client1.close();
+                    if (game.client2 != null) game.client2.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                finally {
+                    playersInGame.remove(whiteSideId);
+                    playersInGame.remove(blackSideId);
+                    state = null;
+                    game.stockFishClient = null;
+                    game.client1 = null;
+                    game.client2 = null;
+                    game = null;
+                    whiteSidePlayerName = null;
+                    blackSidePlayerName = null;
+                    whiteSideId = null;
+                    blackSideId = null;
+                    mc.sendMessage("-------------------Error on Thread " + threadNum + " - " + finalReply).queue();
+                    mc = null;
+                    System.gc(); //Attempt to call garbage collector to clear memory
+                }
+                break;
+            }
+
             if (CHECKMATE.equals(status) || DRAW.equals(status) || COMPUTER_RESIGN.equals(status)) {
                 String finalReply = reply;
                 while (game.threadRunning) {
@@ -76,6 +104,9 @@ public class TrainThread extends Thread {
                     playersInGame.remove(whiteSideId);
                     playersInGame.remove(blackSideId);
                     state = null;
+                    game.stockFishClient = null;
+                    game.client1 = null;
+                    game.client2 = null;
                     game = null;
                     whiteSidePlayerName = null;
                     blackSidePlayerName = null;
