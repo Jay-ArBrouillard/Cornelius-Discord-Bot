@@ -91,6 +91,18 @@ public class GoogleSheets {
 
     }
 
+    public static synchronized List<List<Object>> getAllUsers() {
+        try {
+            if (service == null) getSheetsService();
+            ValueRange response = service.spreadsheets().values().get(SPREAD_SHEET_ID, RANKED_TAB).execute();
+            totalRows = response.getValues().size();
+            return response.getValues();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     /**
      * Add new user if they don't exist and returns their elo value
      * @param id

@@ -555,6 +555,10 @@ public class ChessGame {
         return db.addUser(id, name);
     }
 
+    public synchronized List<List<Object>> getAllUsers() {
+        return db.getAllUsers();
+    }
+
     private synchronized void updateDatabaseDraw() {
         threadRunning = true;
         whiteSidePlayer.incrementDraws();
