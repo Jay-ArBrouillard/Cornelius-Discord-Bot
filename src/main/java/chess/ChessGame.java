@@ -717,24 +717,25 @@ public class ChessGame {
                 if (client1 instanceof RandyRandomClient) {
                     bestMoveString = client1.submit(new Query.Builder(QueryType.Best_Move)
                             .setMovetime(randomThinkTime)
-                            .setFen(FenUtils.parseFEN(this.board)).build());
+                            .setBoard(this.board).build());
+
                 }
                 else {
                     bestMoveString = client1.submit(new Query.Builder(QueryType.Best_Move)
                             .setMovetime(randomThinkTime)
-                            .setBoard(this.board).build());
+                            .setFen(FenUtils.parseFEN(this.board)).build());
                 }
             }
             else if (isBlackPlayerTurn()) {
                 if (client2 instanceof RandyRandomClient) {
                     bestMoveString = client2.submit(new Query.Builder(QueryType.Best_Move)
                             .setMovetime(randomThinkTime)
-                            .setFen(FenUtils.parseFEN(this.board)).build());
+                            .setBoard(this.board).build());
                 }
                 else {
                     bestMoveString = client2.submit(new Query.Builder(QueryType.Best_Move)
                             .setMovetime(randomThinkTime)
-                            .setBoard(this.board).build());
+                            .setFen(FenUtils.parseFEN(this.board)).build());
                 }
             }
         } catch (Exception e) {
