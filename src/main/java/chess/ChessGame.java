@@ -739,8 +739,6 @@ public class ChessGame {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            //Do nothing is client fails
         }
 
         if (bestMoveString == null || bestMoveString.isEmpty()) {

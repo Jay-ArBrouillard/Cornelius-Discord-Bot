@@ -467,7 +467,7 @@ public class GoogleSheets {
             //Sort Matches by updated on column
             BatchUpdateSpreadsheetRequest busReq = new BatchUpdateSpreadsheetRequest();
             SortSpec sortSpec = new SortSpec();
-            sortSpec.setDimensionIndex(14);
+            sortSpec.setDimensionIndex(15); //Sort by UTC so we don't have any issues with UTC to CST conversion
             sortSpec.setSortOrder("DESCENDING");
             SortRangeRequest sortRangeRequest = new SortRangeRequest();
             GridRange gridRange = new GridRange();
