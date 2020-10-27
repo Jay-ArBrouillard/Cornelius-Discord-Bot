@@ -589,6 +589,7 @@ public class ChessCommand {
 
         int gamesCompleted = 0;
         String discordId = split[2];
+        System.out.println(discordId);
         int range = Integer.parseInt(split[3]);
         int totalGames = Integer.parseInt(split[4]);
         int playerIndex = 0;

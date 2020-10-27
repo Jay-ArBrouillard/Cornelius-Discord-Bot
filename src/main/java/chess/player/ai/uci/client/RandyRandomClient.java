@@ -7,11 +7,11 @@ import java.io.IOException;
 
 public class RandyRandomClient extends BaseAiClient{
     RandyRandom engine;
-    public RandyRandomClient() throws IOException {
+    public RandyRandomClient() {
         engine = new RandyRandom();
     }
 
-    public String submit(Query query) throws IOException {
+    public String submit(Query query) {
         String output;
 
         switch (query.getType()) {

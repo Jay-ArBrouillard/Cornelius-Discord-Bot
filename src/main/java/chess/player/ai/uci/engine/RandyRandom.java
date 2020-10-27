@@ -16,8 +16,11 @@ public class RandyRandom extends UCIEngine {
 
     public String getBestMove(Query query) {
          List<Move> moves = query.getBoard().getCurrentPlayer().getLegalMoves();
+         System.out.println(moves);
          Move selection = moves.get(rand.nextInt(moves.size()));
-        return BoardUtils.getPositionAtCoordinate(selection.getCurrentCoordinate()) + BoardUtils.getPositionAtCoordinate(selection.getDestinationCoordinate());
+         String v = BoardUtils.getPositionAtCoordinate(selection.getCurrentCoordinate()) + BoardUtils.getPositionAtCoordinate(selection.getDestinationCoordinate());
+         System.out.println(v);
+        return v;
     }
 
     public void close() throws IOException {
