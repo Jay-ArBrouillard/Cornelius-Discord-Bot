@@ -605,9 +605,6 @@ public class ChessCommand {
             chessGame = new ChessGame(state);
             whiteSidePlayer = chessGame.addUser(players[playerIndex][0], players[playerIndex][1]);
             blackSidePlayer = chessGame.findOpponentSimilarElo(whiteSidePlayer.elo, whiteSidePlayer.discordId, range);
-            if (blackSidePlayer == null) { //If we don't find an opponent in the elo range above/below
-                blackSidePlayer = chessGame.findUserByClosestElo(whiteSidePlayer.elo, whiteSidePlayer.discordId); //Then settle for the closest elo
-            }
             chessGame.setBlackSidePlayer(blackSidePlayer);
             chessGame.setWhiteSidePlayer(whiteSidePlayer);
             gameType = GameType.CVC;

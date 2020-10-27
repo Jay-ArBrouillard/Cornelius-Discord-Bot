@@ -287,14 +287,20 @@ public class GoogleSheets {
             }
 
             //Choose a random opponent from candidate list
-            List player = candidates.get(rand.nextInt(candidates.size()));
-            ChessPlayer user = new ChessPlayer((String)player.get(0), (String)player.get(1), Double.parseDouble((String)player.get(2)), null,
-                    Boolean.valueOf((String)player.get(4)), (String)player.get(5), Integer.parseInt((String)player.get(6)),
-                    Integer.parseInt((String)player.get(7)), Integer.parseInt((String)player.get(8)),
-                    Double.parseDouble((String)player.get(9)), Integer.parseInt((String)player.get(10)), (String)player.get(11),
-                    (String)player.get(12), (String)player.get(13));
-            if (!user.provisional) {
-                user.highestElo = Double.parseDouble((String)player.get(3));
+            ChessPlayer user;
+            if (candidates.size() == 0) {
+                user = findUserClosestElo(elo, id);
+            }
+            else {
+                List player = candidates.get(rand.nextInt(candidates.size()));
+                user = new ChessPlayer((String)player.get(0), (String)player.get(1), Double.parseDouble((String)player.get(2)), null,
+                        Boolean.valueOf((String)player.get(4)), (String)player.get(5), Integer.parseInt((String)player.get(6)),
+                        Integer.parseInt((String)player.get(7)), Integer.parseInt((String)player.get(8)),
+                        Double.parseDouble((String)player.get(9)), Integer.parseInt((String)player.get(10)), (String)player.get(11),
+                        (String)player.get(12), (String)player.get(13));
+                if (!user.provisional) {
+                    user.highestElo = Double.parseDouble((String)player.get(3));
+                }
             }
             return user;
         } catch (Exception e) {
