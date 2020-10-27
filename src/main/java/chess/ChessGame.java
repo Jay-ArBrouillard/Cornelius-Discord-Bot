@@ -501,7 +501,7 @@ public class ChessGame {
             if (DEBUG && isComputer) {
                 System.out.println(String.format("Start coordinate: %d, Destination coordinate: %d, Move command: %s, Promotion Type: %s", startCoordinate, destinationCoordinate, moveCmd, promotionType));
                 System.out.println(String.format("Current fen:%s", FenUtils.parseFEN(this.board)));
-                if (didWhiteJustMove()) {
+                if (isWhitePlayerTurn()) {
                     System.out.println(client1 + " just sent an move that leaves player in check or an illegal move");
                 }
                 else {
