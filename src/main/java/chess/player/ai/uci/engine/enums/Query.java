@@ -9,12 +9,13 @@ public class Query {
     private long movetime;
     private Board board;
 
-    public Query(QueryType type, String fen, String move, int depth, long movetime) {
+    public Query(QueryType type, String fen, String move, int depth, long movetime, Board board) {
         this.type = type;
         this.fen = fen;
         this.move = move;
         this.depth = depth;
         this.movetime = movetime;
+        this.board = board;
     }
 
     public QueryType getType() {
@@ -82,7 +83,7 @@ public class Query {
             if (fen == null && board == null)
                 throw new IllegalStateException("Query is missing FEN or Board");
 
-            return new Query(type, fen, move, depth, movetime);
+            return new Query(type, fen, move, depth, movetime, board);
         }
     }
 }

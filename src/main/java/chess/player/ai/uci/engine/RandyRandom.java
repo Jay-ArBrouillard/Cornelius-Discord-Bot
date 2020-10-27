@@ -2,6 +2,7 @@ package chess.player.ai.uci.engine;
 
 import chess.board.BoardUtils;
 import chess.board.Move;
+import chess.board.Move.PawnPromotion;
 import chess.player.ai.uci.engine.enums.Query;
 
 import java.util.*;
@@ -16,11 +17,13 @@ public class RandyRandom extends UCIEngine {
 
     public String getBestMove(Query query) {
          List<Move> moves = query.getBoard().getCurrentPlayer().getLegalMoves();
-         System.out.println(moves);
          Move selection = moves.get(rand.nextInt(moves.size()));
-         String v = BoardUtils.getPositionAtCoordinate(selection.getCurrentCoordinate()) + BoardUtils.getPositionAtCoordinate(selection.getDestinationCoordinate());
-         System.out.println(v);
-        return v;
+         String moveNotation = BoardUtils.getPositionAtCoordinate(selection.getCurrentCoordinate()) + BoardUtils.getPositionAtCoordinate(selection.getDestinationCoordinate());
+         if (selection instanceof PawnPromotion) {
+             String[] promotionTypes = new String[]{"q", "r", "n", "b"};
+             moveNotation = moveNotation + promotionTypes[rand.nextInt(promotionTypes.length)];
+         }
+        return moveNotation;
     }
 
     public void close() throws IOException {
