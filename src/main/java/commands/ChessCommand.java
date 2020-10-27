@@ -2,6 +2,7 @@ package commands;
 
 import chess.*;
 import chess.multithread.TrainThread;
+import chess.pgn.FenUtils;
 import chess.tables.ChessPlayer;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -576,10 +577,10 @@ public class ChessCommand {
     }
 
     private static void handleTrainUser(MessageReceivedEvent event, String message) {
-        //Ex: !chess train discordId 10 - Player with this id would play 10 games against similar elo opponents
+        //Ex: !chess train discordId range 10 - Player with this id would play 10 games against similar elo opponents
         String [] split = message.split("\\s+");
-        if (split.length != 4) {
-            event.getChannel().sendMessage("Incorrect format for `!chess trainUser discordId number`. Valid example `!chess trainUser 693282099167494225FN3000 10`").queue();
+        if (split.length != 5) {
+            event.getChannel().sendMessage("Incorrect format for `!chess trainUser discordId range number`. Valid example `!chess trainUser 693282099167494225FN3000 50 10`").queue();
             return;
         }
 
@@ -588,7 +589,8 @@ public class ChessCommand {
 
         int gamesCompleted = 0;
         String discordId = split[2];
-        int totalGames = Integer.parseInt(split[3]);
+        int range = Integer.parseInt(split[3]);
+        int totalGames = Integer.parseInt(split[4]);
         int playerIndex = 0;
         for (int i = 0; i < players.length; i++) {
             if (players[i][0].equals(discordId)) {
@@ -601,13 +603,8 @@ public class ChessCommand {
             state = new ChessGameState();
             chessGame = new ChessGame(state);
             whiteSidePlayer = chessGame.addUser(players[playerIndex][0], players[playerIndex][1]);
-            if (whiteSidePlayer.provisional) { //Increased range
-                blackSidePlayer = chessGame.findOpponentSimilarElo(whiteSidePlayer.elo, whiteSidePlayer.discordId, 100);
-            }
-            else {
-                blackSidePlayer = chessGame.findOpponentSimilarElo(whiteSidePlayer.elo, whiteSidePlayer.discordId, 50);
-            }
-            if (blackSidePlayer == null) { //If we don't find an opponent in a range of 50 elo above/below
+            blackSidePlayer = chessGame.findOpponentSimilarElo(whiteSidePlayer.elo, whiteSidePlayer.discordId, range);
+            if (blackSidePlayer == null) { //If we don't find an opponent in the elo range above/below
                 blackSidePlayer = chessGame.findUserByClosestElo(whiteSidePlayer.elo, whiteSidePlayer.discordId); //Then settle for the closest elo
             }
             chessGame.setBlackSidePlayer(blackSidePlayer);
@@ -628,7 +625,23 @@ public class ChessCommand {
                 reply = state.getMessage();
                 status = state.getStatus();
 
-                if (CHECKMATE.equals(status) || DRAW.equals(status) || COMPUTER_RESIGN.equals(status)) {
+                boolean isGameOver = CHECKMATE.equals(status) || DRAW.equals(status) || COMPUTER_RESIGN.equals(status) || ERROR.equals(status);
+                long minutesElapsed = (Instant.now().toEpochMilli() - state.getMatchStartTime()) / 1000 / 60;
+                if (minutesElapsed >= 3.5) { //3.5 minutes
+                    if (chessGame.didWhiteJustMove()) {
+                        System.out.println(String.format("client:%s, reply:%s, status:%s, fen:%s", chessGame.client1, reply, status, FenUtils.parseFEN(chessGame.board)));
+                    }
+                    else {
+                        System.out.println(String.format("client:%s, reply:%s, status:%s, fen:%s", chessGame.client2, reply, status, FenUtils.parseFEN(chessGame.board)));
+                    }
+                    if (minutesElapsed >= 10 && !isGameOver) {
+                        event.getChannel().sendMessage((String.format("Ending match for %s vs %s because match is taking longer than 10 minutes to complete", whiteSidePlayer.name, blackSidePlayer.name))).queue();
+                        totalGames--;
+                        break;
+                    }
+                }
+
+                if (isGameOver) {
                     try {
                         if (chessGame != null) {
                             if (chessGame.stockFishClient != null) chessGame.stockFishClient.close();
@@ -638,26 +651,29 @@ public class ChessCommand {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    state = null;
-                    chessGame.stockFishClient = null;
-                    chessGame.client1 = null;
-                    chessGame.client2 = null;
-                    chessGame.board = null;
-                    chessGame.blackSidePlayer = null;
-                    chessGame.whiteSidePlayer = null;
-                    chessGame.state = null;
-                    chessGame.messageHandler = null;
-                    chessGame.db = null;
-                    chessGame = null;
-                    whiteSidePlayer = null;
-                    blackSidePlayer = null;
-                    System.gc(); //Attempt to call garbage collector to clear memory
-                    event.getChannel().sendMessage(reply).queue();
-                    gamesCompleted++;
-                    break;
+                    finally {
+                        state = null;
+                        chessGame.stockFishClient = null;
+                        chessGame.client1 = null;
+                        chessGame.client2 = null;
+                        chessGame.board = null;
+                        chessGame.blackSidePlayer = null;
+                        chessGame.whiteSidePlayer = null;
+                        chessGame.state = null;
+                        chessGame.messageHandler = null;
+                        chessGame.db = null;
+                        chessGame = null;
+                        whiteSidePlayer = null;
+                        blackSidePlayer = null;
+                        event.getChannel().sendMessage(reply).queue();
+                        gamesCompleted++;
+                        break;
+                    }
                 }
 
             } while (true);
+
+            System.gc(); //Attempt to call garbage collector to clear memory
         }
 
         event.getChannel().sendMessage("Completed").queue();
@@ -666,6 +682,7 @@ public class ChessCommand {
 
     private static String[][] getAIList() {
         return new String[][]{
+                {"693282099167494225RR", "Randy Random"},
                 {"693282099167494225ET12", "Ethereal 12"},
             {"693282099167494225MO0.3", "Moustique 0.3"},
             {"693282099167494225LW0.6", "LittleWing 0.6"},

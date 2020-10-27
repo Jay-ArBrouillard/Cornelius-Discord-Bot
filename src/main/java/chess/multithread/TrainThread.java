@@ -56,7 +56,7 @@ public class TrainThread extends Thread {
             status = state.getStatus();
             boolean isGameOver = CHECKMATE.equals(status) || DRAW.equals(status) || COMPUTER_RESIGN.equals(status) || ERROR.equals(status);
             long minutesElapsed = (Instant.now().toEpochMilli() - state.getMatchStartTime()) / 1000 / 60;
-            if (minutesElapsed >= 2) { //2 minutes
+            if (minutesElapsed >= 3.5) { //3.5 minutes
                 if (game.didWhiteJustMove()) {
                     System.out.println(String.format("thread:%d, client:%s, reply:%s, status:%s, fen:%s", threadNum, game.client1, reply, status, FenUtils.parseFEN(game.board)));
                 }
@@ -81,9 +81,11 @@ public class TrainThread extends Thread {
                     }
                 }
                 try {
-                    if (game.stockFishClient != null) game.stockFishClient.close();
-                    if (game.client1 != null) game.client1.close();
-                    if (game.client2 != null) game.client2.close();
+                    if (game != null) {
+                        if (game.stockFishClient != null) game.stockFishClient.close();
+                        if (game.client1 != null) game.client1.close();
+                        if (game.client2 != null) game.client2.close();
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

@@ -1,5 +1,6 @@
 package chess;
 
+import chess.player.ai.uci.engine.RandyRandom;
 import utils.EloRanking;
 import utils.GoogleSheets;
 import chess.board.Board;
@@ -182,6 +183,9 @@ public class ChessGame {
             setClient(new EtherealClient.Builder()
                     .setOption(Option.Hash, 16)
                     .build(), p);
+        }
+        else if (p.name.contains("Randy Random")) {
+            setClient(new RandyRandomClient(), p);
         }
     }
 
@@ -710,60 +714,31 @@ public class ChessGame {
         String bestMoveString = null;
         try {
             if (isWhitePlayerTurn()) {
-                bestMoveString = client1.submit(new Query.Builder(QueryType.Best_Move)
-                        .setMovetime(randomThinkTime)
-                        .setFen(FenUtils.parseFEN(this.board)).build());
+                if (client1 instanceof RandyRandomClient) {
+                    bestMoveString = client1.submit(new Query.Builder(QueryType.Best_Move)
+                            .setMovetime(randomThinkTime)
+                            .setFen(FenUtils.parseFEN(this.board)).build());
+                }
+                else {
+                    bestMoveString = client1.submit(new Query.Builder(QueryType.Best_Move)
+                            .setMovetime(randomThinkTime)
+                            .setBoard(this.board).build());
+                }
             }
             else if (isBlackPlayerTurn()) {
-                bestMoveString = client2.submit(new Query.Builder(QueryType.Best_Move)
-                        .setMovetime(randomThinkTime)
-                        .setFen(FenUtils.parseFEN(this.board)).build());
+                if (client2 instanceof RandyRandomClient) {
+                    bestMoveString = client2.submit(new Query.Builder(QueryType.Best_Move)
+                            .setMovetime(randomThinkTime)
+                            .setFen(FenUtils.parseFEN(this.board)).build());
+                }
+                else {
+                    bestMoveString = client2.submit(new Query.Builder(QueryType.Best_Move)
+                            .setMovetime(randomThinkTime)
+                            .setBoard(this.board).build());
+                }
             }
         } catch (Exception e) {
-            try {
-                System.out.println("-----------------client1 was using " + client1 + ", client 2 was using " + client2);
-                if (isWhitePlayerTurn()) {
-                    if (client1 != null) {
-                        client1.close();
-                        System.out.println("-----------------Shutdown client1");
-                    }
-                }
-                else {
-                    if (client2 != null) {
-                        client2.close();
-                        System.out.println("-----------------Shutdown client2");
-                    }
-                }
-            } catch (Exception ex) {
-                //Do nothing is client close fails
-            }
-            finally {
-                randomThinkTime = 5000;
-                if (isWhitePlayerTurn()) {
-                    try {
-                        client1 = null;
-                        setClient(whiteSidePlayer);
-                        System.out.println("-----------------Restarted " + client1);
-                        bestMoveString = client1.submit(new Query.Builder(QueryType.Best_Move)
-                                .setMovetime(randomThinkTime)
-                                .setFen(FenUtils.parseFEN(this.board)).build());
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
-                }
-                else {
-                    try {
-                        client2 = null;
-                        setClient(blackSidePlayer);
-                        System.out.println("-----------------Restarted " + client2);
-                        bestMoveString = client2.submit(new Query.Builder(QueryType.Best_Move)
-                                .setMovetime(randomThinkTime)
-                                .setFen(FenUtils.parseFEN(this.board)).build());
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
-                }
-            }
+            //Do nothing is client fails
         }
 
         if (bestMoveString == null || bestMoveString.isEmpty()) {

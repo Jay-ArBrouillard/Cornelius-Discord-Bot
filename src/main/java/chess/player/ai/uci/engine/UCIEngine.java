@@ -7,9 +7,13 @@ import java.io.*;
 import java.util.*;
 
 abstract class UCIEngine {
-    final BufferedReader input;
-    final BufferedWriter output;
-    final Process process;
+    BufferedReader input;
+    BufferedWriter output;
+    Process process;
+
+    UCIEngine() {
+        //empty
+    }
 
     UCIEngine(Variant variant, String filePath, Option... options) throws IOException {
         try {
