@@ -129,9 +129,9 @@ public class GoogleSheets {
                 return user;
             } else {
                 // Player doesn't exist. Add them as a provisional player
-                ZonedDateTime utc = ZonedDateTime.now(ZoneOffset.UTC);
-                String createdOn = getDate(utc, RANKED_TAB, false);
-                String updatedOn = getDate(utc, RANKED_TAB, true);
+                ZonedDateTime cst = Instant.now().atZone(ZoneId.of("America/Chicago"));
+                String createdOn = getDate(cst, RANKED_TAB, false);
+                String updatedOn = getDate(cst, RANKED_TAB, true);
                 // New users get default elo of 1500 - Class C
                 ValueRange appendBody = new ValueRange()
                         .setValues(Arrays.asList(
@@ -377,7 +377,7 @@ public class GoogleSheets {
             values.add(user.totalGames);
             values.add(user.totalGameTimeStr);
             values.add(user.createdOn);
-            values.add(getDate(ZonedDateTime.now(ZoneOffset.UTC), RANKED_TAB, true));
+            values.add(getDate(Instant.now().atZone(ZoneId.of("America/Chicago")), RANKED_TAB, true));
 
             ValueRange body = new ValueRange().setValues(Arrays.asList(values));
             service.spreadsheets().values()
@@ -428,26 +428,27 @@ public class GoogleSheets {
             String p2EloDiff;
             ValueRange appendBody = null;
             String status = state.getStatus();
-            String updatedOn = getDate(ZonedDateTime.now(ZoneOffset.UTC), MATCHES_TAB, true);
+            Instant utc = Instant.now();
+            String updatedOn = getDate(utc.atZone(ZoneId.of("America/Chicago")), MATCHES_TAB, true);
             if (DRAW.equals(status)) {
                 p1EloDiff = generateEloDiffString(whiteSidePrevElo, whiteSidePlayer.elo);
                 p2EloDiff = generateEloDiffString(blackSidePrevElo, blackSidePlayer.elo);
                 appendBody = new ValueRange().setValues(Arrays.asList(Arrays.asList(whiteSidePlayer.name, whiteSidePlayer.discordId, Math.round(whiteSidePlayer.elo)+" ("+p1EloDiff+")", formatPercent.format(p1Odds*100)+"%",
                                                                                     blackSidePlayer.name,  blackSidePlayer.discordId,  Math.round(blackSidePlayer.elo)+" ("+p2EloDiff+")", formatPercent.format(p2Odds*100)+"%",
-                                                                                    "-", "-", DRAW.equals(status), state.isPlayerForfeited(), state.getFullMoves(), matchLength, updatedOn)));
+                                                                                    "-", "-", DRAW.equals(status), state.isPlayerForfeited(), state.getFullMoves(), matchLength, updatedOn, utc)));
             } else if (state.getWinnerId().equals(whiteSidePlayer.discordId)) {
                 p1EloDiff = generateEloDiffString(whiteSidePrevElo, whiteSidePlayer.elo);
                 p2EloDiff = generateEloDiffString(blackSidePrevElo, blackSidePlayer.elo);
                 appendBody = new ValueRange().setValues(Arrays.asList(Arrays.asList(whiteSidePlayer.name, whiteSidePlayer.discordId, Math.round(whiteSidePlayer.elo)+" ("+p1EloDiff+")", formatPercent.format(p1Odds*100)+"%",
                                                                                     blackSidePlayer.name,  blackSidePlayer.discordId, Math.round(blackSidePlayer.elo)+" ("+p2EloDiff+")", formatPercent.format(p2Odds*100)+"%",
-                                                                                    whiteSidePlayer.name, blackSidePlayer.name, DRAW.equals(status), state.isPlayerForfeited(), state.getFullMoves(), matchLength, updatedOn)));
+                                                                                    whiteSidePlayer.name, blackSidePlayer.name, DRAW.equals(status), state.isPlayerForfeited(), state.getFullMoves(), matchLength, updatedOn, utc)));
             }
             else if (state.getWinnerId().equals(blackSidePlayer.discordId)) {
                 p1EloDiff = generateEloDiffString(whiteSidePrevElo, whiteSidePlayer.elo);
                 p2EloDiff = generateEloDiffString(blackSidePrevElo, blackSidePlayer.elo);
                 appendBody = new ValueRange().setValues(Arrays.asList(Arrays.asList(whiteSidePlayer.name, whiteSidePlayer.discordId, Math.round(whiteSidePlayer.elo)+" ("+p1EloDiff+")", formatPercent.format(p1Odds *100)+"%",
                                                                                     blackSidePlayer.name,  blackSidePlayer.discordId, Math.round(blackSidePlayer.elo)+" ("+p2EloDiff+")", formatPercent.format(p2Odds*100)+"%",
-                                                                                    blackSidePlayer.name, whiteSidePlayer.name, DRAW.equals(status), state.isPlayerForfeited(), state.getFullMoves(), matchLength, updatedOn)));
+                                                                                    blackSidePlayer.name, whiteSidePlayer.name, DRAW.equals(status), state.isPlayerForfeited(), state.getFullMoves(), matchLength, updatedOn, utc)));
             }
 
             //Append the new match
@@ -539,16 +540,16 @@ public class GoogleSheets {
         return eloDiff;
     }
 
-    public static String getDate(ZonedDateTime utc, String sheetName, boolean isUpdatedOn) {
+    public static String getDate(ZonedDateTime cst, String sheetName, boolean isUpdatedOn) {
         if (sheetName.equals(MATCHES_TAB)) {
-            return utc.format(DateTimeFormatter.ofPattern(MM_DD_YYYY_HH_MM_SS_A).withZone(ZoneId.of("America/Chicago")));
+            return cst.format(DateTimeFormatter.ofPattern(MM_DD_YYYY_HH_MM_SS_A));
         }
         else { //RANKED Tab
             if (isUpdatedOn) { // Updated On
-                return utc.format(DateTimeFormatter.ofPattern(MMM_DD_YYYY_HH_MM_A).withZone(ZoneId.of("America/Chicago")));
+                return cst.format(DateTimeFormatter.ofPattern(MMM_DD_YYYY_HH_MM_A));
             }
             else { //Created On
-                return utc.format(DateTimeFormatter.ofPattern(MMM_DD_YYYY).withZone(ZoneId.of("America/Chicago")));
+                return cst.format(DateTimeFormatter.ofPattern(MMM_DD_YYYY));
             }
         }
     }
