@@ -360,7 +360,7 @@ public class ChessCommand {
                 playersInGame.add(matchup.get(2)); // Add id2
                 threads[threadIndex] = new TrainThread(matchup.get(0), matchup.get(1), matchup.get(2), matchup.get(3), threadIndex, event.getChannel(), playersInGame);
                 threads[threadIndex].start();
-                event.getChannel().sendMessage("Matches left to start: " + allMatchups.size()).queue();
+                event.getChannel().sendMessage("Matches left to start: " + (allMatchups.size()+1)).queue();
             }
         }
 
@@ -526,7 +526,7 @@ public class ChessCommand {
                 state.setMatchStartTime(Instant.now().toEpochMilli());
                 decision = COMPUTER_MOVE;
 
-                event.getChannel().sendMessage("Beginning match (" + gamesCompleted + "/" + totalGames + ") : " + whiteSidePlayer.name + " vs " + blackSidePlayer.name).queue();
+                event.getChannel().sendMessage("Beginning match (" + (gamesCompleted+1) + "/" + totalGames + ") : " + whiteSidePlayer.name + " vs " + blackSidePlayer.name).queue();
                 String status;
                 do {
                     state = chessGame.ai(null);
@@ -607,7 +607,7 @@ public class ChessCommand {
             state.setMatchStartTime(Instant.now().toEpochMilli());
             decision = COMPUTER_MOVE;
 
-            event.getChannel().sendMessage("Beginning match (" + gamesCompleted + "/" + totalGames + ") : " + whiteSidePlayer.name + " vs " + blackSidePlayer.name).queue();
+            event.getChannel().sendMessage("Beginning match (" + (gamesCompleted+1) + "/" + totalGames + ") : " + whiteSidePlayer.name + " vs " + blackSidePlayer.name).queue();
             String status;
             do {
                 state = chessGame.ai(null);

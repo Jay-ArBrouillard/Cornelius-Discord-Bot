@@ -116,7 +116,7 @@ public class EloRanking {
     public static void calculateChessEloSingle(boolean isDraw, boolean isWin, ChessPlayer c, double oPrevElo, ChessPlayer o) {
         if (isDraw) {
             if (!c.provisional && !o.provisional) {
-                c.elo = EloRanking.calculateEstablishedVsEstablished(o.elo, oPrevElo, 0.5);
+                c.elo = EloRanking.calculateEstablishedVsEstablished(c.elo, oPrevElo, 0.5);
             }
             else if (!c.provisional && o.provisional) {
                 c.elo = EloRanking.calculateEstablishedVsProvisional(c.elo, oPrevElo, o.totalGames,0.5);
