@@ -18,7 +18,7 @@ public class StandardBoardEvaluator implements BoardEvaluator {
 
     @Override
     public int evaluate(final Board board, final int depth) {
-        return score(board.getWhitePlayer()) - score(board.getBlackPlayer());
+        return score(board.getWhitePlayer(), depth) - score(board.getBlackPlayer(), depth);
     }
 
     public String evaluationDetails(final Board board, final int depth) {
@@ -39,14 +39,15 @@ public class StandardBoardEvaluator implements BoardEvaluator {
                         "Final Score = " + evaluate(board, depth);
     }
 
-    private static int score(final Player player) {
+    private static int score(final Player player, final int depth) {
         return mobility(player) +
                 kingThreats(player) +
                 attacks(player) +
                 castle(player) +
                 pieceEvaluations(player) +
                 pawnStructure(player) +
-                kingSafety(player);
+                kingSafety(player) +
+                depthBonus(depth);
     }
 
     private static int attacks(final Player player) {

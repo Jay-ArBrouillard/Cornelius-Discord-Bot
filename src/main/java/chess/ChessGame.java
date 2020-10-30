@@ -190,6 +190,9 @@ public class ChessGame {
         else if (p.name.contains("Stewart")) {
             setClient(new StewartClient(4), p);
         }
+        else if (p.name.contains("Bartholomew")) {
+            setClient(new StewartClient(4), p);
+        }
     }
 
     private void setClient(BaseAiClient client, ChessPlayer p) {
