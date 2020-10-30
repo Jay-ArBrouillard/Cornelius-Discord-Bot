@@ -250,7 +250,7 @@ public class ChessGame {
         ChessPlayer player = null;
         if (opponent == null || (opponent != null && opponent.isEmpty())) { //Find a random opponent with a similar elo if possible
             mc.sendTyping().queue();
-            player = findUserByClosestElo(elo, id); //Should never be null
+            player = findOpponentSimilarElo(elo, id, 50); //Should never be null
         }
         else if (option.equals("2") || option.equals("3")){
             mc.sendTyping().queue();
@@ -755,7 +755,7 @@ public class ChessGame {
 
         boolean error1 = gameType.isComputerVsComputer() && (client1 == null || client2 == null);
         boolean error2 = gameType.isPlayerVsComputer() && client1 == null && client2 == null;
-        if (error1 || error2 || bestMoveString == null || bestMoveString.isEmpty()) {
+        if ((error1 || error2) && (bestMoveString == null || bestMoveString.isEmpty())) {
             if (isWhitePlayerTurn()) {
                 System.out.println(String.format("client:%s, bestMoveString:%s, fen:%s", client1, bestMoveString, FenUtils.parseFEN(this.board)));
                 state.setMessage("Error forcing game to end with no consequences. " + client1 + " was not able initialize or find a move");

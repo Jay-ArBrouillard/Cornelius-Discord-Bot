@@ -169,7 +169,7 @@ public class ChessCommand {
             case SETUP:
                 reply = "`Chess` Initialized. Please choose from game options `(1-3)`:\n1. Player (WHITE) vs. Player (BLACK)\n2. Player vs. Computer\n3. Computer vs. Player\n\n" +
                         "After choosing a game option you will make moves using algebraic long notation (ie: e5e7). When playing against the computer you can select your computer opponent by adding their name after the option for example `2 Komodo v11`\n" +
-                        "Otherwise a computer around the same elo as you will be chosen at random or totally random computer if none are near your elo.";
+                        "Otherwise a random computer that is +/- 50 elo from you will be chosen. If there are none, then the closest elo computer is chosen.";
                 decision = Decision.SETUP_RESPONSE;
                 break;
             case SETUP_RESPONSE:
