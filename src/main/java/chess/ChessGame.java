@@ -187,6 +187,9 @@ public class ChessGame {
         else if (p.name.contains("Randy Random")) {
             setClient(new RandyRandomClient(), p);
         }
+        else if (p.name.contains("Stewart")) {
+            setClient(new StewartClient(), p);
+        }
     }
 
     private void setClient(BaseAiClient client, ChessPlayer p) {
@@ -714,11 +717,10 @@ public class ChessGame {
         String bestMoveString = null;
         try {
             if (isWhitePlayerTurn()) {
-                if (client1 instanceof RandyRandomClient) {
+                if (client1 instanceof RandyRandomClient || client1 instanceof StewartClient) {
                     bestMoveString = client1.submit(new Query.Builder(QueryType.Best_Move)
                             .setMovetime(randomThinkTime)
                             .setBoard(this.board).build());
-
                 }
                 else {
                     bestMoveString = client1.submit(new Query.Builder(QueryType.Best_Move)
@@ -727,7 +729,7 @@ public class ChessGame {
                 }
             }
             else if (isBlackPlayerTurn()) {
-                if (client2 instanceof RandyRandomClient) {
+                if (client2 instanceof RandyRandomClient || client2 instanceof StewartClient) {
                     bestMoveString = client2.submit(new Query.Builder(QueryType.Best_Move)
                             .setMovetime(randomThinkTime)
                             .setBoard(this.board).build());
@@ -741,14 +743,14 @@ public class ChessGame {
         } catch (Exception e) {
         }
 
-        if (bestMoveString == null || bestMoveString.isEmpty()) {
+        if (client1 == null || client2 == null || bestMoveString == null || bestMoveString.isEmpty()) {
             if (isWhitePlayerTurn()) {
                 System.out.println(String.format("client:%s, bestMoveString:%s, fen:%s", client1, bestMoveString, FenUtils.parseFEN(this.board)));
-                state.setMessage("Error forcing game to end. " + client1 + " was not able initialize external process.");
+                state.setMessage("Error forcing game to end with no consequences. " + client1 + " was not able initialize or find a move");
             }
             else {
                 System.out.println(String.format("client:%s, bestMoveString:%s, fen:%s", client2, bestMoveString, FenUtils.parseFEN(this.board)));
-                state.setMessage("Error forcing game to end. " + client2 + " was not able initialize external process.");
+                state.setMessage("Error forcing game to end with no consequences. " + client2 + " was not able initialize or find a move");
             }
             client1 = null;
             client2 = null;

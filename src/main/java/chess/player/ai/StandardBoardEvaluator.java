@@ -17,7 +17,7 @@ public class StandardBoardEvaluator implements BoardEvaluator {
     private final static int TWO_BISHOPS_BONUS = 25;
 
     @Override
-    public int evaluate(final Board board) {
+    public int evaluate(final Board board, final int depth) {
         return score(board.getWhitePlayer()) - score(board.getBlackPlayer());
     }
 
@@ -36,7 +36,7 @@ public class StandardBoardEvaluator implements BoardEvaluator {
                         "Black castle : " + castle(board.getBlackPlayer()) + "\n" +
                         "Black pieceEval : " + pieceEvaluations(board.getBlackPlayer()) + "\n" +
                         "Black pawnStructure : " + pawnStructure(board.getBlackPlayer()) + "\n\n" +
-                        "Final Score = " + evaluate(board);
+                        "Final Score = " + evaluate(board, depth);
     }
 
     private static int score(final Player player) {
