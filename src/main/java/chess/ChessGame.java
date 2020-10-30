@@ -720,7 +720,7 @@ public class ChessGame {
         String bestMoveString = null;
         try {
             if (isWhitePlayerTurn()) {
-                if (client1 instanceof RandyRandomClient || client1 instanceof StewartClient) {
+                if (client1 instanceof RandyRandomClient || client1 instanceof StewartClient || client1 instanceof BartholomewClient) {
                     bestMoveString = client1.submit(new Query.Builder(QueryType.Best_Move)
                             .setMovetime(randomThinkTime)
                             .setBoard(this.board).build());
@@ -732,7 +732,7 @@ public class ChessGame {
                 }
             }
             else if (isBlackPlayerTurn()) {
-                if (client2 instanceof RandyRandomClient || client2 instanceof StewartClient) {
+                if (client2 instanceof RandyRandomClient || client2 instanceof StewartClient || client2 instanceof BartholomewClient) {
                     bestMoveString = client2.submit(new Query.Builder(QueryType.Best_Move)
                             .setMovetime(randomThinkTime)
                             .setBoard(this.board).build());
