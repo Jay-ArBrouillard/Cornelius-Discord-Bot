@@ -753,7 +753,9 @@ public class ChessGame {
         } catch (Exception e) {
         }
 
-        if (client1 == null || client2 == null || bestMoveString == null || bestMoveString.isEmpty()) {
+        boolean error1 = gameType.isComputerVsComputer() && (client1 == null || client2 == null);
+        boolean error2 = gameType.isPlayerVsComputer() && client1 == null && client2 == null;
+        if (error1 || error2 || bestMoveString == null || bestMoveString.isEmpty()) {
             if (isWhitePlayerTurn()) {
                 System.out.println(String.format("client:%s, bestMoveString:%s, fen:%s", client1, bestMoveString, FenUtils.parseFEN(this.board)));
                 state.setMessage("Error forcing game to end with no consequences. " + client1 + " was not able initialize or find a move");
