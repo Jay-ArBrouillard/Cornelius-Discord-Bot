@@ -671,6 +671,7 @@ public class ChessCommand {
 
     private static String[][] getAIList() {
         return new String[][]{
+                {"693282099167494225MAYHEM", "Mayhem 0"},
                 {"693282099167494225CL0", "Claudia 0"},
                 {"693282099167494225BARTH", "Bartholomew"},
                 {"693282099167494225STEW", "Stewart"},

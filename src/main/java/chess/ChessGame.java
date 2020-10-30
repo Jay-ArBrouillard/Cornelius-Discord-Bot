@@ -191,6 +191,11 @@ public class ChessGame {
                     //Claudia only has Hash option and sets it 32 by default (min value aswell)
                     .build(), p);
         }
+        else if (p.name.contains("Mayhem")) {
+            setClient(new MayhemClient.Builder()
+                    //Mayhem has no option for Hash. Unsure how much memory this uses
+                    .build(), p);
+        }
         else if (p.name.contains("Randy Random")) {
             setClient(new RandyRandomClient(), p);
         }
