@@ -188,7 +188,7 @@ public class ChessGame {
             setClient(new RandyRandomClient(), p);
         }
         else if (p.name.contains("Stewart")) {
-            setClient(new StewartClient(), p);
+            setClient(new StewartClient(4), p);
         }
     }
 

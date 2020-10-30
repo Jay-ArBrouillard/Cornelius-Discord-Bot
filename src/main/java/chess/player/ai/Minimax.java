@@ -19,12 +19,15 @@ public class Minimax implements MoveStrategy {
     private long boardsEvaluated;
     private FreqTableRow[] freqTable;
     private int freqTableIndex;
-    private int thinkTime = 10000; //In millis
+    private long thinkTime = 10000; //In millis
 
-    public Minimax(final int searchDepth, final int thinkTime) {
+    public Minimax(final int searchDepth) {
         this.evaluator = new StandardBoardEvaluator();
         this.boardsEvaluated = 0;
         this.searchDepth = searchDepth;
+    }
+
+    public void setThinkTime(long thinkTime) {
         this.thinkTime = thinkTime;
     }
 

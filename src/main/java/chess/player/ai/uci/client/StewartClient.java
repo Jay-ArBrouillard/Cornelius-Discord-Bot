@@ -1,14 +1,14 @@
 package chess.player.ai.uci.client;
 
-import chess.player.ai.uci.engine.RandyRandom;
+import chess.player.ai.uci.engine.Stewart;
 import chess.player.ai.uci.engine.enums.Query;
 
 import java.io.IOException;
 
 public class StewartClient extends BaseAiClient{
-    RandyRandom engine;
-    public StewartClient() {
-        engine = new RandyRandom();
+    Stewart engine;
+    public StewartClient(final int searchDepth) {
+        engine = new Stewart(searchDepth);
     }
 
     public String submit(Query query) {
