@@ -15,6 +15,8 @@ public enum Option {
     Nodestime("nodestime"),
     Limit_Strength("UCI_LimitStrength"),
     Elo("UCI_Elo"),
+    Table_Memory("Table Memory"),
+    Book_File("Book File"),
     Opponent("UCI_Opponent"); //format of the string has to be [GM|IM|FM|WGM|WIM|none] [<elo>|none] [computer|human] <name>
 
     private String optionString;

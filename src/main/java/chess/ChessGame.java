@@ -45,7 +45,7 @@ public class ChessGame {
     public void setupStockfishClient() {
         try {
             stockFishClient = new StockFishClient.Builder()
-                                .setOption(Option.Hash, 16)
+                                .setOption(Option.Hash, 2)
                                 .setVariant(Variant.MODERN)  // BMI for windows, Modern for linux
                                 .build();
         } catch (Exception e) {
@@ -82,7 +82,7 @@ public class ChessGame {
     private void setClient(ChessPlayer p) throws IOException {
         if (p.name.contains("Cornelius")) { //Cornelius will default to use stockfish client
             setClient(new StockFishClient.Builder()
-                    .setOption(Option.Hash, 16)
+                    .setOption(Option.Hash, 32)
                     .setVariant(Variant.MODERN) // BMI for windows, Modern for linux
                     .setOption(Option.Limit_Strength, Boolean.TRUE)
                     .setOption(Option.Elo, p.name.split("Cornelius ")[1]) //Elo Skill level is in their name
@@ -90,21 +90,21 @@ public class ChessGame {
         }
         else if (p.name.contains("Cheng")) {
             setClient(new ChengClient.Builder()
-                    .setOption(Option.Hash, 16)
+                    .setOption(Option.Hash, 32)
                     .setOption(Option.Limit_Strength, Boolean.TRUE)
                     .setOption(Option.Elo, p.name.split("Cheng ")[1]) //Elo Skill level is in their name
                     .build(), p);
         }
         else if (p.name.contains("Fishnet")) {
             setClient(new FishnetClient.Builder()
-                    .setOption(Option.Hash, 16)
+                    .setOption(Option.Hash, 32)
                     .setOption(Option.Limit_Strength, Boolean.TRUE)
                     .setOption(Option.Elo, p.name.split("Fishnet ")[1]) //Elo Skill level is in their name
                     .build(), p);
         }
         else if (p.name.contains("CT800")) {
             setClient(new CT800Client.Builder()
-                    .setOption(Option.Hash, 16)
+                    .setOption(Option.Hash, 32)
                     .setOption(Option.Limit_Strength, Boolean.TRUE)
                     .setOption(Option.Elo, p.name.split("CT800 ")[1]) //Elo Skill level is in their name
                     .build(), p);
@@ -112,76 +112,83 @@ public class ChessGame {
         else if (p.name.contains("Xiphos")) {
             setClient(new XiphosClient.Builder()
                     .setVariant(Variant.SSE) //BMI for windows, SSE for linux
-                    .setOption(Option.Hash, 16)
+                    .setOption(Option.Hash, 32)
                     .build(), p);
         }
         else if (p.name.contains("Komodo")) {
             setClient(new KomodoClient.Builder()
-                    .setOption(Option.Hash, 16)
+                    //Komodo defaults table memory to 128mb. Not sure if this is problematic yet
+                    .setOption(Option.Hash, 32)
                     .build(), p);
         }
         else if (p.name.contains("Cinnamon")) {
             setClient(new CinnamonClient.Builder()
-                    .setOption(Option.Hash, 16)
+                    .setOption(Option.Hash, 32)
                     .build(), p);
         }
         else if (p.name.contains("Laser")) {
             setClient(new LaserClient.Builder()
-                    .setOption(Option.Hash, 16)
+                    .setOption(Option.Hash, 32)
                     .build(), p);
         }
         else if (p.name.contains("Amoeba")) {
             setClient(new AmoebaClient.Builder()
-                    .setOption(Option.Hash, 16)
+                    .setOption(Option.Hash, 32)
                     .build(), p);
         }
         else if (p.name.contains("CounterGo")) {
             setClient(new CounterGoClient.Builder()
-                    .setOption(Option.Hash, 16)
+                    .setOption(Option.Hash, 32)
                     .build(), p);
         }
         else if (p.name.contains("Asymptote")) {
             setClient(new AsymptoteClient.Builder()
-                    .setOption(Option.Hash, 16)
+                    .setOption(Option.Hash, 32)
                     .build(), p);
         }
         else if (p.name.contains("Dumb")) {
             setClient(new DumbClient.Builder()
-                    .setOption(Option.Hash, 16)
+                    .setOption(Option.Hash, 32)
                     .build(), p);
         }
         else if (p.name.contains("Pigeon")) {
             setClient(new PigeonClient.Builder()
-                    .setOption(Option.Hash, 16)
+                    .setOption(Option.Hash, 32)
                     .build(), p);
         }
         else if (p.name.contains("Monolith")) {
             setClient(new MonolithClient.Builder()
-                    .setOption(Option.Hash, 16)
+                    .setOption(Option.Hash, 32)
                     .build(), p);
         }
         else if (p.name.contains("Floyd")) {
             setClient(new FloydClient.Builder()
-                    .setOption(Option.Hash, 16)
+                    .setOption(Option.Hash, 32)
                     .build(), p);
         }
         else if (p.name.contains("Fridolin")) {
             setClient(new FridolinClient.Builder()
-                    .setOption(Option.Hash, 16)
+                    .setOption(Option.Hash, 32)
                     .build(), p);
         }
         else if (p.name.contains("LittleWing")) {
             setClient(new LittleWingClient.Builder()
-                    .setOption(Option.Hash, 16)
+                    .setOption(Option.Hash, 32)
                     .build(), p);
         }
         else if (p.name.contains("Moustique")) {
             setClient(new MoustiqueClient.Builder()
+                    //Don't have any uci options
                     .build(), p);
         }
         else if (p.name.contains("Ethereal")) {
             setClient(new EtherealClient.Builder()
-                    .setOption(Option.Hash, 16)
+                    .setOption(Option.Hash, 32)
+                    .build(), p);
+        }
+        else if (p.name.contains("Claudia")) {
+            setClient(new ClaudiaClient.Builder()
+                    //Claudia only has Hash option and sets it 32 by default (min value aswell)
                     .build(), p);
         }
         else if (p.name.contains("Randy Random")) {
