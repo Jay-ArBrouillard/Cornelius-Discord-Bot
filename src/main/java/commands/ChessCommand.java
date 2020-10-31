@@ -300,7 +300,8 @@ public class ChessCommand {
         chessGame = new ChessGame(null);
         for (int i = 0; i < players.length; i++) {
             //google api limit is 1 per second
-            chessGame.addUser(players[i][0], players[i][1]); //This executes 3 requests
+            ChessPlayer p = chessGame.addUser(players[i][0], players[i][1]); //This executes 3 requests
+            event.getChannel().sendMessage("Added " + p.name).queue();
             try {
                 Thread.sleep(3000);
             } catch (InterruptedException e) {
