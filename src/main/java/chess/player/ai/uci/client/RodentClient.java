@@ -43,7 +43,7 @@ public class RodentClient extends BaseAiClient{
     public static class Builder {
         private Set<Option> options = new HashSet<>();
         private Variant variant = Variant.DEFAULT;
-        private String path = "bin/rodent-iv-plain.exe";
+        private String path = "bin/rodent_III_linux";
 
         public final RodentClient.Builder setVariant(Variant v) {
             variant = v;
