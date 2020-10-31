@@ -27,6 +27,7 @@ abstract class UCIEngine {
 
             //toremove
             System.out.println("START-----------------------------------------------------------------------");
+            waitForReady();
             Thread.sleep(2000); //toremove
             sendCommand("uci");
             readResponse("uciok");
