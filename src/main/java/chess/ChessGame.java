@@ -215,6 +215,7 @@ public class ChessGame {
 
     private String findPersonalityFileLocation(String name) {
         File f = new File("/app/bin/personalities");
+        System.out.println("Search is:"+name+".txt");
         return searchFile(f, name+".txt");
     }
 
@@ -222,11 +223,13 @@ public class ChessGame {
         if (file.isDirectory()) {
             File[] files = file.listFiles();
             for (File f : files) {
-                searchFile(f, search);
+                return searchFile(f, search);
             }
         } else {
-            System.out.println("search:" + file.getAbsolutePath());
-            if (search.equals(file.getName())) {
+            System.out.println("looking for:" + search + ", file:" + file.getName());
+            System.out.println("file path:"+file.getPath());
+            if (file.getName().contains(search)) {
+                System.out.println("Found:"+file.getAbsolutePath());
                 return file.getAbsolutePath();
             }
         }
