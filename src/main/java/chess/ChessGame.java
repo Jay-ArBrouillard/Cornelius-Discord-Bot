@@ -191,10 +191,11 @@ public class ChessGame {
                     .build(), p);
         }
         else if (p.discordId.endsWith("RO4")) { //Rodent IV
+            String [] name = p.name.split(" ");
             setClient(new RodentClient.Builder()
                     //Rodent passes personality. One of the personalities called "Simple" which will be called Rodent instead
                     //otherwise we use the name field
-                    .setOption(Option.Personality, p.name.toLowerCase())
+                    .setOption(Option.Personality, name.length == 1 ? name[0].toLowerCase() : name[1].toLowerCase())
                     .build(), p);
         }
         else if (p.name.contains("Randy Random")) {
