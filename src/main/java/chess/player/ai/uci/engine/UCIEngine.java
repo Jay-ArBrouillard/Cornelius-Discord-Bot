@@ -64,6 +64,7 @@ abstract class UCIEngine {
     }
 
     void passOption(Option option) throws IOException {
+        System.out.println(option.toString()); //To remove
         sendCommand(option.toString());
     }
 
