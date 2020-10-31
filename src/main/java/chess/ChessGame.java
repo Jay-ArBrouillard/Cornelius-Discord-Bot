@@ -16,6 +16,8 @@ import chess.player.ai.uci.engine.enums.Variant;
 import chess.tables.ChessPlayer;
 import net.dv8tion.jda.api.entities.MessageChannel;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -195,8 +197,8 @@ public class ChessGame {
             setClient(new RodentClient.Builder()
                     //Rodent passes personality. One of the personalities called "Simple" which will be called Rodent instead
                     //otherwise we use the name field
-                    //.setOption(Option.Personality, name.length == 1 ? name[0].toLowerCase()+".txt" : name[1].toLowerCase()+".txt")
-                    .setOption(Option.PersonalityFileLocation, "bin/personalities/fun/zero.txt")
+                    .setOption(Option.PersonalityFileLocation, name.length == 1 ? findPersonalityFileLocation(name[0].toLowerCase()) :
+                                                                                  findPersonalityFileLocation(name[1].toLowerCase()))
                     .build(), p);
         }
         else if (p.name.contains("Randy Random")) {
@@ -208,6 +210,13 @@ public class ChessGame {
         else if (p.name.contains("Bartholomew")) {
             setClient(new StewartClient(4), p);
         }
+    }
+
+    private String findPersonalityFileLocation(String name) {
+        File f = new File("/app/bin/personalities");
+        File[] matchingFiles = f.listFiles((dir, name1) -> name1.startsWith(name) && name1.endsWith("txt"));
+        if (matchingFiles.length >= 1) System.out.println("Found file:" + matchingFiles[0].getAbsolutePath());
+        return matchingFiles[0].getAbsolutePath();
     }
 
     private void setClient(BaseAiClient client, ChessPlayer p) {
