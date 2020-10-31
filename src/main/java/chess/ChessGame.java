@@ -214,12 +214,24 @@ public class ChessGame {
     }
 
     private String findPersonalityFileLocation(String name) {
-        File f = new File(".");
-        File[] matchingFiles = f.listFiles((dir, name1) -> name1.startsWith(name) && name1.endsWith("txt"));
-        if (matchingFiles.length >= 1) System.out.println("Found file:" + matchingFiles[0].getAbsolutePath());
-        return matchingFiles[0].getAbsolutePath();
+        File f = new File("/app/bin/personalities");
+        return searchFile(f, name);
     }
 
+    private static String searchFile(File file, String search) {
+        if (file.isDirectory()) {
+            File[] files = file.listFiles();
+            for (File f : files) {
+                return searchFile(f, search);
+            }
+        } else {
+            System.out.println("search:" + file.getAbsolutePath());
+            if (search.equals(file.getName())) {
+                return file.getAbsolutePath();
+            }
+        }
+        return null;
+    }
     private void setClient(BaseAiClient client, ChessPlayer p) {
         if (p.discordId.equals(whiteSidePlayer.discordId)) {
             client1 = client; //White side player will always be client1
