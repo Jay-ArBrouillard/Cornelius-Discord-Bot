@@ -194,7 +194,7 @@ public class ChessGame {
             setClient(new RodentClient.Builder()
                     //Rodent passes personality. One of the personalities called "Simple" which will be called Rodent instead
                     //otherwise we use the name field
-                    .setOption(Option.Personality, p.name.equals("Rodent") ? "Simple.txt" : p.name+".txt")
+                    .setOption(Option.Personality, p.name+".txt")
                     .build(), p);
         }
         else if (p.name.contains("Randy Random")) {

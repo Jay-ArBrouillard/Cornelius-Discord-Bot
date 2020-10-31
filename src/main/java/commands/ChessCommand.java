@@ -672,22 +672,9 @@ public class ChessCommand {
 
     private static String[][] getAIList() {
         return new String[][]{
-                {"693282099167494225AmandaRO4", "Amanda"},
-                {"693282099167494225AmpereRO4", "Ampere"},
-                {"693282099167494225CloeRO4", "Cloe"},
-                {"693282099167494225DeborahRO4", "Deborah"},
-                {"693282099167494225DefenderRO4", "Defender"},
-                {"693282099167494225GrumpyRO4", "Grumpy"},
-                {"693282099167494225MorphyRO4", "Morphy"},
-                {"693282099167494225NimzowitschRO4", "Nimzowitsch"},
-                {"693282099167494225PartisanRO4", "Partisan"},
-                {"693282099167494225PawnsackerRO4", "Pawnsacker"},
-                {"693282099167494225PedritaRO4", "Pedrita"},
-                {"693282099167494225PrestonRO4", "Preston"},
-                {"693282099167494225RodentRO4", "Rodent"},
-                {"693282099167494225SpitfireRO4", "Spitfire"},
-                {"693282099167494225StranglerRO4", "Strangler"},
-                {"693282099167494225TalRO4", "Tal"},
+                {"693282099167494225HelplessRO4", "Helpless"},
+                {"693282099167494225KarpovRO4", "Karpov"},
+
                 {"693282099167494225CL0", "Claudia 0"},
                 {"693282099167494225BARTH", "Bartholomew"},
                 {"693282099167494225STEW", "Stewart"},
