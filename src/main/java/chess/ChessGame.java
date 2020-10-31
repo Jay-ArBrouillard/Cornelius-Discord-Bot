@@ -16,10 +16,7 @@ import chess.player.ai.uci.engine.enums.Variant;
 import chess.tables.ChessPlayer;
 import net.dv8tion.jda.api.entities.MessageChannel;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FilenameFilter;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -216,25 +213,28 @@ public class ChessGame {
     private String findPersonalityFileLocation(String name) {
         File f = new File("/app/bin/personalities");
         System.out.println("Search is:"+name+".txt");
-        return searchFile(f, name+".txt");
-    }
-
-    private static String searchFile(File file, String search) {
-        if (file.isDirectory()) {
-            File[] files = file.listFiles();
-            for (File f : files) {
-                searchFile(f, search);
-            }
-        } else {
-            System.out.println("looking for:" + search + ", file:" + file.getName());
-            System.out.println("file path:"+file.getPath());
-            if (file.getName().contains(search)) {
-                System.out.println("Found:"+file.getAbsolutePath());
-                return file.getAbsolutePath();
+        String fileName = name+".txt";
+        Collection<File> allFiles = listFileTree(f);
+        for (File file : allFiles) {
+            if (fileName.equals(file.getName())) {
+                return file.getPath();
             }
         }
-        return null;
+        throw new RuntimeException("Could not find personality file for " + name);
     }
+
+    public static Collection<File> listFileTree(File dir) {
+        Set<File> fileTree = new HashSet<>();
+        if(dir==null||dir.listFiles()==null){
+            return fileTree;
+        }
+        for (File entry : dir.listFiles()) {
+            if (entry.isFile()) fileTree.add(entry);
+            else fileTree.addAll(listFileTree(entry));
+        }
+        return fileTree;
+    }
+
     private void setClient(BaseAiClient client, ChessPlayer p) {
         if (p.discordId.equals(whiteSidePlayer.discordId)) {
             client1 = client; //White side player will always be client1
