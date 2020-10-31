@@ -301,7 +301,7 @@ public class ChessCommand {
         for (int i = 0; i < players.length; i++) {
             //google api limit is 1 per second
             ChessPlayer p = chessGame.addUser(players[i][0], players[i][1]); //This executes 3 requests
-            event.getChannel().sendMessage("Added " + p.name).queue();
+            event.getChannel().sendMessage("Added " + p.name + " - " + p.discordId).queue();
             try {
                 Thread.sleep(3000);
             } catch (InterruptedException e) {

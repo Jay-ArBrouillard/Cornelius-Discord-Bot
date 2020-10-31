@@ -192,8 +192,9 @@ public class ChessGame {
         }
         else if (p.discordId.endsWith("RO4")) { //Rodent IV
             setClient(new RodentClient.Builder()
-                    //Rodent passes personality
-                    .setOption(Option.Personality, p.name+".txt")
+                    //Rodent passes personality. One of the personalities called "Simple" which will be called Rodent instead
+                    //otherwise we use the name field
+                    .setOption(Option.Personality, p.name.equals("Rodent") ? "Simple.txt" : p.name+".txt")
                     .build(), p);
         }
         else if (p.name.contains("Randy Random")) {
