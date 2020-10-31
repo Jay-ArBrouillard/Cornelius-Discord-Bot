@@ -83,29 +83,29 @@ public class ChessGame {
             setClient(new StockFishClient.Builder()
                     .setOption(Option.Hash, 32)
                     .setVariant(Variant.MODERN) // BMI for windows, Modern for linux
-                    .setOption(Option.Limit_Strength, Boolean.TRUE)
-                    .setOption(Option.Elo, p.name.split("Cornelius ")[1]) //Elo Skill level is in their name
+//                    .setOption(Option.Limit_Strength, Boolean.TRUE)
+//                    .setOption(Option.Elo, p.name.split("Cornelius ")[1]) //Elo Skill level is in their name
                     .build(), p);
         }
         else if (p.name.contains("Cheng")) {
             setClient(new ChengClient.Builder()
                     .setOption(Option.Hash, 32)
-                    .setOption(Option.Limit_Strength, Boolean.TRUE)
-                    .setOption(Option.Elo, p.name.split("Cheng ")[1]) //Elo Skill level is in their name
+//                    .setOption(Option.Limit_Strength, Boolean.TRUE)
+//                    .setOption(Option.Elo, p.name.split("Cheng ")[1]) //Elo Skill level is in their name
                     .build(), p);
         }
         else if (p.name.contains("Fishnet")) {
             setClient(new FishnetClient.Builder()
                     .setOption(Option.Hash, 32)
-                    .setOption(Option.Limit_Strength, Boolean.TRUE)
-                    .setOption(Option.Elo, p.name.split("Fishnet ")[1]) //Elo Skill level is in their name
+//                    .setOption(Option.Limit_Strength, Boolean.TRUE)
+//                    .setOption(Option.Elo, p.name.split("Fishnet ")[1]) //Elo Skill level is in their name
                     .build(), p);
         }
         else if (p.name.contains("CT800")) {
             setClient(new CT800Client.Builder()
                     .setOption(Option.Hash, 32)
-                    .setOption(Option.Limit_Strength, Boolean.TRUE)
-                    .setOption(Option.Elo, p.name.split("CT800 ")[1]) //Elo Skill level is in their name
+//                    .setOption(Option.Limit_Strength, Boolean.TRUE)
+//                    .setOption(Option.Elo, p.name.split("CT800 ")[1]) //Elo Skill level is in their name
                     .build(), p);
         }
         else if (p.name.contains("Xiphos")) {
