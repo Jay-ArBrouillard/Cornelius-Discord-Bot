@@ -1,5 +1,6 @@
 package chess.player.ai.uci.engine;
 
+import chess.player.ai.uci.client.RodentClient;
 import chess.player.ai.uci.engine.enums.Option;
 import chess.player.ai.uci.engine.enums.Variant;
 
