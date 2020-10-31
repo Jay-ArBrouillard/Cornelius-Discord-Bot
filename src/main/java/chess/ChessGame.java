@@ -17,6 +17,7 @@ import chess.tables.ChessPlayer;
 import net.dv8tion.jda.api.entities.MessageChannel;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.*;
@@ -213,7 +214,7 @@ public class ChessGame {
     }
 
     private String findPersonalityFileLocation(String name) {
-        File f = new File("/app/bin/personalities");
+        File f = new File(".");
         File[] matchingFiles = f.listFiles((dir, name1) -> name1.startsWith(name) && name1.endsWith("txt"));
         if (matchingFiles.length >= 1) System.out.println("Found file:" + matchingFiles[0].getAbsolutePath());
         return matchingFiles[0].getAbsolutePath();
