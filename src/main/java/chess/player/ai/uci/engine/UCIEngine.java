@@ -10,6 +10,7 @@ abstract class UCIEngine {
     BufferedReader input;
     BufferedWriter output;
     Process process;
+    boolean DEBUG = true;
 
     UCIEngine() {
         //empty
@@ -73,7 +74,7 @@ abstract class UCIEngine {
     }
 
     void sendCommand(String command) throws IOException {
-//        System.out.println("sendCommand:"+command); //To remove
+        if (DEBUG) System.out.println("sendCommand:"+command); //To remove
         output.write(command + "\n");
         output.flush();
     }
@@ -82,7 +83,7 @@ abstract class UCIEngine {
         String line;
 
         while ((line = input.readLine()) != null) {
-//            System.out.println("readLine:"+line); //To remove
+            if (DEBUG) System.out.println("readLine:"+line); //To remove
             if (line.startsWith(expected))
                 return line;
         }
@@ -95,7 +96,7 @@ abstract class UCIEngine {
         String line;
 
         while ((line = input.readLine()) != null) {
-//            System.out.println("readResponse:"+line); //To remove
+            if (DEBUG) System.out.println("readResponse:"+line); //To remove
             lines.add(line);
 
             if (line.startsWith(expected) || line.startsWith("Protocol not found")) //In some UCI isReady is not needed
