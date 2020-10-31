@@ -23,7 +23,28 @@ abstract class UCIEngine {
 
             for (Option option : options)
                 passOption(option);
-        } catch (IOException e) {
+
+            //toremove
+            System.out.println("START-----------------------------------------------------------------------");
+            Thread.sleep(2000); //toremove
+            sendCommand("uci");
+            readResponse("uciok");
+            Thread.sleep(2000);
+            System.out.println("Starting to do moves");
+
+            waitForReady();
+            sendCommand("position fen rnbqkbnr/ppp2p1p/8/3pp1p1/6P1/5P2/PPPPP2P/RNBQKBNR b KQkq - 0 1");
+
+            StringBuilder command = new StringBuilder("go movetime 10000");
+
+            waitForReady();
+            sendCommand(command.toString());
+
+            System.out.println(readLine("bestmove").split("\\s+")[1].trim());
+            System.out.println("END-----------------------------------------------------------------------");
+            close();
+
+        } catch (IOException | InterruptedException e) {
             throw new IOException("Unable to start and bind " + super.getClass().getSimpleName() + " process: ", e);
         }
     }
@@ -48,7 +69,7 @@ abstract class UCIEngine {
             readResponse("uciok");
 
             boolean hashIsSet = false;
-            for (Option option : options)
+            for (Option option : options) {
                 if (option.getOptionString().contains("Hash")) {
                     if (!hashIsSet) {
                         passOption(option);
@@ -58,13 +79,14 @@ abstract class UCIEngine {
                 else {
                     passOption(option);
                 }
+            }
         } catch (IOException e) {
             throw new IOException("Unable to start and bind " + super.getClass().getSimpleName() + " process: ", e);
         }
     }
 
     void passOption(Option option) throws IOException {
-        System.out.println(option.toString()); //To remove
+//        System.out.println(option.toString()); //To remove
         sendCommand(option.toString());
     }
 
