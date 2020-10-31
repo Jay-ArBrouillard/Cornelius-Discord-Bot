@@ -215,14 +215,14 @@ public class ChessGame {
 
     private String findPersonalityFileLocation(String name) {
         File f = new File("/app/bin/personalities");
-        return searchFile(f, name);
+        return searchFile(f, name+".txt");
     }
 
     private static String searchFile(File file, String search) {
         if (file.isDirectory()) {
             File[] files = file.listFiles();
             for (File f : files) {
-                return searchFile(f, search);
+                searchFile(f, search);
             }
         } else {
             System.out.println("search:" + file.getAbsolutePath());
