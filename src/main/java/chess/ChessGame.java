@@ -223,7 +223,7 @@ public class ChessGame {
         if (file.isDirectory()) {
             File[] files = file.listFiles();
             for (File f : files) {
-                return searchFile(f, search);
+                searchFile(f, search);
             }
         } else {
             System.out.println("looking for:" + search + ", file:" + file.getName());
