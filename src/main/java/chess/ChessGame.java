@@ -193,8 +193,6 @@ public class ChessGame {
         else if (p.discordId.endsWith("RO4")) { //Rodent IV
             String [] name = p.name.split(" ");
             setClient(new RodentClient.Builder()
-                    //Rodent passes personality. One of the personalities called "Simple" which will be called Rodent instead
-                    //otherwise we use the name field
                     .setOption(Option.PersonalityFileLocation, name.length == 1 ? findPersonalityFileLocation(name[0].toLowerCase()) :
                                                                                   findPersonalityFileLocation(name[1].toLowerCase()))
                     .build(), p);
@@ -212,7 +210,6 @@ public class ChessGame {
 
     private String findPersonalityFileLocation(String name) {
         File f = new File("/app/bin/personalities");
-        System.out.println("Search is:"+name+".txt");
         String fileName = name+".txt";
         Collection<File> allFiles = listFileTree(f);
         for (File file : allFiles) {
