@@ -1,6 +1,5 @@
 package chess;
 
-import chess.player.ai.uci.engine.RandyRandom;
 import utils.EloRanking;
 import utils.GoogleSheets;
 import chess.board.Board;
@@ -191,9 +190,10 @@ public class ChessGame {
                     //Claudia only has Hash option and sets it 32 by default (min value aswell)
                     .build(), p);
         }
-        else if (p.name.contains("Mayhem")) {
-            setClient(new MayhemClient.Builder()
-                    //Mayhem has no option for Hash. Unsure how much memory this uses
+        else if (p.discordId.endsWith("RO4")) { //Rodent IV
+            setClient(new RodentClient.Builder()
+                    //Rodent passes personality
+                    .setOption(Option.Personality, p.name+".txt")
                     .build(), p);
         }
         else if (p.name.contains("Randy Random")) {

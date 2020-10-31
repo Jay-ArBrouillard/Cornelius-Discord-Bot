@@ -8,15 +8,16 @@ public enum Option {
     Clear_Hash("Clear Hash"),
     Ponder("Ponder"),
     MultiPV("MultiPV"),
-    Skill_Level("Skill Level"),
+    Skill_Level("Skill Level"), //Used only for Stockfihs
     Move_Overhead("Move Overhead"),
     Minimum_Thinking_Time("Minimum Thinking Time"),
     Slow_Mover("Slow Mover"),
     Nodestime("nodestime"),
     Limit_Strength("UCI_LimitStrength"),
     Elo("UCI_Elo"),
-    Table_Memory("Table Memory"),
+    Table_Memory("Table Memory"), //Used only for Komodo
     Book_File("Book File"),
+    Personality("Personality"), //Used only for Rodent
     Opponent("UCI_Opponent"); //format of the string has to be [GM|IM|FM|WGM|WIM|none] [<elo>|none] [computer|human] <name>
 
     private String optionString;
