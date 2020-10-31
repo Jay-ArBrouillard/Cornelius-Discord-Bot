@@ -5,6 +5,8 @@ import chess.player.ai.uci.engine.enums.Option;
 import chess.player.ai.uci.engine.enums.Variant;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 abstract class UCIEngine {
@@ -22,31 +24,21 @@ abstract class UCIEngine {
             input = new BufferedReader(new InputStreamReader(process.getInputStream()));
             output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
-            for (Option option : options)
-                passOption(option);
-
-            //toremove
-            System.out.println("START-----------------------------------------------------------------------");
-            waitForReady();
-            Thread.sleep(2000); //toremove
-            sendCommand("uci");
-            readResponse("uciok");
-            Thread.sleep(2000);
-            System.out.println("Starting to do moves");
-
-            waitForReady();
-            sendCommand("position fen rnbqkbnr/ppp2p1p/8/3pp1p1/6P1/5P2/PPPPP2P/RNBQKBNR b KQkq - 0 1");
-
-            StringBuilder command = new StringBuilder("go movetime 10000");
-
-            waitForReady();
-            sendCommand(command.toString());
-
-            System.out.println(readLine("bestmove").split("\\s+")[1].trim());
-            System.out.println("END-----------------------------------------------------------------------");
-            close();
-
-        } catch (IOException | InterruptedException e) {
+            for (Option option : options) {
+                Object value = option.getValue();
+                if (value != null && value.toString().endsWith(".txt")) {
+                    List<String> lines = Files.readAllLines(Paths.get(value.toString()));
+                    for (String line : lines) {
+                        if (line.startsWith("setoption")) {
+                            sendCommand(line);
+                        }
+                    }
+                }
+                else {
+                    passOption(option);
+                }
+            }
+        } catch (IOException e) {
             throw new IOException("Unable to start and bind " + super.getClass().getSimpleName() + " process: ", e);
         }
     }

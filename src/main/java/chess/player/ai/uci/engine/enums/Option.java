@@ -17,7 +17,7 @@ public enum Option {
     Elo("UCI_Elo"),
     Table_Memory("Table Memory"), //Used only for Komodo
     Book_File("Book File"),
-    Personality("Personality"), //Used only for Rodent
+    PersonalityFileLocation("Personality_File_Location"), //Used only for Rodent
     Opponent("UCI_Opponent"); //format of the string has to be [GM|IM|FM|WGM|WIM|none] [<elo>|none] [computer|human] <name>
 
     private String optionString;
