@@ -203,6 +203,16 @@ public class ChessGame {
         else if (p.name.contains("Bartholomew")) {
             setClient(new StewartClient(4), p);
         }
+        else if (p.name.contains("Sugar")) {
+            setClient(new SugarClient.Builder()
+                    .setOption(Option.Hash, 32)
+                    .build(), p);
+        }
+        else if (p.name.contains("Cheese")) {
+            setClient(new CheeseClient.Builder()
+                    .setOption(Option.Hash, 32)
+                    .build(), p);
+        }
     }
 
     private void setClient(BaseAiClient client, ChessPlayer p) {

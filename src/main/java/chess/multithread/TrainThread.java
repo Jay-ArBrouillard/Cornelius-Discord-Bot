@@ -74,7 +74,30 @@ public class TrainThread extends Thread {
                     System.out.println(String.format("thread:%d, client:%s, reply:%s, status:%s, fen:%s", threadNum, game.client2, reply, status, FenUtils.parseFEN(game.board)));
                 }
                 if (minutesElapsed >= 10 && !isGameOver) {
-                    mc.sendMessage((String.format("Ending match for %s vs %s because match is taking longer than 10 minutes to complete", whiteSidePlayerName, blackSidePlayerName))).queue();
+                    try {
+                        if (game != null) {
+                            if (game.stockFishClient != null) game.stockFishClient.close();
+                            if (game.client1 != null) game.client1.close();
+                            if (game.client2 != null) game.client2.close();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    finally {
+                        playersInGame.remove(whiteSideId);
+                        playersInGame.remove(blackSideId);
+                        state = null;
+                        game.stockFishClient = null;
+                        game.client1 = null;
+                        game.client2 = null;
+                        game = null;
+                        whiteSideId = null;
+                        blackSideId = null;
+                        mc.sendMessage((String.format("Ending match for %s vs %s because match is taking longer than 10 minutes to complete", whiteSidePlayerName, blackSidePlayerName))).queue();
+                        mc = null;
+                        whiteSidePlayerName = null;
+                        blackSidePlayerName = null;
+                    }
                     break;
                 }
             }
