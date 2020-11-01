@@ -114,6 +114,7 @@ public class ChessGame {
         else if (p.name.contains("Komodo")) {
             setClient(new KomodoClient.Builder()
                     //Komodo defaults table memory to 128mb. Not sure if this is problematic yet
+                    .setOption(Option.Book_File, "/app/bin/books/elo-2650.bin")
                     .setOption(Option.Hash, 32)
                     .build(), p);
         }
