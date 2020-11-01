@@ -778,7 +778,7 @@ public class ChessGame {
             }
         } catch (Exception e) {
         }
-
+        System.out.println(bestMoveString);
         boolean error1 = gameType.isComputerVsComputer() && (client1 == null || client2 == null);
         boolean error2 = gameType.isPlayerVsComputer() && client1 == null && client2 == null;
         if (error1 || error2 || bestMoveString == null || bestMoveString.isEmpty()) {
@@ -797,11 +797,15 @@ public class ChessGame {
         }
 
         //Parse bestMoveString for taunt messages
+        //Rodent Taunt example: "e5e7##tauntString"
+        System.out.println(bestMoveString);
         String tauntMsg = null;
         if (bestMoveString.contains("##")) {
             String[] split = bestMoveString.split("##");
             bestMoveString = split[0];
             tauntMsg = split[1].trim();
+            System.out.println(bestMoveString);
+            System.out.println(tauntMsg);
         }
 
         if (mc != null)  {
