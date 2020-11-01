@@ -1,5 +1,6 @@
 ; Pawnsacker personality for Rodent IV chess engine
 ; balanced, slightly less materialistic than default, lowered pawn value
+;
 setoption name PawnValueMg value 85
 setoption name KnightValueMg value 380
 setoption name BishopValueMg value 390
@@ -55,8 +56,9 @@ setoption name PawnMass value 100
 setoption name PawnChains value 100
 setoption name PrimaryPstStyle value 0
 setoption name SecondaryPstStyle value 1
-setoption name NpsLimit value 0
-setoption name EvalBlur value 0
+; little things, not accessible via UCI options
+setoption name blockedcpawn value -17
+; non-eval stuff
 setoption name Contempt value 0
 setoption name SlowMover value 100
 setoption name Selectivity value 175
