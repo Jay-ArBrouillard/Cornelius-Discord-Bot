@@ -5,27 +5,29 @@ import chess.player.ai.uci.engine.enums.Query;
 import chess.player.ai.uci.engine.enums.Variant;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * When running Sugar it will create experience.bin and pawngame.bin for persistent learning
  */
 public class Sugar extends UCIEngine {
+    private final String BOOK_FILE_1 = "/app/bin/books/elo-2650.bin";
+    private final String BOOK_FILE_2 = "/app/bin/books/pwned-book.bin";
+
     public Sugar(Variant variant, String filePath, Option... options) throws IOException {
         super(variant, filePath, options);
 
         waitForReady();
         sendCommand("setoption name Less Pruning Mode value 3");
         sendCommand("setoption name Use MCTS Score value true");
-        sendCommand("setoption name BookFile value /app/bin/books/elo-2650.bin");
+        sendCommand("setoption name BookFile value " + BOOK_FILE_1);
         String line1 = readLine("info string");
         if (line1.contains("Could not open book"))
-            throw new RuntimeException("Error opening book /app/bin/books/elo-2650.bin for " + this.getClass().getSimpleName());
+            throw new RuntimeException("Error opening book " + BOOK_FILE_1 + " for " + this.getClass().getSimpleName());
         waitForReady();
-        sendCommand("setoption name BookFile2 value /app/bin/books/pwned-book.bin");
+        sendCommand("setoption name BookFile2 value " + BOOK_FILE_2);
         String line2 = readLine("info string");
         if (line2.contains("Could not open book"))
-            throw new RuntimeException("Error opening book /app/bin/books/pwned-book.bin for " + this.getClass().getSimpleName());
+            throw new RuntimeException("Error opening book " + BOOK_FILE_2 + " for " + this.getClass().getSimpleName());
     }
 
     public String getBestMove(Query query) throws IOException {

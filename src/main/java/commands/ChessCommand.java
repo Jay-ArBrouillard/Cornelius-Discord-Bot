@@ -169,7 +169,7 @@ public class ChessCommand {
                 break;
             case SETUP:
                 reply = "`Chess` Initialized. Please choose from game options `(1-3)`:\n1. Player (WHITE) vs. Player (BLACK)\n2. Player vs. Computer\n3. Computer vs. Player\n\n" +
-                        "After choosing a game option you will make moves using algebraic long notation (ie: e5e7). When playing against the computer you can select your computer opponent by adding their name after the option for example `2 Komodo v11`\n" +
+                        "After choosing a game option you will make moves using algebraic long notation (ie: e5e7). When playing against the computer you can select your computer opponent by adding their name after the option for example `2 Komodo` or `3 Mikhail Tal`\n" +
                         "Otherwise a random computer that is +/- 50 elo from you will be chosen. If there are none, then the closest elo computer is chosen.";
                 decision = Decision.SETUP_RESPONSE;
                 break;
@@ -729,6 +729,7 @@ public class ChessCommand {
 
     private static String[][] getAIList() {
         return new String[][]{
+                {"693282099167494225DONNA4.1", "Donna"},
                 {"693282099167494225SUGAR", "Sugar"},
                 {"693282099167494225CHEESE2.2", "Cheese"},
                 {"693282099167494225DynamicRO4", "Dynamic"},
@@ -762,25 +763,25 @@ public class ChessCommand {
 //                {"693282099167494225RubinsteinRO4", "Akiba Rubinstein"},
 //                {"693282099167494225SpasskyRO4", "Boris Spassky"},
 //                {"693282099167494225TarraschRO4", "Siegbert Tarrasch"},
-                {"693282099167494225CL0", "Claudia 0"},
+                {"693282099167494225CL0", "Claudia"},
                 {"693282099167494225BARTH", "Bartholomew"},
                 {"693282099167494225STEW", "Stewart"},
                 {"693282099167494225RR", "Randy Random"},
-                {"693282099167494225ET12", "Ethereal 12"},
-            {"693282099167494225MO0.3", "Moustique 0.3"},
-            {"693282099167494225LW0.6", "LittleWing 0.6"},
-            {"693282099167494225FR3", "Fridolin 3"},
-            {"693282099167494225FL0.9", "Floyd 0.9"},
-            {"693282099167494225MO2", "Monolith 2"},
-            {"693282099167494225PI1.5", "Pigeon 1.5"},
-            {"693282099167494225DU1.4", "Dumb 1.4"},
-            {"693282099167494225A0.8", "Asymptote 0.8"},
-            {"693282099167494225CG3.6", "CounterGo 3.6"},
-            {"693282099167494225A3.2", "Amoeba 3.2"},
-            {"693282099167494225L1.7", "Laser 1.7"},
-            {"693282099167494225C2.3", "Cinnamon 2.3"},
-            {"693282099167494225X0.6", "Xiphos 0.6"},
-            {"693282099167494225K11", "Komodo 11"},
+                {"693282099167494225ET12", "Ethereal"},
+            {"693282099167494225MO0.3", "Moustique"},
+            {"693282099167494225LW0.6", "LittleWing"},
+            {"693282099167494225FR3", "Fridolin"},
+            {"693282099167494225FL0.9", "Floyd"},
+            {"693282099167494225MO2", "Monolith"},
+            {"693282099167494225PI1.5", "Pigeon"},
+            {"693282099167494225DU1.4", "Dumb"},
+            {"693282099167494225A0.8", "Asymptote"},
+            {"693282099167494225CG3.6", "CounterGo"},
+            {"693282099167494225A3.2", "Amoeba"},
+            {"693282099167494225L1.7", "Laser"},
+            {"693282099167494225C2.3", "Cinnamon"},
+            {"693282099167494225X0.6", "Xiphos"},
+            {"693282099167494225K11", "Komodo"},
 //            {"693282099167494225CH800", "Cheng 800"},
 //            {"693282099167494225CH900", "Cheng 900"},
 //            {"693282099167494225CH1000", "Cheng 1000"},
