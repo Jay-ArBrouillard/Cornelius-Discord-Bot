@@ -700,6 +700,12 @@ public class ChessCommand {
 
     private static String[][] getAIList() {
         return new String[][]{
+                {"693282099167494225DynamicRO4", "Dynamic"},
+                {"693282099167494225MorphyRO4", "Morphy"},
+                {"693282099167494225SteinitzRO4", "Wilhelm Steinitz"},
+                {"693282099167494225StranglerRO4", "Strangler"},
+                {"693282099167494225SwapperRO4", "Swapper"},
+                {"693282099167494225TarraschRO4", "Siegbert Tarrasch"},
                 {"693282099167494225VincentRO4", "Vincent"},
                 {"693282099167494225AnandRO4", "Viswanathan Anand"},
                 {"693282099167494225AmandaRO4", "Amanda"},
