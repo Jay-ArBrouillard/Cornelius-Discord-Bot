@@ -76,9 +76,9 @@ public class Rodent extends UCIEngine {
             //Now append taunt
             if (lines[0] != null && lines[0].startsWith("info string")) {
                 sb.append("##");
+                lines[0] = lines[0].substring(12);
                 lines[0] = lines[0].replaceAll("\uFFFD", "'");
-                lines[0] = lines[0].replaceAll("\u002C", ",");
-                sb.append(lines[0].substring(12));
+                sb.append(lines[0]);
             }
             return sb.toString();
         }

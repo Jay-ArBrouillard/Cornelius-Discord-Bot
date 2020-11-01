@@ -803,12 +803,12 @@ public class ChessGame {
         if (bestMoveString.contains("##")) {
             String[] split = bestMoveString.split("##");
             bestMoveString = split[0];
-            tauntMsg = split[1].trim();
+            if (split.length == 2) tauntMsg = split[1];
         }
 
         if (mc != null)  {
             mc.sendTyping().queue();
-            //If computer is winning by 5 points there is a 50% chance he will sent a taunt message
+            //If computer is winning by 5 points there is a 50% chance he will send a taunt message
             if (tauntMsg != null && Math.random() >= 0.5 && state.getBoardEvaluationMessage() != null) {
                 double evaluationScore = Double.parseDouble(state.getBoardEvaluationMessage().replace("(white side)", "").trim());
                 if ((isWhitePlayerTurn() && evaluationScore <= -5.0) || (isBlackPlayerTurn() && evaluationScore >= 5.0)) {
