@@ -49,16 +49,14 @@ public class TrainThread extends Thread {
             e.printStackTrace();
             mc.sendMessage(e.toString()).queue();
         }
-        finally {
-            playersInGame.remove(whiteSideId);
-            playersInGame.remove(blackSideId);
-        }
     }
 
     public void run() {
         String status;
         String reply;
         if (state.getMatchStartTime() == null) {
+            playersInGame.remove(whiteSideId);
+            playersInGame.remove(blackSideId);
             return;
         }
         mc.sendMessage("Beginning match on Thread " + threadNum + ": " + whiteSidePlayerName + " vs " + blackSidePlayerName).queue();

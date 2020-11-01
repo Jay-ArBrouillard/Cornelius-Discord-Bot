@@ -84,6 +84,12 @@ public class ChessGame {
 //                    .setOption(Option.Elo, p.name.split("Cornelius ")[1]) //Elo Skill level is in their name
                     .build(), p);
         }
+        else if (p.discordId.endsWith("RO4")) { //Rodent IV
+            String [] name = p.name.split(" ");
+            setClient(new RodentClient.Builder()
+                    .setOption(Option.Personality_File, name.length == 1 ? findPersonalityFileLocation(p.name) : findPersonalityFileLocation(name[1]))
+                    .build(), p);
+        }
         else if (p.name.contains("Cheng")) {
             setClient(new ChengClient.Builder()
                     .setOption(Option.Hash, 32)
@@ -186,12 +192,6 @@ public class ChessGame {
         else if (p.name.contains("Claudia")) {
             setClient(new ClaudiaClient.Builder()
                     //Claudia only has Hash option and sets it 32 by default (min value aswell)
-                    .build(), p);
-        }
-        else if (p.discordId.endsWith("RO4")) { //Rodent IV
-            String [] name = p.name.split(" ");
-            setClient(new RodentClient.Builder()
-                    .setOption(Option.Personality_File, name.length == 1 ? findPersonalityFileLocation(p.name) : findPersonalityFileLocation(name[1]))
                     .build(), p);
         }
         else if (p.name.contains("Randy Random")) {
