@@ -101,11 +101,11 @@ abstract class UCIEngine {
         String line;
         int count = 0;
 
+        //Read for specific amount of responses matching the expected
         while ((line = input.readLine()) != null && count < amount) {
             System.out.println("readResponse:"+line); //To remove
-            lines.add(line);
-
             if (line.startsWith(expected)) {
+                lines.add(line);
                 count++;
             }
         }

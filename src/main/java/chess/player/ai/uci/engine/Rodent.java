@@ -31,11 +31,12 @@ public class Rodent extends UCIEngine {
         List<String> responses = readResponse("info string reading", 3);
         int numSuccesses = 0;
         for (String s : responses) {
-            if (s.endsWith("success")) {
+            System.out.println(s);
+            if (s.contains("success")) {
                 System.out.println("SUCCESS LOADING:" + s);
                 numSuccesses++;
             }
-            if (s.endsWith("failure")) {
+            if (s.contains("failure")) {
                 System.out.println("FAILURE LOADING:" + s);
                 break;
             }
