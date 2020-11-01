@@ -5,7 +5,6 @@ import chess.ChessGameState;
 import chess.GameType;
 import chess.pgn.FenUtils;
 import chess.tables.ChessPlayer;
-import commands.ChessCommand;
 import net.dv8tion.jda.api.entities.MessageChannel;
 
 import java.util.*;
@@ -50,17 +49,19 @@ public class TrainThread extends Thread {
             e.printStackTrace();
             mc.sendMessage(e.getMessage()).queue();
         }
+        finally {
+            playersInGame.remove(whiteSideId);
+            playersInGame.remove(blackSideId);
+        }
     }
 
     public void run() {
         String status;
         String reply;
-        mc.sendMessage("Beginning match on Thread " + threadNum + ": " + whiteSidePlayerName + " vs " + blackSidePlayerName).queue();
-        if (game.client1 == null || game.client2 == null) {
-            playersInGame.remove(whiteSideId);
-            playersInGame.remove(blackSideId);
+        if (state.getMatchStartTime() == null) {
             return;
         }
+        mc.sendMessage("Beginning match on Thread " + threadNum + ": " + whiteSidePlayerName + " vs " + blackSidePlayerName).queue();
         do {
             state = game.ai(null);
             reply = state.getMessage();

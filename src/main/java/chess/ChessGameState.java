@@ -7,7 +7,7 @@ public class ChessGameState {
     private String message;
     private String status;
     private Map<String, Double> prevElo; //PlayerId -> Elo
-    private long matchStartTime;
+    private Long matchStartTime;
     private String boardEvaluationMessage;
     private int fullMoves = 1; //The number of the full move. It starts at 1, and is incremented after Black's move.
     private String winnerId;
@@ -37,11 +37,11 @@ public class ChessGameState {
         return prevElo;
     }
 
-    public long getMatchStartTime() {
+    public Long getMatchStartTime() {
         return matchStartTime;
     }
 
-    public void setMatchStartTime(long matchStartTime) {
+    public void setMatchStartTime(Long matchStartTime) {
         this.matchStartTime = matchStartTime;
     }
 
