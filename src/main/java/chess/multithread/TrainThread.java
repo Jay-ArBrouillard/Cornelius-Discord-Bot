@@ -47,7 +47,7 @@ public class TrainThread extends Thread {
         }
         catch (Exception e) {
             e.printStackTrace();
-            mc.sendMessage(e.getMessage()).queue();
+            mc.sendMessage(e.toString()).queue();
         }
         finally {
             playersInGame.remove(whiteSideId);

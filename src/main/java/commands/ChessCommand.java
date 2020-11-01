@@ -542,7 +542,7 @@ public class ChessCommand {
                     state.setMatchStartTime(Instant.now().toEpochMilli());
                 } catch (IOException e) {
                     e.printStackTrace();
-                    event.getChannel().sendMessage(e.getMessage()).queue();
+                    event.getChannel().sendMessage(e.toString()).queue();
                     gamesCompleted++;
                     continue;
                 }
@@ -631,7 +631,7 @@ public class ChessCommand {
                 state.setMatchStartTime(Instant.now().toEpochMilli());
             } catch (IOException e) {
                 e.printStackTrace();
-                event.getChannel().sendMessage(e.getMessage()).queue();
+                event.getChannel().sendMessage(e.toString()).queue();
                 gamesCompleted++;
                 continue;
             }
