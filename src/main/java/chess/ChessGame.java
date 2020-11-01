@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
 
 public class ChessGame {
     public Board board;
@@ -795,7 +796,21 @@ public class ChessGame {
             return state;
         }
 
-        if (mc != null) mc.sendTyping().queue();
+        //Parse bestMoveString for taunt messages
+        String tauntMsg = null;
+        if (bestMoveString.contains("##")) {
+            String[] split = bestMoveString.split("##");
+            bestMoveString = split[0];
+            tauntMsg = split[1].trim();
+        }
+
+        if (mc != null)  {
+            mc.sendTyping().queue();
+            if (tauntMsg != null) {
+                String fullMessage = didWhiteJustMove() ? "`"+whiteSidePlayer.name+"`: " + tauntMsg : "`"+blackSidePlayer.name+"`: " + tauntMsg;
+                mc.sendMessage(fullMessage).queue();
+            }
+        }
         //Is castling notation?
         bestMoveString = bestMoveString.trim().toLowerCase(); //Always convert best move to lowercase
 

@@ -31,13 +31,10 @@ public class Rodent extends UCIEngine {
         List<String> responses = readResponse("info string reading", 3);
         int numSuccesses = 0;
         for (String s : responses) {
-            System.out.println(s);
             if (s.contains("success")) {
-                System.out.println("SUCCESS LOADING:" + s);
                 numSuccesses++;
             }
             if (s.contains("failure")) {
-                System.out.println("FAILURE LOADING:" + s);
                 break;
             }
         }
@@ -46,6 +43,7 @@ public class Rodent extends UCIEngine {
             throw new RuntimeException("Error initializing Personality and/or opening book files for " + this.getClass().getSimpleName());
         }
         sendCommand("setoption name Verbose value false");
+        sendCommand("setoption name Taunting value true"); //NOTE turned Taunting on here
     }
 
     public String getBestMove(Query query) throws IOException {
@@ -63,8 +61,38 @@ public class Rodent extends UCIEngine {
         waitForReady();
         sendCommand(command.toString());
 
-        String result = readLine("bestmove");
-        if (result != null) return result.split("\\s+")[1].trim();
+        //Assuming Taunting is on
+        //BestMoveString - ex: "e5e7##tauntString"
+        String[] lines = readLines("bestmove");
+        if (lines.length == 1) {
+            if (lines[0] != null) return lines[0].split("\\s+")[1].trim();
+        }
+        else { //Taunt - bestmove
+            StringBuilder sb = null;
+            if (lines[1] != null) {
+                sb.append(lines[1].split("\\s+")[1].trim());
+            }
+
+            if (lines[0] != null && lines[0].startsWith("info string")) {
+                sb.append("##");
+                sb.append(lines[0].substring(lines[0].indexOf("info string ")));
+            }
+            return sb.toString();
+        }
+        return null;
+    }
+
+    String[] readLines(String expected) throws IOException {
+        String[] lines = new String[2]; //index 0 is previous line, index1 is current line
+        String line;
+        while ((line = input.readLine()) != null) {
+            lines[1] = line;
+            if (line.startsWith(expected)) {
+                return lines;
+            }
+            lines[0] = lines[1];
+        }
+
         return null;
     }
 
