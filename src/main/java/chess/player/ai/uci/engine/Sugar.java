@@ -17,8 +17,8 @@ public class Sugar extends UCIEngine {
         waitForReady();
         sendCommand("setoption name Less Pruning Mode value 3");
         sendCommand("setoption name Use MCTS Score value true");
-        sendCommand("setoption name BookFile value books/elo-2650.bin"); //Relative paths work not absolute for here
-        sendCommand("setoption name BookFile value books/ph-exoticbook.bin");
+        sendCommand("setoption name BookFile value /app/bin/books/elo-2650.bin");
+        sendCommand("setoption name BookFile2 value /app/bin/books/ph-exoticbook.bin");
 
         //Ensure books are read in
         List<String> responses = readResponse("info string", 2);
