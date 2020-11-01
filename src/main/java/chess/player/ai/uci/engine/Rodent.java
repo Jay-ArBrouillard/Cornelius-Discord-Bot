@@ -20,6 +20,7 @@ public class Rodent extends UCIEngine {
          */
         waitForReady();
         sendCommand("setoption name Verbose value true");
+        waitForReady();
         sendCommand("setoption name Personality value Cloe");
         readLine("info string reading personality");
 
@@ -27,12 +28,17 @@ public class Rodent extends UCIEngine {
         int numSuccesses = 0;
         for (String s : responses) {
             if (s.endsWith("(success)")) {
+                System.out.println("SUCCESS LOADING:" + s);
                 numSuccesses++;
+            }
+            if (s.endsWith("(failure)")) {
+                System.out.println("FAILURE LOADING:" + s);
+                break;
             }
         }
 
         if (numSuccesses != 3) {
-            throw new RuntimeException("Error initializing Personality and opening book files for " + this);
+            throw new RuntimeException("Error initializing Personality and opening book files for " + this.getClass().getSimpleName());
         }
         sendCommand("setoption name Verbose value false");
     }
