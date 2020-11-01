@@ -52,29 +52,25 @@ public class ChessGame {
         }
     }
 
-    public void setupComputerClient(GameType gameType) {
-        try {
-            ChessPlayer [] players;
-            if (gameType.isPlayerVsComputer()) {
-                if (whiteSidePlayer.discordId.contains(System.getenv("OWNER_ID"))) { //White side is ai
-                    players = new ChessPlayer[]{whiteSidePlayer};
-                }
-                else { //black side is ai
-                    players = new ChessPlayer[]{blackSidePlayer};
-                }
-            } else if (gameType.isComputerVsComputer()) {
-                players = new ChessPlayer[]{whiteSidePlayer, blackSidePlayer};
-            } else { //Player vs player
-                //Don't initialize clients
-                client1 = null;
-                client2 = null;
-                return;
+    public void setupComputerClient(GameType gameType) throws IOException {
+        ChessPlayer [] players;
+        if (gameType.isPlayerVsComputer()) {
+            if (whiteSidePlayer.discordId.contains(System.getenv("OWNER_ID"))) { //White side is ai
+                players = new ChessPlayer[]{whiteSidePlayer};
             }
-            for (ChessPlayer p : players) {
-                setClient(p);
+            else { //black side is ai
+                players = new ChessPlayer[]{blackSidePlayer};
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } else if (gameType.isComputerVsComputer()) {
+            players = new ChessPlayer[]{whiteSidePlayer, blackSidePlayer};
+        } else { //Player vs player
+            //Don't initialize clients
+            client1 = null;
+            client2 = null;
+            return;
+        }
+        for (ChessPlayer p : players) {
+            setClient(p);
         }
     }
 

@@ -31,12 +31,9 @@ public class TrainThread extends Thread {
         ChessPlayer blackSidePlayer = game.addUser(id2, name2);
         game.setWhiteSidePlayer(whiteSidePlayer);
         game.setBlackSidePlayer(blackSidePlayer);
-        game.setupStockfishClient();
-        game.setupComputerClient(GameType.CVC);
         game.gameType = GameType.CVC;
         state.getPrevElo().put(whiteSidePlayer.discordId, whiteSidePlayer.elo);
         state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
-        state.setMatchStartTime(Instant.now().toEpochMilli());
         this.whiteSidePlayerName = name1;
         this.blackSidePlayerName = name2;
         this.whiteSideId = id1;
@@ -44,12 +41,26 @@ public class TrainThread extends Thread {
         this.threadNum = threadNum;
         this.mc = mc;
         this.playersInGame = playersInGame;
+        try {
+            game.setupComputerClient(GameType.CVC);
+            game.setupStockfishClient();
+            state.setMatchStartTime(Instant.now().toEpochMilli());
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            mc.sendMessage(e.getMessage()).queue();
+        }
     }
 
     public void run() {
         String status;
         String reply;
         mc.sendMessage("Beginning match on Thread " + threadNum + ": " + whiteSidePlayerName + " vs " + blackSidePlayerName).queue();
+        if (game.client1 == null || game.client2 == null) {
+            playersInGame.remove(whiteSideId);
+            playersInGame.remove(blackSideId);
+            return;
+        }
         do {
             state = game.ai(null);
             reply = state.getMessage();

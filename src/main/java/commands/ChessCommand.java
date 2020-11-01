@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.io.File;
+import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
 
@@ -200,9 +201,15 @@ public class ChessCommand {
                     gameType = GameType.PVC;
                     chessGame.gameType = GameType.PVC;
                     decision = PLAYER_MOVE;
-                    chessGame.setupComputerClient(gameType);
-                    chessGame.setupStockfishClient();
-                    state.setMatchStartTime(Instant.now().toEpochMilli());
+                    try {
+                        chessGame.setupComputerClient(gameType);
+                        chessGame.setupStockfishClient();
+                        state.setMatchStartTime(Instant.now().toEpochMilli());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        event.getChannel().sendMessage(e.getMessage()).queue();
+                        endGame(event.getChannel());
+                    }
                 }
                 else if (reply.startsWith(GameType.CVP.toString())) {
                     boardImageFile = new File(GAME_BOARD_IMAGE_LOCATION);
@@ -219,9 +226,15 @@ public class ChessCommand {
                     gameType = GameType.CVP;
                     chessGame.gameType = GameType.CVP;
                     decision = COMPUTER_MOVE;
-                    chessGame.setupComputerClient(gameType);
-                    chessGame.setupStockfishClient();
-                    state.setMatchStartTime(Instant.now().toEpochMilli());
+                    try {
+                        chessGame.setupComputerClient(gameType);
+                        chessGame.setupStockfishClient();
+                        state.setMatchStartTime(Instant.now().toEpochMilli());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        event.getChannel().sendMessage(e.getMessage()).queue();
+                        endGame(event.getChannel());
+                    }
                 }
                 break;
             case CHALLENGE_OPPONENT:
@@ -520,12 +533,19 @@ public class ChessCommand {
                 chessGame.setWhiteSidePlayer(whiteSidePlayer);
                 gameType = GameType.CVC;
                 chessGame.gameType = GameType.CVC;
-                chessGame.setupStockfishClient();
-                chessGame.setupComputerClient(gameType);
                 state.getPrevElo().put(whiteSidePlayer.discordId, whiteSidePlayer.elo);
                 state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
-                state.setMatchStartTime(Instant.now().toEpochMilli());
                 decision = COMPUTER_MOVE;
+                try {
+                    chessGame.setupComputerClient(gameType);
+                    chessGame.setupStockfishClient();
+                    state.setMatchStartTime(Instant.now().toEpochMilli());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    event.getChannel().sendMessage(e.getMessage()).queue();
+                    gamesCompleted++;
+                    continue;
+                }
 
                 event.getChannel().sendMessage("Beginning match (" + (gamesCompleted+1) + "/" + totalGames + ") : " + whiteSidePlayer.name + " vs " + blackSidePlayer.name).queue();
                 String status;
@@ -601,12 +621,20 @@ public class ChessCommand {
             chessGame.setWhiteSidePlayer(whiteSidePlayer);
             gameType = GameType.CVC;
             chessGame.gameType = GameType.CVC;
-            chessGame.setupStockfishClient();
-            chessGame.setupComputerClient(gameType);
             state.getPrevElo().put(whiteSidePlayer.discordId, whiteSidePlayer.elo);
             state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
-            state.setMatchStartTime(Instant.now().toEpochMilli());
             decision = COMPUTER_MOVE;
+
+            try {
+                chessGame.setupComputerClient(gameType);
+                chessGame.setupStockfishClient();
+                state.setMatchStartTime(Instant.now().toEpochMilli());
+            } catch (IOException e) {
+                e.printStackTrace();
+                event.getChannel().sendMessage(e.getMessage()).queue();
+                gamesCompleted++;
+                continue;
+            }
 
             event.getChannel().sendMessage("Beginning match (" + (gamesCompleted+1) + "/" + totalGames + ") : " + whiteSidePlayer.name + " vs " + blackSidePlayer.name).queue();
             String status;
