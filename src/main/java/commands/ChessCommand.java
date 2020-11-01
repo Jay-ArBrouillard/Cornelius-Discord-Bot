@@ -359,12 +359,27 @@ public class ChessCommand {
             List<String> matchup = null;
 
             // Find a match that is not running. Same player can't be in two games at the same time
-            for (int i = 0; i < allMatchups.size(); i++) {
-                List currMatchup = allMatchups.get(i);
-                if (!playersInGame.contains(currMatchup.get(0)) && !playersInGame.contains(currMatchup.get(2))) {
-                    //found a free matchup
-                    matchup = allMatchups.remove(i);
-                    break;
+            // Alternate iterating from front and back so games are played more evenly
+            if (allMatchups.size() % 2 == 0) {
+                for (int i = 0; i < allMatchups.size(); i++) {
+                    List currMatchup = allMatchups.get(i);
+                    if (!playersInGame.contains(currMatchup.get(0)) && !playersInGame.contains(currMatchup.get(2))) {
+                        //found a free matchup
+                        matchup = allMatchups.remove(i);
+                        System.gc();
+                        break;
+                    }
+                }
+            }
+            else {
+                for (int i = allMatchups.size()-1; i >= 0; i--) {
+                    List currMatchup = allMatchups.get(i);
+                    if (!playersInGame.contains(currMatchup.get(0)) && !playersInGame.contains(currMatchup.get(2))) {
+                        //found a free matchup
+                        matchup = allMatchups.remove(i);
+                        System.gc();
+                        break;
+                    }
                 }
             }
 
@@ -477,13 +492,27 @@ public class ChessCommand {
             List<String> matchup = null;
 
             // Find a match that is not running. Same player can't be in two games at the same time
-            for (int i = 0; i < allMatchups.size(); i++) {
-                List currMatchup = allMatchups.get(i);
-                if (!playersInGame.contains(currMatchup.get(0)) && !playersInGame.contains(currMatchup.get(2))) {
-                    //found a free matchup
-                    matchup = allMatchups.remove(i);
-                    System.gc();
-                    break;
+            // Alternate iterating from front and back so games are played more evenly
+            if (allMatchups.size() % 2 == 0) {
+                for (int i = 0; i < allMatchups.size(); i++) {
+                    List currMatchup = allMatchups.get(i);
+                    if (!playersInGame.contains(currMatchup.get(0)) && !playersInGame.contains(currMatchup.get(2))) {
+                        //found a free matchup
+                        matchup = allMatchups.remove(i);
+                        System.gc();
+                        break;
+                    }
+                }
+            }
+            else {
+                for (int i = allMatchups.size()-1; i >= 0; i--) {
+                    List currMatchup = allMatchups.get(i);
+                    if (!playersInGame.contains(currMatchup.get(0)) && !playersInGame.contains(currMatchup.get(2))) {
+                        //found a free matchup
+                        matchup = allMatchups.remove(i);
+                        System.gc();
+                        break;
+                    }
                 }
             }
 
