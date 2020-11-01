@@ -1,4 +1,7 @@
-; Personality for Rodent IV chess engine
+; Anand personality for Rodent IV chess engine
+; hommage to Viswanathan Anand
+; fast player, slight preference for attack, cares for pawn structure
+
 setoption name PawnValueMg value 100
 setoption name KnightValueMg value 325
 setoption name BishopValueMg value 335
