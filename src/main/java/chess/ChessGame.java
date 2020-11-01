@@ -213,6 +213,11 @@ public class ChessGame {
                     .setOption(Option.Hash, 32)
                     .build(), p);
         }
+        else if (p.name.contains("Critter")) {
+            setClient(new CritterClient.Builder()
+                    .setOption(Option.Hash, 32)
+                    .build(), p);
+        }
     }
 
     private void setClient(BaseAiClient client, ChessPlayer p) {
