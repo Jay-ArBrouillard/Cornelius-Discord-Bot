@@ -5,6 +5,7 @@ import chess.player.ai.uci.engine.enums.Query;
 import chess.player.ai.uci.engine.enums.Variant;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 public class Rodent extends UCIEngine {
@@ -18,13 +19,15 @@ public class Rodent extends UCIEngine {
             info string reading book file '/app/bin/books/guide/cat.bin' (success)
             info string reading book file '/app/bin/books/rodent.bin' (success)
          */
-        waitForReady();
-        sendCommand("uci");
-        readLine("uciok");
+        Option personality = Arrays.stream(options).findFirst().filter(o -> Option.Personality_File.getOptionString().equals(o.getOptionString())).orElse(null);
+        if (personality == null) {
+            throw new RuntimeException("Error initializing " + this.getClass().getSimpleName() + " Personality File is not set");
+        }
+
         waitForReady();
         sendCommand("setoption name Verbose value true");
         waitForReady();
-        sendCommand("setoption name Personality value Cloe");
+        sendCommand("setoption name PersonalityFile value " + personality.getValue());
         readLine("info string reading personality");
 
         List<String> responses = readResponse("info string reading book file", 2);

@@ -189,7 +189,7 @@ public class ChessGame {
         else if (p.discordId.endsWith("RO4")) { //Rodent IV
             String [] name = p.name.split(" ");
             setClient(new RodentClient.Builder()
-                    .setOption(Option.Personality, name.length == 1 ? p.name : name[1])
+                    .setOption(Option.Personality_File, name.length == 1 ? findPersonalityFileLocation(p.name) : findPersonalityFileLocation(name[1]))
                     .build(), p);
         }
         else if (p.name.contains("Randy Random")) {
@@ -210,6 +210,30 @@ public class ChessGame {
         else if (p.discordId.equals(blackSidePlayer.discordId)) {
             client2 = client; //Black side player will always be client 2
         }
+    }
+
+    private String findPersonalityFileLocation(String name) {
+        File f = new File("/app/bin/personalities");
+        String fileName = (name+".txt").toLowerCase(); //Force lowercase here
+        Collection<File> allFiles = listFileTree(f);
+        for (File file : allFiles) {
+            if (fileName.equals(file.getName())) {
+                return file.getPath();
+            }
+        }
+        throw new RuntimeException("Could not find personality file for " + name);
+    }
+
+    public static Collection<File> listFileTree(File dir) {
+        Set<File> fileTree = new HashSet<>();
+        if(dir==null||dir.listFiles()==null){
+            return fileTree;
+        }
+        for (File entry : dir.listFiles()) {
+            if (entry.isFile()) fileTree.add(entry);
+            else fileTree.addAll(listFileTree(entry));
+        }
+        return fileTree;
     }
 
     public void setWhiteSidePlayer(ChessPlayer whiteSidePlayer) {

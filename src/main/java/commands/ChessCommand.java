@@ -207,8 +207,8 @@ public class ChessCommand {
                         state.setMatchStartTime(Instant.now().toEpochMilli());
                     } catch (IOException e) {
                         e.printStackTrace();
-                        event.getChannel().sendMessage(e.getMessage()).queue();
-                        endGame(event.getChannel());
+                        reply = e.getMessage();
+                        state.setStateError();
                     }
                 }
                 else if (reply.startsWith(GameType.CVP.toString())) {
@@ -225,15 +225,15 @@ public class ChessCommand {
                     reply = "`Starting Chess Game " + whiteSidePlayer.name + " (" + (int)whiteSidePlayer.elo + ")" + " vs. " + blackSidePlayer.name + " (" + (int)blackSidePlayer.elo + ")`\n" + whiteSidePlayer.name + " will go first...";
                     gameType = GameType.CVP;
                     chessGame.gameType = GameType.CVP;
-                    decision = COMPUTER_MOVE;
                     try {
                         chessGame.setupComputerClient(gameType);
                         chessGame.setupStockfishClient();
+                        decision = COMPUTER_MOVE;
                         state.setMatchStartTime(Instant.now().toEpochMilli());
                     } catch (IOException e) {
                         e.printStackTrace();
-                        event.getChannel().sendMessage(e.getMessage()).queue();
-                        endGame(event.getChannel());
+                        reply = e.getMessage();
+                        state.setStateError();
                     }
                 }
                 break;
@@ -849,7 +849,7 @@ public class ChessCommand {
         currentMessageIds.clear();
 
         String status = state.getStatus();
-        if (CHECKMATE.equals(status) || DRAW.equals(status) || COMPUTER_RESIGN.equals(status) || CHALLENGEE_DECLINE.equals(status)) {
+        if (CHECKMATE.equals(status) || DRAW.equals(status) || COMPUTER_RESIGN.equals(status) || CHALLENGEE_DECLINE.equals(status) || ERROR.equals(status)) {
             endGame(event.getChannel());
         }
     }
