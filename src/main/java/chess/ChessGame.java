@@ -189,7 +189,7 @@ public class ChessGame {
         else if (p.discordId.endsWith("RO4")) { //Rodent IV
             String [] name = p.name.split(" ");
             setClient(new RodentClient.Builder()
-                    .setOption(Option.PersonalityFileLocation, name.length == 1 ? p.name : name[1])
+                    .setOption(Option.Personality, name.length == 1 ? p.name : name[1])
                     .build(), p);
         }
         else if (p.name.contains("Randy Random")) {

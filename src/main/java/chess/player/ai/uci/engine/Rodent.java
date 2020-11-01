@@ -19,6 +19,9 @@ public class Rodent extends UCIEngine {
             info string reading book file '/app/bin/books/rodent.bin' (success)
          */
         waitForReady();
+        sendCommand("uci");
+        readLine("uciok");
+        waitForReady();
         sendCommand("setoption name Verbose value true");
         waitForReady();
         sendCommand("setoption name Personality value Cloe");

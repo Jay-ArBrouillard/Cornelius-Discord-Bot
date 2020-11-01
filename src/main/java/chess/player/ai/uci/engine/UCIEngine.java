@@ -25,18 +25,8 @@ abstract class UCIEngine {
             output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
             for (Option option : options) {
-                Object value = option.getValue();
-                if (value != null && value.toString().endsWith(".txt")) {
-                    List<String> lines = Files.readAllLines(Paths.get(value.toString()));
-                    for (String line : lines) {
-                        if (line.startsWith("setoption")) {
-                            sendCommand(line);
-                        }
-                    }
-                }
-                else {
-                    passOption(option);
-                }
+                if (option.getOptionString().equals("Personality")) continue; //Skip Personality option here setting this in Rodent constructor
+                passOption(option);
             }
         } catch (IOException e) {
             throw new IOException("Unable to start and bind " + super.getClass().getSimpleName() + " process: ", e);
