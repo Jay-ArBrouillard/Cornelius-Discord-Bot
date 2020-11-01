@@ -104,8 +104,26 @@ abstract class UCIEngine {
                 return line;
         }
 
-        return line;
+        return null;
     }
+
+    List<String> readResponse(String expected, int amount) throws IOException {
+        List<String> lines = new ArrayList<>();
+        String line;
+        int count = 0;
+
+        while ((line = input.readLine()) != null && count < amount) {
+//            System.out.println("readResponse:"+line); //To remove
+            lines.add(line);
+
+            if (line.startsWith(expected)) {
+                count++;
+            }
+        }
+
+        return lines;
+    }
+
 
     List<String> readResponse(String expected) throws IOException {
         List<String> lines = new ArrayList<>();

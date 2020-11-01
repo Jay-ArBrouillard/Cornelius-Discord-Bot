@@ -193,8 +193,7 @@ public class ChessGame {
         else if (p.discordId.endsWith("RO4")) { //Rodent IV
             String [] name = p.name.split(" ");
             setClient(new RodentClient.Builder()
-                    .setOption(Option.PersonalityFileLocation, name.length == 1 ? findPersonalityFileLocation(name[0].toLowerCase()) :
-                                                                                  findPersonalityFileLocation(name[1].toLowerCase()))
+                    .setOption(Option.PersonalityFileLocation, name.length == 1 ? p.name : name[1])
                     .build(), p);
         }
         else if (p.name.contains("Randy Random")) {
@@ -206,30 +205,6 @@ public class ChessGame {
         else if (p.name.contains("Bartholomew")) {
             setClient(new StewartClient(4), p);
         }
-    }
-
-    private String findPersonalityFileLocation(String name) {
-        File f = new File("/app/bin/personalities");
-        String fileName = name+".txt";
-        Collection<File> allFiles = listFileTree(f);
-        for (File file : allFiles) {
-            if (fileName.equals(file.getName())) {
-                return file.getPath();
-            }
-        }
-        throw new RuntimeException("Could not find personality file for " + name);
-    }
-
-    public static Collection<File> listFileTree(File dir) {
-        Set<File> fileTree = new HashSet<>();
-        if(dir==null||dir.listFiles()==null){
-            return fileTree;
-        }
-        for (File entry : dir.listFiles()) {
-            if (entry.isFile()) fileTree.add(entry);
-            else fileTree.addAll(listFileTree(entry));
-        }
-        return fileTree;
     }
 
     private void setClient(BaseAiClient client, ChessPlayer p) {
