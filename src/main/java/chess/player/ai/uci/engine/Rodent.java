@@ -64,19 +64,26 @@ public class Rodent extends UCIEngine {
         //Assuming Taunting is on
         //BestMoveString - ex: "e5e7##tauntString"
         String[] lines = readLines("bestmove");
+        System.out.println(lines.length);
+        System.out.println(lines[0] + ", " + lines[1]);
         if (lines.length == 1) {
             if (lines[0] != null) return lines[0].split("\\s+")[1].trim();
         }
         else { //Taunt - bestmove
             StringBuilder sb = null;
-            if (lines[1] != null) {
+            if (lines[1] != null) { //Best move
                 sb.append(lines[1].split("\\s+")[1].trim());
             }
 
+            System.out.println(sb.toString());
+
             if (lines[0] != null && lines[0].startsWith("info string")) {
                 sb.append("##");
-                sb.append(lines[0].substring(lines[0].indexOf("info string ")));
+                sb.append(lines[0].substring(lines[0].indexOf("info string")));
             }
+
+            System.out.println(sb.toString());
+
             return sb.toString();
         }
         return null;
