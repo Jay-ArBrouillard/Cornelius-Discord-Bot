@@ -808,9 +808,13 @@ public class ChessGame {
 
         if (mc != null)  {
             mc.sendTyping().queue();
-            if (tauntMsg != null) {
-                String fullMessage = isWhitePlayerTurn() ? "`"+whiteSidePlayer.name+"` -" + tauntMsg : "`"+blackSidePlayer.name+"`: " + tauntMsg;
-                mc.sendMessage(fullMessage).queue();
+            //If computer is winning by 5 points there is a 50% chance he will sent a taunt message
+            if (tauntMsg != null && Math.random() >= 0.5 && state.getBoardEvaluationMessage() != null) {
+                double evaluationScore = Double.parseDouble(state.getBoardEvaluationMessage().replace("(white side)", "").trim());
+                if ((isWhitePlayerTurn() && evaluationScore <= -5.0) || (isBlackPlayerTurn() && evaluationScore >= 5.0)) {
+                    String fullMessage = isWhitePlayerTurn() ? "`"+whiteSidePlayer.name+"` -" + tauntMsg : "`"+blackSidePlayer.name+"`: " + tauntMsg;
+                    mc.sendMessage(fullMessage).queue();
+                }
             }
         }
         //Is castling notation?
