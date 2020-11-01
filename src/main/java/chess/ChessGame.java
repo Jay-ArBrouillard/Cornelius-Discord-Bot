@@ -809,7 +809,7 @@ public class ChessGame {
         if (mc != null)  {
             mc.sendTyping().queue();
             if (tauntMsg != null) {
-                String fullMessage = didWhiteJustMove() ? "`"+whiteSidePlayer.name+"`: " + tauntMsg : "`"+blackSidePlayer.name+"`: " + tauntMsg;
+                String fullMessage = isWhitePlayerTurn() ? "`"+whiteSidePlayer.name+"` -" + tauntMsg : "`"+blackSidePlayer.name+"`: " + tauntMsg;
                 mc.sendMessage(fullMessage).queue();
             }
         }
