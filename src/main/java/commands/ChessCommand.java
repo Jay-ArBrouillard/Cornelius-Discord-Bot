@@ -875,7 +875,7 @@ public class ChessCommand {
             event.getChannel().purgeMessagesById(oldMessageIds);
             oldMessageIds.clear();
         }
-        if ((reply != null) && reply.contains("null")) return;
+        if (reply == null || reply.isEmpty()) return;
         event.getChannel().sendMessage(reply).queue((msg) -> currentMessageIds.add(msg.getId()));
         if (file != null) {
             event.getChannel().sendFile(file).queue((msg) -> currentMessageIds.add(msg.getId()));

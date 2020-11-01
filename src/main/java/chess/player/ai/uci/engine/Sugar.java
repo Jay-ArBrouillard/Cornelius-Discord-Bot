@@ -18,23 +18,14 @@ public class Sugar extends UCIEngine {
         sendCommand("setoption name Less Pruning Mode value 3");
         sendCommand("setoption name Use MCTS Score value true");
         sendCommand("setoption name BookFile value /app/bin/books/elo-2650.bin");
-        sendCommand("setoption name BookFile2 value /app/bin/books/ph-exoticbook.bin");
-
-        //Ensure books are read in
-        List<String> responses = readResponse("info string", 2);
-        int numSuccesses = 0;
-        for (String s : responses) {
-            if (s.contains("Book Loaded")) {
-                numSuccesses++;
-            }
-            if (s.contains("Could not open book")) {
-                break;
-            }
-        }
-
-        if (numSuccesses != 2) {
-            throw new RuntimeException("Error opening book files for " + this.getClass().getSimpleName());
-        }
+        String line1 = readLine("info string");
+        if (line1.contains("Could not open book"))
+            throw new RuntimeException("Error opening book /app/bin/books/elo-2650.bin for " + this.getClass().getSimpleName());
+        waitForReady();
+        sendCommand("setoption name BookFile2 value /app/bin/books/pwned-book.bin");
+        String line2 = readLine("info string");
+        if (line2.contains("Could not open book"))
+            throw new RuntimeException("Error opening book /app/bin/books/pwned-book.bin for " + this.getClass().getSimpleName());
     }
 
     public String getBestMove(Query query) throws IOException {
