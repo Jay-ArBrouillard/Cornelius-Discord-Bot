@@ -19,7 +19,6 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
 
 public class ChessGame {
     public Board board;
@@ -213,8 +212,13 @@ public class ChessGame {
                     .setOption(Option.Hash, 32)
                     .build(), p);
         }
-        else if (p.name.contains("Critter")) {
-            setClient(new CritterClient.Builder()
+        else if (p.name.contains("Fruit")) {
+            setClient(new FruitClient.Builder()
+                    .setOption(Option.Hash, 32)
+                    .build(), p);
+        }
+        else if (p.name.contains("Donna")) {
+            setClient(new DonnaClient.Builder()
                     .setOption(Option.Hash, 32)
                     .build(), p);
         }
