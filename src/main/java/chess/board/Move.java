@@ -81,6 +81,7 @@ public abstract class Move {
 
     public boolean isCaptureOrPawnMove(Move move) {
         if (move instanceof MajorAttackMove ||
+                move instanceof AttackMove ||
                 move instanceof PawnMove ||
                 move instanceof PawnAttackMove ||
                 move instanceof PawnEnPassantAttackMove ||
