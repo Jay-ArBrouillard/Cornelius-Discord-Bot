@@ -1,11 +1,15 @@
 package chess.board;
 
 import chess.board.Board.Builder;
+import chess.pgn.FenUtils;
 import chess.pieces.Pawn;
 import chess.pieces.Piece;
 import chess.pieces.Piece.PieceType;
 import chess.pieces.Queen;
 import chess.pieces.Rook;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class Move {
 
@@ -88,7 +92,6 @@ public abstract class Move {
                 move instanceof PawnPromotion ||
                 move instanceof PawnJump)
             return true;
-
         return false;
     }
 
@@ -110,7 +113,15 @@ public abstract class Move {
         builder.setMoveMaker(this.board.getCurrentPlayer().getOpponent().getAlliance());
         int numHalfMovesSinceCaptureOrPawnMove = isCaptureOrPawnMove(this) ? 0 : this.board.getNumHalfMoves() + 1;
         int numFullMoves = this.board.getCurrentPlayer().getAlliance().isBlack() ? this.board.getNumFullMoves() + 1 : this.board.getNumFullMoves();
-        return builder.build(numHalfMovesSinceCaptureOrPawnMove, numFullMoves); //Return a new board
+        String fen = FenUtils.parseFENNoMoves(this.board);
+        Map<String, Integer> positionCountMap = this.board.getPositionCountMap();
+        if (positionCountMap.containsKey(fen)) {
+            positionCountMap.put(fen, positionCountMap.get(fen) + 1);
+        }
+        else {
+            positionCountMap.put(fen, 1);
+        }
+        return builder.build(numHalfMovesSinceCaptureOrPawnMove, numFullMoves, positionCountMap); //Return a new board
     }
 
     /*
@@ -246,7 +257,15 @@ public abstract class Move {
             builder.setMoveMaker(this.board.getCurrentPlayer().getOpponent().getAlliance());
             int numHalfMovesSinceCaptureOrPawnMove = isCaptureOrPawnMove(this) ? 0 : this.board.getNumHalfMoves() + 1;
             int numFullMoves = this.board.getCurrentPlayer().getAlliance().isBlack() ? this.board.getNumFullMoves() + 1 : this.board.getNumFullMoves();
-            return builder.build(numHalfMovesSinceCaptureOrPawnMove, numFullMoves); //Return a new board
+            String fen = FenUtils.parseFENNoMoves(this.board);
+            Map<String, Integer> positionCountMap = this.board.getPositionCountMap();
+            if (positionCountMap.containsKey(fen)) {
+                positionCountMap.put(fen, positionCountMap.get(fen) + 1);
+            }
+            else {
+                positionCountMap.put(fen, 1);
+            }
+            return builder.build(numHalfMovesSinceCaptureOrPawnMove, numFullMoves, positionCountMap); //Return a new board
         }
 
         @Override
@@ -307,7 +326,15 @@ public abstract class Move {
             builder.setMoveMaker(this.board.getCurrentPlayer().getOpponent().getAlliance());
             int numHalfMovesSinceCaptureOrPawnMove = isCaptureOrPawnMove(this) ? 0 : this.board.getNumHalfMoves() + 1;
             int numFullMoves = this.board.getCurrentPlayer().getAlliance().isBlack() ? this.board.getNumFullMoves() + 1 : this.board.getNumFullMoves();
-            return builder.build(numHalfMovesSinceCaptureOrPawnMove, numFullMoves); //Return a new board
+            String fen = FenUtils.parseFENNoMoves(this.board);
+            Map<String, Integer> positionCountMap = this.board.getPositionCountMap();
+            if (positionCountMap.containsKey(fen)) {
+                positionCountMap.put(fen, positionCountMap.get(fen) + 1);
+            }
+            else {
+                positionCountMap.put(fen, 1);
+            }
+            return builder.build(numHalfMovesSinceCaptureOrPawnMove, numFullMoves, positionCountMap); //Return a new board
         }
 
         @Override
@@ -360,7 +387,15 @@ public abstract class Move {
             builder.setMoveMaker(this.board.getCurrentPlayer().getOpponent().getAlliance());
             int numHalfMovesSinceCaptureOrPawnMove = isCaptureOrPawnMove(this) ? 0 : this.board.getNumHalfMoves() + 1;
             int numFullMoves = this.board.getCurrentPlayer().getAlliance().isBlack() ? this.board.getNumFullMoves() + 1 : this.board.getNumFullMoves();
-            return builder.build(numHalfMovesSinceCaptureOrPawnMove, numFullMoves); //Return a new board
+            String fen = FenUtils.parseFENNoMoves(this.board);
+            Map<String, Integer> positionCountMap = this.board.getPositionCountMap();
+            if (positionCountMap.containsKey(fen)) {
+                positionCountMap.put(fen, positionCountMap.get(fen) + 1);
+            }
+            else {
+                positionCountMap.put(fen, 1);
+            }
+            return builder.build(numHalfMovesSinceCaptureOrPawnMove, numFullMoves, positionCountMap); //Return a new board
         }
 
         @Override
@@ -440,7 +475,15 @@ public abstract class Move {
             builder.setMoveMaker(this.board.getCurrentPlayer().getOpponent().getAlliance());
             int numHalfMovesSinceCaptureOrPawnMove = isCaptureOrPawnMove(this) ? 0 : this.board.getNumHalfMoves() + 1;
             int numFullMoves = this.board.getCurrentPlayer().getAlliance().isBlack() ? this.board.getNumFullMoves() + 1 : this.board.getNumFullMoves();
-            return builder.build(numHalfMovesSinceCaptureOrPawnMove, numFullMoves); //Return a new board
+            String fen = FenUtils.parseFENNoMoves(this.board);
+            Map<String, Integer> positionCountMap = this.board.getPositionCountMap();
+            if (positionCountMap.containsKey(fen)) {
+                positionCountMap.put(fen, positionCountMap.get(fen) + 1);
+            }
+            else {
+                positionCountMap.put(fen, 1);
+            }
+            return builder.build(numHalfMovesSinceCaptureOrPawnMove, numFullMoves, positionCountMap); //Return a new board
         }
 
         @Override

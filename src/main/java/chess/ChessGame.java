@@ -472,6 +472,13 @@ public class ChessGame {
             }
 
             // Is game in a draw?
+            if (this.board.isFivefoldRepetition()) {
+                state.setMessage("DRAW! Fivefold Repetition rule. The exact same position occurred 5 times.");
+                state.setStateDraw();
+                updateDatabaseDraw();
+                return state;
+            }
+
             if (this.board.isDraw50MoveRule()) {
                 state.setMessage("DRAW (50 move rule)! The previous 50 moves resulted in no captures or pawn movements.");
                 state.setStateDraw();
