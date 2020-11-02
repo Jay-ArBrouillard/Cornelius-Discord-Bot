@@ -32,7 +32,9 @@ public class ChessGame {
     public BaseAiClient client1;
     public BaseAiClient client2;
     public GameType gameType;
-    private boolean DEBUG = true;
+    //Computer must have an maintain an evaluation of +-10 for 3 consecutive moves
+    public List<Boolean> whiteSideResign = new LinkedList<>();
+    public List<Boolean> blackSideResign = new LinkedList<>();
 
     public ChessGame(ChessGameState state) {
         db = new GoogleSheets();
@@ -525,24 +527,44 @@ public class ChessGame {
             }
 
             //Should computer resign?
+            // Evaluation must be +- 10 based on the side they are playing on for 3 consecutive turns
+            // This ensures that one bad move doesn't cause computer to immediately forfeit
+            // In fact they must play 3 very, very bad moves in a row
             if (isComputer && state.getBoardEvaluationMessage() != null) {
                 double evaluationScore = Double.parseDouble(state.getBoardEvaluationMessage().replace("(white side)", "").trim());
-                if (didWhiteJustMove() && evaluationScore <= -12) {
-                    state.setMessage(whiteSidePlayer.name + " has RESIGNED!");
-                    state.setStateComputerResign();
-                    state.setWinnerId(blackSidePlayer.discordId);
-                    state.setPlayerForfeit();
-                    updateDatabaseBlackSideWin(true);
-                    return state;
+                if (didWhiteJustMove()) {
+                    if (evaluationScore <= -10) {
+                        manageResignList(true, true);
+                    } else {
+                        manageResignList(true, false);
+                    }
+                    if (whiteSideResign.stream().allMatch(x -> x.booleanValue() == true)) {
+                        state.setMessage(whiteSidePlayer.name + " has RESIGNED!");
+                        state.setStateComputerResign();
+                        state.setWinnerId(blackSidePlayer.discordId);
+                        state.setPlayerForfeit();
+                        updateDatabaseBlackSideWin(true);
+                        return state;
+                    }
                 }
-                if (didBlackJustMove() && evaluationScore >= 12) {
-                    state.setMessage(blackSidePlayer.name + " has RESIGNED!");
-                    state.setStateComputerResign();
-                    state.setWinnerId(whiteSidePlayer.discordId);
-                    state.setPlayerForfeit();
-                    updateDatabaseWhiteSideWin(true);
-                    return state;
+                else {
+                    if (evaluationScore >= 10) {
+                        manageResignList(false, true);
+                    } else {
+                        manageResignList(false, false);
+                    }
+                    if (blackSideResign.stream().allMatch(x -> x.booleanValue() == true)) {
+                        state.setMessage(blackSidePlayer.name + " has RESIGNED!");
+                        state.setStateComputerResign();
+                        state.setWinnerId(whiteSidePlayer.discordId);
+                        state.setPlayerForfeit();
+                        updateDatabaseWhiteSideWin(true);
+                        return state;
+                    }
                 }
+            }
+            else if (isComputer) {
+                manageResignList(didWhiteJustMove(), false);
             }
 
             //If we get to this point then player made a legal move
@@ -557,7 +579,7 @@ public class ChessGame {
             return state;
         }
         else {
-            if (DEBUG && isComputer) {
+            if (isComputer) {
                 System.out.println(String.format("Start coordinate: %d, Destination coordinate: %d, Move command: %s, Promotion Type: %s", startCoordinate, destinationCoordinate, moveCmd, promotionType));
                 System.out.println(String.format("Current fen:%s", FenUtils.parseFEN(this.board)));
                 if (isWhitePlayerTurn()) {
@@ -580,6 +602,21 @@ public class ChessGame {
                 transition = null;
                 return state;
             }
+        }
+    }
+
+    private void manageResignList(boolean isWhiteSide, boolean result) {
+        if (isWhiteSide) {
+            if (whiteSideResign.size() == 3) {
+                whiteSideResign.remove(0);
+            }
+            whiteSideResign.add(result);
+        }
+        else {
+            if (blackSideResign.size() == 3) {
+                blackSideResign.remove(0);
+            }
+            blackSideResign.add(result);
         }
     }
 
