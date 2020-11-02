@@ -24,7 +24,7 @@ public class Board {
     private final Player currentPlayer;
 
     private final Pawn enPassantPawn;
-    private final List<Boolean> movesPlayed; //If a move captures a piece or moves a pawn value is true else false
+    private final int numHalfMoves; //The number of half moves since a capture or a pawn move
     private final int numFullMoves; //The number of the full move. It starts at 1, and is incremented after Black's move.
 
     private static final int START_X_COORDINATE = 70;
@@ -32,8 +32,9 @@ public class Board {
     private static final int X_OFFSET = 162;
     private static final int Y_OFFSET = 162;
 
-    public Board(Builder builder, List<Boolean> movesPlayed, int numFullMoves) {
+    public Board(Builder builder, int numHalfMoves, int numFullMoves) {
         this.gameBoard = createGameBoard(builder);
+        this.numHalfMoves = numHalfMoves;
         this.numFullMoves = numFullMoves;
         this.whitePieces = calculateActivePieces(this.gameBoard, Alliance.WHITE);
         this.blackPieces = calculateActivePieces(this.gameBoard, Alliance.BLACK);
@@ -45,8 +46,6 @@ public class Board {
         this.whitePlayer = new WhitePlayer(this, whiteStandardLegalMoves, blackStandardLegalMoves);
         this.blackPlayer = new BlackPlayer(this, whiteStandardLegalMoves, blackStandardLegalMoves);
         this.currentPlayer = builder.nextMoveMaker.choosePlayer(this.whitePlayer, this.blackPlayer);
-
-        this.movesPlayed = movesPlayed;
     }
 
     public Collection<Piece> getWhitePieces() {
@@ -73,8 +72,8 @@ public class Board {
         return this.enPassantPawn;
     }
 
-    public List<Boolean> getMovesPlayed() {
-        return movesPlayed;
+    public int getNumHalfMoves() {
+        return numHalfMoves;
     }
 
     public int getNumFullMoves() {
@@ -82,8 +81,7 @@ public class Board {
     }
 
     public boolean isDraw50MoveRule() {
-        if (movesPlayed.size() < 50) return false;
-        return movesPlayed.stream().allMatch(x -> x.booleanValue() == false);
+        return numHalfMoves >= 50;
     }
 
     public boolean isDrawImpossibleToCheckMate() {
@@ -285,7 +283,7 @@ public class Board {
         //white to move
         builder.setMoveMaker(Alliance.WHITE);
         //build the board
-        return builder.build(new LinkedList<>(), 1);
+        return builder.build(0, 1);
     }
 
     public static class Builder {
@@ -308,11 +306,8 @@ public class Board {
             return this;
         }
 
-        public Board build(List<Boolean> movesPlayed, int numFullMoves) {
-            if (movesPlayed.size() >= 51) {
-                movesPlayed.remove(0); //IMPORTANT: never let the size exceed 50 moves. Remove the first move in the list
-            }
-            return new Board(this, movesPlayed, numFullMoves);
+        public Board build(int numHalfMoves, int numFullMoves) {
+            return new Board(this, numHalfMoves, numFullMoves);
         }
 
         public void setEnPassantPawn(Pawn movedPawn) {

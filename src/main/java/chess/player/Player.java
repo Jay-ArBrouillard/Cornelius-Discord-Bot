@@ -147,19 +147,6 @@ public abstract class Player {
                     }
                 }
             }
-
-            //Add to moves played
-            if (move instanceof PawnEnPassantAttackMove ||
-                    move instanceof PawnMove ||
-                    move instanceof PawnJump ||
-                    move instanceof MajorAttackMove ||
-                    move instanceof AttackMove ||
-                    move instanceof PawnAttackMove)   {
-                transitionBoard.getMovesPlayed().add(true);
-            }
-            else {
-                transitionBoard.getMovesPlayed().add(false);
-            }
         }
 
         return new MoveTransition(transitionBoard, move, MoveStatus.DONE);

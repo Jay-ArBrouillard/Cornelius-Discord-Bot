@@ -79,18 +79,15 @@ public abstract class Move {
         return null;
     }
 
-    public boolean isForwardMove() {
-        if (this.board.getCurrentPlayer().getAlliance().isWhite()) {
-            int value = BoardUtils.getWhiteForwardMoveCoordinate(getCurrentCoordinate());
-            if (value != -1 && value <= getDestinationCoordinate()) {
-                return true;
-            }
-        }
-        else {
-            int value = BoardUtils.getBlackForwardMoveCoordinate(getCurrentCoordinate());
-            if (value != -1 && value >= getDestinationCoordinate()) {
-                return true;
-            }
+    public boolean isCaptureOrPawnMove(Move move) {
+        //Add to moves played
+        if (move instanceof PawnEnPassantAttackMove ||
+                move instanceof PawnMove ||
+                move instanceof PawnJump ||
+                move instanceof MajorAttackMove ||
+                move instanceof AttackMove ||
+                move instanceof PawnAttackMove)   {
+            return true;
         }
         return false;
     }
@@ -111,8 +108,9 @@ public abstract class Move {
         }
         builder.setPiece(this.movedPiece.movePiece(this));
         builder.setMoveMaker(this.board.getCurrentPlayer().getOpponent().getAlliance());
+        int numHalfMovesSinceCaptureOrPawnMove = isCaptureOrPawnMove(this) ? 0 : this.board.getNumHalfMoves() + 1;
         int numFullMoves = this.board.getCurrentPlayer().getAlliance().isBlack() ? this.board.getNumFullMoves() + 1 : this.board.getNumFullMoves();
-        return builder.build(this.board.getMovesPlayed(), numFullMoves); //Return a new board
+        return builder.build(numHalfMovesSinceCaptureOrPawnMove, numFullMoves); //Return a new board
     }
 
     /*
@@ -246,8 +244,9 @@ public abstract class Move {
             builder.setPiece(movedPawn);
             builder.setEnPassantPawn(movedPawn);
             builder.setMoveMaker(this.board.getCurrentPlayer().getOpponent().getAlliance());
+            int numHalfMovesSinceCaptureOrPawnMove = isCaptureOrPawnMove(this) ? 0 : this.board.getNumHalfMoves() + 1;
             int numFullMoves = this.board.getCurrentPlayer().getAlliance().isBlack() ? this.board.getNumFullMoves() + 1 : this.board.getNumFullMoves();
-            return builder.build(this.board.getMovesPlayed(), numFullMoves); //Return a new board
+            return builder.build(numHalfMovesSinceCaptureOrPawnMove, numFullMoves); //Return a new board
         }
 
         @Override
@@ -306,8 +305,9 @@ public abstract class Move {
             }
             builder.setPiece(this.movedPiece.movePiece(this));
             builder.setMoveMaker(this.board.getCurrentPlayer().getOpponent().getAlliance());
+            int numHalfMovesSinceCaptureOrPawnMove = isCaptureOrPawnMove(this) ? 0 : this.board.getNumHalfMoves() + 1;
             int numFullMoves = this.board.getCurrentPlayer().getAlliance().isBlack() ? this.board.getNumFullMoves() + 1 : this.board.getNumFullMoves();
-            return builder.build(this.board.getMovesPlayed(), numFullMoves); //Return a new board
+            return builder.build(numHalfMovesSinceCaptureOrPawnMove, numFullMoves); //Return a new board
         }
 
         @Override
@@ -358,8 +358,9 @@ public abstract class Move {
             }
             builder.setPiece(this.promotedPawn.getPromotionPiece(promotionType).movePiece(this));
             builder.setMoveMaker(this.board.getCurrentPlayer().getOpponent().getAlliance());
+            int numHalfMovesSinceCaptureOrPawnMove = isCaptureOrPawnMove(this) ? 0 : this.board.getNumHalfMoves() + 1;
             int numFullMoves = this.board.getCurrentPlayer().getAlliance().isBlack() ? this.board.getNumFullMoves() + 1 : this.board.getNumFullMoves();
-            return builder.build(this.board.getMovesPlayed(), numFullMoves); //Return a new board
+            return builder.build(numHalfMovesSinceCaptureOrPawnMove, numFullMoves); //Return a new board
         }
 
         @Override
@@ -437,8 +438,9 @@ public abstract class Move {
             builder.setPiece(this.movedPiece.movePiece(this));
             builder.setPiece(new Rook(this.castleRookDestination, this.castleRook.getPieceAlliance(), false));
             builder.setMoveMaker(this.board.getCurrentPlayer().getOpponent().getAlliance());
+            int numHalfMovesSinceCaptureOrPawnMove = isCaptureOrPawnMove(this) ? 0 : this.board.getNumHalfMoves() + 1;
             int numFullMoves = this.board.getCurrentPlayer().getAlliance().isBlack() ? this.board.getNumFullMoves() + 1 : this.board.getNumFullMoves();
-            return builder.build(this.board.getMovesPlayed(), numFullMoves); //Return a new board
+            return builder.build(numHalfMovesSinceCaptureOrPawnMove, numFullMoves); //Return a new board
         }
 
         @Override
