@@ -80,15 +80,14 @@ public abstract class Move {
     }
 
     public boolean isCaptureOrPawnMove(Move move) {
-        //Add to moves played
-        if (move instanceof PawnEnPassantAttackMove ||
+        if (move instanceof MajorAttackMove ||
                 move instanceof PawnMove ||
-                move instanceof PawnJump ||
-                move instanceof MajorAttackMove ||
-                move instanceof AttackMove ||
-                move instanceof PawnAttackMove)   {
+                move instanceof PawnAttackMove ||
+                move instanceof PawnEnPassantAttackMove ||
+                move instanceof PawnPromotion ||
+                move instanceof PawnJump)
             return true;
-        }
+
         return false;
     }
 
