@@ -61,10 +61,13 @@ setoption name SecondaryPstStyle value 2
 ; little things, not accessible via UCI options
 setoption name blockedcpawn value -17
 ; non-eval stuff
+setoption name NpsLimit value 0
+setoption name EvalBlur value 0
 setoption name Contempt value 0
 setoption name SlowMover value 90
 setoption name Selectivity value 175
 setoption name SearchSkill value 10
+setoption name RiskyDepth value 0
 setoption name BookFilter value 20
 setoption name GuideBookFile value /app/bin/books/players/ph-anand2.bin
 setoption name MainBookFile value /app/bin/books/hist/_post06.bin

@@ -62,10 +62,13 @@ setoption name SecondaryPstStyle value 1
 ; little things, not accessible via UCI options
 setoption name blockedcpawn value -20
 ; non-eval stuff
+setoption name NpsLimit value 0
+setoption name EvalBlur value 0
 setoption name Contempt value 20
 setoption name SlowMover value 100
 setoption name Selectivity value 125
 setoption name SearchSkill value 10
+setoption name RiskyDepth value 0
 setoption name BookFilter value 20
 setoption name GuideBookFile value /app/bin/books/players/steinitz.bin
 setoption name MainBookFile value /app/bin/books/hist/_pre30.bin

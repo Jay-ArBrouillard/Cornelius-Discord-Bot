@@ -527,7 +527,7 @@ public class ChessGame {
             //Should computer resign?
             if (isComputer && state.getBoardEvaluationMessage() != null) {
                 double evaluationScore = Double.parseDouble(state.getBoardEvaluationMessage().replace("(white side)", "").trim());
-                if (didWhiteJustMove() && evaluationScore <= -10) {
+                if (didWhiteJustMove() && evaluationScore <= -12) {
                     state.setMessage(whiteSidePlayer.name + " has RESIGNED!");
                     state.setStateComputerResign();
                     state.setWinnerId(blackSidePlayer.discordId);
@@ -535,7 +535,7 @@ public class ChessGame {
                     updateDatabaseBlackSideWin(true);
                     return state;
                 }
-                if (didBlackJustMove() && evaluationScore >= 10) {
+                if (didBlackJustMove() && evaluationScore >= 12) {
                     state.setMessage(blackSidePlayer.name + " has RESIGNED!");
                     state.setStateComputerResign();
                     state.setWinnerId(whiteSidePlayer.discordId);
