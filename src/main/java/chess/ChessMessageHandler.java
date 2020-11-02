@@ -75,8 +75,7 @@ public class ChessMessageHandler {
                 lastErrorMessage = new StringBuilder("Invalid move input format for promotion. Promotion type must be one of " + promotionTypes.toString() + " Ex: `e7e8q`");
                 return;
             }
-        }
-        if (input.length() != 4) {
+        } else if (input.length() != 4) {
             lastErrorMessage = new StringBuilder("Invalid move input format. Use format such as `c2 c4` or `c2c4` or `e7e8q` for promotion or castling notation");
         }
     }

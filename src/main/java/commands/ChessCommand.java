@@ -51,7 +51,7 @@ public class ChessCommand {
     }
 
     public static void execute(MessageReceivedEvent event, String message) {
-        if (Arrays.asList(ChessConstants.QUIT).contains(message)) {
+        if (Arrays.asList(ChessConstants.QUIT).stream().anyMatch(x -> x.equals(message))) {
             if (isMessageFromPlayer(event.getAuthor().getId())) {
                 state.setPlayerForfeit();
                 if (gameType != null && gameType.isPlayerVsComputer() && (decision == Decision.PLAYER_MOVE || decision == COMPUTER_MOVE)) { //Player vs Computer game
@@ -76,9 +76,8 @@ public class ChessCommand {
                         }
                     }
                 }
+                endGame(event.getChannel()); //Only end game if quit command is from player in the current game
             }
-
-            endGame(event.getChannel());
             return;
         }
 
