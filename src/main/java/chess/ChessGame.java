@@ -472,8 +472,8 @@ public class ChessGame {
             }
 
             // Is game in a draw?
-            if (this.board.isThreeFoldRepetition()) {
-                state.setMessage("DRAW! Fivefold Repetition rule. The exact same position occurred 5 times.");
+            if (this.board.isFiveFoldRepetition()) {
+                state.setMessage("DRAW! FiveFold Repetition rule. The exact same position occurred 5 times, which includes board position and player to move next.");
                 state.setStateDraw();
                 updateDatabaseDraw();
                 return state;
@@ -872,10 +872,10 @@ public class ChessGame {
 
         if (mc != null)  {
             mc.sendTyping().queue();
-            //If computer is winning by 5 points there is a 50% chance he will send a taunt message
+            //If computer is winning by 4 points there is a 50% chance he will send a taunt message
             if (tauntMsg != null && Math.random() >= 0.5 && state.getBoardEvaluationMessage() != null) {
                 double evaluationScore = Double.parseDouble(state.getBoardEvaluationMessage().replace("(white side)", "").trim());
-                if ((isWhitePlayerTurn() && evaluationScore <= -5.0) || (isBlackPlayerTurn() && evaluationScore >= 5.0)) {
+                if ((isWhitePlayerTurn() && evaluationScore <= -4.0) || (isBlackPlayerTurn() && evaluationScore >= 4.0)) {
                     String fullMessage = isWhitePlayerTurn() ? "`"+whiteSidePlayer.name+"` -" + tauntMsg : "`"+blackSidePlayer.name+"`: " + tauntMsg;
                     mc.sendMessage(fullMessage).queue();
                 }

@@ -86,8 +86,8 @@ public class Board {
         return positionCountMap;
     }
 
-    public boolean isThreeFoldRepetition() {
-        return positionCountMap.containsValue(3);
+    public boolean isFiveFoldRepetition() {
+        return positionCountMap.containsValue(5);
     }
     
     public boolean isDraw50MoveRule() {
