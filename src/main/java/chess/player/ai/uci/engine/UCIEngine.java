@@ -24,9 +24,18 @@ abstract class UCIEngine {
             input = new BufferedReader(new InputStreamReader(process.getInputStream()));
             output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
+            boolean hashIsSet = false;
             for (Option option : options) {
-                if (option.getOptionString().equals("Personality")) continue; //Skip Personality option here setting this in Rodent constructor
-                passOption(option);
+                if (option.getOptionString().equals("PersonalityFile")) continue; //Skip PersonalityFile option here setting this in Rodent constructor
+                if (option.getOptionString().contains("Hash")) {
+                    if (!hashIsSet) {
+                        passOption(option);
+                        hashIsSet = true;
+                    }
+                }
+                else {
+                    passOption(option);
+                }
             }
         } catch (IOException e) {
             throw new IOException("Unable to start and bind " + super.getClass().getSimpleName() + " process: ", e);

@@ -892,7 +892,7 @@ public class ChessCommand {
         currentMessageIds.clear();
 
         String status = state.getStatus();
-        if (CHECKMATE.equals(status) || DRAW.equals(status) || COMPUTER_RESIGN.equals(status) || CHALLENGEE_DECLINE.equals(status) || ERROR.equals(status)) {
+        if (CHECKMATE.equals(status) || DRAW.equals(status) || COMPUTER_RESIGN.equals(status) || CHALLENGEE_DECLINE.equals(status)) {
             endGame(event.getChannel());
         }
     }

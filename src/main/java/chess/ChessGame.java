@@ -88,6 +88,7 @@ public class ChessGame {
         else if (p.discordId.endsWith("RO4")) { //Rodent IV
             String [] name = p.name.split(" ");
             setClient(new RodentClient.Builder()
+                    .setOption(Option.Hash, 32)
                     .setOption(Option.Personality_File, name.length == 1 ? findPersonalityFileLocation(p.name) : findPersonalityFileLocation(name[1]))
                     .build(), p);
         }
