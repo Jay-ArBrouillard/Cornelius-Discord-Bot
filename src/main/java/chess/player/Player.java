@@ -5,14 +5,12 @@ import chess.board.Board;
 import chess.board.Move;
 import chess.board.Move.*;
 import chess.board.Tile;
+import chess.pgn.FenUtils;
 import chess.pieces.King;
 import chess.pieces.Piece;
 import chess.pieces.Rook;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -123,6 +121,7 @@ public abstract class Player {
         if (!kingAttacks.isEmpty()) {
             return new MoveTransition(this.board, move, MoveStatus.LEAVES_PLAYER_CHECK);
         }
+
         if (!isDummyMove) {
             //Update is castle capable. Used in FenUtils
             if (move.isCastlingMove() || move.getMovedPiece() instanceof King) {
@@ -147,10 +146,36 @@ public abstract class Player {
                     }
                 }
             }
+
+            //Handle half and full moves
+            transitionBoard.setNumHalfMoves(isCaptureOrPawnMove(move) ? 0 : this.board.getNumHalfMoves() + 1);
+            transitionBoard.setNumFullMoves(this.board.getCurrentPlayer().getOpponent().getAlliance().isBlack() ? this.board.getNumFullMoves() + 1 : this.board.getNumFullMoves());
+            String fen = FenUtils.parseFENNoMoves(this.board);
+            Map<String, Integer> positionCountMap = this.board.getPositionCountMap();
+            if (positionCountMap.containsKey(fen)) {
+                positionCountMap.put(fen, positionCountMap.get(fen) + 1);
+            }
+            else {
+                positionCountMap.put(fen, 1);
+            }
+            transitionBoard.setPositionCountMap(positionCountMap);
         }
 
         return new MoveTransition(transitionBoard, move, MoveStatus.DONE);
     }
+
+    protected boolean isCaptureOrPawnMove(Move move) {
+        if (move instanceof MajorAttackMove ||
+                move instanceof AttackMove ||
+                move instanceof PawnMove ||
+                move instanceof PawnAttackMove ||
+                move instanceof PawnEnPassantAttackMove ||
+                move instanceof PawnPromotion ||
+                move instanceof PawnJump)
+            return true;
+        return false;
+    }
+
 
     protected boolean hasCastleOpportunities() {
         return !this.isInCheck && !this.playerKing.isCastled() &&

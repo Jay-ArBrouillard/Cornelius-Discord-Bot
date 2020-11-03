@@ -474,7 +474,15 @@ public class ChessGame {
 
             // Is game in a draw?
             if (this.board.isFiveFoldRepetition()) {
-                state.setMessage("DRAW! FiveFold Repetition rule. The exact same position occurred 5 times, which includes board position and player to move next.");
+                StringBuilder fenBuilder = new StringBuilder("[");
+                for (Map.Entry<String,Integer> entry : this.board.getPositionCountMap().entrySet()) {
+                    if (entry.getValue() >= 5) {
+                        fenBuilder.append(entry.getKey()).append("->").append(entry.getValue()).append(", ");
+                    }
+                }
+                fenBuilder.substring(0, fenBuilder.length()-2);
+                fenBuilder.append("]");
+                state.setMessage("DRAW! FiveFold Repetition rule. The exact same position occurred 5 times, which includes board position and player to move next.\n" + fenBuilder.toString());
                 state.setStateDraw();
                 updateDatabaseDraw();
                 return state;
