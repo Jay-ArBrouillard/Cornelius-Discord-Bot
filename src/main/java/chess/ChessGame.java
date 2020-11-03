@@ -472,7 +472,7 @@ public class ChessGame {
             }
 
             // Is game in a draw?
-            if (this.board.isFivefoldRepetition()) {
+            if (this.board.isThreeFoldRepetition()) {
                 state.setMessage("DRAW! Fivefold Repetition rule. The exact same position occurred 5 times.");
                 state.setStateDraw();
                 updateDatabaseDraw();

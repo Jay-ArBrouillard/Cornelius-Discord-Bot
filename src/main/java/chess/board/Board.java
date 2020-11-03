@@ -86,12 +86,12 @@ public class Board {
         return positionCountMap;
     }
 
-    public boolean isFivefoldRepetition() {
-        return positionCountMap.containsKey(5);
+    public boolean isThreeFoldRepetition() {
+        return positionCountMap.containsValue(3);
     }
     
     public boolean isDraw50MoveRule() {
-        //2 half moves is equal to 1 full moves
+        //2 half moves is equal to 1 full move
         return numHalfMoves >= 100;
     }
 

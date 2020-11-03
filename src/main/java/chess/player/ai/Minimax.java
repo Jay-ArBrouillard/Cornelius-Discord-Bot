@@ -60,10 +60,12 @@ public class Minimax implements MoveStrategy {
                 this.freqTableIndex++;
                 if (board.getCurrentPlayer().getAlliance().isWhite() &&
                         currentValue >= highestSeenValue) {
+                    if (currentValue == highestSeenValue && Math.random() < 0.5) continue; //50% chance to choose equal moves
                     highestSeenValue = currentValue;
                     bestMove = move;
                 } else if (board.getCurrentPlayer().getAlliance().isBlack() &&
                         currentValue <= lowestSeenValue) {
+                    if (currentValue == lowestSeenValue && Math.random() < 0.5) continue;
                     lowestSeenValue = currentValue;
                     bestMove = move;
                 }
