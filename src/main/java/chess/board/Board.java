@@ -24,17 +24,20 @@ public class Board {
     private final Player currentPlayer;
 
     private final Pawn enPassantPawn;
-    private int numHalfMoves = 0; //The number of half moves since a capture or a pawn move
-    private int numFullMoves = 1; //The number of the full move. It starts at 1, and is incremented after Black's move.
-    private Map<String, Integer> positionCountMap = new HashMap<>(); //Stores a count of positions as Fen Format (minus half/full moves) -> count of how many times played
+    private int numHalfMoves; //The number of half moves since a capture or a pawn move
+    private int numFullMoves; //The number of the full move. It starts at 1, and is incremented after Black's move.
+    private Map<String, Integer> positionCountMap; //Stores a count of positions as Fen Format (minus half/full moves) -> count of how many times played
 
     private static final int START_X_COORDINATE = 70;
     private static final int START_Y_COORDINATE = 43;
     private static final int X_OFFSET = 162;
     private static final int Y_OFFSET = 162;
 
-    public Board(Builder builder) {
+    public Board(Builder builder, int numHalfMoves, int numFullMoves, Map<String, Integer> positionCountMap) {
         this.gameBoard = createGameBoard(builder);
+        this.numHalfMoves = numHalfMoves;
+        this.numFullMoves = numFullMoves;
+        this.positionCountMap = positionCountMap;
         this.whitePieces = calculateActivePieces(this.gameBoard, Alliance.WHITE);
         this.blackPieces = calculateActivePieces(this.gameBoard, Alliance.BLACK);
         this.enPassantPawn = builder.enPassantPawn;
@@ -299,7 +302,7 @@ public class Board {
         //white to move
         builder.setMoveMaker(Alliance.WHITE);
         //build the board
-        return builder.build();
+        return builder.build(0, 1, new HashMap<>());
     }
 
     public static class Builder {
@@ -322,8 +325,8 @@ public class Board {
             return this;
         }
 
-        public Board build() {
-            return new Board(this);
+        public Board build(int numHalfMoves, int numFullMoves, Map<String, Integer> positionCountMap) {
+            return new Board(this, numHalfMoves, numFullMoves, positionCountMap);
         }
 
         public void setEnPassantPawn(Pawn movedPawn) {

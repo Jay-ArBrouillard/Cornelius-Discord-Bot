@@ -147,7 +147,7 @@ public abstract class Player {
                 }
             }
 
-            //Handle half and full moves
+            //Handle half, full moves, positionCountMap
             transitionBoard.setNumHalfMoves(isCaptureOrPawnMove(move) ? 0 : this.board.getNumHalfMoves() + 1);
             transitionBoard.setNumFullMoves(this.board.getCurrentPlayer().getOpponent().getAlliance().isBlack() ? this.board.getNumFullMoves() + 1 : this.board.getNumFullMoves());
             String fen = FenUtils.parseFENNoMoves(this.board);
