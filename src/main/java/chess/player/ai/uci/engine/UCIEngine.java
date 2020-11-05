@@ -57,9 +57,11 @@ abstract class UCIEngine {
             input = new BufferedReader(new InputStreamReader(process.getInputStream()));
             output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
+            Thread.sleep(1000);
             readResponse(startUpReadCommand);
             sendCommand("uci");
             readResponse("uciok");
+            waitForReady();
 
             boolean hashIsSet = false;
             for (Option option : options) {
@@ -73,7 +75,7 @@ abstract class UCIEngine {
                     passOption(option);
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             throw new IOException("Unable to start and bind " + super.getClass().getSimpleName() + " process: ", e);
         }
     }

@@ -8,7 +8,7 @@ import java.io.IOException;
 
 public class Cheese extends UCIEngine {
     public Cheese(Variant variant, String filePath, Option... options) throws IOException {
-        super(variant, filePath, "Cheese 2.2 (64 bits) by Patrice Duhamel", options);
+        super(variant, filePath, "Cheese 2.2", options);
     }
 
     public String getBestMove(Query query) throws IOException {
