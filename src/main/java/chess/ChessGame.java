@@ -89,7 +89,7 @@ public class ChessGame {
             String [] name = p.name.split(" ");
             setClient(new RodentClient.Builder()
                     .setOption(Option.Hash, 32)
-                    .setOption(Option.Personality_File, name.length == 1 ? findPersonalityFileLocation(p.name) : findPersonalityFileLocation(name[1]))
+                    .setOption(Option.Personality_File, name.length == 1 ? findPersonalityFileLocation(name[0]) : findPersonalityFileLocation(name[1]))
                     .build(), p);
         }
         else if (p.name.contains("Cheng")) {
@@ -477,10 +477,13 @@ public class ChessGame {
                 StringBuilder fenBuilder = new StringBuilder("[");
                 for (Map.Entry<String,Integer> entry : this.board.getPositionCountMap().entrySet()) {
                     if (entry.getValue() >= 5) {
-                        fenBuilder.append(entry.getKey()).append("->").append(entry.getValue()).append(", ");
+                        fenBuilder.append("\"");
+                        fenBuilder.append(entry.getKey());
+                        fenBuilder.append("\"");
+                        fenBuilder.append("->");
+                        fenBuilder.append(entry.getValue()).append(",");
                     }
                 }
-                fenBuilder.substring(0, fenBuilder.length()-2);
                 fenBuilder.append("]");
                 state.setMessage("DRAW! FiveFold Repetition rule. The exact same position occurred 5 times, which includes board position and player to move next.\n" + fenBuilder.toString());
                 state.setStateDraw();
