@@ -12,6 +12,7 @@ public class ChessGameState {
     private int fullMoves = 1; //The number of the full move. It starts at 1, and is incremented after Black's move.
     private String winnerId;
     private boolean playerForfeited = false;
+    StringBuilder moveHistoryBuilder = new StringBuilder();
 
     public ChessGameState() {
         prevElo = new HashMap<>();
@@ -127,4 +128,11 @@ public class ChessGameState {
         this.playerForfeited = true;
     }
 
+    public StringBuilder getMoveHistoryBuilder() {
+        return moveHistoryBuilder;
+    }
+
+    public void setMoveHistoryBuilder(StringBuilder moveHistoryBuilder) {
+        this.moveHistoryBuilder = moveHistoryBuilder;
+    }
 }

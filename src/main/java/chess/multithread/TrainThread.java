@@ -44,7 +44,6 @@ public class TrainThread extends Thread {
             game.setupComputerClient(GameType.CVC);
             game.setupStockfishClient();
             state.setMatchStartTime(Instant.now().toEpochMilli());
-
         }
         catch (Exception e) {
             e.printStackTrace();

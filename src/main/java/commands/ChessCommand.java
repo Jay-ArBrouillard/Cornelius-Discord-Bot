@@ -200,10 +200,10 @@ public class ChessCommand {
                     reply = "`Starting Chess Game " + whiteSidePlayer.name + " (" + (int)whiteSidePlayer.elo + ")" + " vs. " + blackSidePlayer.name + " (" + (int)blackSidePlayer.elo + ")`\nMake a move (ex: `c2 c4`)";
                     gameType = GameType.PVC;
                     chessGame.gameType = GameType.PVC;
-                    decision = PLAYER_MOVE;
                     try {
                         chessGame.setupComputerClient(gameType);
                         chessGame.setupStockfishClient();
+                        decision = PLAYER_MOVE;
                         state.setMatchStartTime(Instant.now().toEpochMilli());
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -540,10 +540,10 @@ public class ChessCommand {
                 chessGame.gameType = GameType.CVC;
                 state.getPrevElo().put(whiteSidePlayer.discordId, whiteSidePlayer.elo);
                 state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
-                decision = COMPUTER_MOVE;
                 try {
                     chessGame.setupComputerClient(gameType);
                     chessGame.setupStockfishClient();
+                    decision = COMPUTER_MOVE;
                     state.setMatchStartTime(Instant.now().toEpochMilli());
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -631,11 +631,10 @@ public class ChessCommand {
             chessGame.gameType = GameType.CVC;
             state.getPrevElo().put(whiteSidePlayer.discordId, whiteSidePlayer.elo);
             state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
-            decision = COMPUTER_MOVE;
-
             try {
                 chessGame.setupComputerClient(gameType);
                 chessGame.setupStockfishClient();
+                decision = COMPUTER_MOVE;
                 state.setMatchStartTime(Instant.now().toEpochMilli());
             } catch (IOException e) {
                 e.printStackTrace();

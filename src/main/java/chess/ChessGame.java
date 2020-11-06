@@ -457,6 +457,14 @@ public class ChessGame {
             state.setFullMoves(this.board.getNumFullMoves());
             if (!gameType.isComputerVsComputer()) this.board.buildImage(); //Only build board image when human player is playing
 
+            //Update move history for computer
+            if (didWhiteJustMove()) {
+                state.getMoveHistoryBuilder().append(state.getFullMoves()).append(". ").append(moveCmd);
+            }
+            else {
+                state.getMoveHistoryBuilder().append(" ").append(state.getFullMoves());
+            }
+
             // Is someone in check mate?
             if (this.board.getCurrentPlayer().isInCheckMate()) {
                 state.setStateCheckmate();
@@ -481,7 +489,7 @@ public class ChessGame {
                         fenBuilder.append("`");
                         fenBuilder.append(entry.getKey());
                         fenBuilder.append("`");
-                        fenBuilder.append(",");
+                        break;
                     }
                 }
                 fenBuilder.append("]");
@@ -865,6 +873,7 @@ public class ChessGame {
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             //Do nothing here Handling outside of catch
         }
 
@@ -896,13 +905,10 @@ public class ChessGame {
 
         if (mc != null)  {
             mc.sendTyping().queue();
-            //If computer is winning by 4 points there is a 50% chance he will send a taunt message
+            //If computer has 50% chance he will send a taunt message
             if (tauntMsg != null && Math.random() >= 0.5 && state.getBoardEvaluationMessage() != null) {
-                double evaluationScore = Double.parseDouble(state.getBoardEvaluationMessage().replace("(white side)", "").trim());
-                if ((isWhitePlayerTurn() && evaluationScore <= -4.0) || (isBlackPlayerTurn() && evaluationScore >= 4.0)) {
-                    String fullMessage = isWhitePlayerTurn() ? "`"+whiteSidePlayer.name+"` -" + tauntMsg : "`"+blackSidePlayer.name+"`: " + tauntMsg;
-                    mc.sendMessage(fullMessage).queue();
-                }
+                String fullMessage = isWhitePlayerTurn() ? "`"+whiteSidePlayer.name+"` -" + tauntMsg : "`"+blackSidePlayer.name+"`: " + tauntMsg;
+                mc.sendMessage(fullMessage).queue();
             }
         }
         //Is castling notation?
