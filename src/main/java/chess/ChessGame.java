@@ -49,7 +49,7 @@ public class ChessGame {
         try {
             stockFishClient = new StockFishClient.Builder()
                                 .setOption(Option.Hash, 2)
-                                .setOption(Option.Use_NNUE, true) //Want to use classical evaluation board scoring
+                                .setOption(Option.Use_NNUE, false) //Want to use classical evaluation board scoring
                                 .setVariant(Variant.MODERN)  // BMI for windows, Modern for linux
                                 .build();
         } catch (Exception e) {
@@ -709,8 +709,11 @@ public class ChessGame {
      * If no moves are made treat this as a draw as long as someone didn't forfeit
      */
     public synchronized void updateDatabaseWhiteSideWin(boolean isForfeit) {
+        if (state.getFullMoves() <= 3) { //End game no consequences
+            return;
+        }
         threadRunning = true;
-        if (isForfeit || state.getFullMoves() > 1) {
+        if (isForfeit) {
             whiteSidePlayer.incrementWins();
             blackSidePlayer.incrementLosses();
             EloRanking.calculateChessElo(state, whiteSidePlayer, blackSidePlayer);
@@ -735,8 +738,11 @@ public class ChessGame {
      * If no moves are made treat this as a draw as long as someone didn't forfeit
      */
     public synchronized void updateDatabaseBlackSideWin(boolean isForfeit) {
+        if (state.getFullMoves() <= 3) { //End game no consequences
+            return;
+        }
         threadRunning = true;
-        if (isForfeit || state.getFullMoves() > 1) {
+        if (isForfeit) {
             whiteSidePlayer.incrementLosses();
             blackSidePlayer.incrementWins();
             EloRanking.calculateChessElo(state, whiteSidePlayer, blackSidePlayer);

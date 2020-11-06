@@ -22,9 +22,13 @@ public class Rodent extends UCIEngine {
         Option personality = null;
         for (Option o : options) {
             System.out.println("Option:"+o.toString());
-            if (Option.Personality_File.getOptionString().equals(o.getOptionString())) {
+            if (Option.Personality_File.getOptionString().contains(o.getOptionString())) {
                 personality = o;
             }
+        }
+
+        if (personality == null) {
+            throw new RuntimeException("PersonalityFile is not found in options list:"+Arrays.asList(options));
         }
 
         waitForReady();
