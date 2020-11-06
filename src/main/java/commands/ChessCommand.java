@@ -548,6 +548,9 @@ public class ChessCommand {
                     e.printStackTrace();
                     event.getChannel().sendMessage(e.toString()).queue();
                     gamesCompleted++;
+                    chessGame = null;
+                    state = null;
+                    System.gc(); //Attempt to call garbage collector to clear memory
                     continue;
                 }
 
@@ -637,6 +640,9 @@ public class ChessCommand {
                 e.printStackTrace();
                 event.getChannel().sendMessage(e.toString()).queue();
                 gamesCompleted++;
+                chessGame = null;
+                state = null;
+                System.gc(); //Attempt to call garbage collector to clear memory
                 continue;
             }
 

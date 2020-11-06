@@ -483,7 +483,7 @@ public class ChessGame {
                         fenBuilder.append("`");
                         fenBuilder.append(entry.getKey());
                         fenBuilder.append("`");
-                        fenBuilder.append(entry.getValue()).append(",");
+                        fenBuilder.append(",");
                     }
                 }
                 fenBuilder.append("]");

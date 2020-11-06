@@ -5,8 +5,6 @@ import chess.player.ai.uci.engine.enums.Option;
 import chess.player.ai.uci.engine.enums.Variant;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 
 abstract class UCIEngine {
@@ -90,7 +88,7 @@ abstract class UCIEngine {
     }
 
     void sendCommand(String command) throws IOException {
-        System.out.println("sendCommand:"+command); //To remove
+//        System.out.println("sendCommand:"+command); //To remove
         output.write(command + "\n");
         output.flush();
     }
@@ -99,7 +97,7 @@ abstract class UCIEngine {
         String line;
 
         while ((line = input.readLine()) != null) {
-            System.out.println("readLine:"+line); //To remove
+//            System.out.println("readLine:"+line); //To remove
             if (line.startsWith(expected))
                 return line;
         }
@@ -114,7 +112,7 @@ abstract class UCIEngine {
 
         //Read for specific amount of responses matching the expected
         while ((line = input.readLine()) != null) {
-            System.out.println("readResponse2:"+line); //To remove
+//            System.out.println("readResponse2:"+line); //To remove
             if (line.startsWith(expected)) {
                 lines.add(line);
                 count++;
@@ -131,7 +129,7 @@ abstract class UCIEngine {
         String line;
 
         while ((line = input.readLine()) != null) {
-            System.out.println("readResponse:"+line); //To remove
+//            System.out.println("readResponse:"+line); //To remove
             lines.add(line);
 
             if (line.startsWith(expected))

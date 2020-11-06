@@ -44,10 +44,14 @@ public class TrainThread extends Thread {
             game.setupComputerClient(GameType.CVC);
             game.setupStockfishClient();
             state.setMatchStartTime(Instant.now().toEpochMilli());
+
         }
         catch (Exception e) {
             e.printStackTrace();
             mc.sendMessage(e.toString()).queue();
+            game = null;
+            state = null;
+            System.gc(); //Attempt to call garbage collector to clear memory
         }
     }
 
