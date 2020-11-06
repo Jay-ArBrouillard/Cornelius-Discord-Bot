@@ -446,7 +446,7 @@ public class ChessGame {
             boolean success = setPromotionType(promotionType, move);
             if (!success) {
                 state.setStateInvalidPawnPromotionType();
-                state.setMessage("Invalid promotion type `" + promotionType + "`. Valid types include q (Queen), r (Rook), n (Knight), or b (Bishop).");
+                state.setMessage(String.format("Invalid promotion type `%s`. Valid types include q (Queen), r (Rook), n (Knight), or b (Bishop).", promotionType));
                 return state;
             }
         }
@@ -458,11 +458,11 @@ public class ChessGame {
             if (!gameType.isComputerVsComputer()) this.board.buildImage(); //Only build board image when human player is playing
 
             //Update move history for computer
-            if (didWhiteJustMove()) {
+            if (isWhitePlayerTurn()) {
                 state.getMoveHistoryBuilder().append(state.getFullMoves()).append(". ").append(moveCmd);
             }
             else {
-                state.getMoveHistoryBuilder().append(" ").append(state.getFullMoves());
+                state.getMoveHistoryBuilder().append(" ").append(moveCmd).append("\n");
             }
 
             // Is someone in check mate?

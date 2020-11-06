@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import utils.EloRanking;
 
 import java.io.File;
 import java.io.IOException;
@@ -118,13 +117,13 @@ public class ChessCommand {
                 //Check if it is their turn
                 oldMessageIds.add(event.getMessageId());
                 if (chessGame.isWhitePlayerTurn() && !event.getAuthor().getId().equals(whiteSidePlayer.discordId)) {
-                    reply = "It's `" + whiteSidePlayer.name + "'s` turn";
+                    reply = String.format("It's `%s's` turn", whiteSidePlayer.name);
                     belowMessage = null;
                     boardImageFile = null;
                     break;
                 }
                 else if (chessGame.isBlackPlayerTurn() && !event.getAuthor().getId().equals(blackSidePlayer.discordId)) {
-                    reply = "It's `" + blackSidePlayer.name + "'s` turn";
+                    reply = String.format("It's `%s's` turn", blackSidePlayer.name);
                     belowMessage = null;
                     boardImageFile = null;
                     break;
@@ -144,9 +143,8 @@ public class ChessCommand {
                     }
                     if (gameType.isPlayerVsComputer()) {
                         decision = COMPUTER_MOVE;
-
-                        belowMessage = chessGame.isWhitePlayerTurn() ? "It's `" + whiteSidePlayer.name + "`'s turn" :
-                                                                       "It's `" + blackSidePlayer.name + "`'s turn" ;
+                        belowMessage = chessGame.isWhitePlayerTurn() ? String.format("It's `%s's` turn", whiteSidePlayer.name) :
+                                                                       String.format("It's `%s's` turn", blackSidePlayer.name) ;
                     }
                 }
                 break;
@@ -892,10 +890,10 @@ public class ChessCommand {
         } else if (CHECK.equals(status) || SUCCESSFUL_MOVE.equals(status)) {
             boardImageFile = new File(GAME_BOARD_IMAGE_LOCATION);
             if (chessGame.isWhitePlayerTurn()) {
-                belowMessage = "`" + whiteSidePlayer.name + "'s` turn. Make a move (ex: `c2c4` or `help` or `helpb2` to see possible moves or `q` to forfeit the game)";
+                belowMessage = String.format("`%s's` turn. Make a move (ex: `c2c4` or `help` or `helpb2` to see possible moves or `q` to forfeit the game)", whiteSidePlayer.name);
             }
             if (chessGame.isBlackPlayerTurn()) {
-                belowMessage = "`" + blackSidePlayer.name + "'s` turn. Make a move (ex: `c2c4` or `help` or `helpb2` to see possible moves or `q` to forfeit the game)";
+                belowMessage = String.format("`%s's` turn. Make a move (ex: `c2c4` or `help` or `helpb2` to see possible moves or `q` to forfeit the game)", blackSidePlayer.name);
             }
             decision = Decision.PLAYER_MOVE;
         }
