@@ -24,6 +24,7 @@ public class Rodent extends UCIEngine {
             System.out.println("Option:"+o.toString());
             if (Option.Personality_File.getOptionString().contains(o.getOptionString())) {
                 personality = o;
+                break;
             }
         }
 
