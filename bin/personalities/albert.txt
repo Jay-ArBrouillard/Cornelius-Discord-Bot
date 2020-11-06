@@ -1,7 +1,7 @@
-; Andy
+; Albert
 ; Personality for Rodent IV chess engine
 ; weak, attacker
-;
+
 setoption name PawnValueMg value 95
 setoption name KnightValueMg value 310
 setoption name BishopValueMg value 322

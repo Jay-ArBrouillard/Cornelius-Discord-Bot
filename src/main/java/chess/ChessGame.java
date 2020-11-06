@@ -35,8 +35,8 @@ public class ChessGame {
     //Computer must have maintained an evaluation of +-10 for x consecutive moves
     public List<Boolean> whiteSideResign = new LinkedList<>();
     public List<Boolean> blackSideResign = new LinkedList<>();
-    private int whiteSideResignValue = -1;
-    private int blackSideResignValue = -1;
+    private int whiteSideResignCount = -1;
+    private int blackSideResignCount = -1;
 
     public ChessGame(ChessGameState state) {
         db = new GoogleSheets();
@@ -633,16 +633,16 @@ public class ChessGame {
      * @param result
      */
     private void manageResignList(boolean isWhiteSide, boolean result) {
-        if (whiteSideResignValue == -1) whiteSideResignValue = Math.max(3, (int) (EloRanking.calculateProbabilityOfWin(whiteSidePlayer.elo, blackSidePlayer.elo) * 10));
-        if (blackSideResignValue == -1) blackSideResignValue = Math.max(3, (int) (EloRanking.calculateProbabilityOfWin(blackSidePlayer.elo, whiteSidePlayer.elo) * 10));
+        if (whiteSideResignCount == 0) whiteSideResignCount = Math.max(3, (int) (EloRanking.calculateProbabilityOfWin(whiteSidePlayer.elo, blackSidePlayer.elo) * 10));
+        if (blackSideResignCount == 0) blackSideResignCount = Math.max(3, (int) (EloRanking.calculateProbabilityOfWin(blackSidePlayer.elo, whiteSidePlayer.elo) * 10));
         if (isWhiteSide) {
-            if (whiteSideResign.size() ==  whiteSideResignValue) {
+            if (whiteSideResign.size() == whiteSideResignCount) {
                 whiteSideResign.remove(0);
             }
             whiteSideResign.add(result);
         }
         else {
-            if (blackSideResign.size() == blackSideResignValue) {
+            if (blackSideResign.size() == blackSideResignCount) {
                 blackSideResign.remove(0);
             }
             blackSideResign.add(result);
