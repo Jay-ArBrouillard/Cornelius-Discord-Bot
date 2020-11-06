@@ -32,9 +32,11 @@ public class ChessGame {
     public BaseAiClient client1;
     public BaseAiClient client2;
     public GameType gameType;
-    //Computer must have an maintain an evaluation of +-10 for 3 consecutive moves
+    //Computer must have maintained an evaluation of +-10 for x consecutive moves
     public List<Boolean> whiteSideResign = new LinkedList<>();
     public List<Boolean> blackSideResign = new LinkedList<>();
+    private int whiteSideResignValue = -1;
+    private int blackSideResignValue = -1;
 
     public ChessGame(ChessGameState state) {
         db = new GoogleSheets();
@@ -47,6 +49,7 @@ public class ChessGame {
         try {
             stockFishClient = new StockFishClient.Builder()
                                 .setOption(Option.Hash, 2)
+                                .setOption(Option.Use_NNUE, true) //Want to use classical evaluation board scoring
                                 .setVariant(Variant.MODERN)  // BMI for windows, Modern for linux
                                 .build();
         } catch (Exception e) {
@@ -477,10 +480,9 @@ public class ChessGame {
                 StringBuilder fenBuilder = new StringBuilder("[");
                 for (Map.Entry<String,Integer> entry : this.board.getPositionCountMap().entrySet()) {
                     if (entry.getValue() >= 5) {
-                        fenBuilder.append("\"");
+                        fenBuilder.append("`");
                         fenBuilder.append(entry.getKey());
-                        fenBuilder.append("\"");
-                        fenBuilder.append("->");
+                        fenBuilder.append("`");
                         fenBuilder.append(entry.getValue()).append(",");
                     }
                 }
@@ -624,15 +626,23 @@ public class ChessGame {
         }
     }
 
+    /**
+     * Computer must get a board evaluation of +-10 for x consecutive turns in order to qualify for resignation
+     * x is the probability of the computer winning based on elo
+     * @param isWhiteSide
+     * @param result
+     */
     private void manageResignList(boolean isWhiteSide, boolean result) {
+        if (whiteSideResignValue == -1) whiteSideResignValue = Math.max(3, (int) (EloRanking.calculateProbabilityOfWin(whiteSidePlayer.elo, blackSidePlayer.elo) * 10));
+        if (blackSideResignValue == -1) blackSideResignValue = Math.max(3, (int) (EloRanking.calculateProbabilityOfWin(blackSidePlayer.elo, whiteSidePlayer.elo) * 10));
         if (isWhiteSide) {
-            if (whiteSideResign.size() == 3) {
+            if (whiteSideResign.size() ==  whiteSideResignValue) {
                 whiteSideResign.remove(0);
             }
             whiteSideResign.add(result);
         }
         else {
-            if (blackSideResign.size() == 3) {
+            if (blackSideResign.size() == blackSideResignValue) {
                 blackSideResign.remove(0);
             }
             blackSideResign.add(result);

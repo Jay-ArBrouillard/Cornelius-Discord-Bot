@@ -17,6 +17,7 @@ public enum Option {
     Elo("UCI_Elo"),
     Table_Memory("Table Memory"), //Used only for Komodo
     Book_File("Book File"),
+    Use_NNUE("Use NNUE"),
     Personality_File("PersonalityFile"); //Used only for Rodent
 
     private String optionString;

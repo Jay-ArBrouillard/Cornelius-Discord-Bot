@@ -358,7 +358,7 @@ public class ChessCommand {
             List<String> matchup = null;
 
             // Find a match that is not running. Same player can't be in two games at the same time
-            // Randomize list everytime so same players play in order
+            // Randomize list everytime so same players don't play in order
             Collections.shuffle(allMatchups);
             for (int i = 0; i < allMatchups.size(); i++) {
                 List currMatchup = allMatchups.get(i);
@@ -479,7 +479,7 @@ public class ChessCommand {
             List<String> matchup = null;
 
             // Find a match that is not running. Same player can't be in two games at the same time
-            // Randomize list everytime so same players play in order
+            // Randomize list everytime so same players don't play in order
             Collections.shuffle(allMatchups);
             for (int i = 0; i < allMatchups.size(); i++) {
                 List currMatchup = allMatchups.get(i);
@@ -712,7 +712,7 @@ public class ChessCommand {
                 {"693282099167494225SUGAR", "Sugar"},
                 {"693282099167494225CHEESE2.2", "Cheese"},
                 {"693282099167494225DynamicRO4", "Dynamic"},
-                {"693282099167494225MorphyRO4", "Morphy"},
+                {"693282099167494225MorphyRO4", "Paul Morphy"},
                 {"693282099167494225SteinitzRO4", "Wilhelm Steinitz"},
                 {"693282099167494225StranglerRO4", "Strangler"},
                 {"693282099167494225SwapperRO4", "Swapper"},
