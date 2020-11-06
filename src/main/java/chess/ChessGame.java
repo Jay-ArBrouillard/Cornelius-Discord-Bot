@@ -32,11 +32,9 @@ public class ChessGame {
     public BaseAiClient client1;
     public BaseAiClient client2;
     public GameType gameType;
-    //Computer must have maintained an evaluation of +-10 for x consecutive moves
+    //Computer must have maintained an evaluation of +-10 for 5 consecutive moves
     public List<Boolean> whiteSideResign = new LinkedList<>();
     public List<Boolean> blackSideResign = new LinkedList<>();
-    private int whiteSideResignCount = -1;
-    private int blackSideResignCount = -1;
 
     public ChessGame(ChessGameState state) {
         db = new GoogleSheets();
@@ -454,9 +452,9 @@ public class ChessGame {
         }
         MoveTransition transition = this.board.getCurrentPlayer().makeMove(move);
         if (transition.getMoveStatus().isDone()) {
-            state.setFullMoves(this.board.getNumFullMoves());
             this.board = null;
             this.board = transition.getTransitionBoard();
+            state.setFullMoves(this.board.getNumFullMoves());
             if (!gameType.isComputerVsComputer()) this.board.buildImage(); //Only build board image when human player is playing
 
             // Is someone in check mate?
@@ -550,7 +548,7 @@ public class ChessGame {
             //Should computer resign?
             // Evaluation must be +- 10 based on the side they are playing on for 3 consecutive turns
             // This ensures that one bad move doesn't cause computer to immediately forfeit
-            // In fact they must play 3 very, very bad moves in a row
+            // In fact they must play 5 very, very bad moves in a row
             if (isComputer && state.getBoardEvaluationMessage() != null) {
                 double evaluationScore = Double.parseDouble(state.getBoardEvaluationMessage().replace("(white side)", "").trim());
                 if (didWhiteJustMove()) {
@@ -633,16 +631,14 @@ public class ChessGame {
      * @param result
      */
     private void manageResignList(boolean isWhiteSide, boolean result) {
-        if (whiteSideResignCount == 0) whiteSideResignCount = Math.max(3, (int) (EloRanking.calculateProbabilityOfWin(whiteSidePlayer.elo, blackSidePlayer.elo) * 10));
-        if (blackSideResignCount == 0) blackSideResignCount = Math.max(3, (int) (EloRanking.calculateProbabilityOfWin(blackSidePlayer.elo, whiteSidePlayer.elo) * 10));
         if (isWhiteSide) {
-            if (whiteSideResign.size() == whiteSideResignCount) {
+            if (whiteSideResign.size() == 5) {
                 whiteSideResign.remove(0);
             }
             whiteSideResign.add(result);
         }
         else {
-            if (blackSideResign.size() == blackSideResignCount) {
+            if (blackSideResign.size() == 5) {
                 blackSideResign.remove(0);
             }
             blackSideResign.add(result);
@@ -713,7 +709,7 @@ public class ChessGame {
             return;
         }
         threadRunning = true;
-        if (isForfeit) {
+        if (isForfeit || state.getFullMoves() > 3) {
             whiteSidePlayer.incrementWins();
             blackSidePlayer.incrementLosses();
             EloRanking.calculateChessElo(state, whiteSidePlayer, blackSidePlayer);
@@ -742,7 +738,7 @@ public class ChessGame {
             return;
         }
         threadRunning = true;
-        if (isForfeit) {
+        if (isForfeit || state.getFullMoves() > 3) {
             whiteSidePlayer.incrementLosses();
             blackSidePlayer.incrementWins();
             EloRanking.calculateChessElo(state, whiteSidePlayer, blackSidePlayer);
