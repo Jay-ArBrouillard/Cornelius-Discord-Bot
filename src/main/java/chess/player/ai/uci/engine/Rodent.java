@@ -19,7 +19,7 @@ public class Rodent extends UCIEngine {
             info string reading book file '/app/bin/books/guide/cat.bin' (success)
             info string reading book file '/app/bin/books/rodent.bin' (success)
          */
-        Option personality = Arrays.stream(options).findFirst().filter(o -> Option.Personality_File.getOptionString().equals(o.getOptionString())).orElse(null);
+        Option personality = Arrays.stream(options).findFirst().filter(o -> "PersonalityFile".equals(o.getOptionString())).orElse(null);
         if (personality == null) {
             System.out.println("All options:"+ Arrays.asList(options));
             throw new RuntimeException("Error initializing " + this.getClass().getSimpleName() + " Personality File is not set");
