@@ -17,14 +17,13 @@ public class CheeseClient extends BaseAiClient{
     }
 
     public String submit(Query query) throws IOException {
-        String output;
+        String output = null;
 
         switch (query.getType()) {
             case Best_Move:
                 output = engine.getBestMove(query);
                 break;
             default:
-                output = null;
                 break;
         }
 
@@ -43,7 +42,7 @@ public class CheeseClient extends BaseAiClient{
     public static class Builder {
         private Set<Option> options = new HashSet<>();
         private Variant variant = Variant.DEFAULT;
-        private String path = "bin/cheese-22-linux-64";
+        private String path = "bin/cheese-21-linux-64";
 
         public final CheeseClient.Builder setVariant(Variant v) {
             variant = v;
