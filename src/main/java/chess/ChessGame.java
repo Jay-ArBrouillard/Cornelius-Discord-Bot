@@ -72,12 +72,27 @@ public class ChessGame {
             client2 = null;
             return;
         }
-        for (ChessPlayer p : players) {
-            setClient(p);
+        if (players.length == 1) {
+            if (players[0].discordId.equals(whiteSidePlayer.discordId)) {
+                setClient(whiteSidePlayer, blackSidePlayer);
+            }
+            else {
+                setClient(blackSidePlayer, whiteSidePlayer);
+            }
+        }
+        else {
+            for (ChessPlayer p : players) {
+                if (p.discordId.equals(whiteSidePlayer.discordId)) {
+                    setClient(whiteSidePlayer, blackSidePlayer);
+                }
+                else {
+                    setClient(blackSidePlayer, whiteSidePlayer);
+                }
+            }
         }
     }
 
-    private void setClient(ChessPlayer p) throws IOException {
+    private void setClient(ChessPlayer p, ChessPlayer o) throws IOException {
         if (p.name.contains("Cornelius")) { //Cornelius will default to use stockfish client
             setClient(new StockFishClient.Builder()
                     .setOption(Option.Hash, 32)
@@ -125,6 +140,7 @@ public class ChessGame {
                     //Komodo defaults table memory to 128mb. Not sure if this is problematic yet
                     .setOption(Option.Book_File, "/app/bin/books/elo-2650.bin")
                     .setOption(Option.Hash, 32)
+                    .setOption(Option.Contempt, calculateContempt("Komodo", o.elo))
                     .build(), p);
         }
         else if (p.name.contains("Cinnamon")) {
@@ -226,6 +242,11 @@ public class ChessGame {
                     .setOption(Option.Hash, 32)
                     .build(), p);
         }
+        else if (p.name.contains("Arasan")) {
+            setClient(new ArasanClient.Builder()
+                    .setOption(Option.Hash, 32)
+                    .build(), p);
+        }
     }
 
     private void setClient(BaseAiClient client, ChessPlayer p) {
@@ -235,6 +256,22 @@ public class ChessGame {
         else if (p.discordId.equals(blackSidePlayer.discordId)) {
             client2 = client; //Black side player will always be client 2
         }
+    }
+
+    private int calculateContempt(String name, double opponentElo) {
+        int contempt = 0;
+
+        if (name.equals("Komodo")) {
+            contempt = 3450 - (int)opponentElo;
+            if (contempt > 500) {
+                contempt = 500;
+            }
+            else if (contempt < -500) {
+                contempt = -500;
+            }
+        }
+
+        return contempt;
     }
 
     private String findPersonalityFileLocation(String name) {

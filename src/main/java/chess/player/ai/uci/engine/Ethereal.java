@@ -9,6 +9,9 @@ import java.io.IOException;
 public class Ethereal extends UCIEngine {
     public Ethereal(Variant variant, String filePath, Option... options) throws IOException {
         super(variant, filePath, options);
+
+        waitForReady();
+        sendCommand("setoption name ContemptDrawPenalty value 20");
     }
 
     public String getBestMove(Query query) throws IOException {
