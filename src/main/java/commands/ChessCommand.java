@@ -199,7 +199,7 @@ public class ChessCommand {
                     state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
                     chessGame.setBlackSidePlayer(blackSidePlayer);
                     double whiteSideWinChance = EloRanking.calculateProbabilityOfWin(whiteSidePlayer.elo, blackSidePlayer.elo);
-                    reply = String.format("`Starting Chess Game %s (%d - %s) vs. %s (%d - %s)`\nMake a move (ex: `c2 c4`)", whiteSidePlayer.name,
+                    reply = String.format("`Starting Chess Match! %s (elo: %d, odds: %s%%) vs. %s (elo: %d, odds: %s%%)`\nMake a move (ex: `c2 c4`)", whiteSidePlayer.name,
                                                                                                                             (int)whiteSidePlayer.elo,
                                                                                                                             formatPercent.format(whiteSideWinChance*100),
                                                                                                                             blackSidePlayer.name,
@@ -230,7 +230,7 @@ public class ChessCommand {
                     chessGame.setBlackSidePlayer(blackSidePlayer);
                     state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
                     double whiteSideWinChance = EloRanking.calculateProbabilityOfWin(whiteSidePlayer.elo, blackSidePlayer.elo);
-                    reply = String.format("`Starting Chess Game %s (%d - %s) vs. %s (%d - %s)`\n%s will go first...", whiteSidePlayer.name,
+                    reply = String.format("`Starting Chess Match! %s (elo: %d, odds: %s%%) vs. %s (elo: %d, odds: %s%%)`\n%s will go first...", whiteSidePlayer.name,
                                                                                                                       whiteSidePlayer.elo,
                                                                                                                       formatPercent.format(whiteSideWinChance*100),
                                                                                                                       blackSidePlayer.name,
