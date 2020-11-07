@@ -462,7 +462,6 @@ public class ChessGame {
             else {
                 state.getMoveHistoryBuilder().append(" ").append(moveCmd).append("\n");
             }
-            state.setFullMoves(this.board.getNumFullMoves());
             if (!gameType.isComputerVsComputer()) this.board.buildImage(); //Only build board image when human player is playing
 
             // Is someone in check mate?
@@ -516,7 +515,7 @@ public class ChessGame {
 
             // Is game in stalement?
             if (this.board.getCurrentPlayer().isInStaleMate()) {
-                state.setMessage("DRAW (Stalement)! " + this.board.getCurrentPlayer().getAlliance() + " is not in check and has no legal moves they can make. Game Over!");
+                state.setMessage("**DRAW** (Stalement)! " + this.board.getCurrentPlayer().getAlliance() + " is not in check and has no legal moves they can make. Game Over!");
                 state.setStateDraw();
                 updateDatabaseDraw();
                 return state;
@@ -594,12 +593,15 @@ public class ChessGame {
                 manageResignList(didWhiteJustMove(), false);
             }
 
+            //Set full moves at this point since game did not end
+            state.setFullMoves(this.board.getNumFullMoves());
+
             //If we get to this point then player made a legal move
             if (didWhiteJustMove()) {
-                state.setMessage("`" + whiteSidePlayer.name + "` SELECTS " + move.toString());
+                state.setMessage(String.format("`%s` SELECTS %s", whiteSidePlayer.name, move.toString()));
             }
             else {
-                state.setMessage("`" + blackSidePlayer.name + "` SELECTS " + move.toString());
+                state.setMessage(String.format("`%s` SELECTS %s", blackSidePlayer.name, move.toString()));
             }
             state.setStateSuccessfulMove();
             transition = null;
