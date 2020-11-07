@@ -742,7 +742,7 @@ public class ChessCommand {
                 {"693282099167494225FRUIT2.1", "Fruit"},
                 {"693282099167494225DONNA4.1", "Donna"},
                 {"693282099167494225SUGAR", "Sugar"},
-                {"693282099167494225CHEESE2.2", "Cheese"},
+                {"693282099167494225CHEESE21", "Cheese"},
                 {"693282099167494225DynamicRO4", "Dynamic"},
                 {"693282099167494225MorphyRO4", "Paul Morphy"},
                 {"693282099167494225SteinitzRO4", "Wilhelm Steinitz"},
