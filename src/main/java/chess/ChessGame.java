@@ -860,7 +860,7 @@ public class ChessGame {
                             .setFen(FenUtils.parseFEN(this.board)).build());
                 }
             }
-            else if (isBlackPlayerTurn()) {
+            else {
                 if (client2 instanceof RandyRandomClient || client2 instanceof StewartClient || client2 instanceof BartholomewClient) {
                     bestMoveString = client2.submit(new Query.Builder(QueryType.Best_Move)
                             .setMovetime(randomThinkTime)
