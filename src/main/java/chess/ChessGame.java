@@ -454,27 +454,27 @@ public class ChessGame {
         if (transition.getMoveStatus().isDone()) {
             this.board = null;
             this.board = transition.getTransitionBoard();
-            state.setFullMoves(this.board.getNumFullMoves());
-            if (!gameType.isComputerVsComputer()) this.board.buildImage(); //Only build board image when human player is playing
-
             //Update move history for computer
+            //Do this before updating full moves
             if (didWhiteJustMove()) {
                 state.getMoveHistoryBuilder().append(state.getFullMoves()).append(". ").append(moveCmd);
             }
             else {
                 state.getMoveHistoryBuilder().append(" ").append(moveCmd).append("\n");
             }
+            state.setFullMoves(this.board.getNumFullMoves());
+            if (!gameType.isComputerVsComputer()) this.board.buildImage(); //Only build board image when human player is playing
 
             // Is someone in check mate?
             if (this.board.getCurrentPlayer().isInCheckMate()) {
                 state.setStateCheckmate();
                 if (didWhiteJustMove()) {
-                    state.setMessage("`" + whiteSidePlayer.name + "` has CHECKMATED `" + blackSidePlayer.name + "`");
+                    state.setMessage(String.format("`%s` has **CHECKMATED** `%s`", whiteSidePlayer.name, blackSidePlayer.name));
                     state.setWinnerId(whiteSidePlayer.discordId);
                     updateDatabaseWhiteSideWin();
                 }
                 else {
-                    state.setMessage("`" + blackSidePlayer.name + "` has CHECKMATED `" + whiteSidePlayer.name + "`");
+                    state.setMessage(String.format("`%s` has **CHECKMATED** `%s`", blackSidePlayer.name, whiteSidePlayer.name));
                     state.setWinnerId(blackSidePlayer.discordId);
                     updateDatabaseBlackSideWin();
                 }
@@ -493,21 +493,21 @@ public class ChessGame {
                     }
                 }
                 fenBuilder.append("]");
-                state.setMessage("DRAW! FiveFold Repetition rule. The exact same position occurred 5 times, which includes board position and player to move next.\n" + fenBuilder.toString());
+                state.setMessage("**DRAW**! FiveFold Repetition rule. The exact same position occurred 5 times, which includes board position and player to move next.\n" + fenBuilder.toString());
                 state.setStateDraw();
                 updateDatabaseDraw();
                 return state;
             }
 
             if (this.board.isDraw50MoveRule()) {
-                state.setMessage("DRAW (50 move rule)! The previous 50 moves resulted in no captures or pawn movements.");
+                state.setMessage("**DRAW** (50 move rule)! The previous 50 moves resulted in no captures or pawn movements.");
                 state.setStateDraw();
                 updateDatabaseDraw();
                 return state;
             }
 
             if (this.board.isDrawImpossibleToCheckMate()) {
-                state.setMessage("DRAW! Neither player can reach checkmate in the current game state... " +
+                state.setMessage("**DRAW**! Neither player can reach checkmate in the current game state... " +
                         "This occurred from one of the following combinations:\n1.King versus King\n2.King and Bishop versus king\n3.King and Knight versus King\n4.King and Bishop versus King and Bishop with the bishops on the same color.");
                 state.setStateDraw();
                 updateDatabaseDraw();
@@ -525,10 +525,10 @@ public class ChessGame {
             // Is someone in check?
             if (this.board.getCurrentPlayer().isInCheck()) {
                 if (didWhiteJustMove()) {
-                    state.setMessage("`" + whiteSidePlayer.name + "` SELECTS " + moveCmd + " `" + blackSidePlayer.name + "` is in check!");
+                    state.setMessage(String.format("`%s` SELECTS %s `%s` is in **check**!", whiteSidePlayer.name, moveCmd, blackSidePlayer.name));
                 }
                 else {
-                    state.setMessage("`" + blackSidePlayer.name + "` SELECTS " + moveCmd + " `" + whiteSidePlayer.name + "` is in check!");
+                    state.setMessage(String.format("`%s` SELECTS %s `%s` is in **check**!", blackSidePlayer.name, moveCmd, whiteSidePlayer.name));
                 }
                 state.setStateCheck();
                 return state;

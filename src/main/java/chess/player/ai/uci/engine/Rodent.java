@@ -21,7 +21,7 @@ public class Rodent extends UCIEngine {
          */
         Option personality = null;
         for (Option o : options) {
-            System.out.println("Option:"+o.toString());
+//            System.out.println("Option:"+o.toString());
             if (Option.Personality_File.getOptionString().contains(o.getOptionString())) {
                 personality = o;
                 break;
