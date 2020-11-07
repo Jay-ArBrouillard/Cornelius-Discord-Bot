@@ -452,10 +452,11 @@ public class ChessGame {
         }
         MoveTransition transition = this.board.getCurrentPlayer().makeMove(move);
         if (transition.getMoveStatus().isDone()) {
+            //Set full moves
+            state.setFullMoves(this.board.getNumFullMoves());
             this.board = null;
             this.board = transition.getTransitionBoard();
             //Update move history for computer
-            //Do this before updating full moves
             if (didWhiteJustMove()) {
                 state.getMoveHistoryBuilder().append(state.getFullMoves()).append(". ").append(moveCmd);
             }
@@ -565,7 +566,7 @@ public class ChessGame {
                         manageResignList(true, false);
                     }
                     if (whiteSideResign.stream().allMatch(x -> x.booleanValue() == true)) {
-                        state.setMessage(whiteSidePlayer.name + " has RESIGNED!");
+                        state.setMessage(whiteSidePlayer.name + " has **RESIGNED**!");
                         state.setStateComputerResign();
                         state.setWinnerId(blackSidePlayer.discordId);
                         state.setPlayerForfeit();
@@ -580,7 +581,7 @@ public class ChessGame {
                         manageResignList(false, false);
                     }
                     if (blackSideResign.stream().allMatch(x -> x.booleanValue() == true)) {
-                        state.setMessage(blackSidePlayer.name + " has RESIGNED!");
+                        state.setMessage(blackSidePlayer.name + " has **RESIGNED**!");
                         state.setStateComputerResign();
                         state.setWinnerId(whiteSidePlayer.discordId);
                         state.setPlayerForfeit();
@@ -592,9 +593,6 @@ public class ChessGame {
             else if (isComputer) {
                 manageResignList(didWhiteJustMove(), false);
             }
-
-            //Set full moves at this point since game did not end
-            state.setFullMoves(this.board.getNumFullMoves());
 
             //If we get to this point then player made a legal move
             if (didWhiteJustMove()) {
