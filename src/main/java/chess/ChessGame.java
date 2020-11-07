@@ -545,7 +545,8 @@ public class ChessGame {
 
             if (this.board.isDrawImpossibleToCheckMate()) {
                 state.setMessage("**DRAW**! Neither player can reach checkmate in the current game state... " +
-                        "This occurred from one of the following combinations:\n1.King versus King\n2.King and Bishop versus king\n3.King and Knight versus King\n4.King and Bishop versus King and Bishop with the bishops on the same color.");
+                        "This occurred from one of the following combinations:\n1.King versus King\n2.King and Bishop versus king\n3.King and Knight versus King\n4.King and Bishop versus King and Bishop with the bishops on the same color.\n" +
+                        "[`" + FenUtils.parseFEN(this.board) + "`]");
                 state.setStateDraw();
                 updateDatabaseDraw();
                 return state;
