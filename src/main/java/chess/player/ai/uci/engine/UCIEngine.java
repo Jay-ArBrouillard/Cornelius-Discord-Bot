@@ -1,6 +1,5 @@
 package chess.player.ai.uci.engine;
 
-import chess.player.ai.uci.client.RodentClient;
 import chess.player.ai.uci.engine.enums.Option;
 import chess.player.ai.uci.engine.enums.Variant;
 
@@ -36,6 +35,7 @@ abstract class UCIEngine {
                 }
             }
         } catch (IOException e) {
+            close();
             throw new IOException("Unable to start and bind " + super.getClass().getSimpleName() + " process: ", e);
         }
     }
@@ -74,6 +74,7 @@ abstract class UCIEngine {
                 }
             }
         } catch (IOException | InterruptedException e) {
+            close();
             throw new IOException("Unable to start and bind " + super.getClass().getSimpleName() + " process: ", e);
         }
     }

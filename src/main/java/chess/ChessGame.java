@@ -227,9 +227,9 @@ public class ChessGame {
                     .setOption(Option.Hash, 32)
                     .build(), p);
         }
-        else if (p.name.contains("Cheese")) {
-            setClient(new CheeseClient.Builder()
-                    .setOption(Option.Hash, 32)
+        else if (p.name.contains("Sophy")) {
+            setClient(new SophyClient.Builder()
+                    //SophyClient has no UCI options
                     .build(), p);
         }
         else if (p.name.contains("Fruit")) {
