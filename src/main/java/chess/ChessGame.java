@@ -262,7 +262,7 @@ public class ChessGame {
         int contempt = 0;
 
         if (name.equals("Komodo")) {
-            contempt = 3450 - (int)opponentElo;
+            contempt = (3450 - (int)opponentElo) / 15;
             if (contempt > 500) {
                 contempt = 500;
             }
