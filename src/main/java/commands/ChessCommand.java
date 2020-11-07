@@ -8,9 +8,11 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import utils.EloRanking;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.time.Instant;
 import java.util.*;
 
@@ -41,6 +43,7 @@ public class ChessCommand {
     private static String reply;
     private static String belowMessage;
     private static File boardImageFile;
+    private static DecimalFormat formatPercent = new DecimalFormat("##0.00");
 
     public static boolean isRunning() {
         return chessGame != null && decision != INACTIVE;
@@ -195,7 +198,13 @@ public class ChessCommand {
                     blackSidePlayer = chessGame.addUser(gameidName[1], gameidName[2]);  //Note: Difficulty value is appended to id and name
                     state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
                     chessGame.setBlackSidePlayer(blackSidePlayer);
-                    reply = "`Starting Chess Game " + whiteSidePlayer.name + " (" + (int)whiteSidePlayer.elo + ")" + " vs. " + blackSidePlayer.name + " (" + (int)blackSidePlayer.elo + ")`\nMake a move (ex: `c2 c4`)";
+                    double whiteSideWinChance = EloRanking.calculateProbabilityOfWin(whiteSidePlayer.elo, blackSidePlayer.elo);
+                    reply = String.format("`Starting Chess Game %s (%d - %s) vs. %s (%d - %s)`\nMake a move (ex: `c2 c4`)", whiteSidePlayer.name,
+                                                                                                                            whiteSidePlayer.elo,
+                                                                                                                            formatPercent.format(whiteSideWinChance*100),
+                                                                                                                            blackSidePlayer.name,
+                                                                                                                            blackSidePlayer.elo,
+                                                                                                                            formatPercent.format((1-whiteSideWinChance)*100));
                     gameType = GameType.PVC;
                     chessGame.gameType = GameType.PVC;
                     try {
@@ -220,7 +229,14 @@ public class ChessCommand {
                     blackSidePlayer = humanPlayer;
                     chessGame.setBlackSidePlayer(blackSidePlayer);
                     state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
-                    reply = "`Starting Chess Game " + whiteSidePlayer.name + " (" + (int)whiteSidePlayer.elo + ")" + " vs. " + blackSidePlayer.name + " (" + (int)blackSidePlayer.elo + ")`\n" + whiteSidePlayer.name + " will go first...";
+                    double whiteSideWinChance = EloRanking.calculateProbabilityOfWin(whiteSidePlayer.elo, blackSidePlayer.elo);
+                    reply = String.format("`Starting Chess Game %s (%d - %s) vs. %s (%d - %s)`\n%s will go first...", whiteSidePlayer.name,
+                                                                                                                      whiteSidePlayer.elo,
+                                                                                                                      formatPercent.format(whiteSideWinChance*100),
+                                                                                                                      blackSidePlayer.name,
+                                                                                                                      blackSidePlayer.elo,
+                                                                                                                      formatPercent.format((1-whiteSideWinChance)*100),
+                                                                                                                      whiteSidePlayer.name);
                     gameType = GameType.CVP;
                     chessGame.gameType = GameType.CVP;
                     try {
@@ -238,7 +254,7 @@ public class ChessCommand {
             case CHALLENGE_OPPONENT:
                 //The player who sent the challenge must enter the challengee's  user id
                 if (!event.getAuthor().getId().equals(whiteSidePlayer.discordId)) {
-                    reply = "`" + whiteSidePlayer.name + "` must enter the Challengee user id";
+                    reply = String.format("`%s` must enter the Challengee user id", whiteSidePlayer.name);
                     belowMessage = null;
                     boardImageFile = null;
                     break;
@@ -258,7 +274,7 @@ public class ChessCommand {
                     blackSidePlayer = chessGame.addUser(message.trim(), member.getEffectiveName());
                     chessGame.setBlackSidePlayer(blackSidePlayer);
                     state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
-                    reply = "`" + whiteSidePlayer.name + "` challenges <@" + blackSidePlayer.discordId + "> to a chess game. Challengee must reply `y` to this text chat to accept!";
+                    reply = String.format("`%s` challenges <@%s> to a chess game. Challengee must reply `y` to this text chat to accept!", whiteSidePlayer.name, blackSidePlayer.discordId);
                     state.setStateWaitingAcceptChallenge();
                     decision = Decision.OPPONENT_ACCEPT_DECLINE;
                 }
@@ -266,25 +282,32 @@ public class ChessCommand {
             case OPPONENT_ACCEPT_DECLINE:
                 if (event.getAuthor().getId().equals(blackSidePlayer.discordId)) {
                     if (message.equalsIgnoreCase("y")) {
-                        reply = "<@" + whiteSidePlayer.discordId + "> ("+(int)whiteSidePlayer.elo+") vs <@" + blackSidePlayer.discordId + "> ("+(int)blackSidePlayer.elo+") Chess Game";
+                        double whiteSideWinChance = EloRanking.calculateProbabilityOfWin(whiteSidePlayer.elo, blackSidePlayer.elo);
+                        reply = String.format("Chess Match Beginning: <@%s> (%d - %s) vs <@%s> (%d - %s)", whiteSidePlayer.name,
+                                                                                                           whiteSidePlayer.elo,
+                                                                                                           formatPercent.format(whiteSideWinChance*100),
+                                                                                                           blackSidePlayer.name,
+                                                                                                           blackSidePlayer.elo,
+                                                                                                           formatPercent.format((1-whiteSideWinChance)*100),
+                                                                                                           whiteSidePlayer.name);
                         boardImageFile = new File(GAME_BOARD_IMAGE_LOCATION);
-                        belowMessage = "`"+ whiteSidePlayer.name + "` goes first. Make a move (ex: `c2 c4`)";
+                        belowMessage = String.format("`%s` goes first. Make a move (ex: `c2 c4`)", whiteSidePlayer.name);
                         decision = Decision.PLAYER_MOVE;
                         chessGame.setupStockfishClient();
                         state.setMatchStartTime(Instant.now().toEpochMilli());
                     }
                     else {
-                        reply = "`" + blackSidePlayer.name + "` has declined the chess match";
+                        reply = String.format("`%s` has declined the chess match", blackSidePlayer.name);
                         state.setStateChallengeeDecline();
                     }
                 }
                 else if (event.getAuthor().getId().equals(whiteSidePlayer.discordId)) {
                     if (message.equalsIgnoreCase("q")) {
-                        reply = "`" + whiteSidePlayer.name + "` has declined the challenge";
+                        reply = String.format("`%s` has declined the chess match", whiteSidePlayer.name);
                         state.setStateChallengeeDecline();
                     }
                     else {
-                        reply = "Waiting for <@"+blackSidePlayer.discordId+"> to accept `y` or decline the challenge. Only they can accept or type `q` to quit."; //No reply
+                        reply = String.format("Waiting for <@%s> to accept `y` or decline the challenge. Only they can accept or type `q` to quit.", blackSidePlayer.discordId);
                     }
                     //Do nothing waiting
                 }

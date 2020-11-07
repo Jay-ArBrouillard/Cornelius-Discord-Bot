@@ -458,7 +458,7 @@ public class ChessGame {
             if (!gameType.isComputerVsComputer()) this.board.buildImage(); //Only build board image when human player is playing
 
             //Update move history for computer
-            if (isWhitePlayerTurn()) {
+            if (didWhiteJustMove()) {
                 state.getMoveHistoryBuilder().append(state.getFullMoves()).append(". ").append(moveCmd);
             }
             else {
