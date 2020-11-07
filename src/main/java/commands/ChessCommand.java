@@ -200,10 +200,10 @@ public class ChessCommand {
                     chessGame.setBlackSidePlayer(blackSidePlayer);
                     double whiteSideWinChance = EloRanking.calculateProbabilityOfWin(whiteSidePlayer.elo, blackSidePlayer.elo);
                     reply = String.format("`Starting Chess Game %s (%d - %s) vs. %s (%d - %s)`\nMake a move (ex: `c2 c4`)", whiteSidePlayer.name,
-                                                                                                                            whiteSidePlayer.elo,
+                                                                                                                            (int)whiteSidePlayer.elo,
                                                                                                                             formatPercent.format(whiteSideWinChance*100),
                                                                                                                             blackSidePlayer.name,
-                                                                                                                            blackSidePlayer.elo,
+                                                                                                                            (int)blackSidePlayer.elo,
                                                                                                                             formatPercent.format((1-whiteSideWinChance)*100));
                     gameType = GameType.PVC;
                     chessGame.gameType = GameType.PVC;
@@ -284,10 +284,10 @@ public class ChessCommand {
                     if (message.equalsIgnoreCase("y")) {
                         double whiteSideWinChance = EloRanking.calculateProbabilityOfWin(whiteSidePlayer.elo, blackSidePlayer.elo);
                         reply = String.format("Chess Match Beginning: <@%s> (%d - %s) vs <@%s> (%d - %s)", whiteSidePlayer.name,
-                                                                                                           whiteSidePlayer.elo,
+                                                                                                           (int)whiteSidePlayer.elo,
                                                                                                            formatPercent.format(whiteSideWinChance*100),
                                                                                                            blackSidePlayer.name,
-                                                                                                           blackSidePlayer.elo,
+                                                                                                           (int)blackSidePlayer.elo,
                                                                                                            formatPercent.format((1-whiteSideWinChance)*100),
                                                                                                            whiteSidePlayer.name);
                         boardImageFile = new File(GAME_BOARD_IMAGE_LOCATION);
