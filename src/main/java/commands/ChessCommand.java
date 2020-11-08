@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
+import net.dv8tion.jda.api.utils.concurrent.Task;
 import utils.EloRanking;
 
 import java.io.File;
@@ -261,24 +262,19 @@ public class ChessCommand {
                     break;
                 }
                 Guild guild = event.getGuild();
-                Member member = null;
+                String discordId = message.trim();
                 try {
-                    guild.retrieveMemberById(message.trim()).complete();
-                    member = guild.getMemberById(message.trim());
+                    guild.findMembers(m -> m.getId().equals(discordId)).onSuccess(members -> {
+                        blackSidePlayer = chessGame.addUser(discordId, members.get(0).getEffectiveName());
+                        chessGame.setBlackSidePlayer(blackSidePlayer);
+                        state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
+                        reply = String.format("`%s` challenges <@%s> to a chess game. Challengee must reply `y` to this text chat to accept!", whiteSidePlayer.name, blackSidePlayer.discordId);
+                        state.setStateWaitingAcceptChallenge();
+                        decision = Decision.OPPONENT_ACCEPT_DECLINE;
+                    }).onError(members -> reply = "Opponent does not exist or is not in your discord server. Please reenter userId.");
                 }
                 catch (Exception e) {
                     //Do nothing
-                }
-                if (member == null) {
-                    reply = "Opponent does not exist or is not in your discord server. Please reenter userId.";
-                }
-                else { //Valid opponent found
-                    blackSidePlayer = chessGame.addUser(message.trim(), member.getEffectiveName());
-                    chessGame.setBlackSidePlayer(blackSidePlayer);
-                    state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
-                    reply = String.format("`%s` challenges <@%s> to a chess game. Challengee must reply `y` to this text chat to accept!", whiteSidePlayer.name, blackSidePlayer.discordId);
-                    state.setStateWaitingAcceptChallenge();
-                    decision = Decision.OPPONENT_ACCEPT_DECLINE;
                 }
                 break;
             case OPPONENT_ACCEPT_DECLINE:
