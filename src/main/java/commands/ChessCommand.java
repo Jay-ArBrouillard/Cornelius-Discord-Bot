@@ -352,7 +352,7 @@ public class ChessCommand {
         String[][] players = getAIList();
         randomizeList(players);
 
-        TrainThread[] threads = new TrainThread[3];
+        TrainThread[] threads = new TrainThread[4];
         ArrayList<ArrayList<String>> allMatchups = new ArrayList<>();
         for (int i = 0; i < players.length; i++) {
             for (int j = 0; j < players.length; j++) {

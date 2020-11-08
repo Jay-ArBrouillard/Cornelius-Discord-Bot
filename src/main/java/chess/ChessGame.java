@@ -943,7 +943,7 @@ public class ChessGame {
 
         if (mc != null)  {
             mc.sendTyping().queue();
-            //If computer has 50% chance he will send a taunt message
+            //Computer has 50% chance he will send a taunt message
             if (tauntMsg != null && Math.random() >= 0.5 && state.getBoardEvaluationMessage() != null) {
                 String fullMessage = isWhitePlayerTurn() ? "`"+whiteSidePlayer.name+"` -" + tauntMsg : "`"+blackSidePlayer.name+"`: " + tauntMsg;
                 mc.sendMessage(fullMessage).queue();
