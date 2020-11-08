@@ -1,6 +1,6 @@
 ; Vincent
 ; Personality for Rodent IV chess engine
-; violent attacker (+ piece pressure, + King Tropism)
+; violent attacker (+ piece pressure)
 ;
 setoption name PawnValueMg value 90
 setoption name KnightValueMg value 310
@@ -31,7 +31,7 @@ setoption name OppAttack value 100
 setoption name OwnMobility value 100
 setoption name OppMobility value 100
 setoption name FlatMobility value 50
-setoption name KingTropism value 120
+setoption name KingTropism value 20
 setoption name PrimaryPstWeight value 58
 setoption name SecondaryPstWeight value 40
 setoption name PiecePressure value 200
@@ -68,5 +68,5 @@ setoption name Selectivity value 175
 setoption name SearchSkill value 10
 setoption name RiskyDepth value 0
 setoption name BookFilter value 20
-setoption name GuideBookFile value /app/bin/books/guide/guide.bin
-setoption name MainBookFile value /app/bin/books/rodent.bin
+setoption name GuideBookFile value /app/bin/books/mini.bin
+setoption name MainBookFile value /app/bin/books/small.bin
