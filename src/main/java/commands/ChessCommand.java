@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.utils.ChunkingFilter;
 import utils.EloRanking;
 
 import java.io.File;
@@ -262,12 +263,13 @@ public class ChessCommand {
                 Guild guild = event.getGuild();
                 Member member = null;
                 try {
-                   member = guild.getMemberById(message.trim());
+                    guild.retrieveMemberById(message.trim()).complete();
+                    member = guild.getMemberById(message.trim());
                 }
                 catch (Exception e) {
                     //Do nothing
                 }
-                if (member == null || !guild.getMembers().contains(member)) {
+                if (member == null) {
                     reply = "Opponent does not exist or is not in your discord server. Please reenter userId.";
                 }
                 else { //Valid opponent found
