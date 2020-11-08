@@ -77,7 +77,7 @@ public class EloRanking {
      * @return
      */
     public static double determineK(double rating) {
-        int K;
+        double K;
         if (rating < 2100) { // 0-2099
             K = 40;
         }
@@ -132,6 +132,9 @@ public class EloRanking {
             if (isWin) {
                 // Never let their elo decrease after a win
                 if (!c.provisional && !o.provisional) {
+                    System.out.println("Current elo:" + c.elo);
+                    System.out.println("New elo:" + EloRanking.calculateEstablishedVsEstablished(c.elo, oPrevElo, 1.0));
+
                     c.elo = Math.max(c.elo, EloRanking.calculateEstablishedVsEstablished(c.elo, oPrevElo, 1.0));
                 }
                 else if (!c.provisional && o.provisional) {
@@ -161,6 +164,7 @@ public class EloRanking {
             }
         }
         c.elo = Math.round(c.elo); // Round double to nearest integer
+        System.out.println("Round new elo:" + c.elo);
         if (c.provisional && c.totalGames > 20) c.provisional = false;
         if (c.totalGames <= 20) {
             c.highestElo = null;
