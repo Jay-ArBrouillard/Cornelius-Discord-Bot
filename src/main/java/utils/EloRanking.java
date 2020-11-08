@@ -54,9 +54,9 @@ public class EloRanking {
      * @param s2
      * @return
      */
-    public static double calculateEstablishedVsProvisional(double rA, double rB, double nB, double s2) {
+    public static double calculateEstablishedVsProvisional(double rA, int nA, double rB, double nB, double s2) {
         double probability = s2 - calculateProbabilityOfWin(rA, rB);
-        return rA + determineK(rA) * (nB / 20.0) * probability;
+        return rA + determineK(rA, nA) * (nB / 20.0) * probability;
     }
 
     /**
@@ -66,28 +66,29 @@ public class EloRanking {
      * @param s2
      * @return
      */
-    public static double calculateEstablishedVsEstablished(double rA, double rB, double s2) {
+    public static double calculateEstablishedVsEstablished(double rA, int nA, double rB, double s2) {
         double probability = s2 - calculateProbabilityOfWin(rA, rB);
-        return rA + determineK(rA) * probability;
+        return rA + determineK(rA, nA) * probability;
     }
 
     /**
-     * Modified K factor from similarly used by the USCF
+     * K factor from FIDE modified
      * @param rating
      * @return
      */
-    public static double determineK(double rating) {
+    public static double determineK(double rating, int numGames) {
         double K;
-        if (rating < 2100) { // 0-2099
-            K = 40;
+        if (numGames < 30 && rating < 2300) {
+            //For 10 games after a new players provisional period they can still significantly influence their elo
+            K = 50;
         }
-        else if (rating < 2200) { //2100 - 2199
+        else if (rating < 2100) { // 0-2099
             K = 32;
         }
-        else if (rating < 2400) { //2200 - 2399
+        else if (rating < 2200) { //2100 - 2199
             K = 24;
         }
-        else { // >= 2400
+        else { //2200+
             K = 16;
         }
 
@@ -116,10 +117,10 @@ public class EloRanking {
     public static void calculateChessEloSingle(boolean isDraw, boolean isWin, ChessPlayer c, double oPrevElo, ChessPlayer o) {
         if (isDraw) {
             if (!c.provisional && !o.provisional) {
-                c.elo = EloRanking.calculateEstablishedVsEstablished(c.elo, oPrevElo, 0.5);
+                c.elo = EloRanking.calculateEstablishedVsEstablished(c.elo, c.totalGames, oPrevElo, 0.5);
             }
             else if (!c.provisional && o.provisional) {
-                c.elo = EloRanking.calculateEstablishedVsProvisional(c.elo, oPrevElo, o.totalGames,0.5);
+                c.elo = EloRanking.calculateEstablishedVsProvisional(c.elo, c.totalGames, oPrevElo, o.totalGames,0.5);
             }
             else if (c.provisional && !o.provisional) {
                 c.elo = EloRanking.calculateProvisionalVsEstablished(c.elo, c.totalGames, oPrevElo, 0.0);
@@ -132,13 +133,10 @@ public class EloRanking {
             if (isWin) {
                 // Never let their elo decrease after a win
                 if (!c.provisional && !o.provisional) {
-                    System.out.println("Current elo:" + c.elo);
-                    System.out.println("New elo:" + EloRanking.calculateEstablishedVsEstablished(c.elo, oPrevElo, 1.0));
-
-                    c.elo = Math.max(c.elo, EloRanking.calculateEstablishedVsEstablished(c.elo, oPrevElo, 1.0));
+                    c.elo = Math.max(c.elo, EloRanking.calculateEstablishedVsEstablished(c.elo, c.totalGames, oPrevElo, 1.0));
                 }
                 else if (!c.provisional && o.provisional) {
-                    c.elo = Math.max(c.elo, EloRanking.calculateEstablishedVsProvisional(c.elo, oPrevElo, o.totalGames,1.0));
+                    c.elo = Math.max(c.elo, EloRanking.calculateEstablishedVsProvisional(c.elo, c.totalGames, oPrevElo, o.totalGames,1.0));
                 }
                 else if (c.provisional && !o.provisional) {
                     c.elo = Math.max(c.elo, EloRanking.calculateProvisionalVsEstablished(c.elo, c.totalGames, oPrevElo, 1.0));
@@ -150,10 +148,10 @@ public class EloRanking {
             else { //Loss
                 // Never let their elo decrease lower than 100
                 if (!c.provisional && !o.provisional) {
-                    c.elo = Math.max(100, EloRanking.calculateEstablishedVsEstablished(c.elo, oPrevElo, 0.0));
+                    c.elo = Math.max(100, EloRanking.calculateEstablishedVsEstablished(c.elo, c.totalGames, oPrevElo, 0.0));
                 }
                 else if (!c.provisional && o.provisional) {
-                    c.elo = Math.max(100, EloRanking.calculateEstablishedVsProvisional(c.elo, oPrevElo, o.totalGames,0.0));
+                    c.elo = Math.max(100, EloRanking.calculateEstablishedVsProvisional(c.elo, c.totalGames, oPrevElo, o.totalGames,0.0));
                 }
                 else if (c.provisional && !o.provisional) {
                     c.elo = Math.max(100, EloRanking.calculateProvisionalVsEstablished(c.elo, c.totalGames, oPrevElo, -1.0));
@@ -164,12 +162,11 @@ public class EloRanking {
             }
         }
         c.elo = Math.round(c.elo); // Round double to nearest integer
-        System.out.println("Round new elo:" + c.elo);
-        if (c.provisional && c.totalGames > 20) c.provisional = false;
-        if (c.totalGames <= 20) {
+        if (c.provisional && c.totalGames == 20) c.provisional = false;
+        if (c.totalGames < 20) {
             c.highestElo = null;
         }
-        else if (c.totalGames == 21) {
+        else if (c.totalGames == 20) {
             c.highestElo = c.elo;
         }
         else if (c.elo > c.highestElo) {
