@@ -911,8 +911,9 @@ public class ChessGame {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            //Do nothing here Handling outside of catch
+            state.setMessage(e.getMessage());
+            state.setStateError();
+            return state;
         }
 
         boolean error1 = gameType.isComputerVsComputer() && (client1 == null || client2 == null);
