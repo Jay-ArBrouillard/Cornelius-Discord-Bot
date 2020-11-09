@@ -561,7 +561,7 @@ public class ChessCommand {
         }
         userObjects = null;
         System.gc();
-        event.getChannel().sendMessage(String.format("Found %d matches", allMatchups.size())).queue();
+        event.getChannel().sendMessage(String.format("Found %d matches - %d matches per player", allMatchups.size(), gamesPerPlayer)).queue();
 
         List<String> playersInGame = new ArrayList<>();
         while (allMatchups.size() > 0) {
