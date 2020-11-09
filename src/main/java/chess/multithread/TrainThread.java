@@ -67,7 +67,7 @@ public class TrainThread extends Thread {
             state = game.ai(null);
             reply = state.getMessage();
             status = state.getStatus();
-            boolean isGameOver = CHECKMATE.equals(status) || DRAW.equals(status) || COMPUTER_RESIGN.equals(status);
+            boolean isGameOver = CHECKMATE.equals(status) || DRAW.equals(status) || COMPUTER_RESIGN.equals(status) || ERROR.equals(status);
             long minutesElapsed = (Instant.now().toEpochMilli() - state.getMatchStartTime()) / 1000 / 60;
             if (minutesElapsed >= 3.5) { //3.5 minutes
                 if (game.didWhiteJustMove()) {

@@ -585,7 +585,7 @@ public class ChessCommand {
                     reply = state.getMessage();
                     status = state.getStatus();
 
-                    if (CHECKMATE.equals(status) || DRAW.equals(status) || COMPUTER_RESIGN.equals(status)) {
+                    if (CHECKMATE.equals(status) || DRAW.equals(status) || COMPUTER_RESIGN.equals(status) || ERROR.equals(status)) {
                         try {
                             if (chessGame.stockFishClient != null) chessGame.stockFishClient.close();
                             if (chessGame.client1 != null) chessGame.client1.close();
@@ -676,7 +676,7 @@ public class ChessCommand {
                 reply = state.getMessage();
                 status = state.getStatus();
 
-                boolean isGameOver = CHECKMATE.equals(status) || DRAW.equals(status) || COMPUTER_RESIGN.equals(status);
+                boolean isGameOver = CHECKMATE.equals(status) || DRAW.equals(status) || COMPUTER_RESIGN.equals(status) || ERROR.equals(status);
                 long minutesElapsed = (Instant.now().toEpochMilli() - state.getMatchStartTime()) / 1000 / 60;
                 if (minutesElapsed >= 3.5) { //3.5 minutes
                     if (chessGame.didWhiteJustMove()) {
@@ -933,7 +933,7 @@ public class ChessCommand {
         state = chessGame.ai(event.getChannel());
         reply = state.getMessage();
         String status = state.getStatus();
-        if (CHECKMATE.equals(status) || DRAW.equals(status) || COMPUTER_RESIGN.equals(status)) {
+        if (CHECKMATE.equals(status) || DRAW.equals(status) || COMPUTER_RESIGN.equals(status) || ERROR.equals(status)) {
             boardImageFile = new File(GAME_BOARD_IMAGE_LOCATION);
             belowMessage = "GG";
         } else if (CHECK.equals(status) || SUCCESSFUL_MOVE.equals(status)) {

@@ -868,6 +868,7 @@ public class ChessGame {
     public ChessGameState ai(MessageChannel mc) {
         int randomThinkTime = mc == null ? 1000 : ThreadLocalRandom.current().nextInt(5000, 10000 + 1); //Between 5-10 seconds against human
         String bestMoveString = null;
+        String exceptionMsg = null;
         try {
             if (isWhitePlayerTurn()) {
                 if (client1 instanceof RandyRandomClient || client1 instanceof StewartClient || client1 instanceof BartholomewClient) {
@@ -894,9 +895,7 @@ public class ChessGame {
                 }
             }
         } catch (Exception e) {
-            state.setMessage(e.getMessage());
-            state.setStateError();
-            return state;
+            exceptionMsg = e.getMessage();
         }
 
         boolean error1 = gameType.isComputerVsComputer() && (client1 == null || client2 == null);
@@ -910,6 +909,7 @@ public class ChessGame {
                 System.out.println(String.format("client:%s, bestMoveString:%s, fen:%s", client2, bestMoveString, FenUtils.parseFEN(this.board)));
                 state.setMessage("Error forcing game to end with no consequences. " + client2 + " was not able initialize or find a move");
             }
+            System.out.println("Exception message:"+exceptionMsg);
             client1 = null;
             client2 = null;
             state.setStateError();
