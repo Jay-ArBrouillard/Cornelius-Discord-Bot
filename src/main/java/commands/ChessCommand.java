@@ -269,7 +269,7 @@ public class ChessCommand {
                 else {
                     Thread t = new Thread(() -> {
                         List<Member> members = guild.findMembers(m -> discordId.equals(m.getId())).get();
-                        if (members != null || members.size() == 1) {
+                        if (members != null && members.size() == 1) {
                             blackSidePlayer = chessGame.addUser(discordId, members.get(0).getEffectiveName());
                             chessGame.setBlackSidePlayer(blackSidePlayer);
                             state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
@@ -283,7 +283,7 @@ public class ChessCommand {
                     });
                     t.start();
                     try {
-                        t.join();
+                        while (t.isAlive()) Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         reply = "Error retrieving opponent from userId:"+discordId;
                         e.printStackTrace();
