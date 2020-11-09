@@ -268,16 +268,25 @@ public class ChessCommand {
                 }
                 else {
                     Task<List<Member>> members = guild.findMembers(m -> discordId.equals(m.getId()));
-                    if (members.get() != null || members.get().size() == 0) {
-                        blackSidePlayer = chessGame.addUser(discordId, members.get().get(0).getEffectiveName());
-                        chessGame.setBlackSidePlayer(blackSidePlayer);
-                        state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
-                        reply = String.format("`%s` challenges <@%s> to a chess game. Challengee must reply `y` to this text chat to accept!", whiteSidePlayer.name, blackSidePlayer.discordId);
-                        state.setStateWaitingAcceptChallenge();
-                        decision = Decision.OPPONENT_ACCEPT_DECLINE;
-                    }
-                    else {
-                        reply = "Opponent does not exist or is not in your discord server. Please reenter userId.";
+                    Thread t = new Thread(() -> {
+                        if (members.get() != null || members.get().size() == 0) {
+                            blackSidePlayer = chessGame.addUser(discordId, members.get().get(0).getEffectiveName());
+                            chessGame.setBlackSidePlayer(blackSidePlayer);
+                            state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
+                            reply = String.format("`%s` challenges <@%s> to a chess game. Challengee must reply `y` to this text chat to accept!", whiteSidePlayer.name, blackSidePlayer.discordId);
+                            state.setStateWaitingAcceptChallenge();
+                            decision = Decision.OPPONENT_ACCEPT_DECLINE;
+                        }
+                        else {
+                            reply = "Opponent does not exist or is not in your discord server. Please reenter userId.";
+                        }
+                    });
+                    t.start();
+                    try {
+                        t.join();
+                    } catch (InterruptedException e) {
+                        reply = "Error retrieving opponent from userId:"+discordId;
+                        e.printStackTrace();
                     }
                 }
                 break;
