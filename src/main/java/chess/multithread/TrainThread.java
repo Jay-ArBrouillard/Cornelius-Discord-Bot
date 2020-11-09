@@ -49,7 +49,6 @@ public class TrainThread extends Thread {
             e.printStackTrace();
             mc.sendMessage(e.toString()).queue();
             game = null;
-            state = null;
             System.gc(); //Attempt to call garbage collector to clear memory
         }
     }
