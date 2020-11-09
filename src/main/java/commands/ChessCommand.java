@@ -267,14 +267,20 @@ public class ChessCommand {
                     reply = "Please enter a non-empty userId";
                 }
                 else {
-                    guild.findMembers(m -> discordId.equals(m.getId())).onSuccess(members -> {
+                    Thread t = new Thread(() -> guild.findMembers(m -> discordId.equals(m.getId())).onSuccess(members -> {
                         blackSidePlayer = chessGame.addUser(discordId, members.get(0).getEffectiveName());
                         chessGame.setBlackSidePlayer(blackSidePlayer);
                         state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
                         reply = String.format("`%s` challenges <@%s> to a chess game. Challengee must reply `y` to this text chat to accept!", whiteSidePlayer.name, blackSidePlayer.discordId);
                         state.setStateWaitingAcceptChallenge();
                         decision = Decision.OPPONENT_ACCEPT_DECLINE;
-                    }).onError(members -> reply = "Opponent does not exist or is not in your discord server. Please reenter userId.");
+                    }).onError(members -> reply = "Opponent does not exist or is not in your discord server. Please reenter userId."));
+                    try {
+                        t.start();
+                        t.join();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
                 break;
             case OPPONENT_ACCEPT_DECLINE:
