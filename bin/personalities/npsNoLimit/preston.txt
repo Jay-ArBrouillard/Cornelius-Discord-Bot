@@ -68,4 +68,4 @@ setoption name SearchSkill value 10
 setoption name RiskyDepth value 0
 setoption name BookFilter value 20
 setoption name GuideBookFile value /app/bin/books/guide/cs.bin
-setoption name MainBookFile value /app/bin/books/rodent.bin
+setoption name MainBookFile value /app/bin/books/pwned-book.bin

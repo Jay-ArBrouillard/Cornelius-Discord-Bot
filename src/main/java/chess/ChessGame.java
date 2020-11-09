@@ -859,7 +859,7 @@ public class ChessGame {
             intValue = 7;
         }
         else {
-            throw new RuntimeException("convertStringLetterToNumber error. Should not happen");
+            throw new RuntimeException("convertStringLetterToNumber error. Should not happen:" + value);
         }
 
         return intValue;
