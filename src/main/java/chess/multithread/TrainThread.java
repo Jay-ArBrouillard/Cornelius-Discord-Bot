@@ -48,8 +48,6 @@ public class TrainThread extends Thread {
         catch (Exception e) {
             e.printStackTrace();
             mc.sendMessage(e.toString()).queue();
-            game = null;
-            System.gc(); //Attempt to call garbage collector to clear memory
         }
     }
 
@@ -59,6 +57,17 @@ public class TrainThread extends Thread {
         if (state.getMatchStartTime() == null) {
             playersInGame.remove(whiteSideId);
             playersInGame.remove(blackSideId);
+            state = null;
+            game.stockFishClient = null;
+            game.client1 = null;
+            game.client2 = null;
+            game = null;
+            whiteSidePlayerName = null;
+            blackSidePlayerName = null;
+            whiteSideId = null;
+            blackSideId = null;
+            mc = null;
+            System.gc(); //Attempt to call garbage collector to clear memory
             return;
         }
         mc.sendMessage("Beginning match on Thread " + threadNum + ": " + whiteSidePlayerName + " vs " + blackSidePlayerName).queue();
