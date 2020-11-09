@@ -482,7 +482,7 @@ public class ChessCommand {
         userObjects = null;
         gamesForPlayer = null;
         System.gc();
-        event.getChannel().sendMessage(String.format("Found %d matches out of %d maximum matches", allMatchups.size(), players.length * gamesPerPlayer)).queue();
+        event.getChannel().sendMessage(String.format("Found %d matches out of %d maximum matches", allMatchups.size(), userObjects.size() * gamesPerPlayer)).queue();
 
         List<String> playersInGame = new ArrayList<>();
         while (allMatchups.size() > 0) {
@@ -551,9 +551,9 @@ public class ChessCommand {
             String name1 = (String) row.get(1);
             if (!id1.startsWith(System.getenv("OWNER_ID"))) continue; //Ensure player is a bot
             for (int j = 0; j < gamesPerPlayer; j++) {
-                int randomIndex = rand.nextInt(players.length);
+                int randomIndex = rand.nextInt(userObjects.size());
                 while (randomIndex == i || !((String)userObjects.get(randomIndex).get(0)).startsWith(System.getenv("OWNER_ID"))) {
-                    randomIndex = rand.nextInt(players.length);
+                    randomIndex = rand.nextInt(userObjects.size());
                 }
                 List<Object> oppRow = userObjects.get(randomIndex);
                 allMatchups.add(new ArrayList<>(Arrays.asList(id1, name1, (String) oppRow.get(0), (String) oppRow.get(1))));
