@@ -99,7 +99,7 @@ public abstract class Move {
         }
         builder.setPiece(this.movedPiece.movePiece(this));
         builder.setMoveMaker(this.board.getCurrentPlayer().getOpponent().getAlliance());
-        return builder.build(this.board.getNumHalfMoves(), this.board.getNumFullMoves(), this.board.getPositionCountMap()); //Return a new board
+        return builder.build(this.board.getNumHalfMoves(), this.board.getNumFullMoves()); //Return a new board
     }
 
     /*
@@ -233,7 +233,7 @@ public abstract class Move {
             builder.setPiece(movedPawn);
             builder.setEnPassantPawn(movedPawn);
             builder.setMoveMaker(this.board.getCurrentPlayer().getOpponent().getAlliance());
-            return builder.build(this.board.getNumHalfMoves(), this.board.getNumFullMoves(), this.board.getPositionCountMap()); //Return a new board
+            return builder.build(this.board.getNumHalfMoves(), this.board.getNumFullMoves()); //Return a new board
         }
 
         @Override
@@ -292,7 +292,7 @@ public abstract class Move {
             }
             builder.setPiece(this.movedPiece.movePiece(this));
             builder.setMoveMaker(this.board.getCurrentPlayer().getOpponent().getAlliance());
-            return builder.build(this.board.getNumHalfMoves(), this.board.getNumFullMoves(), this.board.getPositionCountMap()); //Return a new board
+            return builder.build(this.board.getNumHalfMoves(), this.board.getNumFullMoves()); //Return a new board
         }
 
         @Override
@@ -343,7 +343,7 @@ public abstract class Move {
             }
             builder.setPiece(this.promotedPawn.getPromotionPiece(promotionType).movePiece(this));
             builder.setMoveMaker(this.board.getCurrentPlayer().getOpponent().getAlliance());
-            return builder.build(this.board.getNumHalfMoves(), this.board.getNumFullMoves(), this.board.getPositionCountMap()); //Return a new board
+            return builder.build(this.board.getNumHalfMoves(), this.board.getNumFullMoves()); //Return a new board
         }
 
         @Override
@@ -421,7 +421,7 @@ public abstract class Move {
             builder.setPiece(this.movedPiece.movePiece(this));
             builder.setPiece(new Rook(this.castleRookDestination, this.castleRook.getPieceAlliance(), false));
             builder.setMoveMaker(this.board.getCurrentPlayer().getOpponent().getAlliance());
-            return builder.build(this.board.getNumHalfMoves(), this.board.getNumFullMoves(), this.board.getPositionCountMap()); //Return a new board
+            return builder.build(this.board.getNumHalfMoves(), this.board.getNumFullMoves()); //Return a new board
         }
 
         @Override
