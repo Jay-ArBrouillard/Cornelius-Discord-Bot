@@ -73,7 +73,7 @@ public class TrainThread extends Thread {
                 else {
                     System.out.println(String.format("thread:%d, client:%s, reply:%s, status:%s, fen:%s", threadNum, game.client2, reply, status, FenUtils.parseFEN(game.board)));
                 }
-                if (minutesElapsed >= 10 && !isGameOver) {
+                if (minutesElapsed >= 10) {
                     mc.sendMessage((String.format("Ending match for %s vs %s because match is taking longer than 10 minutes to complete", whiteSidePlayerName, blackSidePlayerName))).queue();
                     clear();
                     break;
