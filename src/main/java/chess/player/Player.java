@@ -150,15 +150,14 @@ public abstract class Player {
             //Handle half, full moves, positionCountMap
             transitionBoard.setNumHalfMoves(isCaptureOrPawnMove(move) ? 0 : this.board.getNumHalfMoves() + 1);
             transitionBoard.setNumFullMoves(this.board.getCurrentPlayer().getAlliance().isBlack() ? this.board.getNumFullMoves() + 1 : this.board.getNumFullMoves());
-            String fen = FenUtils.parseFENNoMoves(this.board);
-            Map<String, Integer> positionCountMap = this.board.getPositionCountMap();
+            String fen = FenUtils.parseFENNoMoves(transitionBoard);
+            Map<String, Integer> positionCountMap = transitionBoard.getPositionCountMap();
             if (positionCountMap.containsKey(fen)) {
                 positionCountMap.put(fen, positionCountMap.get(fen) + 1);
             }
             else {
                 positionCountMap.put(fen, 1);
             }
-            transitionBoard.setPositionCountMap(positionCountMap);
         }
 
         return new MoveTransition(transitionBoard, move, MoveStatus.DONE);

@@ -232,7 +232,7 @@ public class ChessCommand {
                     chessGame.setBlackSidePlayer(blackSidePlayer);
                     state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
                     double whiteSideWinChance = EloRanking.calculateProbabilityOfWin(whiteSidePlayer.elo, blackSidePlayer.elo);
-                    reply = String.format("`Starting Chess Match! %s (elo: %d, odds: %s%%) vs. %s (elo: %d, odds: %s%%)`\n%s will go first...", whiteSidePlayer.name,
+                    reply = String.format("`Starting Chess Match!` %s (elo: %d, odds: %s%%) vs. %s (elo: %d, odds: %s%%)\n%s will go first...", whiteSidePlayer.name,
                                                                                                                       whiteSidePlayer.elo,
                                                                                                                       formatPercent.format(whiteSideWinChance*100),
                                                                                                                       blackSidePlayer.name,
@@ -285,13 +285,13 @@ public class ChessCommand {
                 if (event.getAuthor().getId().equals(blackSidePlayer.discordId)) {
                     if (message.equalsIgnoreCase("y")) {
                         double whiteSideWinChance = EloRanking.calculateProbabilityOfWin(whiteSidePlayer.elo, blackSidePlayer.elo);
-                        reply = String.format("Chess Match Beginning: <@%s> (%d - %s) vs <@%s> (%d - %s)", whiteSidePlayer.name,
-                                                                                                           (int)whiteSidePlayer.elo,
-                                                                                                           formatPercent.format(whiteSideWinChance*100),
-                                                                                                           blackSidePlayer.name,
-                                                                                                           (int)blackSidePlayer.elo,
-                                                                                                           formatPercent.format((1-whiteSideWinChance)*100),
-                                                                                                           whiteSidePlayer.name);
+                        reply = String.format("`Starting Chess Match!` %s (elo: %d, odds: %s%%) vs. %s (elo: %d, odds: %s%%)", whiteSidePlayer.name,
+                                                                                                                                whiteSidePlayer.elo,
+                                                                                                                                formatPercent.format(whiteSideWinChance*100),
+                                                                                                                                blackSidePlayer.name,
+                                                                                                                                blackSidePlayer.elo,
+                                                                                                                                formatPercent.format((1-whiteSideWinChance)*100),
+                                                                                                                                whiteSidePlayer.name);
                         boardImageFile = new File(GAME_BOARD_IMAGE_LOCATION);
                         belowMessage = String.format("`%s` goes first. Make a move (ex: `c2 c4`)", whiteSidePlayer.name);
                         decision = Decision.PLAYER_MOVE;
