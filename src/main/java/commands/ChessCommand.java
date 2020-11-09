@@ -268,9 +268,9 @@ public class ChessCommand {
                 }
                 else {
                     Thread t = new Thread(() -> {
-                        Task<List<Member>> members = guild.findMembers(m -> discordId.equals(m.getId()));
-                        if (members.get() != null || members.get().size() == 1) {
-                            blackSidePlayer = chessGame.addUser(discordId, members.get().get(0).getEffectiveName());
+                        List<Member> members = guild.findMembers(m -> discordId.equals(m.getId())).get();
+                        if (members != null || members.size() == 1) {
+                            blackSidePlayer = chessGame.addUser(discordId, members.get(0).getEffectiveName());
                             chessGame.setBlackSidePlayer(blackSidePlayer);
                             state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
                             reply = String.format("`%s` challenges <@%s> to a chess game. Challengee must reply `y` to this text chat to accept!", whiteSidePlayer.name, blackSidePlayer.discordId);
