@@ -3,13 +3,12 @@ package commands;
 import chess.*;
 import chess.multithread.TrainThread;
 import chess.pgn.FenUtils;
+import chess.player.ai.uci.engine.RandyRandom;
 import chess.tables.ChessPlayer;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.utils.ChunkingFilter;
-import net.dv8tion.jda.api.utils.concurrent.Task;
 import utils.EloRanking;
 
 import java.io.File;
@@ -539,84 +538,72 @@ public class ChessCommand {
 
         event.getChannel().sendMessage("Train all computer players vs random opponents...").queue();
         String[][] players = getAIList();
-        randomizeList(players);
-        //Randomize list
-        Random random = new Random();
+        Random rand = new Random();
 
-        int gamesCompleted = 0;
         int gamesPerPlayer = Integer.parseInt(split[2]);
-        int totalGames = players.length * gamesPerPlayer;
-
-        while (gamesCompleted < totalGames) {
-            for (int i = 0; i < players.length; i++) {
-                int randomIndex = random.nextInt(players.length);
+        TrainThread[] threads = new TrainThread[3];
+        ArrayList<ArrayList<String>> allMatchups = new ArrayList<>();
+        List<List<Object>> userObjects = new ChessGame(null).getAllUsers();
+        userObjects.remove(0); // Remove header row
+        for (int i = 0; i < userObjects.size(); i++) {
+            List<Object> row = userObjects.get(i);
+            String id1 = (String) row.get(0);
+            String name1 = (String) row.get(1);
+            if (!id1.contains(System.getenv("OWNER_ID"))) continue; //Ensure player is a bot
+            for (int j = 0; j < gamesPerPlayer; j++) {
+                int randomIndex = rand.nextInt(players.length);
                 while (randomIndex == i) {
-                    randomIndex = random.nextInt(players.length);
+                    randomIndex = rand.nextInt(players.length);
                 }
-                state = new ChessGameState();
-                chessGame = new ChessGame(state);
-                whiteSidePlayer = chessGame.addUser(players[i][0], players[i][1]);
-                blackSidePlayer = chessGame.addUser(players[randomIndex][0], players[randomIndex][1]);
-                chessGame.setBlackSidePlayer(blackSidePlayer);
-                chessGame.setWhiteSidePlayer(whiteSidePlayer);
-                gameType = GameType.CVC;
-                chessGame.gameType = GameType.CVC;
-                state.getPrevElo().put(whiteSidePlayer.discordId, whiteSidePlayer.elo);
-                state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
-                try {
-                    chessGame.setupComputerClient(gameType);
-                    chessGame.setupStockfishClient();
-                    decision = COMPUTER_MOVE;
-                    state.setMatchStartTime(Instant.now().toEpochMilli());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    event.getChannel().sendMessage(e.toString()).queue();
-                    gamesCompleted++;
-                    chessGame = null;
-                    state = null;
-                    System.gc(); //Attempt to call garbage collector to clear memory
-                    continue;
-                }
+                List<Object> oppRow = userObjects.get(randomIndex);
+                allMatchups.add(new ArrayList<>(Arrays.asList(id1, name1, (String) oppRow.get(0), (String) oppRow.get(1))));
+            }
+        }
+        userObjects = null;
+        System.gc();
+        event.getChannel().sendMessage(String.format("Found %d matches", allMatchups.size())).queue();
 
-                event.getChannel().sendMessage("Beginning match (" + (gamesCompleted+1) + "/" + totalGames + ") : " + whiteSidePlayer.name + " vs " + blackSidePlayer.name).queue();
-                String status;
-                do {
-                    state = chessGame.ai(null);
-                    reply = state.getMessage();
-                    status = state.getStatus();
-
-                    if (CHECKMATE.equals(status) || DRAW.equals(status) || COMPUTER_RESIGN.equals(status) || ERROR.equals(status)) {
-                        try {
-                            if (chessGame.stockFishClient != null) chessGame.stockFishClient.close();
-                            if (chessGame.client1 != null) chessGame.client1.close();
-                            if (chessGame.client2 != null) chessGame.client2.close();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        state = null;
-                        chessGame.stockFishClient = null;
-                        chessGame.client1 = null;
-                        chessGame.client2 = null;
-                        chessGame.board = null;
-                        chessGame.blackSidePlayer = null;
-                        chessGame.whiteSidePlayer = null;
-                        chessGame.state = null;
-                        chessGame.messageHandler = null;
-                        chessGame.db = null;
-                        chessGame = null;
-                        whiteSidePlayer = null;
-                        blackSidePlayer = null;
-                        System.gc(); //Attempt to call garbage collector to clear memory
-                        event.getChannel().sendMessage(reply).queue();
-                        gamesCompleted++;
+        List<String> playersInGame = new ArrayList<>();
+        while (allMatchups.size() > 0) {
+            boolean isThreadOpen = false;
+            int threadIndex = 0;
+            while (!isThreadOpen) {
+                for (int k = 0; k < threads.length; k++) {
+                    TrainThread currThread = threads[k];
+                    if (currThread == null || !currThread.isAlive()) {
+                        threadIndex = k;
+                        threads[k] = null;
+                        isThreadOpen = true;
                         break;
                     }
+                }
+            }
+            List<String> matchup = null;
 
-                } while (true);
+            // Find a match that is not running. Same player can't be in two games at the same time
+            // Randomize list everytime so same players don't play in order
+            Collections.shuffle(allMatchups);
+            for (int i = 0; i < allMatchups.size(); i++) {
+                List currMatchup = allMatchups.get(i);
+                if (!playersInGame.contains(currMatchup.get(0)) && !playersInGame.contains(currMatchup.get(2))) {
+                    //found a free matchup
+                    matchup = allMatchups.remove(i);
+                    System.gc();
+                    break;
+                }
+            }
+
+            if (matchup != null) {
+                //matchup - id1, name1, id2, name2
+                playersInGame.add(matchup.get(0)); // Add id1
+                playersInGame.add(matchup.get(2)); // Add id2
+                threads[threadIndex] = new TrainThread(matchup.get(0), matchup.get(1), matchup.get(2), matchup.get(3), threadIndex, event.getChannel(), playersInGame);
+                threads[threadIndex].start();
+                event.getChannel().sendMessage("Matches left to start: " + allMatchups.size()).queue();
             }
         }
 
-        event.getChannel().sendMessage("Completed").queue();
+        event.getChannel().sendMessage("Completed train Random").queue();
         endGame(event.getChannel());
     }
 
