@@ -283,7 +283,7 @@ public class ChessCommand {
                     });
                     t.start();
                     try {
-                        while (t.isAlive()) Thread.sleep(1000);
+                        t.join();
                     } catch (InterruptedException e) {
                         reply = "Error retrieving opponent from userId:"+discordId;
                         e.printStackTrace();
