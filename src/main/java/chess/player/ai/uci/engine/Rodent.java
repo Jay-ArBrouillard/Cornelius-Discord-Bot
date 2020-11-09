@@ -48,7 +48,7 @@ public class Rodent extends UCIEngine {
         }
 
         if (numSuccesses != 3) {
-            throw new RuntimeException("Error initializing Personality and/or opening book files for " + this.getClass().getSimpleName());
+            throw new RuntimeException("Error initializing Personality and/or opening book files for " + this.getClass().getSimpleName() + " - " + personality.getValue());
         }
         sendCommand("setoption name Verbose value false");
         sendCommand("setoption name Taunting value true"); //NOTE turned Taunting on here
