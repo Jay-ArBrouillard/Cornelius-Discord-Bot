@@ -267,9 +267,9 @@ public class ChessCommand {
                     reply = "Please enter a non-empty userId";
                 }
                 else {
-                    Task<List<Member>> members = guild.findMembers(m -> discordId.equals(m.getId()));
                     Thread t = new Thread(() -> {
-                        if (members.get() != null || members.get().size() == 0) {
+                        Task<List<Member>> members = guild.findMembers(m -> discordId.equals(m.getId()));
+                        if (members.get() != null || members.get().size() == 1) {
                             blackSidePlayer = chessGame.addUser(discordId, members.get().get(0).getEffectiveName());
                             chessGame.setBlackSidePlayer(blackSidePlayer);
                             state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);

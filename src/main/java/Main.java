@@ -27,7 +27,7 @@ public class Main {
                   .setStatus(OnlineStatus.ONLINE)
                   .setActivity(Activity.playing("!help or @Cornelius !help"))
 //                  .setChunkingFilter(ChunkingFilter.NONE) //Setting this to save memory
-                  .setMemberCachePolicy(MemberCachePolicy.VOICE.or(MemberCachePolicy.ONLINE))
+//                  .setMemberCachePolicy(MemberCachePolicy.VOICE.or(MemberCachePolicy.ONLINE))
                   .setEnabledIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_EMOJIS, GatewayIntent.GUILD_MESSAGES)
                   .setAutoReconnect(true)
                   .build()
