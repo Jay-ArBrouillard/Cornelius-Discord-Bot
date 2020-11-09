@@ -57,9 +57,9 @@ setoption name SecondaryPstStyle value 2
 ; little things, not accessible via UCI options
 setoption name blockedcpawn value -17
 ; non-eval stuff
-setoption name NpsLimit value 0
+setoption name NpsLimit value 50000
 setoption name EvalBlur value 1000
-setoption name Contempt value 0
+setoption name Contempt value 10
 setoption name SlowMover value 100
 setoption name Selectivity value 175
 setoption name SearchSkill value 10
