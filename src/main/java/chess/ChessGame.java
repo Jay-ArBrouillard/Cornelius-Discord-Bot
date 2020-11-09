@@ -825,7 +825,7 @@ public class ChessGame {
                 rowValue = 0;
                 break;
             default:
-                throw new RuntimeException("transformRowNumber Error. Should not happen.");
+                throw new RuntimeException("transformRowNumber Error. Should not happen: " + rowNumber);
         }
 
         return rowValue;
