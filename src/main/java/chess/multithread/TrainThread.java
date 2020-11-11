@@ -47,8 +47,8 @@ public class TrainThread extends Thread {
         }
         catch (Exception e) {
             e.printStackTrace();
-            mc.sendMessage(e.toString()).queue();
             state.setMatchStartTime(null);
+            mc.sendMessage(e.toString()).queue();
         }
     }
 

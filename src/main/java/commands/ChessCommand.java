@@ -449,14 +449,13 @@ public class ChessCommand {
             int lowerBound = elo1 - range;
             int upperBound = elo1 + range;
             int gamesFoundForPlayer;
-            if (gamesForPlayer.get(id1) == null) {
-                gamesForPlayer.put(id1, 0);
-                gamesFoundForPlayer = 0;
-            }
-            else {
+            if (gamesForPlayer.containsKey(id1)) {
                 gamesFoundForPlayer = gamesForPlayer.get(id1);
             }
-            if (gamesFoundForPlayer != gamesPerPlayer) {
+            else {
+                gamesFoundForPlayer = 0;
+            }
+            if (gamesFoundForPlayer < gamesPerPlayer) {
                 for (List row2 : userObjects) {
                     String id2 = (String) row2.get(0);
                     if (id1.equals(id2)) continue;
