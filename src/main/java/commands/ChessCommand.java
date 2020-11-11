@@ -430,8 +430,6 @@ public class ChessCommand {
         }
 
         event.getChannel().sendMessage("Train all computer players vs fair opponents...").queue();
-        String[][] players = getAIList();
-        randomizeList(players);
 
         int range = Integer.parseInt(split[2]);
         int gamesPerPlayer = Integer.parseInt(split[3]);
@@ -465,11 +463,6 @@ public class ChessCommand {
                     if (elo2 >= lowerBound && elo2 <= upperBound) {
                         allMatchups.add(new ArrayList<>(Arrays.asList(id1, name1, id2, name2)));
                         gamesFoundForPlayer++;
-                    }
-                    if (elo2 < lowerBound) {
-                        //Since users are ordered by elo. If we find an elo that is lower than the lowerbound
-                        //Then the rest of the users in this loop will also be lower than the lowerbound
-                        break;
                     }
                     if (gamesFoundForPlayer == gamesPerPlayer) {
                         break;
