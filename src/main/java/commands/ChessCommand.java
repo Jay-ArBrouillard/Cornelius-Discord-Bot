@@ -436,42 +436,42 @@ public class ChessCommand {
         TrainThread[] threads = new TrainThread[3];
         ArrayList<ArrayList<String>> allMatchups = new ArrayList<>();
         List<List<Object>> userObjects = new ChessGame(null).getAllUsers();
-        Map<String, Integer> gamesForPlayer = new HashMap<>();
+        Map<String, Integer> playerGamesMap = new HashMap<>();
         userObjects.remove(0); // Remove header row
         event.getChannel().sendMessage(String.format("Attempting to find %d opponent(s) in a +/-%d range for each player...", gamesPerPlayer, range)).queue();
         for (List row : userObjects) {
             String id1 = (String) row.get(0);
-            if (!id1.contains(System.getenv("OWNER_ID"))) continue; //Ensure player is a bot
+            if (!id1.startsWith(System.getenv("OWNER_ID"))) continue; //Ensure player is a bot
             String name1 = (String) row.get(1);
             int elo1 = Integer.parseInt((String) row.get(2));
             int lowerBound = elo1 - range;
             int upperBound = elo1 + range;
-            int gamesFoundForPlayer = gamesForPlayer.containsKey(id1) ? gamesForPlayer.get(id1) : 0;
+            int gamesFoundForPlayer = playerGamesMap.containsKey(id1) ? playerGamesMap.get(id1) : 0;
             if (gamesFoundForPlayer < gamesPerPlayer) {
                 for (List row2 : userObjects) {
                     String id2 = (String) row2.get(0);
-                    if (id1.equals(id2)) continue;
-                    if (!id2.contains(System.getenv("OWNER_ID"))) continue; //Ensure player is a bot
-                    String name2 = (String) row2.get(1);
-                    int elo2 = Integer.parseInt((String) row2.get(2));
-                    if (elo2 >= lowerBound && elo2 <= upperBound) {
-                        System.out.println("Adding matchup: " + name1 + " vs. " + name2);
-                        allMatchups.add(new ArrayList<>(Arrays.asList(id1, name1, id2, name2)));
-                        gamesFoundForPlayer++;
-                    }
-                    if (elo2 > lowerBound) {
-                        break;
-                    }
-                    if (gamesFoundForPlayer == gamesPerPlayer) {
-                        break;
+                    if (id1.equals(id2)) continue; // Don't play itself
+                    if (id2.startsWith(System.getenv("OWNER_ID"))) { //Ensure opponent is a bot
+                        String name2 = (String) row2.get(1);
+                        int elo2 = Integer.parseInt((String) row2.get(2));
+                        if (elo2 >= lowerBound && elo2 <= upperBound) {
+                            allMatchups.add(new ArrayList<>(Arrays.asList(id1, name1, id2, name2)));
+                            gamesFoundForPlayer++;
+                        }
+                        if (elo2 > lowerBound) {
+                            break;
+                        }
+                        if (gamesFoundForPlayer == gamesPerPlayer) {
+                            break;
+                        }
                     }
                 }
-                gamesForPlayer.put(id1, gamesFoundForPlayer);
+                playerGamesMap.put(id1, gamesFoundForPlayer);
             }
         }
         event.getChannel().sendMessage(String.format("Found %d matches out of %d maximum matches", allMatchups.size(), userObjects.size() * gamesPerPlayer)).queue();
         userObjects = null;
-        gamesForPlayer = null;
+        playerGamesMap = null;
         System.gc();
 
         List<String> playersInGame = new ArrayList<>();
