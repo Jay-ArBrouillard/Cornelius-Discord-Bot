@@ -443,7 +443,7 @@ public class ChessCommand {
         event.getChannel().sendMessage(String.format("Attempting to find %d opponents in a +/-%d range for each player...", gamesPerPlayer, range)).queue();
         for (List row : userObjects) {
             String id1 = (String) row.get(0);
-            if (!id1.startsWith(System.getenv("OWNER_ID"))) continue; //Ensure player is a bot
+            if (!id1.contains(System.getenv("OWNER_ID"))) continue; //Ensure player is a bot
             String name1 = (String) row.get(1);
             int elo1 = Integer.parseInt((String) row.get(2));
             int lowerBound = elo1 - range;
@@ -460,7 +460,7 @@ public class ChessCommand {
                 for (List row2 : userObjects) {
                     String id2 = (String) row2.get(0);
                     if (id1.equals(id2)) continue;
-                    if (!id2.startsWith(System.getenv("OWNER_ID"))) continue; //Ensure player is a bot
+                    if (!id2.contains(System.getenv("OWNER_ID"))) continue; //Ensure player is a bot
                     String name2 = (String) row2.get(1);
                     int elo2 = Integer.parseInt((String) row2.get(2));
                     if (elo2 >= lowerBound && elo2 <= upperBound) {
@@ -548,10 +548,10 @@ public class ChessCommand {
             List<Object> row = userObjects.get(i);
             String id1 = (String) row.get(0);
             String name1 = (String) row.get(1);
-            if (!id1.startsWith(System.getenv("OWNER_ID"))) continue; //Ensure player is a bot
+            if (!id1.contains(System.getenv("OWNER_ID"))) continue; //Ensure player is a bot
             for (int j = 0; j < gamesPerPlayer; j++) {
                 int randomIndex = rand.nextInt(userObjects.size());
-                while (randomIndex == i || !((String)userObjects.get(randomIndex).get(0)).startsWith(System.getenv("OWNER_ID"))) {
+                while (randomIndex == i || !((String)userObjects.get(randomIndex).get(0)).contains(System.getenv("OWNER_ID"))) {
                     randomIndex = rand.nextInt(userObjects.size());
                 }
                 List<Object> oppRow = userObjects.get(randomIndex);
