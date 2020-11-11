@@ -9,6 +9,8 @@ import java.io.IOException;
 public class Komodo extends UCIEngine {
     public Komodo(Variant variant, String filePath, Option... options) throws IOException {
         super(variant, filePath, options);
+        waitForReady();
+        sendCommand("setoption name Use MCTS value true");
     }
 
     public String getBestMove(Query query) throws IOException {

@@ -43,7 +43,7 @@ public class KomodoClient extends BaseAiClient{
     public static class Builder {
         private Set<Option> options = new HashSet<>();
         private Variant variant = Variant.DEFAULT;
-        private String path = "bin/komodo_11.01_linux";
+        private String path = "bin/komodo-12.1.1-linux";
 
         public final KomodoClient.Builder setVariant(Variant v) {
             variant = v;

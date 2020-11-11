@@ -455,7 +455,6 @@ public class ChessCommand {
                         String name2 = (String) row2.get(1);
                         int elo2 = Integer.parseInt((String) row2.get(2));
                         if (elo2 >= lowerBound && elo2 <= upperBound) {
-                            System.out.println(String.format("Adding %s (%d) vs %s (%d)", name1, elo1, name2, elo2));
                             allMatchups.add(new ArrayList<>(Arrays.asList(id1, name1, id2, name2)));
                             gamesFoundForPlayer++;
                         }
@@ -793,7 +792,7 @@ public class ChessCommand {
             {"693282099167494225L1.7", "Laser"},
             {"693282099167494225C2.3", "Cinnamon"},
             {"693282099167494225X0.6", "Xiphos"},
-            {"693282099167494225K11", "Komodo"},
+            {"693282099167494225K12.1", "Komodo"},
 //            {"693282099167494225CH800", "Cheng 800"},
 //            {"693282099167494225CH900", "Cheng 900"},
 //            {"693282099167494225CH1000", "Cheng 1000"},
