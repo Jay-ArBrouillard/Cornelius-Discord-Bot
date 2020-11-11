@@ -455,11 +455,9 @@ public class ChessCommand {
                         String name2 = (String) row2.get(1);
                         int elo2 = Integer.parseInt((String) row2.get(2));
                         if (elo2 >= lowerBound && elo2 <= upperBound) {
+                            System.out.println(String.format("Adding %s (%d) vs %s (%d)", name1, elo1, name2, elo2));
                             allMatchups.add(new ArrayList<>(Arrays.asList(id1, name1, id2, name2)));
                             gamesFoundForPlayer++;
-                        }
-                        if (elo2 > upperBound) {
-                            break;
                         }
                         if (gamesFoundForPlayer == gamesPerPlayer) {
                             break;
