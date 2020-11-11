@@ -469,10 +469,10 @@ public class ChessCommand {
                 gamesForPlayer.put(id1, gamesFoundForPlayer);
             }
         }
+        event.getChannel().sendMessage(String.format("Found %d matches out of %d maximum matches", allMatchups.size(), userObjects.size() * gamesPerPlayer)).queue();
         userObjects = null;
         gamesForPlayer = null;
         System.gc();
-        event.getChannel().sendMessage(String.format("Found %d matches out of %d maximum matches", allMatchups.size(), userObjects.size() * gamesPerPlayer)).queue();
 
         List<String> playersInGame = new ArrayList<>();
         while (allMatchups.size() > 0) {
