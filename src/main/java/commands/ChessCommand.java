@@ -458,7 +458,7 @@ public class ChessCommand {
                             allMatchups.add(new ArrayList<>(Arrays.asList(id1, name1, id2, name2)));
                             gamesFoundForPlayer++;
                         }
-                        if (elo2 > lowerBound) {
+                        if (elo2 > upperBound) {
                             break;
                         }
                         if (gamesFoundForPlayer == gamesPerPlayer) {
