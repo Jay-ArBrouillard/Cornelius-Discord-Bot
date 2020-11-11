@@ -466,7 +466,7 @@ public class ChessCommand {
                         break;
                     }
                 }
-                gamesForPlayer.put(id1, gamesForPlayer.get(id1) + gamesFoundForPlayer);
+                gamesForPlayer.put(id1, gamesFoundForPlayer);
             }
         }
         userObjects = null;
