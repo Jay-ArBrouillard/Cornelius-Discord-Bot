@@ -43,7 +43,7 @@ public class NemorinoClient extends BaseAiClient{
     public static class Builder {
         private Set<Option> options = new HashSet<>();
         private Variant variant = Variant.DEFAULT;
-        private String path = "bin/nemorino-5.0-linux";
+        private String path = "bin/nemorino-6.0-linux";
 
         public final NemorinoClient.Builder setVariant(Variant v) {
             variant = v;
