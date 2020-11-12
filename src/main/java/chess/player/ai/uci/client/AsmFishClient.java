@@ -37,13 +37,13 @@ public class AsmFishClient extends BaseAiClient{
 
     @Override
     public String toString() {
-        return "ASMFishClient";
+        return "AsmFishClient";
     }
 
     public static class Builder {
         private Set<Option> options = new HashSet<>();
         private Variant variant = Variant.DEFAULT;
-        private String path = "bin/asmFishL_9_bmi2";
+        private String path = "bin/asmFishL_9_base";
 
         public final AsmFishClient.Builder setVariant(Variant v) {
             variant = v;

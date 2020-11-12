@@ -9,6 +9,11 @@ import java.io.IOException;
 public class AsmFish extends UCIEngine {
     public AsmFish(Variant variant, String filePath, Option... options) throws IOException {
         super(variant, filePath, options);
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public String getBestMove(Query query) throws IOException {
