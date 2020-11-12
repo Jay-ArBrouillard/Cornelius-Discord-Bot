@@ -277,12 +277,15 @@ public class GoogleSheets {
                 if (id.equalsIgnoreCase((String)row.get(0))) { // User can't be itself
                     continue;
                 }
-                if (!((String)row.get(0)).contains(System.getenv("OWNER_ID"))) { // Ensure opponent found is a computer
+                if (!((String)row.get(0)).startsWith(System.getenv("OWNER_ID"))) { // Ensure opponent found is a computer
                     continue;
                 }
                 double currElo = Double.parseDouble((String)row.get(2));
                 if (currElo >= lowerBound && currElo <= upperBound) {
                     candidates.add(row);
+                }
+                if (currElo < lowerBound) {
+                    break;
                 }
             }
 

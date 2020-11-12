@@ -622,11 +622,24 @@ public class ChessCommand {
             }
         }
 
+        whiteSidePlayer = chessGame.addUser(players[playerIndex][0], players[playerIndex][1]);
+        if (whiteSidePlayer == null) {
+            totalGames--;
+            event.getChannel().sendMessage(String.format("Error finding player with id %s from database.", players[playerIndex][0])).queue();
+            endGame(event.getChannel());
+            return;
+        }
+
         while (gamesCompleted < totalGames) {
             state = new ChessGameState();
             chessGame = new ChessGame(state);
-            whiteSidePlayer = chessGame.addUser(players[playerIndex][0], players[playerIndex][1]);
             blackSidePlayer = chessGame.findOpponentSimilarElo(whiteSidePlayer.elo, whiteSidePlayer.discordId, range);
+            if (blackSidePlayer == null) {
+                totalGames--;
+                event.getChannel().sendMessage(String.format("Error finding opponent from database skipping match... Now %d total matches left", totalGames)).queue();
+                continue;
+            }
+
             chessGame.setBlackSidePlayer(blackSidePlayer);
             chessGame.setWhiteSidePlayer(whiteSidePlayer);
             gameType = GameType.CVC;
