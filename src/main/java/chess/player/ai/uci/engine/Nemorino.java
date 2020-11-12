@@ -10,14 +10,7 @@ public class Nemorino extends UCIEngine {
     public Nemorino(Variant variant, String filePath, Option... options) throws IOException {
         super(variant, filePath, null, options);
 
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        sendCommand("uci");
-        readResponse("uciok");
+        waitForReady();
         sendCommand("setoption name OwnBook value true");
         sendCommand("setoption name BookFile value /app/bin/books/elo-2650.bin");
     }
