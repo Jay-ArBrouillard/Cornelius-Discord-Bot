@@ -23,7 +23,7 @@ public class TrainThread extends Thread {
     public String blackSideId;
     public List<String> playersInGame;
 
-    public TrainThread(String id1, String name1, String id2, String name2, int threadNum, MessageChannel mc, List<String> playersInGame) {
+    public TrainThread(String id1, String name1, String id2, String name2, int threadNum, MessageChannel mc, List<String> playersInGame) throws IOException {
         state = new ChessGameState();
         game = new ChessGame(state);
         ChessPlayer whiteSidePlayer = game.addUser(id1, name1);
