@@ -47,7 +47,7 @@ public class TrainThread extends Thread {
         }
         catch (Exception e) {
             e.printStackTrace();
-            state.setMatchStartTime(null);
+            clear();
             mc.sendMessage(e.toString()).queue();
         }
     }
@@ -55,10 +55,6 @@ public class TrainThread extends Thread {
     public void run() {
         String status;
         String reply;
-        if (state.getMatchStartTime() == null) {
-            clear();
-            return;
-        }
         mc.sendMessage("Beginning match on Thread " + threadNum + ": " + whiteSidePlayerName + " vs " + blackSidePlayerName).queue();
         do {
             state = game.ai(null);
