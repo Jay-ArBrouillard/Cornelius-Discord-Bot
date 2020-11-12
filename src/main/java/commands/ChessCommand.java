@@ -57,7 +57,11 @@ public class ChessCommand {
         if (Arrays.asList(ChessConstants.QUIT).stream().anyMatch(x -> x.equals(message))) {
             if (isMessageFromPlayer(event.getAuthor().getId())) {
                 state.setPlayerForfeit();
-                if (gameType != null && gameType.isPlayerVsComputer() && (decision == Decision.PLAYER_MOVE || decision == COMPUTER_MOVE)) { //Player vs Computer game
+                // If less than or equal to 3 full moves have been completed then game ends with no consequences
+                if (state.getFullMoves() <= 3) {
+                    event.getChannel().sendMessage("**NOTICE** Less than 4 moves were made in this game so no win or loss or draw is awarded").queue();
+                }
+                else if (gameType != null && gameType.isPlayerVsComputer() && (decision == Decision.PLAYER_MOVE || decision == COMPUTER_MOVE)) { //Player vs Computer game
                     if (event.getAuthor().getId().equals(blackSidePlayer.discordId)) { // Black quit
                         state.setWinnerId(whiteSidePlayer.discordId);
                         new Thread(() -> chessGame.updateDatabaseWhiteSideWin(true)).start();
