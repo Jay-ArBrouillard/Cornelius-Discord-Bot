@@ -551,10 +551,10 @@ public class ChessGame {
             // Is someone in check?
             if (this.board.getCurrentPlayer().isInCheck()) {
                 if (didWhiteJustMove()) {
-                    state.setMessage(String.format("`%s` SELECTS %s `%s` is in **check**!", whiteSidePlayer.name, moveCmd, blackSidePlayer.name));
+                    state.setMessage(String.format("`%s` SELECTS %s `%s` is in **CHECK**!", whiteSidePlayer.name, moveCmd, blackSidePlayer.name));
                 }
                 else {
-                    state.setMessage(String.format("`%s` SELECTS %s `%s` is in **check**!", blackSidePlayer.name, moveCmd, whiteSidePlayer.name));
+                    state.setMessage(String.format("`%s` SELECTS %s `%s` is in **CHECK**!", blackSidePlayer.name, moveCmd, whiteSidePlayer.name));
                 }
                 state.setStateCheck();
                 return state;
