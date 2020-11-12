@@ -706,7 +706,6 @@ public class ChessCommand {
                         chessGame.messageHandler = null;
                         chessGame.db = null;
                         chessGame = null;
-                        whiteSidePlayer = null;
                         blackSidePlayer = null;
                         event.getChannel().sendMessage(reply).queue();
                         gamesCompleted++;
