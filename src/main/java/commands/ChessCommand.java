@@ -199,7 +199,7 @@ public class ChessCommand {
                     state.getPrevElo().put(whiteSidePlayer.discordId, whiteSidePlayer.elo);
                     //Set up black side
                     String [] gameidName = reply.split("-");
-                    blackSidePlayer = chessGame.addUser(gameidName[1], gameidName[2]);  //Note: Difficulty value is appended to id and name
+                    blackSidePlayer = chessGame.addUser(gameidName[1], gameidName[2]);
                     state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
                     chessGame.setBlackSidePlayer(blackSidePlayer);
                     double whiteSideWinChance = EloRanking.calculateProbabilityOfWin(whiteSidePlayer.elo, blackSidePlayer.elo);

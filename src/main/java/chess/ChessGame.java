@@ -388,13 +388,14 @@ public class ChessGame {
         else if (option.equals("2") || option.equals("3")){
             mc.sendTyping().queue();
             player = findUserByName(opponent);
-            if (player == null) {
-                return new StringBuilder("Opponent by the name of `").append(opponent).append("` does not exist in the database. Try again and/or check the chess record spreadsheets for exact name").toString();
-            }
-            //Ensure opponent is a bot
-            if (!player.discordId.startsWith(System.getenv("OWNER_ID"))) {
-                return new StringBuilder("Opponent by the name of `").append(opponent).append("` must be an AI such as `Cornelius 20`. Try again.").toString();
-            }
+        }
+
+        if (player == null) {
+            return new StringBuilder("Opponent by the name of `").append(opponent).append("` does not exist in the database. Try again and/or check the chess record spreadsheets for exact name").toString();
+        }
+        //Ensure opponent is a bot
+        if (!player.discordId.startsWith(System.getenv("OWNER_ID"))) {
+            return new StringBuilder("Opponent by the name of `").append(opponent).append("` must be an AI such as `Cornelius 20`. Try again.").toString();
         }
 
         if (message.startsWith("2")) { // Option 2
