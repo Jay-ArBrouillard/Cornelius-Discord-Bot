@@ -9,6 +9,9 @@ import java.io.IOException;
 public class Monolith extends UCIEngine {
     public Monolith(Variant variant, String filePath, Option... options) throws IOException {
         super(variant, filePath, "Monolith 2", options);
+
+        waitForReady();
+        sendCommand("setoption name Book File value /app/bin/books/elo-2650.bin");
     }
 
     public String getBestMove(Query query) throws IOException {

@@ -252,8 +252,8 @@ public class ChessGame {
                     .setOption(Option.Hash, 32)
                     .build(), p);
         }
-        else if (p.name.contains("Fizbo")) {
-            setClient(new FizboClient.Builder()
+        else if (p.name.contains("ASMFish")) {
+            setClient(new AsmFishClient.Builder()
                     .setOption(Option.Hash, 32)
                     .build(), p);
         }
