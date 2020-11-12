@@ -8,7 +8,7 @@ import java.io.IOException;
 
 public class Nemorino extends UCIEngine {
     public Nemorino(Variant variant, String filePath, Option... options) throws IOException {
-        super(variant, filePath, "", options);
+        super(variant, filePath, null, options);
 
         try {
             Thread.sleep(500);

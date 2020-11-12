@@ -58,7 +58,8 @@ abstract class UCIEngine {
             output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
             Thread.sleep(500);
-            readResponse(startUpReadCommand);
+            //Some cases where uci engine prints nothing to read
+            if (startUpReadCommand != null) readResponse(startUpReadCommand);
             sendCommand("uci");
             readResponse("uciok");
             waitForReady();
