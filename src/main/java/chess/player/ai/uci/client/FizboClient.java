@@ -43,7 +43,7 @@ public class FizboClient extends BaseAiClient{
     public static class Builder {
         private Set<Option> options = new HashSet<>();
         private Variant variant = Variant.DEFAULT;
-        private String path = "bin/fizbo-2-linux.exe";
+        private String path = "bin/fizbo-2-linux";
 
         public final FizboClient.Builder setVariant(Variant v) {
             variant = v;
