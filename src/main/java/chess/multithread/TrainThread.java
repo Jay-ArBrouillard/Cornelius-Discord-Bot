@@ -47,8 +47,8 @@ public class TrainThread extends Thread {
         }
         catch (Exception e) {
             e.printStackTrace();
-            clear();
             mc.sendMessage(e.toString()).queue();
+            clear();
         }
     }
 
