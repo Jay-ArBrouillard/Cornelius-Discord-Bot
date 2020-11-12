@@ -636,7 +636,7 @@ public class ChessCommand {
             blackSidePlayer = chessGame.findOpponentSimilarElo(whiteSidePlayer.elo, whiteSidePlayer.discordId, range);
             if (blackSidePlayer == null) {
                 totalGames--;
-                event.getChannel().sendMessage(String.format("Error finding opponent from database skipping match... Now %d total matches left", totalGames)).queue();
+                event.getChannel().sendMessage(String.format("Error finding opponent from database skipping match... Now %d total matches left", totalGames - gamesCompleted)).queue();
                 continue;
             }
 
@@ -654,7 +654,7 @@ public class ChessCommand {
             } catch (IOException e) {
                 e.printStackTrace();
                 event.getChannel().sendMessage(e.toString()).queue();
-                gamesCompleted++;
+                totalGames--;
                 chessGame = null;
                 state = null;
                 System.gc(); //Attempt to call garbage collector to clear memory
@@ -718,7 +718,7 @@ public class ChessCommand {
             System.gc(); //Attempt to call garbage collector to clear memory
         }
 
-        event.getChannel().sendMessage("Completed").queue();
+        event.getChannel().sendMessage("Completed TrainUser. Total Matches completed: " + gamesCompleted).queue();
         endGame(event.getChannel());
     }
 
