@@ -47,7 +47,7 @@ public class TrainThread extends Thread {
         }
         catch (Exception e) {
             e.printStackTrace();
-            mc.sendMessage(e.toString()).queue();
+            //this.mc.sendMessage(e.toString()).queue();
             clear();
         }
     }
@@ -119,7 +119,7 @@ public class TrainThread extends Thread {
             blackSidePlayerName = null;
             whiteSideId = null;
             blackSideId = null;
-            mc = null;
+            this.mc = null;
         }
     }
 }
