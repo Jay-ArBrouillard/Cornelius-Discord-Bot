@@ -3,7 +3,6 @@ package commands;
 import chess.*;
 import chess.multithread.TrainThread;
 import chess.pgn.FenUtils;
-import chess.player.ai.uci.engine.RandyRandom;
 import chess.tables.ChessPlayer;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -709,6 +708,7 @@ public class ChessCommand {
 
     private static String[][] getAIList() {
         return new String[][]{
+                {"693282099167494225Fizbo2", "Fizbo"},
                 {"693282099167494225LazyGull0.4", "LazyGull"},
                 {"693282099167494225CavemanRO4", "Caveman"},
                 {"693282099167494225MasterRO4", "Master"},

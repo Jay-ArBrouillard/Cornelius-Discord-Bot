@@ -252,6 +252,11 @@ public class ChessGame {
                     .setOption(Option.Hash, 32)
                     .build(), p);
         }
+        else if (p.name.contains("Fizbo")) {
+            setClient(new FizboClient.Builder()
+                    .setOption(Option.Hash, 32)
+                    .build(), p);
+        }
     }
 
     private void setClient(BaseAiClient client, ChessPlayer p) {
