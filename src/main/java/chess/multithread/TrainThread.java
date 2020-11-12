@@ -119,7 +119,7 @@ public class TrainThread extends Thread {
             blackSidePlayerName = null;
             whiteSideId = null;
             blackSideId = null;
-            this.mc = null;
+            //this.mc = null;
         }
     }
 }
