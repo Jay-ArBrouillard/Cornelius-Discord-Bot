@@ -709,7 +709,7 @@ public class ChessCommand {
 
     private static String[][] getAIList() {
         return new String[][]{
-                {"693282099167494225LazyGull0.3", "LazyGull"},
+                {"693282099167494225LazyGull0.4", "LazyGull"},
                 {"693282099167494225CavemanRO4", "Caveman"},
                 {"693282099167494225MasterRO4", "Master"},
                 {"693282099167494225BenRO4", "Ben"},

@@ -43,7 +43,7 @@ public class LazyGullClient extends BaseAiClient{
     public static class Builder {
         private Set<Option> options = new HashSet<>();
         private Variant variant = Variant.DEFAULT;
-        private String path = "bin/lazygull-0.3-linux";
+        private String path = "bin/lazygull-0.4-linux";
 
         public final LazyGullClient.Builder setVariant(Variant v) {
             variant = v;
