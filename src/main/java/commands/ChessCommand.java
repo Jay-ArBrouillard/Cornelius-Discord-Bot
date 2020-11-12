@@ -622,7 +622,7 @@ public class ChessCommand {
             }
         }
 
-        whiteSidePlayer = chessGame.addUser(players[playerIndex][0], players[playerIndex][1]);
+        whiteSidePlayer = new ChessGame(null).addUser(players[playerIndex][0], players[playerIndex][1]);
         if (whiteSidePlayer == null) {
             totalGames--;
             event.getChannel().sendMessage(String.format("Error finding player with id %s from database.", players[playerIndex][0])).queue();
