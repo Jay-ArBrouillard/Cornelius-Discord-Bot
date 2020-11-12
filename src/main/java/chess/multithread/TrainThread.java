@@ -7,6 +7,7 @@ import chess.pgn.FenUtils;
 import chess.tables.ChessPlayer;
 import net.dv8tion.jda.api.entities.MessageChannel;
 
+import java.io.IOException;
 import java.util.*;
 import java.time.Instant;
 
