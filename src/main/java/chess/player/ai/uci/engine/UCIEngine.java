@@ -21,6 +21,8 @@ abstract class UCIEngine {
             input = new BufferedReader(new InputStreamReader(process.getInputStream()));
             output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
+            waitForReady();
+
             boolean hashIsSet = false;
             for (Option option : options) {
                 if (option.getOptionString().equals("PersonalityFile")) continue; //Skip PersonalityFile option here setting this in Rodent constructor
