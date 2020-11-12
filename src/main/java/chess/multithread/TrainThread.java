@@ -40,16 +40,9 @@ public class TrainThread extends Thread {
         this.threadNum = threadNum;
         this.mc = mc;
         this.playersInGame = playersInGame;
-        try {
-            game.setupComputerClient(GameType.CVC);
-            game.setupStockfishClient();
-            state.setMatchStartTime(Instant.now().toEpochMilli());
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            //this.mc.sendMessage(e.toString()).queue();
-            clear();
-        }
+        game.setupComputerClient(GameType.CVC);
+        game.setupStockfishClient();
+        state.setMatchStartTime(Instant.now().toEpochMilli());
     }
 
     public void run() {
