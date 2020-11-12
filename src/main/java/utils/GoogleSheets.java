@@ -258,7 +258,7 @@ public class GoogleSheets {
      * @param range
      * @return
      */
-    public static synchronized ChessPlayer it (double elo, String id, double range) {
+    public static synchronized ChessPlayer findUserSimilarElo(double elo, String id, double range) {
         try {
             if (service == null) getSheetsService();
 
