@@ -252,8 +252,8 @@ public class ChessGame {
                     .setOption(Option.Hash, 32)
                     .build(), p);
         }
-        else if (p.name.contains("ASMFish")) {
-            setClient(new AsmFishClient.Builder()
+        else if (p.name.contains("Rofchade")) {
+            setClient(new RofchadeClient.Builder()
                     .setOption(Option.Hash, 32)
                     .build(), p);
         }
