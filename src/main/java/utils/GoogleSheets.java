@@ -258,7 +258,7 @@ public class GoogleSheets {
      * @param range
      * @return
      */
-    public static synchronized ChessPlayer findUserSimilarElo(double elo, String id, double range) {
+    public static synchronized ChessPlayer it (double elo, String id, double range) {
         try {
             if (service == null) getSheetsService();
 
@@ -283,9 +283,6 @@ public class GoogleSheets {
                 double currElo = Double.parseDouble((String)row.get(2));
                 if (currElo >= lowerBound && currElo <= upperBound) {
                     candidates.add(row);
-                }
-                if (currElo < lowerBound) {
-                    break;
                 }
             }
 
