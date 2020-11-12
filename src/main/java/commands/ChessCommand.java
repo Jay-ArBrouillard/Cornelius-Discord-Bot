@@ -400,9 +400,16 @@ public class ChessCommand {
                 //matchup - id1, name1, id2, name2
                 playersInGame.add(matchup.get(0)); // Add id1
                 playersInGame.add(matchup.get(2)); // Add id2
-                threads[threadIndex] = new TrainThread(matchup.get(0), matchup.get(1), matchup.get(2), matchup.get(3), threadIndex, event.getChannel(), playersInGame);
-                threads[threadIndex].start();
-                event.getChannel().sendMessage("Matches left to start: " + (allMatchups.size()+1)).queue();
+                try {
+                    threads[threadIndex] = new TrainThread(matchup.get(0), matchup.get(1), matchup.get(2), matchup.get(3), threadIndex, event.getChannel(), playersInGame);
+                    threads[threadIndex].start();
+                } catch (IOException ie) {
+                    System.out.println(String.format("Error starting match on thread %d: %s", threadIndex, ie.getMessage()));
+                    playersInGame.remove(matchup.get(0)); // Remove id1
+                    playersInGame.remove(matchup.get(2)); // Remove id2
+                } finally {
+                    event.getChannel().sendMessage("Matches left to start: " + (allMatchups.size()+1)).queue();
+                }
             }
         }
 
@@ -511,9 +518,16 @@ public class ChessCommand {
                 //matchup - id1, name1, id2, name2
                 playersInGame.add(matchup.get(0)); // Add id1
                 playersInGame.add(matchup.get(2)); // Add id2
-                threads[threadIndex] = new TrainThread(matchup.get(0), matchup.get(1), matchup.get(2), matchup.get(3), threadIndex, event.getChannel(), playersInGame);
-                threads[threadIndex].start();
-                event.getChannel().sendMessage("Matches left to start: " + allMatchups.size()).queue();
+                try {
+                    threads[threadIndex] = new TrainThread(matchup.get(0), matchup.get(1), matchup.get(2), matchup.get(3), threadIndex, event.getChannel(), playersInGame);
+                    threads[threadIndex].start();
+                } catch (IOException ie) {
+                    System.out.println(String.format("Error starting match on thread %d: %s", threadIndex, ie.getMessage()));
+                    playersInGame.remove(matchup.get(0)); // Remove id1
+                    playersInGame.remove(matchup.get(2)); // Remove id2
+                } finally {
+                    event.getChannel().sendMessage("Matches left to start: " + (allMatchups.size()+1)).queue();
+                }
             }
         }
 
@@ -589,9 +603,16 @@ public class ChessCommand {
                 //matchup - id1, name1, id2, name2
                 playersInGame.add(matchup.get(0)); // Add id1
                 playersInGame.add(matchup.get(2)); // Add id2
-                threads[threadIndex] = new TrainThread(matchup.get(0), matchup.get(1), matchup.get(2), matchup.get(3), threadIndex, event.getChannel(), playersInGame);
-                threads[threadIndex].start();
-                event.getChannel().sendMessage("Matches left to start: " + allMatchups.size()).queue();
+                try {
+                    threads[threadIndex] = new TrainThread(matchup.get(0), matchup.get(1), matchup.get(2), matchup.get(3), threadIndex, event.getChannel(), playersInGame);
+                    threads[threadIndex].start();
+                } catch (IOException ie) {
+                    System.out.println(String.format("Error starting match on thread %d: %s", threadIndex, ie.getMessage()));
+                    playersInGame.remove(matchup.get(0)); // Remove id1
+                    playersInGame.remove(matchup.get(2)); // Remove id2
+                } finally {
+                    event.getChannel().sendMessage("Matches left to start: " + (allMatchups.size()+1)).queue();
+                }
             }
         }
 

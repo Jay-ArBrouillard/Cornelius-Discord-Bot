@@ -23,7 +23,7 @@ public class TrainThread extends Thread {
     public String blackSideId;
     public List<String> playersInGame;
 
-    public TrainThread(String id1, String name1, String id2, String name2, int threadNum, MessageChannel mc, List<String> playersInGame) {
+    public TrainThread(String id1, String name1, String id2, String name2, int threadNum, MessageChannel mc, List<String> playersInGame) throws IOException {
         state = new ChessGameState();
         game = new ChessGame(state);
         ChessPlayer whiteSidePlayer = game.addUser(id1, name1);
@@ -40,25 +40,14 @@ public class TrainThread extends Thread {
         this.threadNum = threadNum;
         this.mc = mc;
         this.playersInGame = playersInGame;
-        try {
-            game.setupComputerClient(GameType.CVC);
-            game.setupStockfishClient();
-            state.setMatchStartTime(Instant.now().toEpochMilli());
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            state.setMatchStartTime(null);
-            mc.sendMessage(e.toString()).queue();
-        }
+        game.setupComputerClient(GameType.CVC);
+        game.setupStockfishClient();
+        state.setMatchStartTime(Instant.now().toEpochMilli());
     }
 
     public void run() {
         String status;
         String reply;
-        if (state.getMatchStartTime() == null) {
-            clear();
-            return;
-        }
         mc.sendMessage("Beginning match on Thread " + threadNum + ": " + whiteSidePlayerName + " vs " + blackSidePlayerName).queue();
         do {
             state = game.ai(null);
@@ -123,7 +112,7 @@ public class TrainThread extends Thread {
             blackSidePlayerName = null;
             whiteSideId = null;
             blackSideId = null;
-            mc = null;
+            //this.mc = null;
         }
     }
 }
