@@ -257,6 +257,12 @@ public class ChessGame {
                     .setOption(Option.Hash, 32)
                     .build(), p);
         }
+        else if (p.name.contains("Nemorino")) {
+            setClient(new NemorinoClient.Builder()
+                    //Hash is defaulted to 32
+                    .setOption(Option.UCI_Opponent, generateUCIOpponentString(o))
+                    .build(), p);
+        }
     }
 
     private void setClient(BaseAiClient client, ChessPlayer p) {
@@ -266,6 +272,36 @@ public class ChessGame {
         else if (p.discordId.equals(blackSidePlayer.discordId)) {
             client2 = client; //Black side player will always be client 2
         }
+    }
+
+    private String generateUCIOpponentString(ChessPlayer o) {
+        String title = o.title;
+        StringBuilder sb = new StringBuilder("");
+        if (title.startsWith("Grandmaster")) {
+            sb.append("GM").append(" ");
+        }
+        else if (title.startsWith("International")) {
+            sb.append("IM").append(" ");
+        }
+        else if (title.startsWith("FIDE")) {
+            sb.append("FM").append(" ");
+        }
+        else {
+            sb.append("none ");
+        }
+
+        int elo = (int) o.elo;
+        sb.append(elo).append(" ");
+
+        if (o.discordId.startsWith(System.getenv("OWNER_ID"))) {
+            sb.append("computer ");
+        }
+        else {
+            sb.append("human ");
+        }
+        sb.append(o.name);
+
+        return sb.toString();
     }
 
     private int calculateContempt(String name, double opponentElo) {

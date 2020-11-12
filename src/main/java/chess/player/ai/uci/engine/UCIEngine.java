@@ -57,7 +57,7 @@ abstract class UCIEngine {
             input = new BufferedReader(new InputStreamReader(process.getInputStream()));
             output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
-            Thread.sleep(1000);
+            Thread.sleep(500);
             readResponse(startUpReadCommand);
             sendCommand("uci");
             readResponse("uciok");

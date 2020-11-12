@@ -15,6 +15,7 @@ public enum Option {
     Nodestime("nodestime"),
     Limit_Strength("UCI_LimitStrength"),
     Elo("UCI_Elo"),
+    UCI_Opponent("UCI_Opponent"), //The format of the string has to be [GM|IM|FM|WGM|WIM|none] [|none] [computer|human]
     Table_Memory("Table Memory"), //Used only for Komodo
     Book_File("Book File"),
     Use_NNUE("Use NNUE"),

@@ -56,6 +56,9 @@ public class ChessPlayer {
     }
 
     public void determineTitle() {
+        if ("Grandmaster (GM)".equals(this.title)) { //Grandmasters never lose this title regardless of elo
+            return;
+        }
         if (this.elo >= 2500) {
             this.title = "Grandmaster (GM)";
         }
