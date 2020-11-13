@@ -16,6 +16,7 @@ import chess.player.ai.uci.engine.enums.Variant;
 import chess.tables.ChessPlayer;
 import net.dv8tion.jda.api.entities.MessageChannel;
 
+import javax.sql.rowset.spi.SyncResolver;
 import java.io.*;
 import java.security.SecureRandom;
 import java.util.*;
@@ -365,16 +366,21 @@ public class ChessGame {
                 int randomNum = 1;
                 if (optionName.equals("GuideBookFile")) {
                     randomNum = rand.nextInt(11) + 1;
+                    System.out.println("setoption name " + optionLst.get(0) + " value " + optionLst.get(randomNum));
+                    fileWriter.write("setoption name " + optionLst.get(0) + " value " + optionLst.get(randomNum));
                 }
                 else if (optionName.equals("MainBookFile")) {
                     randomNum = rand.nextInt(9) + 1;
+                    System.out.println("setoption name " + optionLst.get(0) + " value " + optionLst.get(randomNum));
+                    fileWriter.write("setoption name " + optionLst.get(0) + " value " + optionLst.get(randomNum));
                 }
                 else {
                     int min = (int) optionLst.get(1);
                     int max = (int) optionLst.get(2);
                     randomNum = rand.nextInt((max - min) + 1) + min;
+                    System.out.println("setoption name " + optionLst.get(0) + " value " + randomNum);
+                    fileWriter.write("setoption name " + optionLst.get(0) + " value " + randomNum);
                 }
-                fileWriter.write("setoption name " + optionLst.get(0) + " value " + randomNum);
             }
         } catch (IOException e) {
             e.printStackTrace();
