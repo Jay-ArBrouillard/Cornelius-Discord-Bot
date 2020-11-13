@@ -360,31 +360,48 @@ public class ChessGame {
                 "/app/bin/books/rodent.bin", "/app/bin/books/small.bin")));
 
         SecureRandom rand = new SecureRandom();
-        try(FileWriter fileWriter = new FileWriter(fileLocationAndPath)) {
+        FileWriter output = null;
+        BufferedWriter bw = null;
+        try {
+            output = new FileWriter(fileLocationAndPath);
+            bw = new BufferedWriter(output);
             for (LinkedList optionLst : options) {
                 String optionName = (String) optionLst.get(0);
-                int randomNum = 1;
+                int randomNum;
                 if (optionName.equals("GuideBookFile")) {
                     randomNum = rand.nextInt(11) + 1;
-                    System.out.println("setoption name " + optionLst.get(0) + " value " + optionLst.get(randomNum));
-                    fileWriter.write("setoption name " + optionLst.get(0) + " value " + optionLst.get(randomNum));
+                    bw.write("setoption name " + optionLst.get(0) + " value " + optionLst.get(randomNum));
+                    bw.newLine();
                 }
                 else if (optionName.equals("MainBookFile")) {
                     randomNum = rand.nextInt(9) + 1;
-                    System.out.println("setoption name " + optionLst.get(0) + " value " + optionLst.get(randomNum));
-                    fileWriter.write("setoption name " + optionLst.get(0) + " value " + optionLst.get(randomNum));
+                    bw.write("setoption name " + optionLst.get(0) + " value " + optionLst.get(randomNum));
                 }
                 else {
                     int min = (int) optionLst.get(1);
                     int max = (int) optionLst.get(2);
                     randomNum = rand.nextInt((max - min) + 1) + min;
-                    System.out.println("setoption name " + optionLst.get(0) + " value " + randomNum);
-                    fileWriter.write("setoption name " + optionLst.get(0) + " value " + randomNum);
+                    bw.write("setoption name " + optionLst.get(0) + " value " + randomNum);
+                    bw.newLine();
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
-            // Cxception handling
+        } finally {
+            if (bw != null) {
+                try {
+                    bw.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (output != null) {
+                try {
+                    output.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
