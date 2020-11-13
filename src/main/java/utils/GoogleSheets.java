@@ -132,10 +132,10 @@ public class GoogleSheets {
                 ZonedDateTime cst = Instant.now().atZone(ZoneId.of("America/Chicago"));
                 String createdOn = getDate(cst, RANKED_TAB, false);
                 String updatedOn = getDate(cst, RANKED_TAB, true);
-                // New users get default elo of 1500 - Class C
+                // New users get default elo of 0 - Class C
                 ValueRange appendBody = new ValueRange()
                         .setValues(Arrays.asList(
-                                Arrays.asList(id, name, 1500, "-", true, "Class C", "0", "0", "0", "0", 0, "0 days 0 hours 0 minutes 0 seconds", createdOn, updatedOn)
+                                Arrays.asList(id, name, 0, "-", true, "-", "0", "0", "0", "0", 0, "0 days 0 hours 0 minutes 0 seconds", createdOn, updatedOn)
                         ));
                 // Add new user to provisional tab
                 service.spreadsheets().values()
@@ -163,7 +163,7 @@ public class GoogleSheets {
                 busReq.setRequests(Arrays.asList(request));
                 service.spreadsheets().batchUpdate(SPREAD_SHEET_ID, busReq).execute();
 
-                return new ChessPlayer(id, name, 1500, null, true, "Class C", 0, 0, 0, 0.0, 0, "0 days 0 hours 0 minutes 0 seconds", createdOn, updatedOn);
+                return new ChessPlayer(id, name, 0, null, true, "-", 0, 0, 0, 0.0, 0, "0 days 0 hours 0 minutes 0 seconds", createdOn, updatedOn);
             }
         } catch (Exception e) {
             e.printStackTrace();
