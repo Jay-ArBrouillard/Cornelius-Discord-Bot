@@ -147,17 +147,18 @@ public class EloRanking {
             }
             else { //Loss
                 // Never let their elo decrease lower than 100
+                // Also if you lose you shouldn't gain elo
                 if (!c.provisional && !o.provisional) {
-                    c.elo = Math.max(100, EloRanking.calculateEstablishedVsEstablished(c.elo, c.totalGames, oPrevElo, 0.0));
+                    c.elo = Math.max(100, Math.min(c.elo, EloRanking.calculateEstablishedVsEstablished(c.elo, c.totalGames, oPrevElo, 0.0)));
                 }
                 else if (!c.provisional && o.provisional) {
-                    c.elo = Math.max(100, EloRanking.calculateEstablishedVsProvisional(c.elo, c.totalGames, oPrevElo, o.totalGames,0.0));
+                    c.elo = Math.max(100, Math.min(c.elo, EloRanking.calculateEstablishedVsProvisional(c.elo, c.totalGames, oPrevElo, o.totalGames,0.0)));
                 }
                 else if (c.provisional && !o.provisional) {
-                    c.elo = Math.max(100, EloRanking.calculateProvisionalVsEstablished(c.elo, c.totalGames, oPrevElo, -1.0));
+                    c.elo = Math.max(100, Math.min(c.elo, EloRanking.calculateProvisionalVsEstablished(c.elo, c.totalGames, oPrevElo, -1.0)));
                 }
                 else {
-                    c.elo = Math.max(100, EloRanking.calculateProvisionalVsProvisional(c.elo, c.totalGames, oPrevElo, -1.0));
+                    c.elo = Math.max(100, Math.min(c.elo, EloRanking.calculateProvisionalVsProvisional(c.elo, c.totalGames, oPrevElo, -1.0)));
                 }
             }
         }
