@@ -87,8 +87,6 @@ public class TrainThread extends Thread {
             }
 
         } while (true);
-
-        System.gc(); //Attempt to call garbage collector to clear memory
     }
 
     private void clear() {
@@ -114,6 +112,7 @@ public class TrainThread extends Thread {
             whiteSideId = null;
             blackSideId = null;
             //this.mc = null;
+            System.gc(); //Attempt to call garbage collector to clear memory
         }
     }
 }

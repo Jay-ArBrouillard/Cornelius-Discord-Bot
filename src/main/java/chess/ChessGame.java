@@ -288,20 +288,20 @@ public class ChessGame {
 
     private void randomizePersonalityFile(String fileLocationAndPath) {
         LinkedList<LinkedList> options = new LinkedList<>();
-        options.add(new LinkedList(Arrays.asList("PawnValueMg", 0, 1350))); //Option, minimum value, maximum value
-        options.add(new LinkedList(Arrays.asList("KnightValueMg", 0, 1350)));
-        options.add(new LinkedList(Arrays.asList("BishopValueMg", 0, 1350)));
-        options.add(new LinkedList(Arrays.asList("RookValueMg", 0, 1350)));
-        options.add(new LinkedList(Arrays.asList("QueenValueMg", 0, 1350)));
-        options.add(new LinkedList(Arrays.asList("PawnValueEg", 0, 1350)));
-        options.add(new LinkedList(Arrays.asList("KnightValueEg", 0, 1350)));
-        options.add(new LinkedList(Arrays.asList("BishopValueEg", 0, 1350)));
-        options.add(new LinkedList(Arrays.asList("RookValueEg", 0, 1350)));
-        options.add(new LinkedList(Arrays.asList("QueenValueEg", 0, 1350)));
-        options.add(new LinkedList(Arrays.asList("KeepPawn", -10, 100)));
-        options.add(new LinkedList(Arrays.asList("KeepKnight", -10, 100)));
-        options.add(new LinkedList(Arrays.asList("KeepBishop", -10, 100)));
-        options.add(new LinkedList(Arrays.asList("KeepRook", -10, 100)));
+        options.add(new LinkedList(Arrays.asList("PawnValueMg", 0, 300))); //Option, minimum value, maximum value
+        options.add(new LinkedList(Arrays.asList("KnightValueMg", 0, 500)));
+        options.add(new LinkedList(Arrays.asList("BishopValueMg", 0, 500)));
+        options.add(new LinkedList(Arrays.asList("RookValueMg", 0, 700)));
+        options.add(new LinkedList(Arrays.asList("QueenValueMg", 800, 1200)));
+        options.add(new LinkedList(Arrays.asList("PawnValueEg", 0, 400)));
+        options.add(new LinkedList(Arrays.asList("KnightValueEg", 0, 600)));
+        options.add(new LinkedList(Arrays.asList("BishopValueEg", 0, 600)));
+        options.add(new LinkedList(Arrays.asList("RookValueEg", 0, 800)));
+        options.add(new LinkedList(Arrays.asList("QueenValueEg", 800, 1350)));
+        options.add(new LinkedList(Arrays.asList("KeepPawn", -10, 20)));
+        options.add(new LinkedList(Arrays.asList("KeepKnight", -10, 50)));
+        options.add(new LinkedList(Arrays.asList("KeepBishop", -10, 50)));
+        options.add(new LinkedList(Arrays.asList("KeepRook", -10, 50)));
         options.add(new LinkedList(Arrays.asList("KeepQueen", -10, 100)));
         options.add(new LinkedList(Arrays.asList("BishopPairMg", 0, 200)));
         options.add(new LinkedList(Arrays.asList("BishopPairEg", 0, 200)));
@@ -317,12 +317,12 @@ public class ChessGame {
         options.add(new LinkedList(Arrays.asList("OwnMobility", 0, 500)));
         options.add(new LinkedList(Arrays.asList("OppMobility", 0, 500)));
         options.add(new LinkedList(Arrays.asList("FlatMobility", 0, 500)));
-        options.add(new LinkedList(Arrays.asList("KingTropism", 0, 500)));
+        options.add(new LinkedList(Arrays.asList("KingTropism", 0, 400)));
         options.add(new LinkedList(Arrays.asList("PrimaryPstWeight", 0, 100)));
         options.add(new LinkedList(Arrays.asList("SecondaryPstWeight", 0, 100)));
-        options.add(new LinkedList(Arrays.asList("PiecePressure", -500, 500)));
+        options.add(new LinkedList(Arrays.asList("PiecePressure", -300, 300)));
         options.add(new LinkedList(Arrays.asList("PassedPawns", 0, 300)));
-        options.add(new LinkedList(Arrays.asList("PawnStructure", 0, 300)));
+        options.add(new LinkedList(Arrays.asList("PawnStructure", 0, 500)));
         options.add(new LinkedList(Arrays.asList("Lines", 0, 300)));
         options.add(new LinkedList(Arrays.asList("Outposts", 0, 500)));
         options.add(new LinkedList(Arrays.asList("Space", -500, 500)));
@@ -339,8 +339,8 @@ public class ChessGame {
         options.add(new LinkedList(Arrays.asList("FianchBase", -100, 100)));
         options.add(new LinkedList(Arrays.asList("FianchKing", -100, 100)));
         options.add(new LinkedList(Arrays.asList("ReturningB", -100, 100)));
-        options.add(new LinkedList(Arrays.asList("PawnMass", -500, 300)));
-        options.add(new LinkedList(Arrays.asList("PawnChains", -500, 300)));
+        options.add(new LinkedList(Arrays.asList("PawnMass", -200, 200)));
+        options.add(new LinkedList(Arrays.asList("PawnChains", -200, 200)));
         options.add(new LinkedList(Arrays.asList("PrimaryPstStyle", 0, 4)));
         options.add(new LinkedList(Arrays.asList("SecondaryPstStyle", 0, 4)));
         options.add(new LinkedList(Arrays.asList("blockedcpawn", -100, 100)));
