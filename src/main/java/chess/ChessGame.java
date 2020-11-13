@@ -58,7 +58,7 @@ public class ChessGame {
         }
     }
 
-    public void setupComputerClient(GameType gameType) throws IOException {
+    public void setupComputerClient(GameType gameType) {
         ChessPlayer [] players;
         if (gameType.isPlayerVsComputer()) {
             if (whiteSidePlayer.discordId.contains(System.getenv("OWNER_ID"))) { //White side is ai
@@ -75,23 +75,30 @@ public class ChessGame {
             client2 = null;
             return;
         }
-        if (players.length == 1) {
-            if (players[0].discordId.equals(whiteSidePlayer.discordId)) {
-                setClient(whiteSidePlayer, blackSidePlayer);
-            }
-            else {
-                setClient(blackSidePlayer, whiteSidePlayer);
-            }
-        }
-        else {
-            for (ChessPlayer p : players) {
-                if (p.discordId.equals(whiteSidePlayer.discordId)) {
+        try {
+            if (players.length == 1) {
+                if (players[0].discordId.equals(whiteSidePlayer.discordId)) {
                     setClient(whiteSidePlayer, blackSidePlayer);
                 }
                 else {
                     setClient(blackSidePlayer, whiteSidePlayer);
                 }
             }
+            else {
+                for (ChessPlayer p : players) {
+                    if (p.discordId.equals(whiteSidePlayer.discordId)) {
+                        setClient(whiteSidePlayer, blackSidePlayer);
+                    }
+                    else {
+                        setClient(blackSidePlayer, whiteSidePlayer);
+                    }
+                }
+            }
+        }
+        catch (IOException ie) {
+            ie.printStackTrace();
+            client1 = null;
+            client2 = null;
         }
     }
 

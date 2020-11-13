@@ -211,16 +211,10 @@ public class ChessCommand {
                                                                                                                             formatPercent.format((1-whiteSideWinChance)*100));
                     gameType = GameType.PVC;
                     chessGame.gameType = GameType.PVC;
-                    try {
-                        chessGame.setupComputerClient(gameType);
-                        chessGame.setupStockfishClient();
-                        decision = PLAYER_MOVE;
-                        state.setMatchStartTime(Instant.now().toEpochMilli());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        reply = e.getMessage();
-                        state.setStateError();
-                    }
+                    chessGame.setupComputerClient(gameType);
+                    chessGame.setupStockfishClient();
+                    decision = PLAYER_MOVE;
+                    state.setMatchStartTime(Instant.now().toEpochMilli());
                 }
                 else if (reply.startsWith(GameType.CVP.toString())) {
                     boardImageFile = new File(GAME_BOARD_IMAGE_LOCATION);
@@ -243,16 +237,10 @@ public class ChessCommand {
                                                                                                                       whiteSidePlayer.name);
                     gameType = GameType.CVP;
                     chessGame.gameType = GameType.CVP;
-                    try {
-                        chessGame.setupComputerClient(gameType);
-                        chessGame.setupStockfishClient();
-                        decision = COMPUTER_MOVE;
-                        state.setMatchStartTime(Instant.now().toEpochMilli());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        reply = e.getMessage();
-                        state.setStateError();
-                    }
+                    chessGame.setupComputerClient(gameType);
+                    chessGame.setupStockfishClient();
+                    decision = COMPUTER_MOVE;
+                    state.setMatchStartTime(Instant.now().toEpochMilli());
                 }
                 break;
             case CHALLENGE_OPPONENT:
@@ -400,16 +388,9 @@ public class ChessCommand {
                 //matchup - id1, name1, id2, name2
                 playersInGame.add(matchup.get(0)); // Add id1
                 playersInGame.add(matchup.get(2)); // Add id2
-                try {
-                    threads[threadIndex] = new TrainThread(matchup.get(0), matchup.get(1), matchup.get(2), matchup.get(3), threadIndex, event.getChannel(), playersInGame);
-                    threads[threadIndex].start();
-                } catch (IOException ie) {
-                    System.out.println(String.format("Error starting match on thread %d: %s", threadIndex, ie.getMessage()));
-                    playersInGame.remove(matchup.get(0)); // Remove id1
-                    playersInGame.remove(matchup.get(2)); // Remove id2
-                } finally {
-                    event.getChannel().sendMessage("Matches left to start: " + (allMatchups.size()+1)).queue();
-                }
+                threads[threadIndex] = new TrainThread(matchup.get(0), matchup.get(1), matchup.get(2), matchup.get(3), threadIndex, event.getChannel(), playersInGame);
+                threads[threadIndex].start();
+                event.getChannel().sendMessage("Matches left to start: " + (allMatchups.size()+1)).queue();
             }
         }
 
@@ -518,16 +499,9 @@ public class ChessCommand {
                 //matchup - id1, name1, id2, name2
                 playersInGame.add(matchup.get(0)); // Add id1
                 playersInGame.add(matchup.get(2)); // Add id2
-                try {
-                    threads[threadIndex] = new TrainThread(matchup.get(0), matchup.get(1), matchup.get(2), matchup.get(3), threadIndex, event.getChannel(), playersInGame);
-                    threads[threadIndex].start();
-                } catch (IOException ie) {
-                    System.out.println(String.format("Error starting match on thread %d: %s", threadIndex, ie.getMessage()));
-                    playersInGame.remove(matchup.get(0)); // Remove id1
-                    playersInGame.remove(matchup.get(2)); // Remove id2
-                } finally {
-                    event.getChannel().sendMessage("Matches left to start: " + (allMatchups.size()+1)).queue();
-                }
+                threads[threadIndex] = new TrainThread(matchup.get(0), matchup.get(1), matchup.get(2), matchup.get(3), threadIndex, event.getChannel(), playersInGame);
+                threads[threadIndex].start();
+                event.getChannel().sendMessage("Matches left to start: " + (allMatchups.size()+1)).queue();
             }
         }
 
@@ -603,16 +577,9 @@ public class ChessCommand {
                 //matchup - id1, name1, id2, name2
                 playersInGame.add(matchup.get(0)); // Add id1
                 playersInGame.add(matchup.get(2)); // Add id2
-                try {
-                    threads[threadIndex] = new TrainThread(matchup.get(0), matchup.get(1), matchup.get(2), matchup.get(3), threadIndex, event.getChannel(), playersInGame);
-                    threads[threadIndex].start();
-                } catch (IOException ie) {
-                    System.out.println(String.format("Error starting match on thread %d: %s", threadIndex, ie.getMessage()));
-                    playersInGame.remove(matchup.get(0)); // Remove id1
-                    playersInGame.remove(matchup.get(2)); // Remove id2
-                } finally {
-                    event.getChannel().sendMessage("Matches left to start: " + (allMatchups.size()+1)).queue();
-                }
+                threads[threadIndex] = new TrainThread(matchup.get(0), matchup.get(1), matchup.get(2), matchup.get(3), threadIndex, event.getChannel(), playersInGame);
+                threads[threadIndex].start();
+                event.getChannel().sendMessage("Matches left to start: " + (allMatchups.size()+1)).queue();
             }
         }
 
@@ -667,20 +634,10 @@ public class ChessCommand {
             chessGame.gameType = GameType.CVC;
             state.getPrevElo().put(whiteSidePlayer.discordId, whiteSidePlayer.elo);
             state.getPrevElo().put(blackSidePlayer.discordId, blackSidePlayer.elo);
-            try {
-                chessGame.setupComputerClient(gameType);
-                chessGame.setupStockfishClient();
-                decision = COMPUTER_MOVE;
-                state.setMatchStartTime(Instant.now().toEpochMilli());
-            } catch (IOException e) {
-                e.printStackTrace();
-                event.getChannel().sendMessage(e.toString()).queue();
-                totalGames--;
-                chessGame = null;
-                state = null;
-                System.gc(); //Attempt to call garbage collector to clear memory
-                continue;
-            }
+            chessGame.setupComputerClient(gameType);
+            chessGame.setupStockfishClient();
+            decision = COMPUTER_MOVE;
+            state.setMatchStartTime(Instant.now().toEpochMilli());
 
             event.getChannel().sendMessage("Beginning match (" + (gamesCompleted+1) + "/" + totalGames + ") : " + whiteSidePlayer.name + " vs " + blackSidePlayer.name).queue();
             String status;
