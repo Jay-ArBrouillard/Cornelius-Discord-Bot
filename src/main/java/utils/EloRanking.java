@@ -17,33 +17,96 @@ public class EloRanking {
         return 1.0 / probabilityDenominator;
     }
 
-    /**
-     * r'A = (rA * nA + ((rA + rB) / 2) + 100 * s1) / (nA + 1)
-     * @param rA
-     * @param nA
-     * @param rB
-     * @param s1
-     * @return
-     */
-    public static double calculateProvisionalVsProvisional(double rA, double nA, double rB, double s1) {
-        double subNumerator = (rA + rB) / 2.0;
-        double numerator = (rA * nA) + subNumerator + (100.0 * s1);
-        double denominator = nA + 1.0;
-        return numerator / denominator;
+    public static double calculateProvisionalVsProvisional(double rA, double nA, double rB, double nB, boolean isWin, boolean isDraw) {
+        double newRating = rA;
+        if (nA == 1) { //First provisional game
+            if (nB == 1) { // New rating is hard coded values if both players first game
+                if (isDraw) {
+                    newRating = 1500;
+                }
+                else {
+                    if (isWin) {
+                        newRating = 1700;
+                    }
+                    else {
+                        newRating = 1300;
+                    }
+                }
+            }
+            else { //The elo differences don't apply
+                if (isDraw) {
+                    newRating = rB;
+                }
+                else {
+                    if (isWin) {
+                        newRating = 200 + rB;
+                    }
+                    else {
+                        newRating = rB - 200;
+                    }
+                }
+            }
+        }
+        else { //Every game after the first game
+            if (isDraw) {
+                newRating = rB;
+            }
+            else {
+                if (isWin) {
+                    //Only award elo if the opponent's rating is no less than 400 points of yours
+                    if (rB < rA && (rA - rB) < 400) {
+                        newRating = 200 + rB;
+                    }
+                }
+                else { //Loss
+                    //Only award elo if the opponent's rating is no more than 400 points of yours
+                    if (rB > rA && (rB - rA) < 400) {
+                        newRating = rB - 200;
+                    }
+                }
+            }
+        }
+
+        return newRating;
     }
 
-    /**
-     * r'A = (rA * nA + rB + 200 * s1) / (nA + 1)
-     * @param rA
-     * @param nA
-     * @param rB
-     * @param s1
-     * @return
-     */
-    public static double calculateProvisionalVsEstablished(double rA, double nA, double rB, double s1) {
-        double numerator = (rA * nA) + rB + (200.0 * s1);
-        double denominator = nA + 1.0;
-        return numerator / denominator;
+    public static double calculateProvisionalVsEstablished(double rA, double nA, double rB, double nB, boolean isWin, boolean isDraw) {
+        double newRating = rA;
+        if (nA == 1) { //First provisional game
+            //The elo differences don't apply
+            if (isDraw) {
+                newRating = rB;
+            }
+            else {
+                if (isWin) {
+                    newRating = 400 + rB;
+                }
+                else {
+                    newRating = rB - 400;
+                }
+            }
+        }
+        else { //Every game after the first game
+            if (isDraw) {
+                newRating = rB;
+            }
+            else {
+                if (isWin) {
+                    //Only award elo if the opponent's rating is no less than 400 points of yours
+                    if (rB < rA && (rA - rB) < 400) {
+                        newRating = 400 + rB;
+                    }
+                }
+                else { //Loss
+                    //Only award elo if the opponent's rating is no more than 400 points of yours
+                    if (rB > rA && (rB - rA) < 400) {
+                        newRating = rB - 400;
+                    }
+                }
+            }
+        }
+
+        return newRating;
     }
 
     /**
@@ -72,7 +135,7 @@ public class EloRanking {
     }
 
     /**
-     * K factor from FIDE modified
+     * Modified from USCF
      * @param rating
      * @return
      */
@@ -80,15 +143,15 @@ public class EloRanking {
         double K;
         if (numGames < 30 && rating < 2300) {
             //For 10 games after a new players provisional period they can still significantly influence their elo
-            K = 50;
+            K = 40;
         }
         else if (rating < 2100) { // 0-2099
             K = 32;
         }
-        else if (rating < 2200) { //2100 - 2199
+        else if (rating <= 2400) { //2100 - 2400
             K = 24;
         }
-        else { //2200+
+        else { //2401+
             K = 16;
         }
 
@@ -123,10 +186,10 @@ public class EloRanking {
                 c.elo = EloRanking.calculateEstablishedVsProvisional(c.elo, c.totalGames, oPrevElo, o.totalGames,0.5);
             }
             else if (c.provisional && !o.provisional) {
-                c.elo = EloRanking.calculateProvisionalVsEstablished(c.elo, c.totalGames, oPrevElo, 0.0);
+                c.elo = EloRanking.calculateProvisionalVsEstablished(c.elo, c.totalGames, oPrevElo, o.totalGames, false, true);
             }
             else {
-                c.elo = EloRanking.calculateProvisionalVsProvisional(c.elo, c.totalGames, oPrevElo, 0.0);
+                c.elo = EloRanking.calculateProvisionalVsProvisional(c.elo, c.totalGames, oPrevElo, o.totalGames, false, true);
             }
         }
         else {
@@ -139,10 +202,10 @@ public class EloRanking {
                     c.elo = Math.max(c.elo, EloRanking.calculateEstablishedVsProvisional(c.elo, c.totalGames, oPrevElo, o.totalGames,1.0));
                 }
                 else if (c.provisional && !o.provisional) {
-                    c.elo = Math.max(c.elo, EloRanking.calculateProvisionalVsEstablished(c.elo, c.totalGames, oPrevElo, 1.0));
+                    c.elo = Math.max(c.elo, EloRanking.calculateProvisionalVsEstablished(c.elo, c.totalGames, oPrevElo, o.totalGames, true, false));
                 }
                 else {
-                    c.elo = Math.max(c.elo, EloRanking.calculateProvisionalVsProvisional(c.elo, c.totalGames, oPrevElo, 1.0));
+                    c.elo = Math.max(c.elo, EloRanking.calculateProvisionalVsProvisional(c.elo, c.totalGames, oPrevElo, o.totalGames, true, false));
                 }
             }
             else { //Loss
@@ -155,10 +218,10 @@ public class EloRanking {
                     c.elo = Math.max(100, Math.min(c.elo, EloRanking.calculateEstablishedVsProvisional(c.elo, c.totalGames, oPrevElo, o.totalGames,0.0)));
                 }
                 else if (c.provisional && !o.provisional) {
-                    c.elo = Math.max(100, Math.min(c.elo, EloRanking.calculateProvisionalVsEstablished(c.elo, c.totalGames, oPrevElo, -1.0)));
+                    c.elo = Math.max(100, Math.min(c.elo, EloRanking.calculateProvisionalVsEstablished(c.elo, c.totalGames, oPrevElo, o.totalGames, false, false)));
                 }
                 else {
-                    c.elo = Math.max(100, Math.min(c.elo, EloRanking.calculateProvisionalVsProvisional(c.elo, c.totalGames, oPrevElo, -1.0)));
+                    c.elo = Math.max(100, Math.min(c.elo, EloRanking.calculateProvisionalVsProvisional(c.elo, c.totalGames, oPrevElo, o.totalGames, false, false)));
                 }
             }
         }
