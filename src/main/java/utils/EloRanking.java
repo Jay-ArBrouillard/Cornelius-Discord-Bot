@@ -17,6 +17,17 @@ public class EloRanking {
         return 1.0 / probabilityDenominator;
     }
 
+    /**
+     *  https://boardgames.stackexchange.com/questions/4561/how-are-numerical-chess-rankings-calculated-for-different-ranking-systems
+     *  Uses 200
+     * @param rA
+     * @param nA
+     * @param rB
+     * @param nB
+     * @param isWin
+     * @param isDraw
+     * @return
+     */
     public static double calculateProvisionalVsProvisional(double rA, double nA, double rB, double nB, boolean isWin, boolean isDraw) {
         double newRating = rA;
         if (nA == 1) { //First provisional game
@@ -70,6 +81,16 @@ public class EloRanking {
         return newRating;
     }
 
+    /**
+     * https://boardgames.stackexchange.com/questions/4561/how-are-numerical-chess-rankings-calculated-for-different-ranking-systems
+     * Uses 400
+     * @param rA
+     * @param nA
+     * @param rB
+     * @param isWin
+     * @param isDraw
+     * @return
+     */
     public static double calculateProvisionalVsEstablished(double rA, double nA, double rB, boolean isWin, boolean isDraw) {
         double newRating = rA;
         if (nA == 1) { //First provisional game
