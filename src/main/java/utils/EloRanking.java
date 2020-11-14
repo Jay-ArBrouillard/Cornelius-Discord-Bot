@@ -194,33 +194,31 @@ public class EloRanking {
         }
         else {
             if (isWin) {
-                // Never let their elo decrease after a win
                 if (!c.provisional && !o.provisional) {
-                    c.elo = Math.max(c.elo, EloRanking.calculateEstablishedVsEstablished(c.elo, c.totalGames, oPrevElo, 1.0));
+                    c.elo = EloRanking.calculateEstablishedVsEstablished(c.elo, c.totalGames, oPrevElo, 1.0);
                 }
                 else if (!c.provisional && o.provisional) {
-                    c.elo = Math.max(c.elo, EloRanking.calculateEstablishedVsProvisional(c.elo, c.totalGames, oPrevElo, o.totalGames,1.0));
+                    c.elo = EloRanking.calculateEstablishedVsProvisional(c.elo, c.totalGames, oPrevElo, o.totalGames,1.0);
                 }
                 else if (c.provisional && !o.provisional) {
-                    c.elo = Math.max(c.elo, EloRanking.calculateProvisionalVsEstablished(c.elo, c.totalGames, oPrevElo, true, false));
+                    c.elo = EloRanking.calculateProvisionalVsEstablished(c.elo, c.totalGames, oPrevElo, true, false);
                 }
                 else {
-                    c.elo = Math.max(c.elo, EloRanking.calculateProvisionalVsProvisional(c.elo, c.totalGames, oPrevElo, o.totalGames, true, false));
+                    c.elo = EloRanking.calculateProvisionalVsProvisional(c.elo, c.totalGames, oPrevElo, o.totalGames, true, false);
                 }
             }
             else { //Loss
-                // Also if you lose you shouldn't gain elo
                 if (!c.provisional && !o.provisional) {
-                    c.elo = Math.min(c.elo, EloRanking.calculateEstablishedVsEstablished(c.elo, c.totalGames, oPrevElo, 0.0));
+                    c.elo = EloRanking.calculateEstablishedVsEstablished(c.elo, c.totalGames, oPrevElo, 0.0);
                 }
                 else if (!c.provisional && o.provisional) {
-                    c.elo = Math.min(c.elo, EloRanking.calculateEstablishedVsProvisional(c.elo, c.totalGames, oPrevElo, o.totalGames,0.0));
+                    c.elo = EloRanking.calculateEstablishedVsProvisional(c.elo, c.totalGames, oPrevElo, o.totalGames,0.0);
                 }
                 else if (c.provisional && !o.provisional) {
-                    c.elo = Math.min(c.elo, EloRanking.calculateProvisionalVsEstablished(c.elo, c.totalGames, oPrevElo, false, false));
+                    c.elo = EloRanking.calculateProvisionalVsEstablished(c.elo, c.totalGames, oPrevElo, false, false);
                 }
                 else {
-                    c.elo = Math.min(c.elo, EloRanking.calculateProvisionalVsProvisional(c.elo, c.totalGames, oPrevElo, o.totalGames, false, false));
+                    c.elo = EloRanking.calculateProvisionalVsProvisional(c.elo, c.totalGames, oPrevElo, o.totalGames, false, false);
                 }
             }
         }
