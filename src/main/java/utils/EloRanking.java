@@ -70,7 +70,7 @@ public class EloRanking {
         return newRating;
     }
 
-    public static double calculateProvisionalVsEstablished(double rA, double nA, double rB, double nB, boolean isWin, boolean isDraw) {
+    public static double calculateProvisionalVsEstablished(double rA, double nA, double rB, boolean isWin, boolean isDraw) {
         double newRating = rA;
         if (nA == 1) { //First provisional game
             //The elo differences don't apply
@@ -186,7 +186,7 @@ public class EloRanking {
                 c.elo = EloRanking.calculateEstablishedVsProvisional(c.elo, c.totalGames, oPrevElo, o.totalGames,0.5);
             }
             else if (c.provisional && !o.provisional) {
-                c.elo = EloRanking.calculateProvisionalVsEstablished(c.elo, c.totalGames, oPrevElo, o.totalGames, false, true);
+                c.elo = EloRanking.calculateProvisionalVsEstablished(c.elo, c.totalGames, oPrevElo, false, true);
             }
             else {
                 c.elo = EloRanking.calculateProvisionalVsProvisional(c.elo, c.totalGames, oPrevElo, o.totalGames, false, true);
@@ -202,29 +202,29 @@ public class EloRanking {
                     c.elo = Math.max(c.elo, EloRanking.calculateEstablishedVsProvisional(c.elo, c.totalGames, oPrevElo, o.totalGames,1.0));
                 }
                 else if (c.provisional && !o.provisional) {
-                    c.elo = Math.max(c.elo, EloRanking.calculateProvisionalVsEstablished(c.elo, c.totalGames, oPrevElo, o.totalGames, true, false));
+                    c.elo = Math.max(c.elo, EloRanking.calculateProvisionalVsEstablished(c.elo, c.totalGames, oPrevElo, true, false));
                 }
                 else {
                     c.elo = Math.max(c.elo, EloRanking.calculateProvisionalVsProvisional(c.elo, c.totalGames, oPrevElo, o.totalGames, true, false));
                 }
             }
             else { //Loss
-                // Never let their elo decrease lower than 100
                 // Also if you lose you shouldn't gain elo
                 if (!c.provisional && !o.provisional) {
-                    c.elo = Math.max(100, Math.min(c.elo, EloRanking.calculateEstablishedVsEstablished(c.elo, c.totalGames, oPrevElo, 0.0)));
+                    c.elo = Math.min(c.elo, EloRanking.calculateEstablishedVsEstablished(c.elo, c.totalGames, oPrevElo, 0.0));
                 }
                 else if (!c.provisional && o.provisional) {
-                    c.elo = Math.max(100, Math.min(c.elo, EloRanking.calculateEstablishedVsProvisional(c.elo, c.totalGames, oPrevElo, o.totalGames,0.0)));
+                    c.elo = Math.min(c.elo, EloRanking.calculateEstablishedVsProvisional(c.elo, c.totalGames, oPrevElo, o.totalGames,0.0));
                 }
                 else if (c.provisional && !o.provisional) {
-                    c.elo = Math.max(100, Math.min(c.elo, EloRanking.calculateProvisionalVsEstablished(c.elo, c.totalGames, oPrevElo, o.totalGames, false, false)));
+                    c.elo = Math.min(c.elo, EloRanking.calculateProvisionalVsEstablished(c.elo, c.totalGames, oPrevElo, false, false));
                 }
                 else {
-                    c.elo = Math.max(100, Math.min(c.elo, EloRanking.calculateProvisionalVsProvisional(c.elo, c.totalGames, oPrevElo, o.totalGames, false, false)));
+                    c.elo = Math.min(c.elo, EloRanking.calculateProvisionalVsProvisional(c.elo, c.totalGames, oPrevElo, o.totalGames, false, false));
                 }
             }
         }
+        System.out.println("New elo no round:" + c.elo);
         c.elo = Math.round(c.elo); // Round double to nearest integer
         if (c.provisional && c.totalGames == 20) c.provisional = false;
         if (c.totalGames < 20) {

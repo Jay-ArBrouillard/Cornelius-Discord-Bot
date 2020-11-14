@@ -59,7 +59,7 @@ public class ChessCommand {
                 state.setPlayerForfeit();
                 // If less than or equal to 3 full moves have been completed then game ends with no consequences
                 if (state.getFullMoves() <= 3) {
-                    event.getChannel().sendMessage("**NOTICE** Less than 4 moves were made in this game so no win or loss or draw is awarded").queue();
+                    event.getChannel().sendMessage("**NOTICE** Less than 3 moves were made in this game so no win or loss or draw is awarded").queue();
                 }
                 else if (gameType != null && gameType.isPlayerVsComputer() && (decision == Decision.PLAYER_MOVE || decision == COMPUTER_MOVE)) { //Player vs Computer game
                     if (event.getAuthor().getId().equals(blackSidePlayer.discordId)) { // Black quit

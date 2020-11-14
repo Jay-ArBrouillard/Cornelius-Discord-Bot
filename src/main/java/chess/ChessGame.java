@@ -848,11 +848,11 @@ public class ChessGame {
      * If no moves are made treat this as a draw as long as someone didn't forfeit
      */
     public synchronized void updateDatabaseWhiteSideWin(boolean isForfeit) {
-        if (state.getFullMoves() <= 3) { //End game no consequences
+        if (state.getFullMoves() <= 2) { //End game no consequences
             return;
         }
         threadRunning = true;
-        if (isForfeit || state.getFullMoves() > 3) {
+        if (isForfeit || state.getFullMoves() > 2) {
             whiteSidePlayer.incrementWins();
             blackSidePlayer.incrementLosses();
             EloRanking.calculateChessElo(state, whiteSidePlayer, blackSidePlayer);
@@ -877,11 +877,11 @@ public class ChessGame {
      * If no moves are made treat this as a draw as long as someone didn't forfeit
      */
     public synchronized void updateDatabaseBlackSideWin(boolean isForfeit) {
-        if (state.getFullMoves() <= 3) { //End game no consequences
+        if (state.getFullMoves() <= 2) { //End game no consequences
             return;
         }
         threadRunning = true;
-        if (isForfeit || state.getFullMoves() > 3) {
+        if (isForfeit || state.getFullMoves() > 2) {
             whiteSidePlayer.incrementLosses();
             blackSidePlayer.incrementWins();
             EloRanking.calculateChessElo(state, whiteSidePlayer, blackSidePlayer);
