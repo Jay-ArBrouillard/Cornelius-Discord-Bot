@@ -58,7 +58,9 @@ public class CCCP extends UCIEngine {
                     }
                 }
             }
-            board = transition.getOriginalBoard();
+            if (transition.getOriginalBoard() != null) {
+                board = transition.getOriginalBoard();
+            }
         }
         System.out.println(checkMates);
         System.out.println(checks);
