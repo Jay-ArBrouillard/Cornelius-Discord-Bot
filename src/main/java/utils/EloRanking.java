@@ -65,13 +65,13 @@ public class EloRanking {
             else {
                 if (isWin) {
                     //Only award elo if the opponent's rating is no less than 400 points of yours
-                    if (rB < rA && (rA - rB) < 400) {
+                    if (rB >= rA || rB < rA && (rA - rB) < 400) {
                         newRating = 200 + rB;
                     }
                 }
                 else { //Loss
                     //Only award elo if the opponent's rating is no more than 400 points of yours
-                    if (rB > rA && (rB - rA) < 400) {
+                    if (rB <= rA || rB > rA && (rB - rA) < 400) {
                         newRating = rB - 200;
                     }
                 }
@@ -114,13 +114,13 @@ public class EloRanking {
             else {
                 if (isWin) {
                     //Only award elo if the opponent's rating is no less than 400 points of yours
-                    if (rB < rA && (rA - rB) < 400) {
+                    if (rB >= rA || rB < rA && (rA - rB) < 400) {
                         newRating = 400 + rB;
                     }
                 }
                 else { //Loss
-                    //Only subtract elo if the opponent's rating is no more than 400 points of yours
-                    if (rB > rA && (rB - rA) < 400) {
+                    //Only award elo if the opponent's rating is no more than 400 points of yours
+                    if (rB <= rA || rB > rA && (rB - rA) < 400) {
                         newRating = rB - 400;
                     }
                 }
