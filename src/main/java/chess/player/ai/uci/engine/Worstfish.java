@@ -62,7 +62,11 @@ public class Worstfish extends UCIEngine {
                 }
             }
         }
-
+        String moveNotation = BoardUtils.getPositionAtCoordinate(worstMove.getCurrentCoordinate()) + BoardUtils.getPositionAtCoordinate(worstMove.getDestinationCoordinate());
+        if (worstMove instanceof Move.PawnPromotion) {
+            String[] promotionTypes = new String[]{"q", "r", "n", "b"};
+            moveNotation = moveNotation + promotionTypes[new Random().nextInt(promotionTypes.length)];
+        }
         return BoardUtils.getPositionAtCoordinate(worstMove.getCurrentCoordinate()) + BoardUtils.getPositionAtCoordinate(worstMove.getDestinationCoordinate());
     }
 

@@ -242,6 +242,9 @@ public class ChessGame {
         else if (p.name.contains("Bartholomew")) {
             setClient(new StewartClient(4), p);
         }
+        else if (p.name.contains("CCCP")) {
+            setClient(new CCCPClient(), p);
+        }
         else if (p.name.contains("Worstfish")) {
             setClient(new WorstfishClient.Builder()
                     .setOption(Option.Hash, 8)

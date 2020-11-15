@@ -686,7 +686,8 @@ public class ChessCommand {
                         chessGame = null;
                         blackSidePlayer = null;
                         event.getChannel().sendMessage(reply).queue();
-                        if (!ERROR.equals(status)) gamesCompleted++;
+                        if (!ERROR.equals(status)) totalGames--;
+                        else gamesCompleted++;
                         break;
                     }
                 }
@@ -702,6 +703,7 @@ public class ChessCommand {
 
     private static String[][] getAIList() {
         return new String[][]{
+                {"693282099167494225CCCP", "CCCP"},
                 {"693282099167494225Worstfish", "Worstfish"},
                 {"693282099167494225DIDRO4", "Dissociative Identity Disorder"},
                 {"693282099167494225JimmyRO4", "Jimmy"},
