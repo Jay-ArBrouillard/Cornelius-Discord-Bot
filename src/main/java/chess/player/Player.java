@@ -152,6 +152,9 @@ public abstract class Player {
             transitionBoard.setNumFullMoves(this.board.getCurrentPlayer().getAlliance().isBlack() ? this.board.getNumFullMoves() + 1 : this.board.getNumFullMoves());
         }
 
+        if (isDummyMove) {
+            return new MoveTransition(this.board, transitionBoard, move, MoveStatus.DONE);
+        }
         return new MoveTransition(transitionBoard, move, MoveStatus.DONE);
     }
 

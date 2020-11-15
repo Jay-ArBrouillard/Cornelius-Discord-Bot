@@ -1,8 +1,11 @@
 package chess.player.ai.uci.engine;
 
+import chess.board.Board;
 import chess.board.BoardUtils;
 import chess.board.Move;
+import chess.pgn.FenUtils;
 import chess.player.MoveTransition;
+import chess.player.Player;
 import chess.player.ai.uci.engine.enums.Query;
 
 import java.io.IOException;
@@ -26,8 +29,9 @@ public class CCCP extends UCIEngine {
         List<Move> checks = new LinkedList<>();
         List<Move> captures = new LinkedList<>();
         List<Move> pushes = new LinkedList<>();
-        for (Move move : query.getBoard().getCurrentPlayer().getLegalMoves()) {
-            MoveTransition transition = query.getBoard().getCurrentPlayer().makeMove(move, true);
+        Board board = query.getBoard();
+        for (Move move : board.getCurrentPlayer().getLegalMoves()) {
+            MoveTransition transition = board.getCurrentPlayer().makeMove(move, true);
             if (transition.getMoveStatus().isDone()) {
                 if (transition.getTransitionBoard().getCurrentPlayer().isInCheckMate()) {
                     checkMates.add(move);
@@ -42,17 +46,18 @@ public class CCCP extends UCIEngine {
                     int currentCoordinate = move.getCurrentCoordinate();
                     if (transition.getTransitionBoard().getCurrentPlayer().getOpponent().getAlliance().isWhite()) {
                         int countToNextRow = currentCoordinate % 8 + 1;
-                        if (move.getMovedPiece().getPiecePosition() <= (currentCoordinate - countToNextRow)) {
+                        if (move.getDestinationCoordinate() <= (currentCoordinate - countToNextRow)) {
                             pushes.add(move);
                         }
                     }
                     else {
                         int countToNextRow = 8 - (currentCoordinate % 8);
-                        if (move.getMovedPiece().getPiecePosition() >= (currentCoordinate + countToNextRow)) {
+                        if (move.getDestinationCoordinate() >= (currentCoordinate + countToNextRow)) {
                             pushes.add(move);
                         }
                     }
                 }
+                board = transition.getOriginalBoard();
             }
         }
         System.out.println(checkMates);
