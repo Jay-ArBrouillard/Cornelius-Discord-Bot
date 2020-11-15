@@ -119,7 +119,7 @@ public class EloRanking {
                     }
                 }
                 else { //Loss
-                    //Only award elo if the opponent's rating is no more than 400 points of yours
+                    //Only subtract elo if the opponent's rating is no more than 400 points of yours
                     if (rB > rA && (rB - rA) < 400) {
                         newRating = rB - 400;
                     }
