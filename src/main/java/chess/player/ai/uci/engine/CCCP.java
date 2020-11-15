@@ -10,6 +10,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * CCCP will always prefer moves in this order: Checkmate, Check, Capture, and then Push
+ * If there are multiple moves in a category then a random move from those is chosen
+ */
 public class CCCP extends UCIEngine {
     Random rand;
     public CCCP() {
