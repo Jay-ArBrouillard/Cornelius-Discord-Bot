@@ -40,7 +40,7 @@ public class CCCP extends UCIEngine {
                 }
                 else {
                     int currentCoordinate = move.getCurrentCoordinate();
-                    if (transition.getTransitionBoard().getCurrentPlayer().getAlliance().isWhite()) {
+                    if (transition.getTransitionBoard().getCurrentPlayer().getOpponent().getAlliance().isWhite()) {
                         int countToNextRow = currentCoordinate % 8 + 1;
                         if (move.getDestinationCoordinate() <= (currentCoordinate - countToNextRow)) {
                             pushes.add(move);
