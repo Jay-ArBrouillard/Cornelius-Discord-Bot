@@ -4,8 +4,8 @@ import chess.board.Board;
 import chess.board.Move;
 
 public class MoveTransition {
-    private Board originalBoard;
-    private final Board transitionBoard;
+    private Board originalBoard; // Board before move was made
+    private final Board transitionBoard; // Board after move was made
     private final Move move;
     private final MoveStatus moveStatus; //Was move allowed?
 
