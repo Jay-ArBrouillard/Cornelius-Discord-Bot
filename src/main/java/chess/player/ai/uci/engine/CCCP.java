@@ -42,13 +42,13 @@ public class CCCP extends UCIEngine {
                     int currentCoordinate = move.getCurrentCoordinate();
                     if (transition.getTransitionBoard().getCurrentPlayer().getOpponent().getAlliance().isWhite()) {
                         int countToNextRow = currentCoordinate % 8 + 1;
-                        if (move.getDestinationCoordinate() <= (currentCoordinate - countToNextRow)) {
+                        if (move.getMovedPiece().getPiecePosition() <= (currentCoordinate - countToNextRow)) {
                             pushes.add(move);
                         }
                     }
                     else {
                         int countToNextRow = 8 - (currentCoordinate % 8);
-                        if (move.getDestinationCoordinate() >= (currentCoordinate + countToNextRow)) {
+                        if (move.getMovedPiece().getPiecePosition() >= (currentCoordinate + countToNextRow)) {
                             pushes.add(move);
                         }
                     }
