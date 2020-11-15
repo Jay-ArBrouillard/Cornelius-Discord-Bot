@@ -35,7 +35,8 @@ public class Worstfish extends UCIEngine {
             MoveTransition transition = board.getCurrentPlayer().makeMove(move, true);
             StringBuilder posBuilder = new StringBuilder("position fen ");
             posBuilder.append(FenUtils.parseFEN(transition.getTransitionBoard()));
-            String evalString = getEvaluation(posBuilder.toString());
+            sendCommand(posBuilder.toString());
+            String evalString = getEvaluation();
             if (evalString != null) {
                 double evaluationScore = Double.parseDouble(evalString.substring(22).replace("(white side)", "").trim());
                 if (board.getCurrentPlayer().getAlliance().isWhite()) {
@@ -43,9 +44,11 @@ public class Worstfish extends UCIEngine {
                         worstMove = move;
                         worstScore = evaluationScore;
                         isFirstMove = false;
+                        System.out.println("worstMove:" + move.toString());
                     } else if (evaluationScore < worstScore) {
                         worstMove = move;
                         worstScore = evaluationScore;
+                        System.out.println("worstMove:" + move.toString());
                     }
                 }
                 else {
@@ -53,9 +56,11 @@ public class Worstfish extends UCIEngine {
                         worstMove = move;
                         worstScore = evaluationScore;
                         isFirstMove = false;
+                        System.out.println("worstMove:" + move.toString());
                     } else if (evaluationScore > worstScore) {
                         worstMove = move;
                         worstScore = evaluationScore;
+                        System.out.println("worstMove:" + move.toString());
                     }
                 }
             }
@@ -64,9 +69,9 @@ public class Worstfish extends UCIEngine {
         return BoardUtils.getPositionAtCoordinate(worstMove.getCurrentCoordinate()) + BoardUtils.getPositionAtCoordinate(worstMove.getDestinationCoordinate());
     }
 
-    public String getEvaluation(String command) throws IOException {
+    public String getEvaluation() throws IOException {
         waitForReady();
-        sendCommand(command);
+        sendCommand("eval");
         return readLine("Final evaluation:");
     }
 
