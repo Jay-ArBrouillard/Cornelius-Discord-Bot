@@ -887,7 +887,6 @@ public class ChessGame {
         }
         threadRunning = true;
         if (isForfeit || state.getFullMoves() > 2) {
-            System.out.println("Black side winning calling database");
             whiteSidePlayer.incrementLosses();
             blackSidePlayer.incrementWins();
             EloRanking.calculateChessElo(state, whiteSidePlayer, blackSidePlayer);

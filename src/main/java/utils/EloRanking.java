@@ -243,7 +243,6 @@ public class EloRanking {
                 }
             }
         }
-        System.out.println("New elo no round:" + c.elo);
         c.elo = Math.round(c.elo); // Round double to nearest integer
         if (c.provisional && c.totalGames == 20) c.provisional = false;
         if (c.totalGames < 20) {

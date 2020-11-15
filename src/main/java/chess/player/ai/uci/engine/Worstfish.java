@@ -36,6 +36,7 @@ public class Worstfish extends UCIEngine {
             StringBuilder posBuilder = new StringBuilder("position fen ");
             posBuilder.append(FenUtils.parseFEN(transition.getTransitionBoard()));
             sendCommand(posBuilder.toString());
+            waitForReady();
             String evalString = getEvaluation();
             if (evalString != null) {
                 double evaluationScore = Double.parseDouble(evalString.substring(22).replace("(white side)", "").trim());
@@ -44,11 +45,9 @@ public class Worstfish extends UCIEngine {
                         worstMove = move;
                         worstScore = evaluationScore;
                         isFirstMove = false;
-                        System.out.println("worstMove:" + move.toString());
                     } else if (evaluationScore < worstScore) {
                         worstMove = move;
                         worstScore = evaluationScore;
-                        System.out.println("worstMove:" + move.toString());
                     }
                 }
                 else {
@@ -56,11 +55,9 @@ public class Worstfish extends UCIEngine {
                         worstMove = move;
                         worstScore = evaluationScore;
                         isFirstMove = false;
-                        System.out.println("worstMove:" + move.toString());
                     } else if (evaluationScore > worstScore) {
                         worstMove = move;
                         worstScore = evaluationScore;
-                        System.out.println("worstMove:" + move.toString());
                     }
                 }
             }
