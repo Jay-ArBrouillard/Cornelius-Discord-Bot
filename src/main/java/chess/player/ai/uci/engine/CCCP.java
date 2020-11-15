@@ -36,7 +36,7 @@ public class CCCP extends UCIEngine {
                 }
                 else {
                     int currentCoordinate = move.getCurrentCoordinate();
-                    if (transition.getTransitionBoard().getCurrentPlayer().getOpponent().getAlliance().isWhite()) {
+                    if (transition.getTransitionBoard().getCurrentPlayer().getAlliance().isWhite()) {
                         int countToNextRow = currentCoordinate % 8 + 1;
                         if (move.getDestinationCoordinate() <= (currentCoordinate - countToNextRow)) {
                             pushes.add(move);
@@ -51,6 +51,10 @@ public class CCCP extends UCIEngine {
                 }
             }
         }
+        System.out.println(checkMates);
+        System.out.println(checks);
+        System.out.println(captures);
+        System.out.println(pushes);
 
         Move selection;
         // Checkmate, Check, Capture, Push
