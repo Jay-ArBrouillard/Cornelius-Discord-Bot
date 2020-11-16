@@ -18,72 +18,7 @@ public class EloRanking {
     }
 
     /**
-     *  https://boardgames.stackexchange.com/questions/4561/how-are-numerical-chess-rankings-calculated-for-different-ranking-systems
-     *  Uses 200
-     * @param rA
-     * @param nA
-     * @param rB
-     * @param nB
-     * @param isWin
-     * @param isDraw
-     * @return
-     */
-    public static double calculateProvisionalVsProvisional(double rA, double nA, double rB, double nB, boolean isWin, boolean isDraw) {
-        double newRating = rA;
-        if (nA == 1.0) { //First provisional game
-            if (nB == 1.0) { // New rating is hard coded values if both players first game
-                if (isDraw) {
-                    newRating = 1500.0;
-                }
-                else {
-                    if (isWin) {
-                        newRating = 1700.0;
-                    }
-                    else {
-                        newRating = 1300.0;
-                    }
-                }
-            }
-            else { //The elo differences don't apply
-                if (isDraw) {
-                    newRating = rB;
-                }
-                else {
-                    if (isWin) {
-                        newRating = 200.0 + rB;
-                    }
-                    else {
-                        newRating = rB - 200.0;
-                    }
-                }
-            }
-        }
-        else { //Every game after the first game
-            if (isDraw) {
-                newRating = rB;
-            }
-            else {
-                if (isWin) {
-                    //Only award elo if the opponent's rating is no less than 400 points of yours
-                    if (rB >= rA || (rB < rA && (rA - rB) < 400.0)) {
-                        newRating = 200.0 + rB;
-                    }
-                }
-                else { //Loss
-                    //Only award elo if the opponent's rating is no more than 400 points of yours
-                    if (rB <= rA || (rB > rA && (rB - rA) < 400.0)) {
-                        newRating = rB - 200.0;
-                    }
-                }
-            }
-        }
-
-        return newRating;
-    }
-
-    /**
      * https://boardgames.stackexchange.com/questions/4561/how-are-numerical-chess-rankings-calculated-for-different-ranking-systems
-     * Uses 400
      * @param rA
      * @param nA
      * @param rB
@@ -91,7 +26,7 @@ public class EloRanking {
      * @param isDraw
      * @return
      */
-    public static double calculateProvisionalVsEstablished(double rA, double nA, double rB, boolean isWin, boolean isDraw) {
+    public static double calculateProvisional(double rA, double nA, double rB, boolean isWin, boolean isDraw) {
         double newRating = rA;
         if (nA == 1.0) { //First provisional game
             //The elo differences don't apply
@@ -206,11 +141,8 @@ public class EloRanking {
             else if (!c.provisional && o.provisional) {
                 c.elo = EloRanking.calculateEstablishedVsProvisional(c.elo, c.totalGames, oPrevElo, o.totalGames,0.5);
             }
-            else if (c.provisional && !o.provisional) {
-                c.elo = EloRanking.calculateProvisionalVsEstablished(c.elo, c.totalGames, oPrevElo, false, true);
-            }
             else {
-                c.elo = EloRanking.calculateProvisionalVsProvisional(c.elo, c.totalGames, oPrevElo, o.totalGames, false, true);
+                c.elo = EloRanking.calculateProvisional(c.elo, c.totalGames, oPrevElo, false, true);
             }
         }
         else {
@@ -221,11 +153,8 @@ public class EloRanking {
                 else if (!c.provisional && o.provisional) {
                     c.elo = EloRanking.calculateEstablishedVsProvisional(c.elo, c.totalGames, oPrevElo, o.totalGames,1.0);
                 }
-                else if (c.provisional && !o.provisional) {
-                    c.elo = EloRanking.calculateProvisionalVsEstablished(c.elo, c.totalGames, oPrevElo, true, false);
-                }
                 else {
-                    c.elo = EloRanking.calculateProvisionalVsProvisional(c.elo, c.totalGames, oPrevElo, o.totalGames, true, false);
+                    c.elo = EloRanking.calculateProvisional(c.elo, c.totalGames, oPrevElo, false, true);
                 }
             }
             else { //Loss
@@ -235,11 +164,8 @@ public class EloRanking {
                 else if (!c.provisional && o.provisional) {
                     c.elo = EloRanking.calculateEstablishedVsProvisional(c.elo, c.totalGames, oPrevElo, o.totalGames,0.0);
                 }
-                else if (c.provisional && !o.provisional) {
-                    c.elo = EloRanking.calculateProvisionalVsEstablished(c.elo, c.totalGames, oPrevElo, false, false);
-                }
                 else {
-                    c.elo = EloRanking.calculateProvisionalVsProvisional(c.elo, c.totalGames, oPrevElo, o.totalGames, false, false);
+                    c.elo = EloRanking.calculateProvisional(c.elo, c.totalGames, oPrevElo, false, true);
                 }
             }
         }
