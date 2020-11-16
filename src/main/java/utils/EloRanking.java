@@ -30,17 +30,17 @@ public class EloRanking {
      */
     public static double calculateProvisionalVsProvisional(double rA, double nA, double rB, double nB, boolean isWin, boolean isDraw) {
         double newRating = rA;
-        if (nA == 1) { //First provisional game
-            if (nB == 1) { // New rating is hard coded values if both players first game
+        if (nA == 1.0) { //First provisional game
+            if (nB == 1.0) { // New rating is hard coded values if both players first game
                 if (isDraw) {
-                    newRating = 1500;
+                    newRating = 1500.0;
                 }
                 else {
                     if (isWin) {
-                        newRating = 1700;
+                        newRating = 1700.0;
                     }
                     else {
-                        newRating = 1300;
+                        newRating = 1300.0;
                     }
                 }
             }
@@ -50,10 +50,10 @@ public class EloRanking {
                 }
                 else {
                     if (isWin) {
-                        newRating = 200 + rB;
+                        newRating = 200.0 + rB;
                     }
                     else {
-                        newRating = rB - 200;
+                        newRating = rB - 200.0;
                     }
                 }
             }
@@ -65,14 +65,14 @@ public class EloRanking {
             else {
                 if (isWin) {
                     //Only award elo if the opponent's rating is no less than 400 points of yours
-                    if (rB >= rA || (rB < rA && (rA - rB) < 400)) {
-                        newRating = 200 + rB;
+                    if (rB >= rA || (rB < rA && (rA - rB) < 400.0)) {
+                        newRating = 200.0 + rB;
                     }
                 }
                 else { //Loss
                     //Only award elo if the opponent's rating is no more than 400 points of yours
-                    if (rB <= rA || (rB > rA && (rB - rA) < 400)) {
-                        newRating = rB - 200;
+                    if (rB <= rA || (rB > rA && (rB - rA) < 400.0)) {
+                        newRating = rB - 200.0;
                     }
                 }
             }
@@ -93,17 +93,17 @@ public class EloRanking {
      */
     public static double calculateProvisionalVsEstablished(double rA, double nA, double rB, boolean isWin, boolean isDraw) {
         double newRating = rA;
-        if (nA == 1) { //First provisional game
+        if (nA == 1.0) { //First provisional game
             //The elo differences don't apply
             if (isDraw) {
                 newRating = rB;
             }
             else {
                 if (isWin) {
-                    newRating = 400 + rB;
+                    newRating = 400.0 + rB;
                 }
                 else {
-                    newRating = rB - 400;
+                    newRating = rB - 400.0;
                 }
             }
         }
@@ -114,14 +114,14 @@ public class EloRanking {
             else {
                 if (isWin) {
                     //Only award elo if the opponent's rating is no less than 400 points of yours
-                    if (rB >= rA || (rB < rA && (rA - rB) < 400)) {
-                        newRating = 400 + rB;
+                    if (rB >= rA || (rB < rA && (rA - rB) < 400.0)) {
+                        newRating = 400.0 + rB;
                     }
                 }
                 else { //Loss
                     //Only award elo if the opponent's rating is no more than 400 points of yours
-                    if (rB <= rA || (rB > rA && (rB - rA) < 400)) {
-                        newRating = rB - 400;
+                    if (rB <= rA || (rB > rA && (rB - rA) < 400.0)) {
+                        newRating = rB - 400.0;
                     }
                 }
             }

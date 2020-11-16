@@ -62,10 +62,6 @@ public class CCCP extends UCIEngine {
                 board = transition.getOriginalBoard();
             }
         }
-        System.out.println(checkMates);
-        System.out.println(checks);
-        System.out.println(captures);
-        System.out.println(pushes);
 
         Move selection;
         // Checkmate, Check, Capture, Push

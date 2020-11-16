@@ -686,7 +686,7 @@ public class ChessCommand {
                         chessGame = null;
                         blackSidePlayer = null;
                         event.getChannel().sendMessage(reply).queue();
-                        if (!ERROR.equals(status)) totalGames--;
+                        if (ERROR.equals(status)) totalGames--;
                         else gamesCompleted++;
                         break;
                     }
