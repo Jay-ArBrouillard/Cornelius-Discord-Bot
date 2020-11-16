@@ -1,5 +1,6 @@
 package chess.player.ai.uci.engine;
 
+import chess.board.Board;
 import chess.board.BoardUtils;
 import chess.board.Move;
 import chess.board.Move.PawnPromotion;
@@ -18,10 +19,14 @@ public class RandyRandom extends UCIEngine {
 
     public String getBestMove(Query query) {
          List<Move> legalMoves = new LinkedList<>();
-         for (Move move : query.getBoard().getCurrentPlayer().getLegalMoves()) {
-             MoveTransition transition = query.getBoard().getCurrentPlayer().makeMove(move, true);
+         Board board = query.getBoard();
+         for (Move move : board.getCurrentPlayer().getLegalMoves()) {
+             MoveTransition transition = board.getCurrentPlayer().makeMove(move, true);
              if (transition.getMoveStatus().isDone()) {
                  legalMoves.add(move);
+             }
+             if (transition.getOriginalBoard() != null) {
+                 board = transition.getOriginalBoard();
              }
          }
          //Legal Moves should always have atleast 1 move in it other the game would be over before we got to this method

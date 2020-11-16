@@ -19,14 +19,17 @@ public class Worstfish extends UCIEngine {
 
     public String getBestMove(Query query) throws IOException {
         List<Move> legalMoves = new ArrayList<>();
+        Board board = query.getBoard();
         for (Move move : query.getBoard().getCurrentPlayer().getLegalMoves()) {
             MoveTransition transition = query.getBoard().getCurrentPlayer().makeMove(move, true);
             if (transition.getMoveStatus().isDone()) {
                 legalMoves.add(move);
             }
+            if (transition.getOriginalBoard() != null) {
+                board = transition.getOriginalBoard();
+            }
         }
 
-        final Board board = query.getBoard();
         Move worstMove = legalMoves.get(0);
         double worstScore = 0;
         boolean isFirstMove = true;
@@ -60,6 +63,9 @@ public class Worstfish extends UCIEngine {
                         worstScore = evaluationScore;
                     }
                 }
+            }
+            if (transition.getOriginalBoard() != null) {
+                board = transition.getOriginalBoard();
             }
         }
         String moveNotation = BoardUtils.getPositionAtCoordinate(worstMove.getCurrentCoordinate()) + BoardUtils.getPositionAtCoordinate(worstMove.getDestinationCoordinate());

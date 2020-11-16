@@ -29,6 +29,7 @@ public class CCCP extends UCIEngine {
         List<Move> checks = new LinkedList<>();
         List<Move> captures = new LinkedList<>();
         List<Move> pushes = new LinkedList<>();
+        List<Move> allMoves = new LinkedList<>();
         Board board = query.getBoard();
         for (Move move : board.getCurrentPlayer().getLegalMoves()) {
             MoveTransition transition = board.getCurrentPlayer().makeMove(move, true);
@@ -43,6 +44,7 @@ public class CCCP extends UCIEngine {
                     captures.add(move);
                 }
                 else {
+                    allMoves.add(move);
                     int currentCoordinate = move.getCurrentCoordinate();
                     if (transition.getTransitionBoard().getCurrentPlayer().getOpponent().getAlliance().isWhite()) {
                         int countToNextRow = currentCoordinate % 8 + 1;
@@ -74,8 +76,11 @@ public class CCCP extends UCIEngine {
         else if (!captures.isEmpty()) {
             selection = captures.get(rand.nextInt(captures.size()));
         }
-        else { //Should always have a move
+        else if (!pushes.isEmpty()) {
             selection = pushes.get(rand.nextInt(pushes.size()));
+        }
+        else { //In the case we have no moves that push a piece forward then choose random from all moves
+            selection = allMoves.get(rand.nextInt(allMoves.size()));
         }
 
         String moveNotation = BoardUtils.getPositionAtCoordinate(selection.getCurrentCoordinate()) + BoardUtils.getPositionAtCoordinate(selection.getDestinationCoordinate());
