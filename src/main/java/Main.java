@@ -14,12 +14,12 @@ import javax.security.auth.login.LoginException;
 public class Main {
 
     public static void main(String[] args) throws LoginException, InterruptedException {
-        String token = "NjkzMjgyMDk5MTY3NDk0MjI1.Xn6zRQ.OYhKF7U55uOHMSVicM8I7KOoMpE";//System.getenv("TOKEN");
+        String token = System.getenv("TOKEN");
         // the second is the bot's owner's id
-        String ownerId = "693282099167494225";//System.getenv("OWNER_ID");
-        String moviesApiKey = "x";//System.getenv("MOVIES_API_KEY");
-        String calendarApiKey = "y";//System.getenv("HOLIDAY_API_KEY");
-        String unsplashAccessKey = "z";//System.getenv("UNSPLASH_ACCESS_KEY");
+        String ownerId = System.getenv("OWNER_ID");
+        String moviesApiKey = System.getenv("MOVIES_API_KEY");
+        String calendarApiKey = System.getenv("HOLIDAY_API_KEY");
+        String unsplashAccessKey = System.getenv("UNSPLASH_ACCESS_KEY");
 
 
 //         start getting a bot account set up
