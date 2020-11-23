@@ -15,7 +15,7 @@ public class Wagon {
     private int clothes;
     private int ammo;
     private double pace = 8.0; //Hours traveled per day (1-24)
-    private final int SPEED = 3; //Miles per hour traveled
+    private int SPEED = 3; //Miles per hour traveled
     private final List<Part> activeParts;
     private final List<Part> spareParts;
     private final List<OregonTrailPlayer> party;

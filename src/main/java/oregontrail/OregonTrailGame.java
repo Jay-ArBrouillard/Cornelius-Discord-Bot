@@ -164,9 +164,9 @@ public class OregonTrailGame {
             // Came across a farmer
             int gainedFood = CorneliusUtils.randomIntBetween(0, 25) + 25;
             wagon.setFood(wagon.getFood() + gainedFood);
-            event.getChannel().sendMessage("You came across a generour farmer and are gifted " + Integer.valueOf(gainedFood) + "lbs of food!").queue();
+            event.getChannel().sendMessage("You came across a generous farmer and are gifted " + Integer.valueOf(gainedFood) + "lbs of food!").queue();
         }
-        else if (rand < 18) {
+        else if (rand < 19) {
             // Came across abandoned wagon
             wagon.getSpareParts().add(new Axle());
             wagon.getSpareParts().add(new Tongue());
@@ -174,7 +174,7 @@ public class OregonTrailGame {
             event.getChannel().sendMessage("You find an abandoned wagon and gather the parts from the wagon.\n You've gained:\n1 Wheel\n1 Axle\n1 Tongue.").queue();
         }
         else if (rand < 20) {
-            // Random Party member recovery (health XOR sickness)
+            // Random Party member recovery (death, health, or sickness)
             List<OregonTrailPlayer> allMembers = wagon.getParty();
             int r = CorneliusUtils.randomIntBetween(0, allMembers.size()-1);
             OregonTrailPlayer selected = allMembers.get(r);
@@ -520,7 +520,7 @@ public class OregonTrailGame {
             result = ImageIO.read(new File("src/main/java/oregontrail/assets/mountains.png"));
             g = result.getGraphics();
 
-            double percentage = END_DISTANCE / 2000.0;
+            double percentage = distanceTraveled / END_DISTANCE;
             int x = (int)Math.round(1800.0 - (percentage * 1800.0));
             //Overlay wagon
             BufferedImage piece = ImageIO.read(new File("src/main/java/oregontrail/assets/wagon.png"));
