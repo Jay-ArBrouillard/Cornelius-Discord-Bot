@@ -242,7 +242,7 @@ public class Wagon {
                         // Find members that don't have this disease
                         List<OregonTrailPlayer> eligibleMembers = new ArrayList<>();
                         for (OregonTrailPlayer player : party) {
-                            if (player.getIllnesses().stream().anyMatch(d -> !disease.name.equals(d))) {
+                            if (!player.getIllnesses().stream().anyMatch(d -> disease.name.equals(d.name))) {
                                 eligibleMembers.add(player);
                             }
                         }
