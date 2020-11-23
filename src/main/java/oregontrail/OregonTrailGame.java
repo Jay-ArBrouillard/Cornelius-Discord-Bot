@@ -24,7 +24,7 @@ import static oregontrail.OTGameStatus.*;
 
 public class OregonTrailGame {
 
-    public final int END_DISTANCE = 1000; //Miles
+    public final double END_DISTANCE = 1000.0; //Miles
 
     public OregonTrailPlayer owner;
     public Wagon wagon;
