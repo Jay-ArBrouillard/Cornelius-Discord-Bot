@@ -39,6 +39,7 @@ public class OregonTrailCommand {
                         "\t3. See the rules (Not working)\n" +
                         "\t4. Exit";
                 event.getChannel().sendMessage(menuOptions).queue();
+                oregonTrailGame = new OregonTrailGame(event);
                 otGameState = START_GAME;
                 break;
             case MAIN:
@@ -64,7 +65,6 @@ public class OregonTrailCommand {
                 }
                 break;
             case START_GAME:
-                oregonTrailGame = new OregonTrailGame(event);
                 otGameStatus = oregonTrailGame.processMenuOption(message);
                 if (START.equals(otGameStatus)) {
                     event.getChannel().sendMessage(getOccupationString()).queue();
