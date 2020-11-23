@@ -226,9 +226,6 @@ public class Wagon {
             // Daily Reward and Penalty for pace
             if (traveled && pace > 8) {
                 double penalty = A * Math.pow(B, pace - 8) + C; // Exponential function for increased pace
-                if (penalty >= 100) {
-                    penalty = 100;
-                }
                 decreaseHealth(member, (int)Math.round(penalty));
             }
 

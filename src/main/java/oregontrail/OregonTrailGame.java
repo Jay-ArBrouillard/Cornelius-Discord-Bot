@@ -650,8 +650,7 @@ public class OregonTrailGame {
     public void update() {
         if (rest) {
             EmbedBuilder restImage = new EmbedBuilder();
-            restImage.setTitle("Rest");
-            restImage.setImage("https://lh3.googleusercontent.com/pw/ACtC-3ftTEk_a_9HdWzXpAsp6xPmjB64z0UzqVvyN8rpkUiGimG04UBZfrqItH8bnlXkbohz-jVWS-2BmslOuUcshvMXQYA_MTOmkquHyTSeRY3-DhoO1ZDa482w9h1c4QnzUIWAiRQTmfhGBXA8VE0mH5g=w760-h467-no?authuser=1");
+            restImage.setImage("https://lh3.googleusercontent.com/pw/ACtC-3fdQWxOURwdivpTrmEifX-C8w7w4ByOCTk8GSoYAsH5X9F1zSK6ohR6SNJpAJEW-JorI1R4rLxECGlOjAFXiPT2I3DhFi5jJ8q7JBsonnmtfdSxejnZG8koaWyun5XnDCjisO0vjQyv0hNlRwq0ikI=w640-h332-no?authuser=1");
             event.getChannel().sendMessage(restImage.build()).queue();
         }
         else {
