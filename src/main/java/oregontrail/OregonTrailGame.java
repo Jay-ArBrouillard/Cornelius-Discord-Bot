@@ -186,7 +186,7 @@ public class OregonTrailGame {
             event.getChannel().sendMessage("Raiders invaded your camp during the night!").queue();
             for (OregonTrailPlayer player : wagon.getParty()) {
                 double wounded = CorneliusUtils.randomNumber01();
-                if (wounded <= 0.33) {
+                if (player.isAlive() && wounded <= 0.33) {
                     int damage = CorneliusUtils.randomIntBetween(0, player.health);
                     wagon.decreaseHealth(player, damage);
                     event.getChannel().sendMessage(player.name + " suffered -" + damage + " damage").queue();
