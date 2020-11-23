@@ -159,9 +159,9 @@ public class OregonTrailCommand {
 
     public static String getOptionsString() {
         StringBuilder optionsBuilder = new StringBuilder();
-        optionsBuilder.append("1. Travel\n");
+        optionsBuilder.append("1. Travel (Optionally provide number of days to travel usage: `1 5`)\n");
         optionsBuilder.append("2. Show Inventory\n");
-        optionsBuilder.append("3. Rest (Optionally provide number of days usage: `3 10`)\n");
+        optionsBuilder.append("3. Rest (Optionally provide number of days rest usage: `3 10`)\n");
         optionsBuilder.append("4. Hunt\n");
         optionsBuilder.append("5. Change Pace (Provide value between `1-24` usage: `5 12.5`)\n");
         optionsBuilder.append("6. Change Rations (Valid options: `Filling`, `Meager`, or `Starving` usage: `6 Meager`)\n");

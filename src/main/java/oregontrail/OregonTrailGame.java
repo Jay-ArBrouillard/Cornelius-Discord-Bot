@@ -52,8 +52,18 @@ public class OregonTrailGame {
         if (CorneliusUtils.isNumeric(split[0])) {
             switch (split[0]) {
                 case "1": //Continue traveling
-                    generateRandomEvents();
-                    wagon.nextDay(this, true);
+                    if (split.length >= 2 && split[1] != null && CorneliusUtils.isNumeric(split[1])) {
+                        int days = Integer.parseInt(split[1]);
+                        for (int i = 0; i < days; i++) {
+                            boolean event = generateRandomEvents();
+                            wagon.nextDay(this, true);
+                            if (event) break;
+                        }
+                    }
+                    else {
+                        generateRandomEvents();
+                        wagon.nextDay(this, true);
+                    }
                     break;
                 case "2": //Show inventory
                     event.getChannel().sendMessage(wagon.printInventory()).queue();
@@ -62,9 +72,10 @@ public class OregonTrailGame {
                     if (split.length >= 2 && split[1] != null && CorneliusUtils.isNumeric(split[1])) {
                         int days = Integer.parseInt(split[1]);
                         for (int i = 0; i < days; i++) {
-                            generateRandomEvents();
+                            boolean event = generateRandomEvents();
                             rest();
                             wagon.nextDay(this, false);
+                            if (event) break;
                         }
                     }
                     else {
@@ -130,6 +141,7 @@ public class OregonTrailGame {
         if (rand < 4) { // Catch Sickness
             OregonTrailPlayer player = wagon.giveRandomSickness();
             event.getChannel().sendMessage(player.name + " has been diagnosed with " + player.getSickness()).queue();
+            return true;
         }
         else if (rand < 6) { // Random Part Breakdown
             Part part = wagon.breakPart();
@@ -141,11 +153,13 @@ public class OregonTrailGame {
                 }
             }
             event.getChannel().sendMessage("Your " + part.toString() + " has broken down").queue();
+            return true;
         }
         else if (rand < 7) {
             //Random party member death
             OregonTrailPlayer player = wagon.killRandomPartyMember();
             event.getChannel().sendMessage(player.name + " has suddenly died").queue();
+            return true;
         }
         else if (rand < 8){
             //Random Oxen Death
@@ -153,6 +167,7 @@ public class OregonTrailGame {
                 wagon.setOxen(wagon.getOxen() - 1);
                 event.getChannel().sendMessage("1 of your oxen suddenly died!").queue();
             }
+            return true;
         }
         else if (rand < 11) {
             // Theft
@@ -160,6 +175,7 @@ public class OregonTrailGame {
             if (item != null) {
                 event.getChannel().sendMessage("1 " + item + " has been stolen from you.").queue();
             }
+            return true;
         }
         else if (rand < 12) {
             // Attacked
@@ -172,12 +188,14 @@ public class OregonTrailGame {
                     event.getChannel().sendMessage(player.name + " suffered -" + damage + " damage").queue();
                 }
             }
+            return true;
         }
         else if (rand < 17) {
             // Came across a farmer
             int gainedFood = CorneliusUtils.randomIntBetween(0, 25) + 25;
             wagon.setFood(wagon.getFood() + gainedFood);
             event.getChannel().sendMessage("You came across a generous farmer and are gifted " + Integer.valueOf(gainedFood) + "lbs of food!").queue();
+            return true;
         }
         else if (rand < 19) {
             // Came across abandoned wagon
@@ -185,6 +203,7 @@ public class OregonTrailGame {
             wagon.getSpareParts().add(new Tongue());
             wagon.getSpareParts().add(new Wheel());
             event.getChannel().sendMessage("You find an abandoned wagon and gather the parts from the wagon.\n You've gained:\n1 Wheel\n1 Axle\n1 Tongue.").queue();
+            return true;
         }
         else if (rand < 20) {
             // Random Party member recovery (death, health, or sickness)
@@ -204,11 +223,12 @@ public class OregonTrailGame {
             else {
                 event.getChannel().sendMessage(selected.name + " had extremely good sleep last night +" + (selected.health - previousHp) + " health").queue();
             }
+            return true;
         }
         else
             ;// Storm lose days
 
-        return true;
+        return false;
     }
 
     /**
