@@ -33,6 +33,7 @@ public class OregonTrailGame {
     public int daysElapsed = 0;
     public RationsEnum rations = RationsEnum.FILLING;
     public int score = 0;
+    private boolean rest = false; //Did you rest this turn
 
     private MessageReceivedEvent event;
     private static DecimalFormat formatPercent = new DecimalFormat("##0.##");
@@ -49,6 +50,7 @@ public class OregonTrailGame {
         }
         optionNumber = optionNumber.trim();
         String[] split = optionNumber.split(" ");
+        rest = false;
         if (CorneliusUtils.isNumeric(split[0])) {
             switch (split[0]) {
                 case "1": //Continue traveling
@@ -83,6 +85,7 @@ public class OregonTrailGame {
                         generateRandomEvents();
                         wagon.nextDay(this, false);
                     }
+                    rest = true;
                     break;
                 case "4": //Hunt
                     hunt();
@@ -160,7 +163,8 @@ public class OregonTrailGame {
             OregonTrailPlayer player = wagon.killRandomPartyMember();
             EmbedBuilder death = new EmbedBuilder();
             death.setColor(Color.GREEN);
-            death.setImage("https://lh3.googleusercontent.com/pw/ACtC-3dvu4OzHzM7vWpPOpvxhpN1apWQlGppVsiuSQ7bDLbRgd6rL2jbR0aAxwDXA6zEQyEyqa_LBa4pPXz8aR7KeJoZfKcWJlAheGbmY9bwhZWrxopvzufaOD3ksDFponrXhSNtZrSigzT7TiBTH80z7U8=w300-h207-no?authuser=1");
+            death.setTitle(player.name + " suddenly died");
+            death.setImage("https://lh3.googleusercontent.com/pw/ACtC-3e2IneIrxRmTvhETM4ijxNi-g-cswNAre18wEH5R7NzoUqKae5aDOC5hsC2aT594KpwAWCoxVnuRYI2NqZJerF4VqMUbVYrRY3dVOngmD2jNkHTCPa3d5kynkfzuT5tkPa_yQ3mufUDljUcBUlPLxE=w1001-h350-no?authuser=1");
             death.setFooter("Noone knows what happened. But fuck that guy. -" + player.name);
             event.getChannel().sendMessage(death.build()).queue();
             return true;
@@ -276,7 +280,7 @@ public class OregonTrailGame {
 
             EmbedBuilder eb = new EmbedBuilder();
             eb.setTitle("Everyone died");
-            eb.setImage("https://lh3.googleusercontent.com/pw/ACtC-3cUWgGW1FIIRRXE5l2X8YRK9hEIDi14YZPpEYgCsqa2QKWDGmL5R7S3qOMem3bVJ8JTadR8X2n7MD86V7igeFCZV1jOhCv0nb3ihUq5xQC9MxgnoxDXJhBMbPyDVHhj0h0vxbbkMzNSUsti3sUTAak=w1400-h744-no?authuser=1");
+            eb.setImage("https://lh3.googleusercontent.com/pw/ACtC-3e6dc8gd5Nkg0FPramKwXKHSZH3Igt28__-O-TEHqsnuBMx6A0TWbG9g6TjXdEC_U1p4s71EETG_75o99y1DB-BjmlMtSJYsbhHM2Gini5UpGNiSUZ1fdhxtAS80EqrFAMdv2RjVL0mfEavOGUyhvE=w1001-h350-no?authuser=1");
             eb.setFooter("Developed by Jay-Ar - https://github.com/Jay-ArBrouillard/Cornelius-Discord-Bot");
             event.getChannel().sendMessage(eb.build()).queue();
             return LOSE;
@@ -633,7 +637,14 @@ public class OregonTrailGame {
 
     public void update() {
         buildProgressImage();
-        event.getChannel().sendFile(new File("src/main/java/oregontrail/gameState.png")).queue();
+        if (rest) {
+            EmbedBuilder restImage = new EmbedBuilder();
+            restImage.setImage("https://lh3.googleusercontent.com/pw/ACtC-3fdQWxOURwdivpTrmEifX-C8w7w4ByOCTk8GSoYAsH5X9F1zSK6ohR6SNJpAJEW-JorI1R4rLxECGlOjAFXiPT2I3DhFi5jJ8q7JBsonnmtfdSxejnZG8koaWyun5XnDCjisO0vjQyv0hNlRwq0ikI=w640-h332-no?authuser=1");
+            event.getChannel().sendMessage(restImage.build()).queue();
+        }
+        else {
+            event.getChannel().sendFile(new File("src/main/java/oregontrail/gameState.png")).queue();
+        }
         printTeamConditions();
         event.getChannel().sendMessage(getOptionsString()).queue();
     }
