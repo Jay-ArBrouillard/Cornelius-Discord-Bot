@@ -188,9 +188,9 @@ public class OregonTrailGame {
         else if (rand < 12) {
             // Attacked
             event.getChannel().sendMessage("Raiders invaded your camp during the night!").queue();
-            for (OregonTrailPlayer player : wagon.getParty()) {
+            for (OregonTrailPlayer player : wagon.getLivingMembers()) {
                 double wounded = CorneliusUtils.randomNumber01();
-                if (player.isAlive() && wounded <= 0.33) {
+                if (wounded <= 0.33) {
                     int damage = CorneliusUtils.randomIntBetween(0, player.health);
                     wagon.decreaseHealth(player, damage);
                     event.getChannel().sendMessage(player.name + " suffered -" + damage + " damage").queue();
@@ -235,7 +235,7 @@ public class OregonTrailGame {
         }
         else if (rand < 23) {
             // Random player eats too much food
-            List<OregonTrailPlayer> livingMembers = wagon.getParty();
+            List<OregonTrailPlayer> livingMembers = wagon.getLivingMembers();
             int r = CorneliusUtils.randomIntBetween(0, livingMembers.size()-1);
             OregonTrailPlayer selected = livingMembers.get(r);
             int foodEaten = CorneliusUtils.randomIntBetween(20, 200);
