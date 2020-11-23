@@ -89,7 +89,7 @@ public class CommandHelper extends ListenerAdapter {
         else if ((ChessCommand.isRunning() || message.startsWith("!chess")) && mc.getName().equals("chess")) {
             ChessCommand.execute(event, message);
         }
-        else if (message.startsWith("!oregontrail") || OregonTrailCommand.gameInProgress()) {
+        else if (OregonTrailCommand.gameInProgress() || message.startsWith("!oregontrail") && mc.getName().equals("oregon-trail") ) {
             OregonTrailCommand.execute(event, message);
         }
     }

@@ -111,7 +111,7 @@ public class OregonTrailGame {
     }
 
     private boolean generateRandomEvents() {
-        int rand = CorneliusUtils.randomIntBetween(0, 200);
+        int rand = CorneliusUtils.randomIntBetween(0, 100);
         if (rand < 4) { // Catch Sickness
             OregonTrailPlayer player = wagon.giveRandomSickness();
             event.getChannel().sendMessage(player.name + " has been diagnosed with " + player.getSickness()).queue();

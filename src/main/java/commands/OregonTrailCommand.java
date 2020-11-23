@@ -140,7 +140,7 @@ public class OregonTrailCommand {
     }
 
     public static boolean gameInProgress() {
-        return !MENU.equals(otGameState.toString());
+        return !MENU.equals(otGameState.toString()) && oregonTrailGame != null;
     }
 
     public static String getOccupationString() {
