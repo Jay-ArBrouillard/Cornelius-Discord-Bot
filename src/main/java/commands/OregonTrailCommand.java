@@ -115,7 +115,7 @@ public class OregonTrailCommand {
                         event.getChannel().sendMessage("You need atleast 1 oxen before beginning your travel...").queue();
                         EmbedBuilder generalStoreEB = new EmbedBuilder();
                         generalStoreEB.setColor(Color.RED);
-                        generalStoreEB.setImage("https://lh3.googleusercontent.com/pw/ACtC-3fQvDwH3krxTymC0zH7qNtPQJnLZIJsxKVfe3RP4G-E5kEGkT-5_lZKJFdz_c6wWMiOy8Ue5tV9oFT-_f21vrDdKZEqIVVQ3TPDDetUDPIpGVOqo4tDmGN3kBH3RHFy8WSpZiJzGffrNyDpuYn7xLw=w687-h363-no?authuser=1");
+                        generalStoreEB.setImage("https://lh3.googleusercontent.com/pw/ACtC-3edocjH5N6m3-apQA9nLEfjI5D57kSMhal5qCeE8om5oKvjZQh0UJBnQJhYyj8pumHp6ekdLBpDShIC4sKXB3wXtbpYX0AviVDiiTAhrD26KG3Qeyr3yNre_kNaleUrelBVQ1LKNah904Trz9XN_W8=w669-h347-no?authuser=1");
                         event.getChannel().sendMessage(generalStoreEB.build()).queue();
                     }
                     else {
