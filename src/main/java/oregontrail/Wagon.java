@@ -276,6 +276,7 @@ public class Wagon {
                     else if (DiseaseEnum.TYPHOID.name.equals(selectedDisease.name)) {
                         diseaseDeath.setImage("https://lh3.googleusercontent.com/pw/ACtC-3csGbPzpgKAe_TJgCgo-QDYavrUIzI8tlXOJYcwalZoKJecccNKUDpIK0V2H3yW1Ih6pgZRLMBIBx9XgrtSROTnAxM_yOeZBptEaEBqymoPd8ZXthIPokB7jPTfY9wBkKSzaWzhDRR8yz3erpt4MoY=w300-h207-no?authuser=1");
                     }
+                    diseaseDeath.setFooter("Told you I was sick");
                     event.getChannel().sendMessage(diseaseDeath.build()).queue();
                 }
                 else {

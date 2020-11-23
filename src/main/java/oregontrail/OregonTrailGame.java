@@ -24,7 +24,7 @@ import static oregontrail.OTGameStatus.*;
 
 public class OregonTrailGame {
 
-    public final double END_DISTANCE = 1000.0; //Miles
+    public final double END_DISTANCE = 2000.0; //Miles
 
     public OregonTrailPlayer owner;
     public Wagon wagon;
@@ -57,7 +57,7 @@ public class OregonTrailGame {
                         for (int i = 0; i < days; i++) {
                             boolean event1 = generateRandomEvents();
                             boolean event2 = wagon.nextDay(this, true);
-                            if (event1 || event2) break;
+                            if (event1 || event2 || isGameOver()) break;
                         }
                     }
                     else {
@@ -75,7 +75,7 @@ public class OregonTrailGame {
                             rest();
                             boolean event1 = generateRandomEvents();
                             boolean event2 = wagon.nextDay(this, false);
-                            if (event1 || event2) break;
+                            if (event1 || event2 || isGameOver()) break;
                         }
                     }
                     else {
@@ -231,8 +231,36 @@ public class OregonTrailGame {
         return false;
     }
 
+
     /**
-     * Determine if game is won or loss
+     * Return boolean if game is over
+     * @return
+     */
+    private boolean isGameOver() {
+        // All players dead - LOSE
+        if (wagon.getParty().stream().allMatch(m -> m.health <= 0)) {
+            return true;
+        }
+
+        // WIN
+        if (distanceTraveled >= END_DISTANCE) {
+            return true;
+        }
+
+        // No oxen alive - LOSE
+        if (wagon.getOxen() == 0) {
+            return true;
+        }
+
+        // Wagon broke down and no spare parts - LOSE
+        if (wagon.getActiveParts().size() != 7) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Return OTGameStatus if game is over and send messages
      * @return
      */
     private OTGameStatus gameOver() {
