@@ -309,15 +309,13 @@ public class OregonTrailGame {
             score += wagon.getClothes() * 2;
             eb.addField(wagon.getClothes() + " sets of clothing X 2", String.valueOf(wagon.getClothes() * 2), false);
             int tempSpareWagonPartsQuantity = 0;
-            int tempSpareWagonParts = 0;
             // TODO 50 for working wagon
             for (Part part : wagon.getSpareParts()) {
-                score += 2;
                 tempSpareWagonPartsQuantity++;
-                tempSpareWagonParts += 2;
             }
 
-            eb.addField(tempSpareWagonParts + " spare wagon parts X 2", String.valueOf(tempSpareWagonPartsQuantity * 2), false);
+            eb.addField(tempSpareWagonPartsQuantity + " spare wagon parts X 2", String.valueOf(tempSpareWagonPartsQuantity * 2), false);
+            score += tempSpareWagonPartsQuantity * 2;
             eb.addField("Final Bonus: " + score + " X " + owner.job.bonusMultipler, String.valueOf(score * owner.job.bonusMultipler), false);
             score *= owner.job.bonusMultipler;
             eb.setTitle("Score: " + score);
