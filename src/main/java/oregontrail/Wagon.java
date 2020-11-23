@@ -160,24 +160,30 @@ public class Wagon {
         }
     }
 
+
     /**
-     * Progress a day in elapsed days. Decrease food and calculate health.
+     * Progress a day in elapsed days. Decrease food and calculate health. Returns true if an event occurred
+     * @param game
+     * @param traveled
+     * @return
      */
-    public void nextDay(OregonTrailGame game, boolean traveled) {
+    public boolean nextDay(OregonTrailGame game, boolean traveled) {
         game.daysElapsed++;
         if (traveled) game.distanceTraveled += pace * SPEED;
         consumeFood(game.rations);
-        calculateHealth(traveled);
+        return calculateHealth(traveled);
     }
 
     /**
-     * Decrease players health based on factors - food, pace, weather, diseases, and random events
+     * Decrease players health based on factors - food, pace, and diseases
      */
-    private void calculateHealth(boolean traveled) {
+    private boolean calculateHealth(boolean traveled) {
         //Local variables used on exponential function
         double A = 0.9;
         double B = 1.132;
         double C = 0.5;
+
+        boolean specialEvent = false;
 
         for (OregonTrailPlayer member : party) {
             if (!member.isAlive()) continue;
@@ -242,11 +248,17 @@ public class Wagon {
                             OregonTrailPlayer other = eligibleMembers.get(rand);
                             other.becomeSick(disease);
                             event.getChannel().sendMessage(member.name + " has spread " + disease.name + " to " + other.name).queue();
+                            specialEvent = true;
                         }
                     }
                 }
             }
+
+            // If member just died
+            if (!member.isAlive()) specialEvent = true;
         }
+
+        return specialEvent;
     }
 
     /**

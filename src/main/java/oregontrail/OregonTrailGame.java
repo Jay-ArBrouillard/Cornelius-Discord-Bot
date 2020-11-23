@@ -55,9 +55,9 @@ public class OregonTrailGame {
                     if (split.length >= 2 && split[1] != null && CorneliusUtils.isNumeric(split[1])) {
                         int days = Integer.parseInt(split[1]);
                         for (int i = 0; i < days; i++) {
-                            boolean event = generateRandomEvents();
-                            wagon.nextDay(this, true);
-                            if (event) break;
+                            boolean event1 = generateRandomEvents();
+                            boolean event2 = wagon.nextDay(this, true);
+                            if (event1 || event2) break;
                         }
                     }
                     else {
@@ -72,15 +72,15 @@ public class OregonTrailGame {
                     if (split.length >= 2 && split[1] != null && CorneliusUtils.isNumeric(split[1])) {
                         int days = Integer.parseInt(split[1]);
                         for (int i = 0; i < days; i++) {
-                            boolean event = generateRandomEvents();
                             rest();
-                            wagon.nextDay(this, false);
-                            if (event) break;
+                            boolean event1 = generateRandomEvents();
+                            boolean event2 = wagon.nextDay(this, false);
+                            if (event1 || event2) break;
                         }
                     }
                     else {
-                        generateRandomEvents();
                         rest();
+                        generateRandomEvents();
                         wagon.nextDay(this, false);
                     }
                     break;
