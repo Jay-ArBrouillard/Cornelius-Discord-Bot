@@ -119,7 +119,7 @@ public class OregonTrailCommand {
                         event.getChannel().sendMessage(generalStoreEB.build()).queue();
                     }
                     else {
-                        event.getChannel().sendMessage("Starting new game of **Oregon Trail**! Travel 2000 miles to win.\nIf all of your party dies, then you lose.\nIf your wagon is unable to move due to a broken part and you do not have the spare part or all of your oxen die, then you will also lose.").queue();
+                        event.getChannel().sendMessage("Starting new game of **Oregon Trail**! Travel " + oregonTrailGame.END_DISTANCE + " miles to win.\nIf all of your party dies, then you lose.\nIf your wagon is unable to move due to a broken part and you do not have the spare part or all of your oxen die, then you will also lose.").queue();
                         otGameState = MAIN;
                         oregonTrailGame.update();
                     }

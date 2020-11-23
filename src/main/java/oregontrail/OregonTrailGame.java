@@ -24,6 +24,8 @@ import static oregontrail.OTGameStatus.*;
 
 public class OregonTrailGame {
 
+    public final int END_DISTANCE = 1000; //Miles
+
     public OregonTrailPlayer owner;
     public Wagon wagon;
     public GeneralStore store;
@@ -146,16 +148,50 @@ public class OregonTrailGame {
                 event.getChannel().sendMessage("1 " + item + " has been stolen from you.").queue();
             }
         }
-        else if (rand < 12)
-            ; //Attacked
-        else if (rand < 17)
-            ; // Came across farmer who gives you food
-        else if (rand < 18)
-            ; // Came across abandoned
-        else if (rand < 20)
-            ;// Oxen Weak (Pace halved)
-        else if (rand < 22)
-            ;// Random Party member recovery (health XOR sickness)
+        else if (rand < 12) {
+            // Attacked
+            event.getChannel().sendMessage("Raiders invaded your camp during the night!").queue();
+            for (OregonTrailPlayer player : wagon.getParty()) {
+                double wounded = CorneliusUtils.randomNumber01();
+                if (wounded <= 0.33) {
+                    int damage = CorneliusUtils.randomIntBetween(0, player.health);
+                    wagon.decreaseHealth(player, damage);
+                    event.getChannel().sendMessage(player.name + " suffered -" + damage + " damage").queue();
+                }
+            }
+        }
+        else if (rand < 17) {
+            // Came across a farmer
+            int gainedFood = CorneliusUtils.randomIntBetween(0, 25) + 25;
+            wagon.setFood(wagon.getFood() + gainedFood);
+            event.getChannel().sendMessage("You came across a generour farmer and are gifted " + Integer.valueOf(gainedFood) + "lbs of food!").queue();
+        }
+        else if (rand < 18) {
+            // Came across abandoned wagon
+            wagon.getSpareParts().add(new Axle());
+            wagon.getSpareParts().add(new Tongue());
+            wagon.getSpareParts().add(new Wheel());
+            event.getChannel().sendMessage("You find an abandoned wagon and gather the parts from the wagon.\n You've gained:\n1 Wheel\n1 Axle\n1 Tongue.").queue();
+        }
+        else if (rand < 20) {
+            // Random Party member recovery (health XOR sickness)
+            List<OregonTrailPlayer> allMembers = wagon.getParty();
+            int r = CorneliusUtils.randomIntBetween(0, allMembers.size()-1);
+            OregonTrailPlayer selected = allMembers.get(r);
+            boolean wasAlive = selected.isAlive();
+            boolean hadIllnesses = selected.getIllnesses().size() > 0;
+            int previousHp = selected.health;
+            wagon.recoverMember(selected);
+            if (!wasAlive && selected.isAlive()) {
+                event.getChannel().sendMessage("By a miracle of god, " + selected.name + ", was brought back to life!").queue();
+            }
+            else if (hadIllnesses && selected.getIllnesses().size() == 0) {
+                event.getChannel().sendMessage(selected.name + " ate some dino vitamins last night and recovered from all illnesses").queue();
+            }
+            else {
+                event.getChannel().sendMessage(selected.name + " had extremely good sleep last night +" + (selected.health - previousHp) + " health").queue();
+            }
+        }
         else
             ;// Storm lose days
 
@@ -182,7 +218,7 @@ public class OregonTrailGame {
         }
 
         // WIN
-        if (distanceTraveled >= 2000) {
+        if (distanceTraveled >= END_DISTANCE) {
             //Formula for score
             EmbedBuilder eb = new EmbedBuilder();
             eb.setImage("https://lh3.googleusercontent.com/pw/ACtC-3cV-AT_mz5aa2SckZ4h4efAzepBYf8aPJTcgY2e5sXAAmUpco74KzW1jZiGFpDlERK914sZPVLyfAzDG3n2YTnOeNd7ExFs76hQg1vScdciZXqlDe24BtF7Bp7ppBGDpVfA5oqmbBzD-AcviVTeVcg=w800-h474-no?authuser=1");
@@ -484,7 +520,7 @@ public class OregonTrailGame {
             result = ImageIO.read(new File("src/main/java/oregontrail/assets/mountains.png"));
             g = result.getGraphics();
 
-            double percentage = distanceTraveled / 2000.0;
+            double percentage = END_DISTANCE / 2000.0;
             int x = (int)Math.round(1800.0 - (percentage * 1800.0));
             //Overlay wagon
             BufferedImage piece = ImageIO.read(new File("src/main/java/oregontrail/assets/wagon.png"));

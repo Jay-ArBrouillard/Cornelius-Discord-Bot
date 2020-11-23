@@ -253,7 +253,7 @@ public class Wagon {
      * @param member
      * @param value
      */
-    private void decreaseHealth(OregonTrailPlayer member, int value) {
+    public void decreaseHealth(OregonTrailPlayer member, int value) {
         int health = member.health;
         if ((health - value) > 0) {
             member.health -= value;
@@ -431,5 +431,27 @@ public class Wagon {
                 ret++;
         }
         return ret;
+    }
+
+    /**
+     * Given a player, will bring them back to life with 50 health, or cure all illnesses, or heal a random value between 1 and 50
+     * @param player
+     */
+    public void recoverMember(OregonTrailPlayer player) {
+        if (!player.isAlive()) {
+            player.sustenance.clear();
+            player.getIllnesses().clear();
+            player.health = 50;
+        }
+        else { // Player is alive
+            if (player.getIllnesses().size() > 0) {
+                // Heal all their illnesses
+                player.getIllnesses().clear();
+            }
+            else { // Has no illnesses
+                // Increase their health
+                player.health += CorneliusUtils.randomIntBetween(1, 50);
+            }
+        }
     }
 }
