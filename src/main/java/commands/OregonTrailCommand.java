@@ -165,7 +165,8 @@ public class OregonTrailCommand {
         optionsBuilder.append("4. Hunt\n");
         optionsBuilder.append("5. Change Pace (Provide value between `1-24` usage: `5 12.5`)\n");
         optionsBuilder.append("6. Change Rations (Valid options: `Filling`, `Meager`, or `Starving` usage: `6 Meager`)\n");
-        optionsBuilder.append("7. Exit Game");
+        optionsBuilder.append("7. Kill Member (Provide name of member usage: `7 Wild Bill`)\n");
+        optionsBuilder.append("8. Exit Game");
         return optionsBuilder.toString();
     }
 

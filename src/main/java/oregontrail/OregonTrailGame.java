@@ -48,7 +48,7 @@ public class OregonTrailGame {
             return INVALID_INPUT;
         }
         optionNumber = optionNumber.trim();
-        String[] split =  optionNumber.split(" ");
+        String[] split = optionNumber.split(" ");
         if (CorneliusUtils.isNumeric(split[0])) {
             switch (split[0]) {
                 case "1": //Continue traveling
@@ -105,7 +105,20 @@ public class OregonTrailGame {
                         }
                     }
                     return INVALID_INPUT;
-                case "7": //Exit game
+                case "7": //Kill Member
+                    if (split.length >= 2) {
+                        String nameToKill = optionNumber.substring(optionNumber.indexOf(" ") + 1);
+                        nameToKill = nameToKill.trim();
+                        for (OregonTrailPlayer player : wagon.getParty()) {
+                            if (nameToKill.equalsIgnoreCase(player.name)) {
+                                player.kill();
+                                event.getChannel().sendMessage("You killed " + player.name + ". Why bro? Did he really deserve that?").queue();
+                                return RUNNING;
+                            }
+                        }
+                    }
+                    return INVALID_INPUT;
+                case "8": //Exit game
                     return QUIT;
             }
         }
