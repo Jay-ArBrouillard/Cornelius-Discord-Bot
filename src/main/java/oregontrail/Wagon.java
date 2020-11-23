@@ -1,12 +1,15 @@
 package oregontrail;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import oregontrail.enums.DiseaseEnum;
 import oregontrail.enums.RationsEnum;
 import utils.CorneliusUtils;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 public class Wagon {
 
@@ -255,7 +258,31 @@ public class Wagon {
             }
 
             // If member just died
-            if (!member.isAlive()) specialEvent = true;
+            if (!member.isAlive()) {
+                if (member.getIllnesses().size() > 0) {
+                    int rand = CorneliusUtils.randomIntBetween(0, member.getIllnesses().size()-1);
+                    DiseaseEnum selectedDisease = member.getIllnesses().get(rand);
+                    EmbedBuilder diseaseDeath = new EmbedBuilder();
+                    diseaseDeath.setColor(Color.GREEN);
+                    if (DiseaseEnum.CHOLERA.name.equals(selectedDisease.name)) {
+                        diseaseDeath.setImage("https://lh3.googleusercontent.com/pw/ACtC-3dAe-WEOmwOWsnJXfhQIr2_OdbkPgv9yzpkB7-GIkD6uMOMsaRvbVQNHp8cXNmeUztXbImmTNCab7nuu0BlpFZMCul54Zh4-8kpLwUQs7irtrya4DX5qUtbAMX1orHrG_2Sl8WziGbFZ4JqnpL8qhA=w300-h207-no?authuser=1");
+                    }
+                    else if (DiseaseEnum.DYSENTERY.name.equals(selectedDisease.name)) {
+                        diseaseDeath.setImage("https://lh3.googleusercontent.com/pw/ACtC-3ezpwOJhpkZddW3K98ksrVbaooEgeGsVGDPZc_7Amo3wYng3GCWHVr4p-Quu5ujgA2aTEWyNxqWGVDBZ8DYj3l_5ysTiWFHQvXI8WlVVlCh0k9Q8USL96RuTtUYgjV5XTSINV3na5KtZnycHDaWdrU=w300-h207-no?authuser=1");
+                    }
+                    else if (DiseaseEnum.MEASLES.name.equals(selectedDisease.name)) {
+                        diseaseDeath.setImage("https://lh3.googleusercontent.com/pw/ACtC-3e0lhlKwNziL6o0eaYMjgoYyoDzTU5pVExLTTSCLgb95OSo7_IWOAMGtsduaXx54P9Wq9Y5AUjW7aJoSL053DjmifdnC3FsOBh2KJJEWiOj0PODG3OF89l8fgY2hQlpQyjy4CM5PKCR8NBOySEsKuM=w300-h207-no?authuser=1");
+                    }
+                    else if (DiseaseEnum.TYPHOID.name.equals(selectedDisease.name)) {
+                        diseaseDeath.setImage("https://lh3.googleusercontent.com/pw/ACtC-3csGbPzpgKAe_TJgCgo-QDYavrUIzI8tlXOJYcwalZoKJecccNKUDpIK0V2H3yW1Ih6pgZRLMBIBx9XgrtSROTnAxM_yOeZBptEaEBqymoPd8ZXthIPokB7jPTfY9wBkKSzaWzhDRR8yz3erpt4MoY=w300-h207-no?authuser=1");
+                    }
+                    event.getChannel().sendMessage(diseaseDeath.build()).queue();
+                }
+                else {
+                    event.getChannel().sendMessage(member.name + " died an average death of inadequate living").queue();
+                }
+                specialEvent = true;
+            }
         }
 
         return specialEvent;
