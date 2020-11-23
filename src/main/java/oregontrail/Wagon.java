@@ -154,6 +154,7 @@ public class Wagon {
                         m.consume(0);
                     }
                 }
+                food = 0;
                 break;
             }
         }
