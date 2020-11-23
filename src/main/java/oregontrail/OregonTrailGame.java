@@ -158,7 +158,11 @@ public class OregonTrailGame {
         else if (rand < 7) {
             //Random party member death
             OregonTrailPlayer player = wagon.killRandomPartyMember();
-            event.getChannel().sendMessage(player.name + " has suddenly died").queue();
+            EmbedBuilder death = new EmbedBuilder();
+            death.setColor(Color.GREEN);
+            death.setImage("https://lh3.googleusercontent.com/pw/ACtC-3dvu4OzHzM7vWpPOpvxhpN1apWQlGppVsiuSQ7bDLbRgd6rL2jbR0aAxwDXA6zEQyEyqa_LBa4pPXz8aR7KeJoZfKcWJlAheGbmY9bwhZWrxopvzufaOD3ksDFponrXhSNtZrSigzT7TiBTH80z7U8=w300-h207-no?authuser=1");
+            death.setFooter("Noone knows what happened. But fuck that guy. -" + player.name);
+            event.getChannel().sendMessage(death.build()).queue();
             return true;
         }
         else if (rand < 8){
