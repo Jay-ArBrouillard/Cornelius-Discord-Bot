@@ -233,8 +233,20 @@ public class OregonTrailGame {
             }
             return true;
         }
-        else
-            ;// Storm lose days
+        else if (rand < 23) {
+            // Random player eats too much food
+            List<OregonTrailPlayer> livingMembers = wagon.getParty();
+            int r = CorneliusUtils.randomIntBetween(0, livingMembers.size()-1);
+            OregonTrailPlayer selected = livingMembers.get(r);
+            int foodEaten = CorneliusUtils.randomIntBetween(20, 200);
+            wagon.setFood(wagon.getFood() - foodEaten);
+            EmbedBuilder munchies = new EmbedBuilder();
+            munchies.setColor(Color.YELLOW);
+            munchies.setImage("https://lh3.googleusercontent.com/pw/ACtC-3ftTEk_a_9HdWzXpAsp6xPmjB64z0UzqVvyN8rpkUiGimG04UBZfrqItH8bnlXkbohz-jVWS-2BmslOuUcshvMXQYA_MTOmkquHyTSeRY3-DhoO1ZDa482w9h1c4QnzUIWAiRQTmfhGBXA8VE0mH5g=w760-h467-no?authuser=1");
+            munchies.setFooter(selected.name + " got stupid stoned the night before and ate a lot of food when their munchies kicked in.\nYou lose " + foodEaten + " lbs of food");
+            event.getChannel().sendMessage(munchies.build()).queue();
+            return true;
+        }
 
         return false;
     }
