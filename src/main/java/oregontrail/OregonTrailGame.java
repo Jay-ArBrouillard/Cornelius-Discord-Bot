@@ -291,12 +291,12 @@ public class OregonTrailGame {
             // 400 for each living member plus the value of their health
             int tempMemberScore = 0;
             for (OregonTrailPlayer member : wagon.getParty()) {
-                if (member.health > 0) {
+                if (member.isAlive()) {
                     tempMemberScore += 400 + member.health;
                 }
             }
 
-            eb.addField(wagon.getParty().size() + " survived X 400 + (their health) =", String.valueOf(tempMemberScore), false);
+            eb.addField(wagon.getLivingMembers().size() + " survived X 400 + (their health) =", String.valueOf(tempMemberScore), false);
             score += tempMemberScore;
             score += Math.round(wagon.getFood() / 25.0);
             eb.addField(wagon.getFood() + " pounds of food / 25", String.valueOf(Math.round(wagon.getFood() / 25.0)), false);

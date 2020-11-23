@@ -276,7 +276,7 @@ public class Wagon {
                     else if (DiseaseEnum.TYPHOID.name.equals(selectedDisease.name)) {
                         diseaseDeath.setImage("https://lh3.googleusercontent.com/pw/ACtC-3csGbPzpgKAe_TJgCgo-QDYavrUIzI8tlXOJYcwalZoKJecccNKUDpIK0V2H3yW1Ih6pgZRLMBIBx9XgrtSROTnAxM_yOeZBptEaEBqymoPd8ZXthIPokB7jPTfY9wBkKSzaWzhDRR8yz3erpt4MoY=w300-h207-no?authuser=1");
                     }
-                    diseaseDeath.setFooter("Told you I was sick");
+                    diseaseDeath.setFooter("R.I.P. -" + member.name);
                     event.getChannel().sendMessage(diseaseDeath.build()).queue();
                 }
                 else {
@@ -350,7 +350,7 @@ public class Wagon {
      * Returns all members in party that are alive
      * @return
      */
-    private List<OregonTrailPlayer> getLivingMembers() {
+    public List<OregonTrailPlayer> getLivingMembers() {
         List<OregonTrailPlayer> livingMembers = new ArrayList<>();
         for (OregonTrailPlayer p : party) {
             if (p.isAlive()) {

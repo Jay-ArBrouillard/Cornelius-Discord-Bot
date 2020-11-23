@@ -143,7 +143,6 @@ public class MattGeneralStore extends GeneralStore {
                 wagon.setAmmo(wagon.getAmmo() + (quantity * 20));
                 break;
             case "4":
-                //TODO THIS ISNT WORKING
                 setNumWagonWheelsAvailable(getNumWagonWheelsAvailable() - quantity);
                 price = getWheelPrice();
                 for (int i = 0; i < quantity; i++) wagon.getSpareParts().add(new Wheel());
