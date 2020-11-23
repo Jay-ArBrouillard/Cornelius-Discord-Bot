@@ -395,6 +395,7 @@ public class OregonTrailGame {
         int minHeal = owner.job instanceof Doctor ? 2 : 1;
         int maxHeal = 5;
         for (OregonTrailPlayer member : wagon.getParty()) {
+            if (!member.isAlive()) continue;
             //Random heal
             member.health += CorneliusUtils.randomIntBetween(minHeal, maxHeal);
 
