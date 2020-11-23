@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import utils.CorneliusUtils;
 import utils.EloRanking;
 
 import java.io.File;
@@ -54,7 +55,7 @@ public class ChessCommand {
     }
 
     public static void execute(MessageReceivedEvent event, String message) {
-        if (Arrays.asList(ChessConstants.QUIT).stream().anyMatch(x -> x.equals(message))) {
+        if (Arrays.asList(CorneliusUtils.QUIT).stream().anyMatch(x -> x.equals(message))) {
             if (isMessageFromPlayer(event.getAuthor().getId())) {
                 state.setPlayerForfeit();
                 // If less than or equal to 2 full moves have been completed then game ends with no consequences

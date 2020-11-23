@@ -32,7 +32,7 @@ public class ChooseCommand {
     public static class Help {
         static String name = "!choose";
         static String description = "make a decision";
-        static String arguments = "<item> <item> ...";
+        static String arguments = "<oregontrail.item> <oregontrail.item> ...";
         static boolean guildOnly = false;
 
         public static String getName() {

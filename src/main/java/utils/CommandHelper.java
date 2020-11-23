@@ -20,7 +20,7 @@ public class CommandHelper extends ListenerAdapter {
         String message = event.getMessage().getContentRaw();
         MessageChannel mc = event.getChannel();
         if (event.getMessage().getAuthor().isBot()) return;
-        if (message.contains("!help")) {
+        if (message.startsWith("!help")) {
             StringBuilder help = new StringBuilder("**Cornelius** commands:\n");
             help.append("`").append(ChooseCommand.Help.getName()).append(" ")
                             .append(ChooseCommand.Help.getArguments()).append("`")
@@ -56,38 +56,41 @@ public class CommandHelper extends ListenerAdapter {
             mc.sendTyping().queue();
             mc.sendMessage(help.toString()).queue();
         }
-        else if (message.contains("!choose")) {
+        else if (message.startsWith("!choose")) {
             ChooseCommand.execute(event, message);
         }
-        else if (message.contains("!420")) {
+        else if (message.startsWith("!420")) {
             CopyPastaCommand.execute(event, message);
         }
-        else if (message.contains("!meme")) {
+        else if (message.startsWith("!meme")) {
             MemeCommand.execute(event);
         }
-        else if (message.contains("!generate")) {
+        else if (message.startsWith("!generate")) {
             NumberGeneratorCommand.execute(event, message);
         }
-        else if (message.contains("!poll")) {
+        else if (message.startsWith("!poll")) {
             PollCommand.execute(event, message);
         }
-        else if (message.contains("!server")) {
+        else if (message.startsWith("!server")) {
             ServerInfoCommand.execute(event);
         }
-        else if (message.contains("!user")) {
+        else if (message.startsWith("!user")) {
             UserInfoCommand.execute(event, message);
         }
-        else if (WumpusCommand.isRunning() || message.contains("!wumpus")) {
+        else if (WumpusCommand.isRunning() || message.startsWith("!wumpus")) {
             WumpusCommand.execute(event, message);
         }
-        else if (message.contains("!purge")) {
+        else if (message.startsWith("!purge")) {
             PurgeCommand.execute(event);
         }
-        else if (message.contains("!covid")) {
+        else if (message.startsWith("!covid")) {
             Covid19Command.execute(event, message);
         }
-        else if ((ChessCommand.isRunning() || message.contains("!chess")) && mc.getName().equals("chess")) {
+        else if ((ChessCommand.isRunning() || message.startsWith("!chess")) && mc.getName().equals("chess")) {
             ChessCommand.execute(event, message);
+        }
+        else if (message.startsWith("!oregontrail") || OregonTrailCommand.gameInProgress()) {
+            OregonTrailCommand.execute(event, message);
         }
     }
 }

@@ -15,7 +15,6 @@ public class ChessConstants {
     public static final String SHOW_ALL_LEGAL_MOVES_FOR_TILE = "show_all_legal_moves_for_tile";
     public static final String SUCCESSFUL_MOVE = "successful_move";
     public static final String WAITING_ACCEPT_CHALLENGE = "waiting_accept_challenge";
-    public static final String[] QUIT = {"q", "Q", "quit", "QUIT"};
 
     public static final String GAME_BOARD_IMAGE_LOCATION = "src/main/java/chess/gameState.png";
 }
