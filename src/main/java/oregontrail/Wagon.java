@@ -238,11 +238,11 @@ public class Wagon {
                     decreaseHealth(member, disease.sicknessPenalty);
                     double infectOther = CorneliusUtils.randomNumber01();
                     // Spread disease to other members
-                    if (infectOther < disease.infectionRate) {
+                    if (infectOther <= disease.infectionRate) {
                         // Find members that don't have this disease
                         List<OregonTrailPlayer> eligibleMembers = new ArrayList<>();
                         for (OregonTrailPlayer player : party) {
-                            if (player.getIllnesses().stream().anyMatch(d -> disease.name.equals(d))) {
+                            if (player.getIllnesses().stream().anyMatch(d -> !disease.name.equals(d))) {
                                 eligibleMembers.add(player);
                             }
                         }
