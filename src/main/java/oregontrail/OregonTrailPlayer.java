@@ -75,10 +75,14 @@ public class OregonTrailPlayer {
         }
     }
 
-    public void becomeSick() {
+    public boolean becomeSick() {
         DiseaseEnum[] allDiseases = DiseaseEnum.class.getEnumConstants();
         int rand = CorneliusUtils.randomIntBetween(0, allDiseases.length-1);
+        if (this.illnesses.contains(allDiseases[rand])) {
+            return false;
+        }
         this.illnesses.add(allDiseases[rand]);
+        return true;
     }
 
     public void becomeSick(DiseaseEnum disease) {

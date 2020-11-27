@@ -25,4 +25,17 @@ public class CorneliusUtils {
     public static int randomIntBetween(int min, int max) {
         return ThreadLocalRandom.current().nextInt(min, max + 1);
     }
+
+    public static double randomDoubleBetween(final int lowerBound,
+                                             final int upperBound,
+                                             final int decimalPlaces){
+
+        if(lowerBound < 0 || upperBound <= lowerBound || decimalPlaces < 0){
+            throw new IllegalArgumentException("randomDoubleBetween - Error invalid format");
+        }
+
+        return ThreadLocalRandom.current().nextDouble()
+                        * (upperBound - lowerBound)
+                        + lowerBound;
+    }
 }

@@ -3,6 +3,9 @@ package commands;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import oregontrail.*;
+import oregontrail.location.Location;
+import oregontrail.store.KearneyGeneralStore;
+import oregontrail.store.MattGeneralStore;
 import utils.CorneliusUtils;
 
 import java.awt.*;
@@ -26,11 +29,16 @@ public class OregonTrailCommand {
         String menuOptions;
         switch (otGameState) {
             case MENU:
+                oregonTrailGame = new OregonTrailGame(event);
                 EmbedBuilder titleEB = new EmbedBuilder();
                 titleEB.setColor(Color.CYAN);
-                titleEB.setDescription("Oregon Trail v1.0 alpha");
+                titleEB.setDescription("Oregon Trail v2.0 alpha");
                 titleEB.setImage("https://lh3.googleusercontent.com/pw/ACtC-3dDFtFhShqsAbNM_yksXXIAjWv0wvkA4MLh0gU_8CGQVsB838MNFvIloYPKP8a0Pchu9h7jp7fgjRF3VD_3-MFjdbkl8ZG2UJhqIBGJCVLBAlyz82XX_Xlb5PLO0MzxaPMPev5Y0sGZggKMsjOziZ4=w1737-h937-no?authuser=1");
-                titleEB.setFooter("Developed by Jay-Ar - https://github.com/Jay-ArBrouillard/Cornelius-Discord-Bot");
+                titleEB.setFooter("Objective: Travel " + (int)oregonTrailGame.END_DISTANCE + " miles to win.\n" +
+                        "If all of your party dies, then you lose.\n" +
+                        "If your wagon is unable to move due to a broken part and you do not have the spare part, then you will also lose.\n" +
+                        "If all your oxen die, then you will also lose.\n" +
+                        "Developed by Jay-Ar - https://github.com/Jay-ArBrouillard/Cornelius-Discord-Bot");
                 event.getChannel().sendMessage(titleEB.build()).queue();
 
                 menuOptions = "You may:\n" +
@@ -39,13 +47,17 @@ public class OregonTrailCommand {
                         "\t3. See the rules (Not working)\n" +
                         "\t4. Exit";
                 event.getChannel().sendMessage(menuOptions).queue();
-                oregonTrailGame = new OregonTrailGame(event);
                 otGameState = START_GAME;
                 break;
             case MAIN:
                 otGameStatus = oregonTrailGame.play(message);
                 if (RUNNING.equals(otGameStatus)) {
-                    oregonTrailGame.update();
+                    Location landMark = oregonTrailGame.checkLandMarks();
+                    if (landMark != null) {
+                        otGameState = LANDMARK;
+                    } else {
+                        oregonTrailGame.update();
+                    }
                 }
                 else if (RULES.equals(otGameStatus)) {
                     //TODO
@@ -60,6 +72,20 @@ public class OregonTrailCommand {
                     event.getChannel().sendMessage("Rip. You lost!").queue();
                     endGame(event);
                 } else {
+                    event.getChannel().sendMessage("Invalid input: `" + message + "` - Please choose a valid option **(1-5)**").queue();
+                    event.getChannel().sendMessage(getOptionsString()).queue();
+                }
+                break;
+            case LANDMARK:
+                otGameStatus = oregonTrailGame.playLandMark(message);
+                if (RUNNING.equals(otGameStatus)) {
+                    oregonTrailGame.update();
+                    otGameState = MAIN;
+                } else if (STORE.equals(otGameStatus)) {
+                    otGameState = GENERAL_STORE;
+                }
+                else if (KEEP_STATE.equals(otGameStatus));
+                else {
                     event.getChannel().sendMessage("Invalid input: `" + message + "` - Please choose a valid option **(1-5)**").queue();
                     event.getChannel().sendMessage(getOptionsString()).queue();
                 }
@@ -88,16 +114,16 @@ public class OregonTrailCommand {
             case SELECT_OCCUPATION:
                 success = oregonTrailGame.setOccupation(message);
                 if (success) {
-                    otGameState = MATT_GENERAL_STORE;
-                    oregonTrailGame.initalizeMattGeneralStore();
+                    otGameState = GENERAL_STORE;
+                    oregonTrailGame.store = new MattGeneralStore(event);
                     EmbedBuilder generalStoreEB = new EmbedBuilder();
                     generalStoreEB.setColor(Color.RED);
-                    generalStoreEB.setImage("https://lh3.googleusercontent.com/pw/ACtC-3edocjH5N6m3-apQA9nLEfjI5D57kSMhal5qCeE8om5oKvjZQh0UJBnQJhYyj8pumHp6ekdLBpDShIC4sKXB3wXtbpYX0AviVDiiTAhrD26KG3Qeyr3yNre_kNaleUrelBVQ1LKNah904Trz9XN_W8=w669-h347-no?authuser=1");
+                    generalStoreEB.setImage(oregonTrailGame.store.getImageURL());
                     event.getChannel().sendMessage(generalStoreEB.build()).queue();
                     event.getChannel().sendMessage( oregonTrailGame.wagon.printInventory() + "\nWhich item and how many of that item would you like to buy ex: `1 2` or `7 2000`? Or type `leave` to leave store").queue();
                 }
                 break;
-            case MATT_GENERAL_STORE:
+            case GENERAL_STORE:
                 success = oregonTrailGame.store.canBuy(message, oregonTrailGame.wagon.getCash());
                 if (success) {
                     oregonTrailGame.store.buy(message, oregonTrailGame.wagon);
@@ -107,7 +133,7 @@ public class OregonTrailCommand {
                     event.getChannel().sendMessage("`" + message + "` is not a valid store option. Please enter **(1-7)** to buy an item or **leave** to leave store").queue();
                     EmbedBuilder generalStoreEB = new EmbedBuilder();
                     generalStoreEB.setColor(Color.RED);
-                    generalStoreEB.setImage("https://lh3.googleusercontent.com/pw/ACtC-3edocjH5N6m3-apQA9nLEfjI5D57kSMhal5qCeE8om5oKvjZQh0UJBnQJhYyj8pumHp6ekdLBpDShIC4sKXB3wXtbpYX0AviVDiiTAhrD26KG3Qeyr3yNre_kNaleUrelBVQ1LKNah904Trz9XN_W8=w669-h347-no?authuser=1");
+                    generalStoreEB.setImage(oregonTrailGame.store.getImageURL());
                     event.getChannel().sendMessage(generalStoreEB.build()).queue();
                 }
                 if (message.startsWith("leave")) {
@@ -115,11 +141,10 @@ public class OregonTrailCommand {
                         event.getChannel().sendMessage("You need atleast 1 oxen before beginning your travel...").queue();
                         EmbedBuilder generalStoreEB = new EmbedBuilder();
                         generalStoreEB.setColor(Color.RED);
-                        generalStoreEB.setImage("https://lh3.googleusercontent.com/pw/ACtC-3edocjH5N6m3-apQA9nLEfjI5D57kSMhal5qCeE8om5oKvjZQh0UJBnQJhYyj8pumHp6ekdLBpDShIC4sKXB3wXtbpYX0AviVDiiTAhrD26KG3Qeyr3yNre_kNaleUrelBVQ1LKNah904Trz9XN_W8=w669-h347-no?authuser=1");
+                        generalStoreEB.setImage(oregonTrailGame.store.getImageURL());
                         event.getChannel().sendMessage(generalStoreEB.build()).queue();
                     }
                     else {
-                        event.getChannel().sendMessage("Starting new game of **Oregon Trail**! Travel " + oregonTrailGame.END_DISTANCE + " miles to win.\nIf all of your party dies, then you lose.\nIf your wagon is unable to move due to a broken part and you do not have the spare part or all of your oxen die, then you will also lose.").queue();
                         otGameState = MAIN;
                         oregonTrailGame.update();
                     }
@@ -159,7 +184,7 @@ public class OregonTrailCommand {
 
     public static String getOptionsString() {
         StringBuilder optionsBuilder = new StringBuilder();
-        optionsBuilder.append("1. Travel (Optionally provide number of days to travel usage: `1 5`)\n");
+        optionsBuilder.append("1. Travel (Optionally provide number of days to travel (automatically stops at significant events) usage: `1` or `1 5`)\n");
         optionsBuilder.append("2. Show Inventory\n");
         optionsBuilder.append("3. Rest (Optionally provide number of days to rest usage: `3 10`)\n");
         optionsBuilder.append("4. Hunt\n");

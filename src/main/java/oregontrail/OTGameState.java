@@ -7,5 +7,6 @@ public enum OTGameState {
     RESUME_GAME,
     SEE_RULES,
     SELECT_OCCUPATION,
-    MATT_GENERAL_STORE,
+    GENERAL_STORE,
+    LANDMARK
 }

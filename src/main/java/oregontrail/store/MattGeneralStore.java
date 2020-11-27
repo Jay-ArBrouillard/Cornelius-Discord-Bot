@@ -8,7 +8,6 @@ import oregontrail.Wheel;
 import utils.CorneliusUtils;
 
 public class MattGeneralStore extends GeneralStore {
-
     private MessageReceivedEvent event;
 
     public MattGeneralStore(MessageReceivedEvent event) {
@@ -28,6 +27,8 @@ public class MattGeneralStore extends GeneralStore {
         setNumWagonTonguesAvailable(3);
         setNumWagonWheelsAvailable(3);
         setNumFoodAvailable(2000);
+
+        setImageURL("https://lh3.googleusercontent.com/pw/ACtC-3edocjH5N6m3-apQA9nLEfjI5D57kSMhal5qCeE8om5oKvjZQh0UJBnQJhYyj8pumHp6ekdLBpDShIC4sKXB3wXtbpYX0AviVDiiTAhrD26KG3Qeyr3yNre_kNaleUrelBVQ1LKNah904Trz9XN_W8=w669-h347-no?authuser=1");
     }
 
     @Override

@@ -15,4 +15,9 @@ public enum DiseaseEnum {
         this.infectionRate = infectionRate;
         this.sicknessPenalty = sicknessPenalty;
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

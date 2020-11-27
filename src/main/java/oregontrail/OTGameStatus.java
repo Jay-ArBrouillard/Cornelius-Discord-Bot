@@ -7,7 +7,9 @@ public enum OTGameStatus {
     QUIT("QUIT"),
     WIN("WIN"),
     LOSE("LOSE"),
-    INVALID_INPUT("INVALID_INPUT");
+    INVALID_INPUT("INVALID_INPUT"),
+    KEEP_STATE("KEEP_STATE"),
+    STORE("STORE");
 
     public final String label;
 

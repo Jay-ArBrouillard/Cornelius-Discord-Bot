@@ -4,9 +4,9 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import oregontrail.enums.DiseaseEnum;
 import oregontrail.enums.RationsEnum;
+import oregontrail.location.*;
 import oregontrail.occupation.*;
-import oregontrail.store.GeneralStore;
-import oregontrail.store.MattGeneralStore;
+import oregontrail.store.*;
 import utils.CorneliusUtils;
 
 import javax.imageio.ImageIO;
@@ -34,6 +34,8 @@ public class OregonTrailGame {
     public RationsEnum rations = RationsEnum.FILLING;
     public int score = 0;
     private boolean rest = false; //Did you rest this turn
+    public Queue<Location> landMarks;
+    public Location currentLocation;
 
     private MessageReceivedEvent event;
     private static DecimalFormat formatPercent = new DecimalFormat("##0.##");
@@ -42,6 +44,12 @@ public class OregonTrailGame {
         this.event = event;
         owner = new OregonTrailPlayer(event.getAuthor().getId(), event.getAuthor().getName());
         wagon = new Wagon(owner, event);
+        landMarks = new LinkedList<>();
+        landMarks.add(new KansasRiverCrossing(102));
+        landMarks.add(new BigBlueRiverCrossing(185));
+        landMarks.add(new FortKearney(304));
+        landMarks.add(new FortLaramie(640));
+        landMarks.add(new SouthPass(932));
     }
 
     public OTGameStatus play(String optionNumber) {
@@ -58,13 +66,13 @@ public class OregonTrailGame {
                         int days = Integer.parseInt(split[1]);
                         for (int i = 0; i < days; i++) {
                             boolean event1 = generateRandomEvents();
-                            boolean event2 = wagon.nextDay(this, true);
+                            boolean event2 = wagon.nextDay(this, true, false);
                             if (event1 || event2 || isGameOver()) break;
                         }
                     }
                     else {
                         generateRandomEvents();
-                        wagon.nextDay(this, true);
+                        wagon.nextDay(this, true, false);
                     }
                     break;
                 case "2": //Show inventory
@@ -76,21 +84,21 @@ public class OregonTrailGame {
                         for (int i = 0; i < days; i++) {
                             rest();
                             boolean event1 = generateRandomEvents();
-                            boolean event2 = wagon.nextDay(this, false);
+                            boolean event2 = wagon.nextDay(this, false, false);
                             if (event1 || event2 || isGameOver()) break;
                         }
                     }
                     else {
                         rest();
                         generateRandomEvents();
-                        wagon.nextDay(this, false);
+                        wagon.nextDay(this, false, false);
                     }
                     rest = true;
                     break;
                 case "4": //Hunt
                     hunt();
                     generateRandomEvents();
-                    wagon.nextDay(this, false);
+                    wagon.nextDay(this, false, false);
                     break;
                 case "5": //Change pace
                     if (split.length >= 2) {
@@ -139,12 +147,19 @@ public class OregonTrailGame {
         return gameOver();
     }
 
+    /**
+     * Return true for potentially game ending events such as illness, sudden death, oxen death, etc.
+     * @return
+     */
     private boolean generateRandomEvents() {
-        int rand = CorneliusUtils.randomIntBetween(0, 100);
+        int rand = CorneliusUtils.randomIntBetween(0, 102);
         if (rand < 4) { // Catch Sickness
             OregonTrailPlayer player = wagon.giveRandomSickness();
-            event.getChannel().sendMessage(player.name + " has been diagnosed with " + player.getSickness()).queue();
-            return true;
+            if (player != null) {
+                event.getChannel().sendMessage("`"+ player.name + "` has been diagnosed with **" + player.getIllnesses().get(player.getIllnesses().size()-1) + "**!").queue();
+                return true;
+            }
+            return false;
         }
         else if (rand < 6) { // Random Part Breakdown
             Part part = wagon.breakPart();
@@ -175,7 +190,7 @@ public class OregonTrailGame {
                 wagon.setOxen(wagon.getOxen() - 1);
                 event.getChannel().sendMessage("1 of your oxen suddenly died!").queue();
             }
-            return true;
+            return false;
         }
         else if (rand < 11) {
             // Theft
@@ -183,7 +198,7 @@ public class OregonTrailGame {
             if (item != null) {
                 event.getChannel().sendMessage("1 " + item + " has been stolen from you.").queue();
             }
-            return true;
+            return false;
         }
         else if (rand < 12) {
             // Attacked
@@ -194,24 +209,40 @@ public class OregonTrailGame {
                     int damage = CorneliusUtils.randomIntBetween(0, player.health);
                     wagon.decreaseHealth(player, damage);
                     event.getChannel().sendMessage(player.name + " suffered -" + damage + " damage").queue();
+                    if (!player.isAlive()) {
+                        return true;
+                    }
                 }
             }
-            return true;
+            return false;
         }
         else if (rand < 17) {
             // Came across a farmer
             int gainedFood = CorneliusUtils.randomIntBetween(0, 25) + 25;
             wagon.setFood(wagon.getFood() + gainedFood);
             event.getChannel().sendMessage("You came across a generous farmer and are gifted " + Integer.valueOf(gainedFood) + "lbs of food!").queue();
-            return true;
+            return false;
         }
         else if (rand < 19) {
             // Came across abandoned wagon
-            wagon.getSpareParts().add(new Axle());
-            wagon.getSpareParts().add(new Tongue());
-            wagon.getSpareParts().add(new Wheel());
-            event.getChannel().sendMessage("You find an abandoned wagon and gather the parts from the wagon.\n You've gained:\n1 Wheel\n1 Axle\n1 Tongue.").queue();
-            return true;
+            if (wagon.getSpareParts().size() < 9) {
+                int axleCount = wagon.countAxles();
+                int tongueCount = wagon.countTongues();
+                int wheelCount = wagon.countWheels();
+                if (axleCount < 3) {
+                    wagon.getSpareParts().add(new Axle());
+                    event.getChannel().sendMessage("You find an abandoned wagon and gather the parts from the wagon.\n You've gained:\n1 Axle").queue();
+                }
+                else if (tongueCount < 3) {
+                    wagon.getSpareParts().add(new Tongue());
+                    event.getChannel().sendMessage("You find an abandoned wagon and gather the parts from the wagon.\n You've gained:\n1 Tongue.").queue();
+                }
+                else if (wheelCount < 3) {
+                    wagon.getSpareParts().add(new Wheel());
+                    event.getChannel().sendMessage("You find an abandoned wagon and gather the parts from the wagon.\n You've gained:\n1 Wheel.").queue();
+                }
+            }
+            return false;
         }
         else if (rand < 20) {
             // Random Party member recovery (death, health, or sickness)
@@ -231,7 +262,7 @@ public class OregonTrailGame {
             else {
                 event.getChannel().sendMessage(selected.name + " had extremely good sleep last night +" + (selected.health - previousHp) + " health").queue();
             }
-            return true;
+            return false;
         }
         else if (rand < 23) {
             // Random player eats too much food
@@ -245,7 +276,10 @@ public class OregonTrailGame {
             munchies.setImage("https://lh3.googleusercontent.com/pw/ACtC-3ftTEk_a_9HdWzXpAsp6xPmjB64z0UzqVvyN8rpkUiGimG04UBZfrqItH8bnlXkbohz-jVWS-2BmslOuUcshvMXQYA_MTOmkquHyTSeRY3-DhoO1ZDa482w9h1c4QnzUIWAiRQTmfhGBXA8VE0mH5g=w760-h467-no?authuser=1");
             munchies.setFooter(selected.name + " got stupid stoned the night before and ate a lot of food when their munchies kicked in.\nYou lose " + foodEaten + " lbs of food");
             event.getChannel().sendMessage(munchies.build()).queue();
-            return true;
+            return false;
+        }
+        else if (rand < 25) {
+            //Wrong trail lose days
         }
 
         return false;
@@ -587,10 +621,6 @@ public class OregonTrailGame {
         return false;
     }
 
-    public void initalizeMattGeneralStore() {
-        store = new MattGeneralStore(event);
-    }
-
     public void buildProgressImage() {
         //Begin with mountains as background
         BufferedImage result = null;
@@ -625,6 +655,9 @@ public class OregonTrailGame {
         eb.setTitle("Team Conditions:");
         eb.addField("Days Elapsed: ", String.valueOf(daysElapsed), true);
         eb.addField("Distance Traveled: ", String.valueOf(distanceTraveled), true);
+        if (landMarks.size() > 0) { //TODO WE MAY NOT NEED THIS IF WE ADD WILLIAMETTE VALLEY AS A LANDMARK
+            eb.addField("Next Landmark: ", String.valueOf(landMarks.peek().getDistance() - distanceTraveled), true);
+        }
         eb.addField("Pace: ", wagon.getPace() + " hours / day", true);
         eb.addField("Rations: ", String.format("%s (%d food per person / day)", rations.name, rations.quantity), true);
         for (OregonTrailPlayer player : wagon.getParty()) {
@@ -659,5 +692,259 @@ public class OregonTrailGame {
         }
         printTeamConditions();
         event.getChannel().sendMessage(getOptionsString()).queue();
+    }
+
+    /**
+     * Return true if we reached the next landmark
+     * @return
+     */
+    public Location checkLandMarks() {
+        Location location = landMarks.peek();
+        if (landMarks.size() == 0) return null;
+        if (distanceTraveled >= location.getDistance()) {
+            distanceTraveled = location.getDistance(); //Once we reach landmark set distance traveled to it
+            currentLocation = location;
+            if (location.toString().contains("River")){
+                EmbedBuilder locationEB = new EmbedBuilder();
+                locationEB.setTitle("You made it to the " + location.toString() + " (day " + daysElapsed + ")");
+                if (location.toString().contains("Big Blue River")) {
+                    locationEB.setImage("https://lh3.googleusercontent.com/pw/ACtC-3cGXBWmS8C29s2d-x-rZNY5670LKA1Wq66zdVxmKF7KLJJJOO4L7KuSv02kitVMLvbIF1HzOGD1KLXyojS5BvY5IsXA-S5XIQXynhhmwyVtvNkOgyiZRxSyEBAEvE1ZH_AL_Q_ouK7UeJbjkmHcGFkp=w470-h180-no?authuser=1");
+                }
+                else if (location.toString().contains("Kansas River")) {
+                    locationEB.setImage("https://lh3.googleusercontent.com/pw/ACtC-3dJ-1a23u2dwPqv3QjUpVf090Acey7reK7dCB3-_KQ8QA00_I1MT0e86I-Lh0dZFy-4rXMN_-3fcq_o6mZw5EheKr5PVDBCax-cqv_8SyZpfAFkTfJo0MUCgNPRg87U8ko9pL2K34Mryz4hkTmw2plE=w644-h325-no?authuser=1");
+                }
+                else if (location.toString().contains("Green River")) {
+                    locationEB.setImage("https://lh3.googleusercontent.com/pw/ACtC-3d_0F8kDaTDoc2aJgYqdxfZP96O_F0nvhrlSEK-MpZta-dw4ropT5GF9ZYqTqOzZYh6fcb_HRf8QwtcicuOtqHmN612dOxn6xSPVkslosY_O68GT8rsy8Ed6FkLE_QggyFppSt4ffwCKepLH3prul1X=w699-h370-no?authuser=1");
+                }
+                else if (location.toString().contains("Snake River")) {
+                    locationEB.setImage("https://lh3.googleusercontent.com/pw/ACtC-3cJ3Dsq0DCTM7riV68Uxc9YNJxU5wzj-i3s7FodmoAxCbtaakBurRMDfmRHCg8KT5GqmdIEyR0_u3-v9V4GMMfZKQcZN7v7oRYfamccVsvEdiqu-ZygI772qxkknUW1-_ftak_cz7rY_Xgw_kn1PdgC=w640-h402-no?authuser=1");
+                }
+                locationEB.setFooter(location.getDescription());
+                event.getChannel().sendMessage(locationEB.build()).queue();
+                if (location.toString().contains("Snake River")) {
+                    event.getChannel().sendMessage(((SnakeRiverCrossing)location).getSnakeRiverOptions()).queue();
+                }
+                else {
+                    event.getChannel().sendMessage(location.getRiverOptions()).queue();
+                }
+            }
+            else if (location.toString().contains("Fort")) {
+                EmbedBuilder locationEB = new EmbedBuilder();
+                locationEB.setTitle("You made it to the " + location.toString() + " (day " + daysElapsed + ")");
+                if (location.toString().contains("Kearney")) {
+                    // Initialize Kearney store
+                    store = new KearneyGeneralStore(event);
+                    // Fort Kearney building
+                    locationEB.setImage("https://lh3.googleusercontent.com/pw/ACtC-3ebaM9yP6x_Q1SqzriI9q_mQKENvtrkfzgJFlh61P4_6cWBr-lNpLadS1WNX1sWsQN02_aqMJZCGBc_q1FLabcOSsF3lHHQI2Ns9_-xoRayD69gASmxCJDu1jKdVEhqJZ33Njuqb_nezuvV9Pbmf9o_=w562-h355-no?authuser=1");
+                }
+                else if (location.toString().contains("Laramie")) {
+                    // Initialize Laramie store
+                    store = new LaramieGeneralStore(event);
+                    // Fort laramie building
+                    locationEB.setImage("https://lh3.googleusercontent.com/pw/ACtC-3cdtiF7weDskn2ekVMSnUxCL7m_dh4bAYUzawTNym0dPpmEJ44Ka4Dw92aAA_NK2JDsL7AqB0bN96MehN6Nkj3SB3KRRk-yLtJOx2j4zpVbtoKCUUDhznmPBMBm0cc7pCmL6dD48ByAQC0gcAfVQpPc=w815-h513-no?authuser=1");
+                }
+                else if (location.toString().contains("Bridger")) {
+                    // Initialize Bridger store
+                    store = new BridgerGeneralStore(event);
+                    // Fort Bridger building
+                    locationEB.setImage("https://lh3.googleusercontent.com/pw/ACtC-3cAjkTk2r-ucbMhOnNiKKy3JqYjv4_1tMSa207fD8qHYqEBKCm_19B0_40670Kk-oKtZUuyCPBnr1Ow8zm08iix6yr1-m7w78q87nDD8d1cecnbHDPp56p270j6XeTCV0IMGx5J6QNFY0aJbM0Vd46l=w562-h347-no?authuser=1");
+                }
+                else if (location.toString().contains("Hall")) {
+                    // Initialize Hall store
+                    store = new HallGeneralStore(event);
+                    // Fort Hall building
+                    locationEB.setImage("https://lh3.googleusercontent.com/pw/ACtC-3feczRjGInpzr0dwb5V0a-aleEZtotViecOBPx4qEwjoZ0YTW7pPVC96wo-vkWRVw9x8srKkZ1I6GVjzGjHBTR7xgO0OQ9UAOg3gCrgsZOuoDZet_xxoHfei9JcdkbwU_1aAsL24WbVolSc748IGwWZ=w1070-h588-no?authuser=1");
+                }
+                else if (location.toString().contains("Boise")) {
+                    // Initialize Boise store
+                    store = new BoiseGeneralStore(event);
+                    // Fort Boise building
+                    locationEB.setImage("https://lh3.googleusercontent.com/pw/ACtC-3d980Uaj6jZQ-E8kwEg0IHqwstxWhGQ7s5aqhxNXFpNenGxC5psnKnAMnRpGCGg5pixWBQU8kQudNaF8hwvB5K9u0qjDKsTAyg1ephLKMBltjeaA2YFh4noZqla76lZDWZd0FAJIamtXs7k8LBcqIrF=w561-h352-no?authuser=1");
+                }
+                locationEB.setFooter(location.getDescription());
+                event.getChannel().sendMessage(locationEB.build()).queue();
+                event.getChannel().sendMessage(location.getFortOptions()).queue();
+            }
+            else if (location.toString().contains("Pass")) {
+                EmbedBuilder locationEB = new EmbedBuilder();
+                locationEB.setTitle("Half way point! " + location.toString() + " (day " + daysElapsed + ")");
+                locationEB.setImage("https://lh3.googleusercontent.com/pw/ACtC-3eMBlCmBYjQuVNgQ68AEAZIcOV9zF8rxe94hO5mZBz2WDBt7CFpW21KxI2NwkLzW8YnMV5Xowj_fCTNC14VYuxKzaBQFm19NyA9iHhXN7YnqiONVSrd4zfSgxxe69wYCdSLqiavlQmCB7rRCXfoFl-l=w639-h393-no?authuser=1");
+                locationEB.setFooter(location.getDescription());
+                event.getChannel().sendMessage(locationEB.build()).queue();
+                event.getChannel().sendMessage(location.getSouthPassOptions()).queue();
+            }
+            return landMarks.poll();
+        }
+        return null;
+    }
+
+    public OTGameStatus playLandMark(String optionNumber) {
+        if (optionNumber == null || optionNumber.isEmpty()) {
+            return INVALID_INPUT;
+        }
+        optionNumber = optionNumber.trim();
+        String[] split = optionNumber.split(" ");
+        rest = false;
+        if (CorneliusUtils.isNumeric(split[0])) {
+            OTGameStatus tempStatus;
+            if (currentLocation.getClass().getSimpleName().contains("River")) {
+                 tempStatus = riverCrossing(split[0]);
+                 if (tempStatus != RUNNING) return tempStatus;
+            }
+            else if (currentLocation.getClass().getSimpleName().contains("Fort")) {
+                tempStatus = fortStop(split[0]);
+                if (tempStatus != RUNNING) return tempStatus;
+            }
+            else if (currentLocation.getClass().getSimpleName().contains("Pass")) {
+                tempStatus = southPathStop(split[0]);
+                if (tempStatus != RUNNING) return tempStatus;
+            }
+        }
+        return gameOver();
+    }
+
+    /**
+     * Logic for selected choice at a South Pass
+     * @param selectedOption
+     */
+    private OTGameStatus southPathStop(String selectedOption) {
+        switch (selectedOption) {
+            case "1": //Go to Fort Bridger
+                landMarks.add(new FortBridger(989));
+                landMarks.add(new GreenRiverCrossing(1151));
+                landMarks.add(new FortHall(1395));
+                landMarks.add(new SnakeRiverCrossing(1534));
+                landMarks.add(new FortBoise(1648));
+                break;
+            case "2": //Take shortcut to Green River Crossing and skip Fort Bridger
+                landMarks.add(new GreenRiverCrossing(1057));
+                landMarks.add(new FortHall(1258));
+                landMarks.add(new SnakeRiverCrossing(1440));
+                landMarks.add(new FortBoise(1554));
+                break;
+        }
+        return RUNNING;
+    }
+
+    /**
+     * Logic for selected choice at a fort
+     * @param selectedOption
+     */
+    private OTGameStatus fortStop(String selectedOption) {
+        switch (selectedOption) {
+            case "1": //Continue on trail
+                return RUNNING;
+            case "2": //Buy Supplies
+                EmbedBuilder generalStoreEB = new EmbedBuilder();
+                if (currentLocation.getClass().getSimpleName().contains("Kearney")) {
+                    generalStoreEB.setColor(Color.GREEN);
+                    generalStoreEB.setImage(store.getImageURL());
+                    event.getChannel().sendMessage(generalStoreEB.build()).queue();
+                }
+                else if (currentLocation.getClass().getSimpleName().contains("Laramie")) {
+                    generalStoreEB.setColor(Color.ORANGE);
+                    generalStoreEB.setImage(store.getImageURL());
+                    event.getChannel().sendMessage(generalStoreEB.build()).queue();
+                }
+                else if (currentLocation.getClass().getSimpleName().contains("Bridger")) {
+                    generalStoreEB.setColor(Color.BLUE);
+                    generalStoreEB.setImage(store.getImageURL());
+                    event.getChannel().sendMessage(generalStoreEB.build()).queue();
+                }
+                else if (currentLocation.getClass().getSimpleName().contains("Hall")) {
+                    generalStoreEB.setColor(Color.YELLOW);
+                    generalStoreEB.setImage(store.getImageURL());
+                    event.getChannel().sendMessage(generalStoreEB.build()).queue();
+                }
+                event.getChannel().sendMessage( wagon.printInventory() + "\nWhich item and how many of that item would you like to buy ex: `1 2` or `7 1500`? Or type `leave` to leave store").queue();
+                return STORE;
+        }
+        return RUNNING;
+    }
+
+    /**
+     * Logic for selected choice at a river.
+     * @param selectedOption
+     */
+    private OTGameStatus riverCrossing (String selectedOption) {
+        River riverCrossing = (River) currentLocation;
+        double success;
+        EmbedBuilder riverEB;
+        switch (selectedOption) {
+            case "1": //Ford the river
+                success = CorneliusUtils.randomDoubleBetween(1, 100, 2);
+                riverEB = new EmbedBuilder();
+                boolean fail = false;
+                if (riverCrossing.getDepth() >= 3) { //Too deep
+                    riverEB.setImage("https://lh3.googleusercontent.com/pw/ACtC-3e4Htbc9YHbuFBGFoAUBxQw_N5em2aWHwU3pJJJkyl1cs7lRmNe13Mvz84VMPKC_hGnPuPynY2tnWMQ4fmyYXfO0R3xENo514Jjbn35233cbps_Kh_Nh2QFEz-CsyA0OnFQu3Y5iR8EQv02ZzlTD2LJ=w300-h213-no?authuser=1");
+                    riverEB.setTitle("River is too deep to cross!");
+                    event.getChannel().sendMessage(riverEB.build()).queue();
+                    fail = true;
+                }
+                else if (success >= riverCrossing.getChance()) {
+                    event.getChannel().sendMessage("You successfully crossed the river!").queue();
+                }
+                else {
+                    riverEB.setImage("https://lh3.googleusercontent.com/pw/ACtC-3e4Htbc9YHbuFBGFoAUBxQw_N5em2aWHwU3pJJJkyl1cs7lRmNe13Mvz84VMPKC_hGnPuPynY2tnWMQ4fmyYXfO0R3xENo514Jjbn35233cbps_Kh_Nh2QFEz-CsyA0OnFQu3Y5iR8EQv02ZzlTD2LJ=w300-h213-no?authuser=1");
+                    riverEB.setTitle("You failed to cross the river!");
+                    event.getChannel().sendMessage(riverEB.build()).queue();
+                    fail = true;
+                }
+                if (fail) {
+                    wagon.failedRiverCrossing();
+                }
+                break;
+            case "2": //Caulk the wagon
+                wagon.nextDay(this, false, true);
+                success = CorneliusUtils.randomDoubleBetween(1, 100, 2);
+                riverEB = new EmbedBuilder();
+                success *= 1.5; //Increase success rate by 50%
+                if (success >= riverCrossing.getChance()) {
+                    event.getChannel().sendMessage("You spend a day caulking the wagon and successfully cross the river!").queue();
+                }
+                else {
+                    riverEB.setImage("https://lh3.googleusercontent.com/pw/ACtC-3e4Htbc9YHbuFBGFoAUBxQw_N5em2aWHwU3pJJJkyl1cs7lRmNe13Mvz84VMPKC_hGnPuPynY2tnWMQ4fmyYXfO0R3xENo514Jjbn35233cbps_Kh_Nh2QFEz-CsyA0OnFQu3Y5iR8EQv02ZzlTD2LJ=w300-h213-no?authuser=1");
+                    riverEB.setTitle("You failed to cross the river!");
+                    event.getChannel().sendMessage(riverEB.build()).queue();
+                    wagon.failedRiverCrossing();
+                }
+                break;
+            case "3": //Take the ferry across or Hire Indian
+                if (currentLocation.toString().contains("Snake River")) {
+                    if (wagon.getClothes() < 3) {
+                        event.getChannel().sendMessage("You do not have enough clothing to part with").queue();
+                        return KEEP_STATE;
+                    }
+                    else {
+                        for (int i = 0; i < 3; i++) {
+                            rest();
+                            wagon.nextDay(this, false, true);
+                        }
+                        wagon.setClothes(wagon.getClothes() - 3);
+                        event.getChannel().sendMessage("You are guided through the Snake River Crossing for a cost of 3 sets of clothing...").queue();
+                    }
+                }
+                else {
+                    for (int i = 0; i < 5; i++) {
+                        rest();
+                        wagon.nextDay(this, false, true);
+                    }
+                    event.getChannel().sendMessage("You take the ferry across for a fee of $5. The trip takes 5 days...").queue();
+                }
+                break;
+            case "4": //Wait a day
+                rest();
+                wagon.nextDay(this, false, true);
+                EmbedBuilder locationEB = new EmbedBuilder();
+                locationEB.setTitle( "Day " + daysElapsed);
+                locationEB.setImage("https://lh3.googleusercontent.com/pw/ACtC-3dJ-1a23u2dwPqv3QjUpVf090Acey7reK7dCB3-_KQ8QA00_I1MT0e86I-Lh0dZFy-4rXMN_-3fcq_o6mZw5EheKr5PVDBCax-cqv_8SyZpfAFkTfJo0MUCgNPRg87U8ko9pL2K34Mryz4hkTmw2plE=w644-h325-no?authuser=1");
+                locationEB.setFooter(currentLocation.getDescription());
+                event.getChannel().sendMessage(locationEB.build()).queue();
+                event.getChannel().sendMessage(currentLocation.getRiverOptions()).queue();
+                return KEEP_STATE;
+            default:
+                return INVALID_INPUT;
+        }
+        return RUNNING;
     }
 }

@@ -3,7 +3,6 @@ package oregontrail.store;
 import oregontrail.Wagon;
 
 public abstract class GeneralStore {
-
     private int numOxenAvailable = 0;
     private int numSetsClothingAvailable = 0;
     private int numAmmoAvailable = 0;
@@ -18,6 +17,7 @@ public abstract class GeneralStore {
     private double axlePrice = 0;
     private double tonguePrice = 0;
     private double foodPrice = 0;
+    private String imageURL;
 
     public abstract boolean canBuy(String input, double cash);
     public abstract double buy(String item, Wagon wagon);
@@ -132,5 +132,13 @@ public abstract class GeneralStore {
 
     public void setFoodPrice(double foodPrice) {
         this.foodPrice = foodPrice;
+    }
+
+    public String getImageURL() {
+        return imageURL;
+    }
+
+    public void setImageURL(String imageURL) {
+        this.imageURL = imageURL;
     }
 }

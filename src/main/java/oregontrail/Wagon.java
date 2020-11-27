@@ -117,12 +117,12 @@ public class Wagon {
         StringBuilder sb = new StringBuilder();
         sb.append("**Cash**: $").append(cash).append("\n");
         sb.append("**Oxen**: ").append(oxen).append("\n");
-        sb.append("**Food**: ").append(food).append("\n");
         sb.append("**Clothes**: ").append(clothes).append("\n");
         sb.append("**Ammo**: ").append(ammo).append("\n");
+        sb.append("**Wheel** (spare): ").append(getWagonPartCount(Wheel.class.getSimpleName())).append("\n");
         sb.append("**Axle** (spare): ").append(getWagonPartCount(Axle.class.getSimpleName())).append("\n");
         sb.append("**Tongue** (spare): ").append(getWagonPartCount(Tongue.class.getSimpleName())).append("\n");
-        sb.append("**Wheel** (spare): ").append(getWagonPartCount(Wheel.class.getSimpleName()));
+        sb.append("**Food**: ").append(food);
         return sb.toString();
     }
 
@@ -170,23 +170,29 @@ public class Wagon {
      * @param traveled
      * @return
      */
-    public boolean nextDay(OregonTrailGame game, boolean traveled) {
+    public boolean nextDay(OregonTrailGame game, boolean traveled, boolean onRiver) {
         game.daysElapsed++;
-        if (traveled) game.distanceTraveled += pace * SPEED;
+        //Only increase distance traveled when traveled is true and onRiver is false
+        if (traveled && !onRiver) game.distanceTraveled += pace * SPEED;
+        boolean reachedLandMark = game.landMarks.size() == 0 ? false : game.distanceTraveled >= game.landMarks.peek().getDistance();
         consumeFood(game.rations);
-        return calculateHealth(traveled);
+        boolean healthDeath = calculateHealth(traveled, onRiver);
+        return reachedLandMark || healthDeath;
     }
 
     /**
      * Decrease players health based on factors - food, pace, and diseases
+     * Returns true if a player dies
+     * @param traveled
+     * @return
      */
-    private boolean calculateHealth(boolean traveled) {
+    public boolean calculateHealth(boolean traveled, boolean onRiver) {
         //Local variables used on exponential function
         double A = 0.9;
         double B = 1.132;
         double C = 0.5;
 
-        boolean specialEvent = false;
+        boolean playerDeath = false;
 
         for (OregonTrailPlayer member : party) {
             if (!member.isAlive()) continue;
@@ -224,7 +230,7 @@ public class Wagon {
             }
 
             // Daily Reward and Penalty for pace
-            if (traveled && pace > 8) {
+            if (traveled && !onRiver && pace > 8) {
                 double penalty = A * Math.pow(B, pace - 8) + C; // Exponential function for increased pace
                 decreaseHealth(member, (int)Math.round(penalty));
             }
@@ -247,8 +253,7 @@ public class Wagon {
                             int rand = CorneliusUtils.randomIntBetween(0, eligibleMembers.size()-1);
                             OregonTrailPlayer other = eligibleMembers.get(rand);
                             other.becomeSick(disease);
-                            event.getChannel().sendMessage(member.name + " has spread " + disease.name + " to " + other.name).queue();
-                            specialEvent = true;
+                            event.getChannel().sendMessage("`" + member.name + "` has spread **" + disease.name + "** to **" + other.name + "**!").queue();
                         }
                     }
                 }
@@ -275,15 +280,16 @@ public class Wagon {
                     }
                     diseaseDeath.setFooter("R.I.P. -" + member.name);
                     event.getChannel().sendMessage(diseaseDeath.build()).queue();
+
                 }
                 else {
                     event.getChannel().sendMessage(member.name + " died an average death of inadequate living").queue();
                 }
-                specialEvent = true;
+                playerDeath = true;
             }
         }
 
-        return specialEvent;
+        return playerDeath;
     }
 
     /**
@@ -337,10 +343,14 @@ public class Wagon {
      */
     public OregonTrailPlayer giveRandomSickness() {
         List<OregonTrailPlayer> livingMembers = getLivingMembers();
-        int rand = CorneliusUtils.randomIntBetween(0, livingMembers.size()-1);
-        OregonTrailPlayer sickMember = livingMembers.get(rand);
-        sickMember.becomeSick();
-        return sickMember;
+        Collections.shuffle(livingMembers);
+        for (OregonTrailPlayer player : livingMembers) {
+            boolean effected = player.becomeSick();
+            if (effected) {
+                return player;
+            }
+        }
+        return null;
     }
 
     /**
@@ -491,5 +501,49 @@ public class Wagon {
                 player.health += CorneliusUtils.randomIntBetween(1, 50);
             }
         }
+    }
+
+    /**
+     * Picks 3 random items or people to lose
+     */
+    public void failedRiverCrossing() {
+        StringBuilder message = new StringBuilder();
+        message.append("You lose:\n");
+        for (int i = 0; i < 3; i++) {
+            if (CorneliusUtils.randomNumber01() <= 0.20) {
+                List<OregonTrailPlayer> livingMembers = getLivingMembers();
+                OregonTrailPlayer drown = livingMembers.get(CorneliusUtils.randomIntBetween(0, livingMembers.size()-1));
+                drown.kill();
+                message.append("\t").append(drown.name).append(" (drowned)\n");
+            }
+            else {
+                String item = removeRandomItem();
+                if (item == null) {
+                    oxen = oxen - 1 < 0 ? 0 : oxen - 1;
+                    message.append("\t").append("1 oxen\n");
+                }
+                else {
+                    if (item.equals("food")) {
+                        int foodLose = CorneliusUtils.randomIntBetween(0, food / 3);
+                        food -= foodLose;
+                        message.append("\t").append(foodLose).append(" lbs of food\n");
+                    }
+                    else if (item.equals("clothes")) {
+                        int clothesLose = CorneliusUtils.randomIntBetween(0, clothes);
+                        clothes -= clothesLose;
+                        message.append("\t").append(clothesLose).append(" sets of clothing\n");
+                    }
+                    else if (item.equals("bullet")) {
+                        int bulletLose = CorneliusUtils.randomIntBetween(0, ammo);
+                        ammo -= bulletLose;
+                        message.append("\t").append(bulletLose).append(" bullets\n");
+                    }
+                    else {
+                        message.append("\t").append("1 ").append(item).append("\n");
+                    }
+                }
+            }
+        }
+        event.getChannel().sendMessage(message.toString()).queue();
     }
 }
