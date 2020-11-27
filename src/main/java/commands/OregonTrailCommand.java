@@ -4,7 +4,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import oregontrail.*;
 import oregontrail.location.Location;
-import oregontrail.store.KearneyGeneralStore;
 import oregontrail.store.MattGeneralStore;
 import utils.CorneliusUtils;
 
