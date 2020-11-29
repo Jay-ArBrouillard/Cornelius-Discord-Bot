@@ -15,6 +15,7 @@ public class SnakeRiverCrossing extends Location implements River {
         this.depth = CorneliusUtils.randomDoubleBetween(1, 20, 2);
         this.chance = width*depth/13000*100;
         setDescription();
+        setImageURL("https://lh3.googleusercontent.com/pw/ACtC-3cJ3Dsq0DCTM7riV68Uxc9YNJxU5wzj-i3s7FodmoAxCbtaakBurRMDfmRHCg8KT5GqmdIEyR0_u3-v9V4GMMfZKQcZN7v7oRYfamccVsvEdiqu-ZygI772qxkknUW1-_ftak_cz7rY_Xgw_kn1PdgC=w640-h402-no?authuser=1");
     }
 
     public int getLength() {

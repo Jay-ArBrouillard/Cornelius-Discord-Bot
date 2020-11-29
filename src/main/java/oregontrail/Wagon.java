@@ -10,6 +10,7 @@ import utils.CorneliusUtils;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.function.BinaryOperator;
 
 public class Wagon {
 
@@ -176,8 +177,30 @@ public class Wagon {
         if (traveled && !onRiver) game.distanceTraveled += pace * SPEED;
         boolean reachedLandMark = game.landMarks.size() == 0 ? false : game.distanceTraveled >= game.landMarks.peek().getDistance();
         consumeFood(game.rations);
+        modifyImmunity();
         boolean healthDeath = calculateHealth(traveled, onRiver);
         return reachedLandMark || healthDeath;
+    }
+
+
+    /**
+     * For each day pass increase immunity counter. If player has a disease for 7 days remove that immunity
+     */
+    public void modifyImmunity() {
+        for (OregonTrailPlayer player : party) {
+            List<String> immunityOver = new LinkedList<>();
+            for (Map.Entry<String, Integer> entry : player.getImmunity().entrySet()) {
+                if (entry.getValue() == 7) {
+                    immunityOver.add(entry.getKey());
+                }
+                else {
+                    player.getImmunity().put(entry.getKey(), entry.getValue() + 1);
+                }
+            }
+            for (String diseaseName : immunityOver) {
+                player.getImmunity().remove(diseaseName);
+            }
+        }
     }
 
     /**
@@ -245,8 +268,11 @@ public class Wagon {
                         // Find members that don't have this disease
                         List<OregonTrailPlayer> eligibleMembers = new ArrayList<>();
                         for (OregonTrailPlayer player : party) {
-                            if (!player.getIllnesses().stream().anyMatch(d -> disease.name.equals(d.name))) {
-                                eligibleMembers.add(player);
+                            for (DiseaseEnum d : player.getIllnesses()) {
+                                if (!disease.name.equals(d.name) && !player.getImmunity().containsKey(disease.name)) {
+                                    eligibleMembers.add(player);
+                                    break;
+                                }
                             }
                         }
                         if (eligibleMembers.size() > 0) {
@@ -393,7 +419,7 @@ public class Wagon {
      *
      * @return String what was removed
      */
-    public String removeRandomItem() {
+    public String removeOneRandomItem() {
         final int itemCt = countItems();
         final int foodRatio = food;
         final int clothesRatio = foodRatio + clothes;
@@ -413,14 +439,78 @@ public class Wagon {
                 ammo -= 1;
                 return "bullet";
             } else if (i < wheelRatio) {
-                spareParts.remove(new Wheel());
-                return "wheel";
+                for (Part part : spareParts) {
+                    if (part.toString().equals("Wheel")) {
+                        spareParts.remove(part);
+                        return "wheel";
+                    }
+                }
             } else if (i < axleRatio) {
-                spareParts.remove(new Axle());
-                return "axle";
-            } else if (spareParts.contains(new Tongue())) {
-                spareParts.remove(new Tongue());
-                return "tongue";
+                for (Part part : spareParts) {
+                    if (part.toString().equals("Axle")) {
+                        spareParts.remove(part);
+                        return "axle";
+                    }
+                }
+            } else {
+                for (Part part : spareParts) {
+                    if (part.toString().equals("Tongue")) {
+                        spareParts.remove(part);
+                        return "tongue";
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Removes random item from the wagon
+     *
+     * @return String what was removed
+     */
+    public String removeRandomItem() {
+        final int itemCt = (int) cash + countItems() + oxen;
+        final int foodRatio = food;
+        final int clothesRatio = foodRatio + clothes;
+        final int bulletRatio = clothesRatio + ammo;
+        final int wheelRatio = bulletRatio + countWheels();
+        final int axleRatio = wheelRatio + countAxles();
+
+        if (itemCt > 0) {
+            final int i = CorneliusUtils.randomIntBetween(0, itemCt);
+            if (i < cash) {
+                int cashLost = (CorneliusUtils.randomIntBetween(1, (int)(cash / 2.0)));
+                cash = cash - cashLost < 0 ? 0 : cash - cashLost;
+                return cashLost + " cash";
+            }
+            else {
+                if (i < foodRatio) {
+                    int foodLost = (CorneliusUtils.randomIntBetween(1, food) / 10);
+                    food = food - foodLost < 0 ? 0 : food - foodLost;
+                    return foodLost + " food";
+                } else if (i < clothesRatio) {
+                    int clothesLost = (CorneliusUtils.randomIntBetween(1, clothes));
+                    clothes = clothes - clothesLost < 0 ? 0 : clothes - clothesLost;
+                    return clothesLost + " clothes";
+                } else if (i < bulletRatio) {
+                    int ammoLost = (CorneliusUtils.randomIntBetween(1, ammo));
+                    ammo = ammo - ammoLost < 0 ? 0 : ammo - ammoLost;
+                    return ammoLost + " ammo";
+                } else if (i < wheelRatio) {
+                    spareParts.remove(new Wheel());
+                    return "1 wheel";
+                } else if (i < axleRatio) {
+                    spareParts.remove(new Axle());
+                    return "1 axle";
+                } else if (spareParts.contains(new Tongue())) {
+                    spareParts.remove(new Tongue());
+                    return "1 tongue";
+                } else if (oxen > 0) {
+                    int oxenLost = (CorneliusUtils.randomIntBetween(1, oxen));
+                    oxen = oxen - oxenLost < 0 ? 0 : oxen - oxenLost;
+                    return oxenLost + " oxen";
+                }
             }
         }
         return null;
@@ -517,7 +607,7 @@ public class Wagon {
                 message.append("\t").append(drown.name).append(" (drowned)\n");
             }
             else {
-                String item = removeRandomItem();
+                String item = removeOneRandomItem();
                 if (item == null) {
                     oxen = oxen - 1 < 0 ? 0 : oxen - 1;
                     message.append("\t").append("1 oxen\n");
@@ -545,5 +635,63 @@ public class Wagon {
             }
         }
         event.getChannel().sendMessage(message.toString()).queue();
+    }
+
+    /**
+     * Raft the final river down to Willamette Valley
+     */
+    public void raft(OregonTrailGame game) {
+        String [] riverEvents = new String[] {
+                "You hit a rock",
+                "Wagon tipped over!",
+                "Man overboard!"
+        };
+
+        this.event.getChannel().sendMessage("**Your party boards the final raft to Oregon...**").queue();
+        for (int i = 1; i <= 90; i++) {
+            // For each mile
+            double rand = CorneliusUtils.randomNumber01();
+            if (rand <= 0.03) {
+                int event = CorneliusUtils.randomIntBetween(0, riverEvents.length-1);
+                this.event.getChannel().sendMessage("`Mile " + i + "`: " + riverEvents[event]).queue();
+                if (event == 0) {
+                    String item = removeRandomItem();
+                    if (item != null) {
+                        this.event.getChannel().sendMessage("\t" + item + " lost").queue();
+                    }
+                }
+                else if (event == 1) {
+                    int numItemsToLose = CorneliusUtils.randomIntBetween(-1, 5);
+                    if (numItemsToLose > 0) {
+                        for (int j = 0; j < numItemsToLose; j++) {
+                            String item = removeRandomItem();
+                            if (item != null) {
+                                this.event.getChannel().sendMessage("\t" + item + " lost").queue();
+                            }
+                        }
+                    }
+                    else {
+                        this.event.getChannel().sendMessage("\t" + "Everyone was able to reboard the wagon safely. No supplies were lost.").queue();
+                    }
+                }
+                else if (event == 2) {
+                    List<OregonTrailPlayer> livingMembers = getLivingMembers();
+                    int rand2 = CorneliusUtils.randomIntBetween(0, livingMembers.size()-1);
+                    OregonTrailPlayer manOverboard = livingMembers.get(rand2);
+                    if (CorneliusUtils.randomIntBetween(0, 1) == 1) {
+                        this.event.getChannel().sendMessage("\t" + manOverboard.name + " was lost to the tide").queue();
+                        manOverboard.kill();
+                    } else {
+                        this.event.getChannel().sendMessage("\t" + manOverboard.name + " was hauled back on board safely").queue();
+                    }
+                }
+                if (game.isGameOver()) {
+                    return;
+                }
+            }
+            game.distanceTraveled += 1;
+        }
+
+        this.event.getChannel().sendMessage("**Successful trip!**").queue();
     }
 }

@@ -15,6 +15,7 @@ public class GreenRiverCrossing extends Location implements River {
         this.depth = CorneliusUtils.randomDoubleBetween(35, 100, 2);
         this.chance = width*depth/121000*100;
         setDescription();
+        setImageURL("https://lh3.googleusercontent.com/pw/ACtC-3d_0F8kDaTDoc2aJgYqdxfZP96O_F0nvhrlSEK-MpZta-dw4ropT5GF9ZYqTqOzZYh6fcb_HRf8QwtcicuOtqHmN612dOxn6xSPVkslosY_O68GT8rsy8Ed6FkLE_QggyFppSt4ffwCKepLH3prul1X=w699-h370-no?authuser=1");
     }
 
     public int getLength() {

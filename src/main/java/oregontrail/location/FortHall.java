@@ -4,6 +4,7 @@ public class FortHall extends Location {
     public FortHall(int distance) {
         super(distance);
         setDescription();
+        setImageURL("https://lh3.googleusercontent.com/pw/ACtC-3feczRjGInpzr0dwb5V0a-aleEZtotViecOBPx4qEwjoZ0YTW7pPVC96wo-vkWRVw9x8srKkZ1I6GVjzGjHBTR7xgO0OQ9UAOg3gCrgsZOuoDZet_xxoHfei9JcdkbwU_1aAsL24WbVolSc748IGwWZ=w1070-h588-no?authuser=1");
     }
 
     private void setDescription() {

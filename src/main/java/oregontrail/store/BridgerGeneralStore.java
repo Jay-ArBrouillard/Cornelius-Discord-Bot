@@ -7,6 +7,8 @@ import oregontrail.Wagon;
 import oregontrail.Wheel;
 import utils.CorneliusUtils;
 
+import java.awt.*;
+
 public class BridgerGeneralStore extends GeneralStore {
     private MessageReceivedEvent event;
 
@@ -28,7 +30,9 @@ public class BridgerGeneralStore extends GeneralStore {
         setNumWagonWheelsAvailable(2);
         setNumFoodAvailable(1500);
 
-        setImageURL("https://lh3.googleusercontent.com/pw/ACtC-3fpp-nKovWkd3k11-5fYke0KpTLT53HZE6FuWu7TrBsdSJXC3bnM3-34_WC3klDM6VhSCg8ZWS9Unwn2Vc9JS17Gk1oJNvXPbm3vpjUZgWOjM5kprEom9Z0FwkjTgxYU4xPDpg1m-vuZz4748wBOEga=w525-h347-no?authuser=1");
+        setStoreURL("https://lh3.googleusercontent.com/pw/ACtC-3fpp-nKovWkd3k11-5fYke0KpTLT53HZE6FuWu7TrBsdSJXC3bnM3-34_WC3klDM6VhSCg8ZWS9Unwn2Vc9JS17Gk1oJNvXPbm3vpjUZgWOjM5kprEom9Z0FwkjTgxYU4xPDpg1m-vuZz4748wBOEga=w525-h347-no?authuser=1");
+        setBuildingURL("https://lh3.googleusercontent.com/pw/ACtC-3cAjkTk2r-ucbMhOnNiKKy3JqYjv4_1tMSa207fD8qHYqEBKCm_19B0_40670Kk-oKtZUuyCPBnr1Ow8zm08iix6yr1-m7w78q87nDD8d1cecnbHDPp56p270j6XeTCV0IMGx5J6QNFY0aJbM0Vd46l=w562-h347-no?authuser=1");
+        setColor(Color.BLUE);
     }
 
     @Override

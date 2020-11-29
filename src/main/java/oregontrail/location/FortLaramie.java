@@ -4,6 +4,7 @@ public class FortLaramie extends Location {
     public FortLaramie(int distance) {
         super(distance);
         setDescription();
+        setImageURL("https://lh3.googleusercontent.com/pw/ACtC-3cdtiF7weDskn2ekVMSnUxCL7m_dh4bAYUzawTNym0dPpmEJ44Ka4Dw92aAA_NK2JDsL7AqB0bN96MehN6Nkj3SB3KRRk-yLtJOx2j4zpVbtoKCUUDhznmPBMBm0cc7pCmL6dD48ByAQC0gcAfVQpPc=w815-h513-no?authuser=1");
     }
 
     private void setDescription() {

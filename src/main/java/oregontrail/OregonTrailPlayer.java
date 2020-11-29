@@ -16,6 +16,7 @@ public class OregonTrailPlayer {
     public LinkedList<Integer> sustenance; //Store food eaten in the last 3 days
 
     private List<DiseaseEnum> illnesses;
+    private Map<String, Integer> immunity;
     private HealthStatus healthStatus;
 
     public OregonTrailPlayer(String id, String name) {
@@ -23,6 +24,7 @@ public class OregonTrailPlayer {
         this.name = name;
         this.sustenance = new LinkedList<>();
         this.illnesses = new ArrayList<>();
+        this.immunity = new HashMap<>();
     }
 
     public HealthStatus getHealthStatus() {
@@ -60,6 +62,14 @@ public class OregonTrailPlayer {
         this.illnesses = illnesses;
     }
 
+    public Map<String, Integer> getImmunity() {
+        return immunity;
+    }
+
+    public void setImmunity(Map<String, Integer> immunity) {
+        this.immunity = immunity;
+    }
+
     public boolean isAlive() {
         return this.health > 0;
     }
@@ -82,11 +92,13 @@ public class OregonTrailPlayer {
             return false;
         }
         this.illnesses.add(allDiseases[rand]);
+        this.immunity.put(allDiseases[rand].name, 0);
         return true;
     }
 
     public void becomeSick(DiseaseEnum disease) {
         this.illnesses.add(disease);
+        this.immunity.put(disease.name, 0);
     }
 
     public void kill() {

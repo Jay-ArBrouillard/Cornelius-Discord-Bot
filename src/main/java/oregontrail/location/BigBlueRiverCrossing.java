@@ -15,6 +15,7 @@ public class BigBlueRiverCrossing extends Location implements River {
         this.depth = CorneliusUtils.randomDoubleBetween(2, 6, 2);
         this.chance = width*depth/6000*100;
         setDescription();
+        setImageURL("https://lh3.googleusercontent.com/pw/ACtC-3cGXBWmS8C29s2d-x-rZNY5670LKA1Wq66zdVxmKF7KLJJJOO4L7KuSv02kitVMLvbIF1HzOGD1KLXyojS5BvY5IsXA-S5XIQXynhhmwyVtvNkOgyiZRxSyEBAEvE1ZH_AL_Q_ouK7UeJbjkmHcGFkp=w470-h180-no?authuser=1");
     }
 
     public int getLength() {

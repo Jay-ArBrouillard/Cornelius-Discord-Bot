@@ -7,6 +7,8 @@ import oregontrail.Wagon;
 import oregontrail.Wheel;
 import utils.CorneliusUtils;
 
+import java.awt.*;
+
 public class HallGeneralStore extends GeneralStore {
     private MessageReceivedEvent event;
 
@@ -28,7 +30,9 @@ public class HallGeneralStore extends GeneralStore {
         setNumWagonWheelsAvailable(2);
         setNumFoodAvailable(1500);
 
-        setImageURL("https://lh3.googleusercontent.com/pw/ACtC-3eMgPUM5lJEAXTvRm5auwMGmy7L0g5G7DroNk5-AOnkEDgZzmGuHU9VcroDtDE6E2yk00LO7-pu7g0EvYbNpTj28-j5hotA-dSht8CXhTf7hGDWvOQ5jLnMQuNQ_VmGFUr6vyk5gJLOj0XVZZrrepfY=w525-h347-no?authuser=1");
+        setStoreURL("https://lh3.googleusercontent.com/pw/ACtC-3eMgPUM5lJEAXTvRm5auwMGmy7L0g5G7DroNk5-AOnkEDgZzmGuHU9VcroDtDE6E2yk00LO7-pu7g0EvYbNpTj28-j5hotA-dSht8CXhTf7hGDWvOQ5jLnMQuNQ_VmGFUr6vyk5gJLOj0XVZZrrepfY=w525-h347-no?authuser=1");
+        setBuildingURL("https://lh3.googleusercontent.com/pw/ACtC-3feczRjGInpzr0dwb5V0a-aleEZtotViecOBPx4qEwjoZ0YTW7pPVC96wo-vkWRVw9x8srKkZ1I6GVjzGjHBTR7xgO0OQ9UAOg3gCrgsZOuoDZet_xxoHfei9JcdkbwU_1aAsL24WbVolSc748IGwWZ=w1070-h588-no?authuser=1");
+        setColor(Color.YELLOW);
     }
 
     @Override

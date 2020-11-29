@@ -15,6 +15,7 @@ public class KansasRiverCrossing extends Location implements River {
         this.depth = CorneliusUtils.randomDoubleBetween(1, 5, 2);
         this.chance = width*depth/3250*100;
         setDescription();
+        setImageURL("https://lh3.googleusercontent.com/pw/ACtC-3dJ-1a23u2dwPqv3QjUpVf090Acey7reK7dCB3-_KQ8QA00_I1MT0e86I-Lh0dZFy-4rXMN_-3fcq_o6mZw5EheKr5PVDBCax-cqv_8SyZpfAFkTfJo0MUCgNPRg87U8ko9pL2K34Mryz4hkTmw2plE=w644-h325-no?authuser=1");
     }
 
     public int getLength() {

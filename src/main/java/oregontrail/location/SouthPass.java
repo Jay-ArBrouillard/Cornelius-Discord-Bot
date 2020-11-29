@@ -4,6 +4,7 @@ public class SouthPass extends Location {
     public SouthPass(int distance) {
         super(distance);
         setDescription();
+        setImageURL("https://lh3.googleusercontent.com/pw/ACtC-3eMBlCmBYjQuVNgQ68AEAZIcOV9zF8rxe94hO5mZBz2WDBt7CFpW21KxI2NwkLzW8YnMV5Xowj_fCTNC14VYuxKzaBQFm19NyA9iHhXN7YnqiONVSrd4zfSgxxe69wYCdSLqiavlQmCB7rRCXfoFl-l=w639-h393-no?authuser=1");
     }
 
     private void setDescription() {

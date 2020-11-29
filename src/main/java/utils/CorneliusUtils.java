@@ -14,8 +14,17 @@ public class CorneliusUtils {
         return false;
     }
 
-    public static double normalize(double value, double tMin, double tMax, double min, double max) {
-        return ((value - tMin) / (tMax - tMin)) * (min - max) + min;
+    /**
+     *
+     * @param value
+     * @param tMin denote the minimum of the range of your desired target scaling
+     * @param tMax denote the maximum of the range of your desired target scaling
+     * @param rMin denote the minimum of the range of your measurement
+     * @param rMax denote the maximum of the range of your measurement
+     * @return
+     */
+    public static double normalize(double value, double tMin, double tMax, double rMin, double rMax) {
+        return ((value - tMin) / (tMax - tMin)) * (rMin - rMax) + rMin;
     }
 
     public static double randomNumber01() {

@@ -7,6 +7,8 @@ import oregontrail.Wagon;
 import oregontrail.Wheel;
 import utils.CorneliusUtils;
 
+import java.awt.*;
+
 public class LaramieGeneralStore extends GeneralStore {
     private MessageReceivedEvent event;
 
@@ -28,7 +30,9 @@ public class LaramieGeneralStore extends GeneralStore {
         setNumWagonWheelsAvailable(2);
         setNumFoodAvailable(1500);
 
-        setImageURL("https://lh3.googleusercontent.com/pw/ACtC-3evUdo6BrLnrZjWG3Wohe7hh-y3pTJ6SpDWqRSzB3Co9PNx4JzHPEhsu8HJjk6XGpXJYEJindLe7BqQ9POwcNdynlUhi0xVfVZZCbWNUe1TUiiql3jhdXTgZ6PJjdN7MC3F9jCXauc254fc6_PS4ya3=w525-h347-no?authuser=1");
+        setStoreURL("https://lh3.googleusercontent.com/pw/ACtC-3evUdo6BrLnrZjWG3Wohe7hh-y3pTJ6SpDWqRSzB3Co9PNx4JzHPEhsu8HJjk6XGpXJYEJindLe7BqQ9POwcNdynlUhi0xVfVZZCbWNUe1TUiiql3jhdXTgZ6PJjdN7MC3F9jCXauc254fc6_PS4ya3=w525-h347-no?authuser=1");
+        setBuildingURL("https://lh3.googleusercontent.com/pw/ACtC-3cdtiF7weDskn2ekVMSnUxCL7m_dh4bAYUzawTNym0dPpmEJ44Ka4Dw92aAA_NK2JDsL7AqB0bN96MehN6Nkj3SB3KRRk-yLtJOx2j4zpVbtoKCUUDhznmPBMBm0cc7pCmL6dD48ByAQC0gcAfVQpPc=w815-h513-no?authuser=1");
+        setColor(Color.ORANGE);
     }
 
     @Override

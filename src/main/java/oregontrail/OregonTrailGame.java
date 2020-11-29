@@ -14,6 +14,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.List;
@@ -24,18 +25,22 @@ import static oregontrail.OTGameStatus.*;
 
 public class OregonTrailGame {
 
-    public final double END_DISTANCE = 2000.0; //Miles
+    public Double END_DISTANCE; //1807-2083 Total miles depending on path chosen
 
     public OregonTrailPlayer owner;
     public Wagon wagon;
     public GeneralStore store;
-    public int distanceTraveled = 0; //2000 miles total
+    public int distanceTraveled = 0;
     public int daysElapsed = 0;
     public RationsEnum rations = RationsEnum.FILLING;
     public int score = 0;
     private boolean rest = false; //Did you rest this turn
     public Queue<Location> landMarks;
     public Location currentLocation;
+    public List<Location> splitPathsChoosen = new LinkedList<>();
+    //Use for build progress image
+    public int startX = 0;
+    public int endX = 102;
 
     private MessageReceivedEvent event;
     private static DecimalFormat formatPercent = new DecimalFormat("##0.##");
@@ -194,7 +199,7 @@ public class OregonTrailGame {
         }
         else if (rand < 11) {
             // Theft
-            String item = wagon.removeRandomItem();
+            String item = wagon.removeOneRandomItem();
             if (item != null) {
                 event.getChannel().sendMessage("1 " + item + " has been stolen from you.").queue();
             }
@@ -290,14 +295,14 @@ public class OregonTrailGame {
      * Return boolean if game is over
      * @return
      */
-    private boolean isGameOver() {
+    public boolean isGameOver() {
         // All players dead - LOSE
         if (wagon.getParty().stream().allMatch(m -> m.health <= 0)) {
             return true;
         }
 
         // WIN
-        if (distanceTraveled >= END_DISTANCE) {
+        if (END_DISTANCE != null && distanceTraveled >= END_DISTANCE) {
             return true;
         }
 
@@ -314,10 +319,27 @@ public class OregonTrailGame {
     }
 
     /**
+     * Return true for win, else false for loss
+     * @return
+     */
+    public boolean isWin() {
+        // All players dead - LOSE
+        if (wagon.getParty().stream().allMatch(m -> m.health <= 0)) {
+            return false;
+        }
+
+        // WIN
+        if (END_DISTANCE != null && distanceTraveled >= END_DISTANCE) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Return OTGameStatus if game is over and send messages
      * @return
      */
-    private OTGameStatus gameOver() {
+    public OTGameStatus gameOver() {
         // All players dead - LOSE
         if (wagon.getParty().stream().allMatch(m -> m.health <= 0)) {
             buildProgressImage();
@@ -333,7 +355,7 @@ public class OregonTrailGame {
         }
 
         // WIN
-        if (distanceTraveled >= END_DISTANCE) {
+        if (END_DISTANCE != null && distanceTraveled >= END_DISTANCE) {
             //Formula for score
             EmbedBuilder eb = new EmbedBuilder();
             eb.setImage("https://lh3.googleusercontent.com/pw/ACtC-3cV-AT_mz5aa2SckZ4h4efAzepBYf8aPJTcgY2e5sXAAmUpco74KzW1jZiGFpDlERK914sZPVLyfAzDG3n2YTnOeNd7ExFs76hQg1vScdciZXqlDe24BtF7Bp7ppBGDpVfA5oqmbBzD-AcviVTeVcg=w800-h474-no?authuser=1");
@@ -554,7 +576,8 @@ public class OregonTrailGame {
                     double healChance = CorneliusUtils.randomNumber01();
                     if (healChance <= 0.5) {
                         diseasesHealed.add(disease);
-                        event.getChannel().sendMessage(member.name + " healed from " + disease.name).queue();
+                        member.getImmunity().put(disease.name, 0);
+                        event.getChannel().sendMessage(member.name + " healed from " + disease.name + " (Immune to " + disease.name + " 7 days)").queue();
                     }
                 }
                 //Remove healed diseases
@@ -625,16 +648,30 @@ public class OregonTrailGame {
         //Begin with mountains as background
         BufferedImage result = null;
         Graphics g = null;
+        double DEFAULT_END_DISTANCE = 2083.0;
         try {
             result = ImageIO.read(new File("src/main/java/oregontrail/assets/mountains.png"));
             g = result.getGraphics();
 
-            double percentage = distanceTraveled / END_DISTANCE;
+            double percentage = distanceTraveled / (END_DISTANCE == null ? DEFAULT_END_DISTANCE : END_DISTANCE);
             int x = (int)Math.round(1800.0 - (percentage * 1800.0));
+
+            //Overlay next landmark
+            if (landMarks.size() > 0) {
+                Location l = landMarks.peek();
+                BufferedImage landmark = ImageIO.read(new URL(l.getImageURL()));
+                int distanceBetweenLocationAndWagon = Math.max(l.getDistance() - distanceTraveled, 0);
+                double lPercentage = 1 - (distanceBetweenLocationAndWagon / (double)endX);
+                int temp = (int)Math.round(lPercentage * (1800 - distanceTraveled));
+                g.drawImage(landmark, temp, 370, 200, 200, null);
+                landmark.flush();
+            }
+
             //Overlay wagon
-            BufferedImage piece = ImageIO.read(new File("src/main/java/oregontrail/assets/wagon.png"));
-            g.drawImage(piece, x, 370, 200, 200, null);
-            piece.flush();
+            BufferedImage wagon = ImageIO.read(new File("src/main/java/oregontrail/assets/wagon.png"));
+            g.drawImage(wagon, x, 370, 200, 200, null);
+            wagon.flush();
+
             ImageIO.write(result, "png", new File("src/main/java/oregontrail/gameState.png"));
         } catch (IOException e) {
             e.printStackTrace();
@@ -655,9 +692,8 @@ public class OregonTrailGame {
         eb.setTitle("Team Conditions:");
         eb.addField("Days Elapsed: ", String.valueOf(daysElapsed), true);
         eb.addField("Distance Traveled: ", String.valueOf(distanceTraveled), true);
-        if (landMarks.size() > 0) { //TODO WE MAY NOT NEED THIS IF WE ADD WILLIAMETTE VALLEY AS A LANDMARK
-            eb.addField("Next Landmark: ", String.valueOf(landMarks.peek().getDistance() - distanceTraveled), true);
-        }
+        if (landMarks.size() > 0)
+        eb.addField("Next Landmark (" + landMarks.peek().toString() + "): ", String.valueOf(landMarks.peek().getDistance() - distanceTraveled), true);
         eb.addField("Pace: ", wagon.getPace() + " hours / day", true);
         eb.addField("Rations: ", String.format("%s (%d food per person / day)", rations.name, rations.quantity), true);
         for (OregonTrailPlayer player : wagon.getParty()) {
@@ -683,7 +719,7 @@ public class OregonTrailGame {
     public void update() {
         if (rest) {
             EmbedBuilder restImage = new EmbedBuilder();
-            restImage.setImage("https://lh3.googleusercontent.com/pw/ACtC-3fdQWxOURwdivpTrmEifX-C8w7w4ByOCTk8GSoYAsH5X9F1zSK6ohR6SNJpAJEW-JorI1R4rLxECGlOjAFXiPT2I3DhFi5jJ8q7JBsonnmtfdSxejnZG8koaWyun5XnDCjisO0vjQyv0hNlRwq0ikI=w640-h332-no?authuser=1");
+            restImage.setImage(Location.getRestURL());
             event.getChannel().sendMessage(restImage.build()).queue();
         }
         else {
@@ -701,23 +737,26 @@ public class OregonTrailGame {
     public Location checkLandMarks() {
         Location location = landMarks.peek();
         if (landMarks.size() == 0) return null;
+        if (location.toString().startsWith("Willamette") && END_DISTANCE == null) {
+            END_DISTANCE = (double) location.getDistance();
+        }
         if (distanceTraveled >= location.getDistance()) {
             distanceTraveled = location.getDistance(); //Once we reach landmark set distance traveled to it
             currentLocation = location;
             if (location.toString().contains("River")){
                 EmbedBuilder locationEB = new EmbedBuilder();
-                locationEB.setTitle("You made it to the " + location.toString() + " (day " + daysElapsed + ")");
+                locationEB.setTitle("You made it to the " + location.toString() + " (day " + daysElapsed + ") - mile " + distanceTraveled);
                 if (location.toString().contains("Big Blue River")) {
-                    locationEB.setImage("https://lh3.googleusercontent.com/pw/ACtC-3cGXBWmS8C29s2d-x-rZNY5670LKA1Wq66zdVxmKF7KLJJJOO4L7KuSv02kitVMLvbIF1HzOGD1KLXyojS5BvY5IsXA-S5XIQXynhhmwyVtvNkOgyiZRxSyEBAEvE1ZH_AL_Q_ouK7UeJbjkmHcGFkp=w470-h180-no?authuser=1");
+                    locationEB.setImage(currentLocation.getImageURL());
                 }
                 else if (location.toString().contains("Kansas River")) {
-                    locationEB.setImage("https://lh3.googleusercontent.com/pw/ACtC-3dJ-1a23u2dwPqv3QjUpVf090Acey7reK7dCB3-_KQ8QA00_I1MT0e86I-Lh0dZFy-4rXMN_-3fcq_o6mZw5EheKr5PVDBCax-cqv_8SyZpfAFkTfJo0MUCgNPRg87U8ko9pL2K34Mryz4hkTmw2plE=w644-h325-no?authuser=1");
+                    locationEB.setImage(currentLocation.getImageURL());
                 }
                 else if (location.toString().contains("Green River")) {
-                    locationEB.setImage("https://lh3.googleusercontent.com/pw/ACtC-3d_0F8kDaTDoc2aJgYqdxfZP96O_F0nvhrlSEK-MpZta-dw4ropT5GF9ZYqTqOzZYh6fcb_HRf8QwtcicuOtqHmN612dOxn6xSPVkslosY_O68GT8rsy8Ed6FkLE_QggyFppSt4ffwCKepLH3prul1X=w699-h370-no?authuser=1");
+                    locationEB.setImage(currentLocation.getImageURL());
                 }
                 else if (location.toString().contains("Snake River")) {
-                    locationEB.setImage("https://lh3.googleusercontent.com/pw/ACtC-3cJ3Dsq0DCTM7riV68Uxc9YNJxU5wzj-i3s7FodmoAxCbtaakBurRMDfmRHCg8KT5GqmdIEyR0_u3-v9V4GMMfZKQcZN7v7oRYfamccVsvEdiqu-ZygI772qxkknUW1-_ftak_cz7rY_Xgw_kn1PdgC=w640-h402-no?authuser=1");
+                    locationEB.setImage(currentLocation.getImageURL());
                 }
                 locationEB.setFooter(location.getDescription());
                 event.getChannel().sendMessage(locationEB.build()).queue();
@@ -730,50 +769,75 @@ public class OregonTrailGame {
             }
             else if (location.toString().contains("Fort")) {
                 EmbedBuilder locationEB = new EmbedBuilder();
-                locationEB.setTitle("You made it to the " + location.toString() + " (day " + daysElapsed + ")");
+                locationEB.setTitle("You made it to the " + location.toString() + " (day " + daysElapsed + ") - mile " + distanceTraveled);
                 if (location.toString().contains("Kearney")) {
                     // Initialize Kearney store
                     store = new KearneyGeneralStore(event);
                     // Fort Kearney building
-                    locationEB.setImage("https://lh3.googleusercontent.com/pw/ACtC-3ebaM9yP6x_Q1SqzriI9q_mQKENvtrkfzgJFlh61P4_6cWBr-lNpLadS1WNX1sWsQN02_aqMJZCGBc_q1FLabcOSsF3lHHQI2Ns9_-xoRayD69gASmxCJDu1jKdVEhqJZ33Njuqb_nezuvV9Pbmf9o_=w562-h355-no?authuser=1");
+                    locationEB.setImage(store.getBuildingURL());
                 }
                 else if (location.toString().contains("Laramie")) {
                     // Initialize Laramie store
                     store = new LaramieGeneralStore(event);
                     // Fort laramie building
-                    locationEB.setImage("https://lh3.googleusercontent.com/pw/ACtC-3cdtiF7weDskn2ekVMSnUxCL7m_dh4bAYUzawTNym0dPpmEJ44Ka4Dw92aAA_NK2JDsL7AqB0bN96MehN6Nkj3SB3KRRk-yLtJOx2j4zpVbtoKCUUDhznmPBMBm0cc7pCmL6dD48ByAQC0gcAfVQpPc=w815-h513-no?authuser=1");
+                    locationEB.setImage(store.getBuildingURL());
                 }
                 else if (location.toString().contains("Bridger")) {
                     // Initialize Bridger store
                     store = new BridgerGeneralStore(event);
                     // Fort Bridger building
-                    locationEB.setImage("https://lh3.googleusercontent.com/pw/ACtC-3cAjkTk2r-ucbMhOnNiKKy3JqYjv4_1tMSa207fD8qHYqEBKCm_19B0_40670Kk-oKtZUuyCPBnr1Ow8zm08iix6yr1-m7w78q87nDD8d1cecnbHDPp56p270j6XeTCV0IMGx5J6QNFY0aJbM0Vd46l=w562-h347-no?authuser=1");
+                    locationEB.setImage(store.getBuildingURL());
                 }
                 else if (location.toString().contains("Hall")) {
                     // Initialize Hall store
                     store = new HallGeneralStore(event);
                     // Fort Hall building
-                    locationEB.setImage("https://lh3.googleusercontent.com/pw/ACtC-3feczRjGInpzr0dwb5V0a-aleEZtotViecOBPx4qEwjoZ0YTW7pPVC96wo-vkWRVw9x8srKkZ1I6GVjzGjHBTR7xgO0OQ9UAOg3gCrgsZOuoDZet_xxoHfei9JcdkbwU_1aAsL24WbVolSc748IGwWZ=w1070-h588-no?authuser=1");
+                    locationEB.setImage(store.getBuildingURL());
                 }
                 else if (location.toString().contains("Boise")) {
                     // Initialize Boise store
                     store = new BoiseGeneralStore(event);
                     // Fort Boise building
-                    locationEB.setImage("https://lh3.googleusercontent.com/pw/ACtC-3d980Uaj6jZQ-E8kwEg0IHqwstxWhGQ7s5aqhxNXFpNenGxC5psnKnAMnRpGCGg5pixWBQU8kQudNaF8hwvB5K9u0qjDKsTAyg1ephLKMBltjeaA2YFh4noZqla76lZDWZd0FAJIamtXs7k8LBcqIrF=w561-h352-no?authuser=1");
+                    locationEB.setImage(store.getBuildingURL());
+                }
+                else if (location.toString().contains("Walla")) {
+                    // Initialize Walla Walla store
+                    store = new WallaWallaGeneralStore(event);
+                    // Fort Walla Walla building
+                    locationEB.setImage(store.getBuildingURL());
                 }
                 locationEB.setFooter(location.getDescription());
                 event.getChannel().sendMessage(locationEB.build()).queue();
                 event.getChannel().sendMessage(location.getFortOptions()).queue();
             }
-            else if (location.toString().contains("Pass")) {
+            else if (location.toString().contains("South Pass")) {
                 EmbedBuilder locationEB = new EmbedBuilder();
-                locationEB.setTitle("Half way point! " + location.toString() + " (day " + daysElapsed + ")");
-                locationEB.setImage("https://lh3.googleusercontent.com/pw/ACtC-3eMBlCmBYjQuVNgQ68AEAZIcOV9zF8rxe94hO5mZBz2WDBt7CFpW21KxI2NwkLzW8YnMV5Xowj_fCTNC14VYuxKzaBQFm19NyA9iHhXN7YnqiONVSrd4zfSgxxe69wYCdSLqiavlQmCB7rRCXfoFl-l=w639-h393-no?authuser=1");
+                locationEB.setTitle("Half way point! " + location.toString() + " (day " + daysElapsed + ") - mile " + distanceTraveled);
+                locationEB.setImage(currentLocation.getImageURL());
                 locationEB.setFooter(location.getDescription());
                 event.getChannel().sendMessage(locationEB.build()).queue();
                 event.getChannel().sendMessage(location.getSouthPassOptions()).queue();
             }
-            return landMarks.poll();
+            else if (location.toString().contains("Grande Ronde")) {
+                EmbedBuilder locationEB = new EmbedBuilder();
+                locationEB.setTitle("You're almost to the end! " + location.toString() + " (day " + daysElapsed + ") - mile " + distanceTraveled);
+                locationEB.setImage(currentLocation.getImageURL());
+                locationEB.setFooter(location.getDescription());
+                event.getChannel().sendMessage(locationEB.build()).queue();
+                event.getChannel().sendMessage(((GrandeRonde)location).getGrandeRondeOptions()).queue();
+            }
+            else if (location.toString().contains("Dalles")) {
+                EmbedBuilder locationEB = new EmbedBuilder();
+                locationEB.setTitle(location.toString() + " (day " + daysElapsed + ") - " + distanceTraveled);
+                locationEB.setImage(currentLocation.getImageURL());
+                locationEB.setFooter(location.getDescription());
+                event.getChannel().sendMessage(locationEB.build()).queue();
+                event.getChannel().sendMessage(((Dalles)location).getDallesOptions()).queue();
+            }
+            Location tempL = landMarks.poll();
+            startX = distanceTraveled;
+            endX = landMarks.size() > 0 ? landMarks.peek().getDistance() : startX + 125;
+            return tempL;
         }
         return null;
     }
@@ -795,12 +859,67 @@ public class OregonTrailGame {
                 tempStatus = fortStop(split[0]);
                 if (tempStatus != RUNNING) return tempStatus;
             }
-            else if (currentLocation.getClass().getSimpleName().contains("Pass")) {
+            else if (currentLocation.getClass().getSimpleName().contains("SouthPass")) {
                 tempStatus = southPathStop(split[0]);
+                if (tempStatus != RUNNING) return tempStatus;
+            }
+            else if (currentLocation.getClass().getSimpleName().contains("GrandeRonde")) {
+                tempStatus = grandeRondeStop(split[0]);
+                if (tempStatus != RUNNING) return tempStatus;
+            }
+            else if (currentLocation.getClass().getSimpleName().contains("Dalles")) {
+                tempStatus = dallesStop(split[0]);
                 if (tempStatus != RUNNING) return tempStatus;
             }
         }
         return gameOver();
+    }
+
+    /**
+     * Logic for selected choice at a Dalles
+     * @param selectedOption
+     */
+    private OTGameStatus dallesStop(String selectedOption) {
+        switch (selectedOption) {
+            case "1": //Take raft down the river (Shorter but more dangerous)
+                if (splitPathsChoosen.get(0).getClass().getSimpleName().contains("GreenRiver")) { // Took Green River Crossing
+                    if (splitPathsChoosen.get(1).getClass().getSimpleName().contains("Dalles")) { // Took Shortcut to Dalles
+                        landMarks.add(new WillametteValley(1807));
+                    }
+                    else { // Went to Walla Walla
+                        landMarks.add(new WillametteValley(1979));
+                    }
+                }
+                else { // Went to Fort Bridger
+                    if (splitPathsChoosen.get(1).getClass().getSimpleName().contains("Dalles")) { // Took Shortcut to Dalles
+                        landMarks.add(new WillametteValley(1898));
+                    }
+                    else { // Went to Walla Walla
+                        landMarks.add(new WillametteValley(2073));
+                    }
+                }
+                wagon.raft(this);
+                break;
+            case "2": //Take the Barlow Toll Road (Safer but 10 miles longer)
+                if (splitPathsChoosen.get(0).getClass().getSimpleName().contains("GreenRiver")) { // Took Green River Crossing
+                    if (splitPathsChoosen.get(1).getClass().getSimpleName().contains("Dalles")) { // Took Shortcut to Dalles
+                        landMarks.add(new WillametteValley(1817));
+                    }
+                    else { // Went to Walla Walla
+                        landMarks.add(new WillametteValley(1989));
+                    }
+                }
+                else { // Went to Fort Bridger
+                    if (splitPathsChoosen.get(1).getClass().getSimpleName().contains("Dalles")) { // Took Shortcut to Dalles
+                        landMarks.add(new WillametteValley(1908));
+                    }
+                    else { // Went to Walla Walla
+                        landMarks.add(new WillametteValley(2083));
+                    }
+                }
+                break;
+        }
+        return RUNNING;
     }
 
     /**
@@ -810,17 +929,51 @@ public class OregonTrailGame {
     private OTGameStatus southPathStop(String selectedOption) {
         switch (selectedOption) {
             case "1": //Go to Fort Bridger
+                splitPathsChoosen.add(new FortBridger(-1));
                 landMarks.add(new FortBridger(989));
                 landMarks.add(new GreenRiverCrossing(1151));
                 landMarks.add(new FortHall(1395));
                 landMarks.add(new SnakeRiverCrossing(1534));
                 landMarks.add(new FortBoise(1648));
+                landMarks.add(new GrandeRonde(1798));
                 break;
             case "2": //Take shortcut to Green River Crossing and skip Fort Bridger
+                splitPathsChoosen.add(new GreenRiverCrossing(-1));
                 landMarks.add(new GreenRiverCrossing(1057));
                 landMarks.add(new FortHall(1258));
                 landMarks.add(new SnakeRiverCrossing(1440));
                 landMarks.add(new FortBoise(1554));
+                landMarks.add(new GrandeRonde(1714));
+                break;
+        }
+        return RUNNING;
+    }
+
+    /**
+     * Logic for selected choice at Grande Ronde in the Blue Mountains
+     * @param selectedOption
+     */
+    private OTGameStatus grandeRondeStop(String selectedOption) {
+        switch (selectedOption) {
+            case "1": //Go to Fort Walla Walla
+                splitPathsChoosen.add(new FortWallaWalla(-1));
+                if (splitPathsChoosen.get(0).getClass().getSimpleName().contains("GreenRiver")) { // Took Green River Crossing
+                    landMarks.add(new FortWallaWalla(1769));
+                    landMarks.add(new Dalles(1889, false));
+                }
+                else { // Went to Fort Bridger
+                    landMarks.add(new FortWallaWalla(1863));
+                    landMarks.add(new Dalles(1983, false));
+                }
+                break;
+            case "2": //Take shortcut to Dalles and skip Fort Walla Walla
+                splitPathsChoosen.add(new Dalles(-1, true));
+                if (splitPathsChoosen.get(0).getClass().getSimpleName().contains("GreenRiver")) { // Took Green River Crossing
+                    landMarks.add(new Dalles(1717, true));
+                }
+                else { // Went to Fort Bridger
+                    landMarks.add(new Dalles(1808, true));
+                }
                 break;
         }
         return RUNNING;
@@ -837,25 +990,22 @@ public class OregonTrailGame {
             case "2": //Buy Supplies
                 EmbedBuilder generalStoreEB = new EmbedBuilder();
                 if (currentLocation.getClass().getSimpleName().contains("Kearney")) {
-                    generalStoreEB.setColor(Color.GREEN);
-                    generalStoreEB.setImage(store.getImageURL());
-                    event.getChannel().sendMessage(generalStoreEB.build()).queue();
+                    generalStoreEB.setColor(store.getColor());
                 }
                 else if (currentLocation.getClass().getSimpleName().contains("Laramie")) {
-                    generalStoreEB.setColor(Color.ORANGE);
-                    generalStoreEB.setImage(store.getImageURL());
-                    event.getChannel().sendMessage(generalStoreEB.build()).queue();
+                    generalStoreEB.setColor(store.getColor());
                 }
                 else if (currentLocation.getClass().getSimpleName().contains("Bridger")) {
-                    generalStoreEB.setColor(Color.BLUE);
-                    generalStoreEB.setImage(store.getImageURL());
-                    event.getChannel().sendMessage(generalStoreEB.build()).queue();
+                    generalStoreEB.setColor(store.getColor());
                 }
                 else if (currentLocation.getClass().getSimpleName().contains("Hall")) {
-                    generalStoreEB.setColor(Color.YELLOW);
-                    generalStoreEB.setImage(store.getImageURL());
-                    event.getChannel().sendMessage(generalStoreEB.build()).queue();
+                    generalStoreEB.setColor(store.getColor());
                 }
+                else if (currentLocation.getClass().getSimpleName().contains("Walla")) {
+                    generalStoreEB.setColor(store.getColor());
+                }
+                generalStoreEB.setImage(store.getStoreURL());
+                event.getChannel().sendMessage(generalStoreEB.build()).queue();
                 event.getChannel().sendMessage( wagon.printInventory() + "\nWhich item and how many of that item would you like to buy ex: `1 2` or `7 1500`? Or type `leave` to leave store").queue();
                 return STORE;
         }
@@ -866,7 +1016,7 @@ public class OregonTrailGame {
      * Logic for selected choice at a river.
      * @param selectedOption
      */
-    private OTGameStatus riverCrossing (String selectedOption) {
+    private OTGameStatus riverCrossing(String selectedOption) {
         River riverCrossing = (River) currentLocation;
         double success;
         EmbedBuilder riverEB;
@@ -876,7 +1026,7 @@ public class OregonTrailGame {
                 riverEB = new EmbedBuilder();
                 boolean fail = false;
                 if (riverCrossing.getDepth() >= 3) { //Too deep
-                    riverEB.setImage("https://lh3.googleusercontent.com/pw/ACtC-3e4Htbc9YHbuFBGFoAUBxQw_N5em2aWHwU3pJJJkyl1cs7lRmNe13Mvz84VMPKC_hGnPuPynY2tnWMQ4fmyYXfO0R3xENo514Jjbn35233cbps_Kh_Nh2QFEz-CsyA0OnFQu3Y5iR8EQv02ZzlTD2LJ=w300-h213-no?authuser=1");
+                    riverEB.setImage(Location.getWagonSunkURL());
                     riverEB.setTitle("River is too deep to cross!");
                     event.getChannel().sendMessage(riverEB.build()).queue();
                     fail = true;
@@ -885,7 +1035,7 @@ public class OregonTrailGame {
                     event.getChannel().sendMessage("You successfully crossed the river!").queue();
                 }
                 else {
-                    riverEB.setImage("https://lh3.googleusercontent.com/pw/ACtC-3e4Htbc9YHbuFBGFoAUBxQw_N5em2aWHwU3pJJJkyl1cs7lRmNe13Mvz84VMPKC_hGnPuPynY2tnWMQ4fmyYXfO0R3xENo514Jjbn35233cbps_Kh_Nh2QFEz-CsyA0OnFQu3Y5iR8EQv02ZzlTD2LJ=w300-h213-no?authuser=1");
+                    riverEB.setImage(Location.getWagonSunkURL());
                     riverEB.setTitle("You failed to cross the river!");
                     event.getChannel().sendMessage(riverEB.build()).queue();
                     fail = true;
@@ -903,7 +1053,7 @@ public class OregonTrailGame {
                     event.getChannel().sendMessage("You spend a day caulking the wagon and successfully cross the river!").queue();
                 }
                 else {
-                    riverEB.setImage("https://lh3.googleusercontent.com/pw/ACtC-3e4Htbc9YHbuFBGFoAUBxQw_N5em2aWHwU3pJJJkyl1cs7lRmNe13Mvz84VMPKC_hGnPuPynY2tnWMQ4fmyYXfO0R3xENo514Jjbn35233cbps_Kh_Nh2QFEz-CsyA0OnFQu3Y5iR8EQv02ZzlTD2LJ=w300-h213-no?authuser=1");
+                    riverEB.setImage(Location.getWagonSunkURL());
                     riverEB.setTitle("You failed to cross the river!");
                     event.getChannel().sendMessage(riverEB.build()).queue();
                     wagon.failedRiverCrossing();
@@ -917,11 +1067,10 @@ public class OregonTrailGame {
                     }
                     else {
                         for (int i = 0; i < 3; i++) {
-                            rest();
                             wagon.nextDay(this, false, true);
                         }
                         wagon.setClothes(wagon.getClothes() - 3);
-                        event.getChannel().sendMessage("You are guided through the Snake River Crossing for a cost of 3 sets of clothing...").queue();
+                        event.getChannel().sendMessage("A Shoshoni Indian guides you through the Snake River Crossing for a cost of 3 sets of clothing...").queue();
                     }
                 }
                 else {
@@ -929,6 +1078,7 @@ public class OregonTrailGame {
                         rest();
                         wagon.nextDay(this, false, true);
                     }
+                    wagon.setCash(wagon.getCash() - 5);
                     event.getChannel().sendMessage("You take the ferry across for a fee of $5. The trip takes 5 days...").queue();
                 }
                 break;
@@ -937,7 +1087,7 @@ public class OregonTrailGame {
                 wagon.nextDay(this, false, true);
                 EmbedBuilder locationEB = new EmbedBuilder();
                 locationEB.setTitle( "Day " + daysElapsed);
-                locationEB.setImage("https://lh3.googleusercontent.com/pw/ACtC-3dJ-1a23u2dwPqv3QjUpVf090Acey7reK7dCB3-_KQ8QA00_I1MT0e86I-Lh0dZFy-4rXMN_-3fcq_o6mZw5EheKr5PVDBCax-cqv_8SyZpfAFkTfJo0MUCgNPRg87U8ko9pL2K34Mryz4hkTmw2plE=w644-h325-no?authuser=1");
+                locationEB.setImage(Location.getRestURL());
                 locationEB.setFooter(currentLocation.getDescription());
                 event.getChannel().sendMessage(locationEB.build()).queue();
                 event.getChannel().sendMessage(currentLocation.getRiverOptions()).queue();
